@@ -16,7 +16,7 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur">
+        <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-white/90 via-white/85 to-white/90 border-b border-[var(--loomina-gold)]/30 shadow-sm backdrop-blur-xl">
             <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4 md:px-10">
                 <Link href="/" className="relative h-[52px] w-[170px] shrink-0">
                     <Image
@@ -28,7 +28,7 @@ export default function Header() {
                     />
                 </Link>
 
-                <nav className="hidden items-center gap-8 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--loomina-text)] md:flex">
+                <nav className="hidden items-center gap-2 md:flex">
                     {NAV_LINKS.map((item) => {
                         const isActive = pathname === item.href;
 
@@ -36,19 +36,31 @@ export default function Header() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`px-1 py-2 transition-colors duration-200 ${
+                                className={`group relative rounded-full px-5 py-2 text-[13px] font-semibold uppercase tracking-[0.18em] transition-colors duration-300 ${
                                     isActive
-                                        ? "text-[var(--loomina-burgundy)] underline underline-offset-8 decoration-2"
-                                        : "text-[var(--loomina-text-light)] hover:text-[var(--loomina-burgundy)] hover:underline hover:underline-offset-8 hover:decoration-2"
+                                        ? "text-[var(--loomina-burgundy)]"
+                                        : "text-[var(--loomina-text-light)] hover:text-[var(--loomina-burgundy)]"
                                 }`}
                             >
-                                {item.label}
+                                <span className="relative z-10">{item.label}</span>
+                                <span
+                                    className={`absolute inset-0 rounded-full bg-[var(--loomina-gold)]/15 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
+                                        isActive ? "opacity-100" : ""
+                                    }`}
+                                    aria-hidden
+                                />
+                                <span
+                                    className={`absolute left-1/2 bottom-1 h-[2px] w-0 -translate-x-1/2 rounded-full bg-[var(--loomina-gold)] transition-all duration-300 group-hover:w-10 ${
+                                        isActive ? "w-10" : ""
+                                    }`}
+                                    aria-hidden
+                                />
                             </Link>
                         );
                     })}
                     <Link
                         href="/offres"
-                        className="rounded-full border border-[var(--loomina-burgundy)] px-4 py-2 text-[var(--loomina-burgundy)] transition hover:bg-[var(--loomina-burgundy)] hover:text-white"
+                        className="ml-3 rounded-full border border-[var(--loomina-gold)]/60 bg-[var(--loomina-burgundy)] px-5 py-2 text-[13px] font-semibold uppercase tracking-[0.18em] text-white shadow-sm transition hover:-translate-y-[1px] hover:shadow-md hover:shadow-[var(--loomina-gold)]/20"
                     >
                         Découvrir
                     </Link>
@@ -56,7 +68,7 @@ export default function Header() {
 
                 <button
                     type="button"
-                    className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white/80 p-2 text-[var(--loomina-text)] shadow-sm transition hover:bg-slate-100 md:hidden"
+                    className="inline-flex items-center justify-center rounded-full border border-[var(--loomina-gold)]/40 bg-white/80 p-2 text-[var(--loomina-text)] shadow-sm transition hover:bg-[var(--loomina-gold)]/10 md:hidden"
                     aria-label="Ouvrir le menu"
                     onClick={() => setIsOpen((open) => !open)}
                 >
@@ -86,19 +98,19 @@ export default function Header() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-[0.12em] transition hover:border-[var(--loomina-burgundy)] hover:text-[var(--loomina-burgundy)] ${
+                                className={`flex items-center justify-between rounded-xl border border-[var(--loomina-gold)]/30 bg-white/95 px-4 py-3 text-[13px] font-semibold uppercase tracking-[0.15em] shadow-sm transition hover:-translate-y-[1px] hover:border-[var(--loomina-gold)]/60 hover:shadow ${
                                     isActive ? "text-[var(--loomina-burgundy)]" : "text-[var(--loomina-text-light)]"
                                 }`}
                                 onClick={() => setIsOpen(false)}
                             >
                                 {item.label}
-                                <span className="h-[3px] w-5 rounded-full bg-[var(--loomina-burgundy)]" aria-hidden />
+                                <span className="h-2 w-2 rounded-full bg-[var(--loomina-gold)]" aria-hidden />
                             </Link>
                         );
                     })}
                     <Link
                         href="/offres"
-                        className="flex items-center justify-center rounded-lg border border-[var(--loomina-burgundy)] bg-[var(--loomina-burgundy)] px-4 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:brightness-110"
+                        className="flex items-center justify-center rounded-xl bg-[var(--loomina-burgundy)] px-4 py-3 text-[13px] font-semibold uppercase tracking-[0.15em] text-white shadow-md shadow-[var(--loomina-gold)]/20 transition hover:-translate-y-[1px]"
                         onClick={() => setIsOpen(false)}
                     >
                         Découvrir nos offres
