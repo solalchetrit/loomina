@@ -6,22 +6,18 @@
 }
 
 :root {
-  /* Palette minimaliste et premium (Quiet Luxury) */
-  --loomina-burgundy: #4b2f36; /* Accent merlot profond */
-  --loomina-burgundy-dark: #342127;
-  --loomina-gold: #c5a572; /* Doré désaturé pour les détails */
-  --loomina-gold-light: #e6dcc7; /* Sable clair pour les surfaces */
-  --loomina-cream: #f7f3ec; /* Fond ivoire calme */
-  --loomina-text: #1f232b; /* Encre douce */
-  --loomina-text-light: #4b505d; /* Gris fumé */
-
-  /* Fond lisse et feutré pour limiter les distractions visuelles */
-  --background: linear-gradient(180deg, #f9f6f1 0%, #f4f0e8 100%);
-  --foreground: var(--loomina-text);
+  --loomina-black: #0a0a0a;
+  --loomina-white: #ffffff;
+  --loomina-gray-light: #f4f4f5;
+  --loomina-gray-dark: #27272a;
+  --loomina-gold: #d4af37;
+  --loomina-gold-light: #f3e5c2;
+  --background: #ffffff;
+  --foreground: var(--loomina-black);
 }
 
 body {
-  color: var(--loomina-text);
+  color: var(--foreground);
   background: var(--background);
   margin: 0;
   padding: 0;

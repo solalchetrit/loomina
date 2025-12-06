@@ -35,17 +35,17 @@ export default function FidjooFAQ() {
     };
 
     return (
-        <div className="w-full max-w-[800px] mx-auto flex flex-col gap-5 font-[family-name:var(--font-quicksand)] text-[var(--loomina-text)]">
+        <div className="w-full max-w-[800px] mx-auto flex flex-col gap-5 font-[family-name:var(--font-quicksand)] text-[var(--loomina-black)]">
             {faqData.map((item, index) => {
                 const isOpen = openIndex === index;
                 return (
                     <div
                         key={index}
-                        className={`bg-[var(--loomina-cream)] rounded-[16px] overflow-hidden transition-all duration-300 border border-[var(--loomina-burgundy)]/10 ${isOpen ? 'shadow-lg' : 'shadow-sm'}`}
+                        className={`bg-[var(--loomina-gray-light)] rounded-[16px] overflow-hidden transition-all duration-300 border border-[var(--loomina-black)]/10 ${isOpen ? 'shadow-lg' : 'shadow-sm'}`}
                     >
                         <button
                             onClick={() => toggleFAQ(index)}
-                            className={`w-full flex items-center justify-between px-6 py-5 bg-transparent border-none cursor-pointer text-left font-bold text-[1.08rem] transition-colors duration-200 ${isOpen ? 'text-[var(--loomina-burgundy)]' : 'text-[var(--loomina-text)]'} hover:text-[var(--loomina-burgundy)]`}
+                            className={`w-full flex items-center justify-between px-6 py-5 bg-transparent border-none cursor-pointer text-left font-bold text-[1.08rem] transition-colors duration-200 ${isOpen ? 'text-[var(--loomina-black)]' : 'text-[var(--loomina-black)]'} hover:text-[var(--loomina-black)]`}
                         >
                             <div className="flex items-center gap-[15px]">
                                 <span className="text-[var(--loomina-gold)] text-[1.4rem] flex items-center">
@@ -65,7 +65,7 @@ export default function FidjooFAQ() {
                         </button>
 
                         <div
-                            className={`overflow-hidden transition-[max-height] duration-300 ease-out text-[var(--loomina-text)] leading-[1.7] bg-[var(--loomina-cream)]`}
+                            className={`overflow-hidden transition-[max-height] duration-300 ease-out text-[var(--loomina-black)] leading-[1.7] bg-[var(--loomina-gray-light)]`}
                             style={{ maxHeight: isOpen ? '500px' : '0' }}
                         >
                             <p className="pb-[25px] pl-[69px] pr-[32px]">{item.answer}</p>

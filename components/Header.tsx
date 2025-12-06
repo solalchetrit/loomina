@@ -15,7 +15,7 @@ export default function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[var(--loomina-burgundy)]/10 bg-white/80 backdrop-blur-xl shadow-[0_12px_40px_-28px_rgba(0,0,0,0.3)]">
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--loomina-gray-dark)]/10 bg-white/80 backdrop-blur-xl shadow-[0_12px_40px_-28px_rgba(0,0,0,0.3)]">
       <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 md:px-10">
         {/* LOGO */}
         <Link href="/" className="relative h-20 w-[260px] shrink-0">
@@ -25,7 +25,7 @@ export default function Header() {
             width={260}
             height={80}
             sizes="(min-width: 1024px) 260px, 200px"
-            className="h-full w-full object-contain object-left drop-shadow-[0_10px_26px_rgba(176,79,97,0.18)]"
+            className="h-full w-full object-contain object-left drop-shadow-[0_10px_26px_rgba(0,0,0,0.16)]"
             priority
           />
         </Link>
@@ -39,11 +39,11 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={`relative transition-opacity hover:opacity-70 ${
-                  isActive ? "text-[var(--loomina-burgundy)]" : "text-[var(--loomina-text)]"
+                  isActive ? "text-[var(--loomina-gold)]" : "text-[var(--loomina-black)]"
                 }`}
               >
                 {item.label}
-                {isActive && <span className="absolute -bottom-1 left-0 h-[2px] w-full bg-gradient-to-r from-[var(--loomina-burgundy)] to-[var(--loomina-gold)]"></span>}
+                {isActive && <span className="absolute -bottom-1 left-0 h-[2px] w-full bg-[var(--loomina-gold)]"></span>}
               </Link>
             );
           })}
