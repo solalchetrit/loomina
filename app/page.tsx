@@ -37,6 +37,43 @@ const processSteps = [
   },
 ];
 
+const carePillars = [
+  {
+    title: "Une éditrice pour vous",
+    description: "Un seul interlocuteur qui suit vos rendez-vous, coordonne les relectures et prend soin des détails.",
+  },
+  {
+    title: "Photos guidées",
+    description: "Sélection et retouche légère pour garder vos images lumineuses sans dénaturer vos souvenirs.",
+  },
+  {
+    title: "Notation discrète",
+    description: "Repères dans les transcriptions pour indiquer les émotions, les silences ou les passages sensibles.",
+  },
+  {
+    title: "Relecture en duo",
+    description: "Vous relisez avec nous : nous ajustons ensemble la voix, les tournures et les titres des chapitres.",
+  },
+];
+
+const sharingFormats = [
+  {
+    title: "Coffret prêt à offrir",
+    detail: "Livres reliés protégés, signets inclus et petit mot imprimé si vous souhaitez l'ajouter.",
+    tag: "Objet fini",
+  },
+  {
+    title: "Espace privé",
+    detail: "Lien sécurisé pour partager la version numérique avec les proches sans inscription compliquée.",
+    tag: "Numérique",
+  },
+  {
+    title: "Guide de partage",
+    detail: "Quelques pistes pour organiser une lecture familiale ou une remise en main propre sereine.",
+    tag: "Transmission",
+  },
+];
+
 export default function Home() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center text-[var(--loomina-ink)]">
@@ -102,6 +139,74 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full bg-white/75 backdrop-blur px-6 py-16">
+        <div className="mx-auto max-w-6xl space-y-10">
+          <div className="space-y-3 text-center">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">
+              On s'occupe des détails
+            </p>
+            <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Plus de soin éditorial, moins de gestion pour vous</h2>
+            <p className="text-[var(--loomina-muted)] max-w-3xl mx-auto leading-relaxed">
+              Nous orchestrons les rendez-vous, la mise en page et la livraison pour que vous profitiez surtout du plaisir de raconter.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.05fr,0.95fr]">
+            <div className="rounded-3xl border border-black/5 bg-white/85 p-6 glow-ring space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[var(--loomina-cloud)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--loomina-ink)] border border-black/5">
+                Soin éditorial
+              </div>
+              <h3 className="text-2xl font-semibold">Une équipe resserrée pour vous écouter</h3>
+              <p className="text-[var(--loomina-muted)] leading-relaxed">
+                Les interviews sont préparés en amont, les transcriptions relues, et votre éditrice garde le même fil conducteur tout au long du projet.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {carePillars.map((pillar) => (
+                  <div
+                    key={pillar.title}
+                    className="rounded-2xl border border-black/5 bg-[var(--loomina-cloud)] p-4 shadow-inner space-y-2"
+                  >
+                    <p className="text-sm uppercase tracking-[0.12em] text-[var(--loomina-amber-strong)] font-semibold">
+                      {pillar.title}
+                    </p>
+                    <p className="text-[var(--loomina-muted)] text-sm leading-relaxed">{pillar.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-black/5 bg-[var(--loomina-cloud)]/80 p-6 glow-ring space-y-5">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--loomina-ink)] border border-black/5">
+                Transmission
+              </div>
+              <h3 className="text-2xl font-semibold">On prépare le moment où vous partagerez le livre</h3>
+              <p className="text-[var(--loomina-muted)] leading-relaxed">
+                Votre récit est pensé pour être offert : de la maquette jusqu'à l'envoi, nous anticipons comment il sera lu et conservé.
+              </p>
+              <div className="space-y-3">
+                {sharingFormats.map((format) => (
+                  <div
+                    key={format.title}
+                    className="flex items-start gap-3 rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm"
+                  >
+                    <div className="inline-flex items-center rounded-full bg-[var(--loomina-amber)]/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--loomina-amber-strong)]">
+                      {format.tag}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-lg font-semibold text-[var(--loomina-ink)]">{format.title}</p>
+                      <p className="text-[var(--loomina-muted)] text-sm leading-relaxed">{format.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-2xl border border-black/5 bg-white/85 p-4 text-sm text-[var(--loomina-muted)]">
+                Chaque étape est documentée : vous recevez un petit récapitulatif après chaque session pour suivre la progression sans y penser.
+              </div>
+            </div>
           </div>
         </div>
       </section>
