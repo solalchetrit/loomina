@@ -56,11 +56,11 @@ export default function HowItWorks() {
   return (
     <section
       id="comment"
-      className="bg-[#0d1528] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] border-t border-white/5"
+      className="bg-[var(--loomina-cream)] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] border-t border-[var(--loomina-burgundy)]/10"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20 space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-[var(--loomina-text)] tracking-tight">
             Comment nous travaillons
           </h2>
           <p className="text-lg text-[var(--loomina-text-light)]">
@@ -72,22 +72,22 @@ export default function HowItWorks() {
           {STEPS.map((step) => (
             <div
               key={step.number}
-              className="relative bg-white/5 rounded-[2rem] p-10 shadow-[0_30px_80px_-60px_rgba(34,211,238,0.7)] border border-white/10 flex flex-col h-full backdrop-blur"
+              className="relative bg-white rounded-[2rem] p-10 shadow-[0_30px_80px_-60px_rgba(217,54,98,0.55)] border border-[var(--loomina-burgundy)]/10 flex flex-col h-full"
             >
               <div
-                className={`absolute -top-5 -left-5 w-12 h-12 rounded-full ${step.color} text-[#050915] flex items-center justify-center text-lg font-bold shadow-lg border-4 border-[#0d1528]`}
+                className={`absolute -top-5 -left-5 w-12 h-12 rounded-full ${step.color} text-white flex items-center justify-center text-lg font-bold shadow-lg border-4 border-white`}
               >
                 {step.number}
               </div>
 
               <div
-                className={`w-16 h-16 rounded-2xl border ${step.borderColor} bg-white/5 flex items-center justify-center mb-8 ${step.iconColor}`}
+                className={`w-16 h-16 rounded-2xl border ${step.borderColor} bg-[var(--loomina-cream)] flex items-center justify-center mb-8 ${step.iconColor}`}
               >
                 {step.icon}
               </div>
 
               <div className="flex-grow">
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-2xl font-bold text-[var(--loomina-text)] mb-4">
                   {step.title}
                 </h3>
                 <p className="text-[var(--loomina-text-light)] leading-relaxed mb-8">
@@ -95,7 +95,7 @@ export default function HowItWorks() {
                 </p>
               </div>
 
-              <div className="pt-6 border-t border-white/10 mt-auto">
+              <div className="pt-6 border-t border-[var(--loomina-burgundy)]/15 mt-auto">
                 <p className="text-sm font-semibold text-[var(--loomina-text-light)] uppercase tracking-wide">
                   {step.footer}
                 </p>

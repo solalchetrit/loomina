@@ -15,15 +15,15 @@ export default function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#050915]/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 md:px-10">
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--loomina-burgundy)]/10 bg-white/80 backdrop-blur-xl shadow-[0_12px_40px_-28px_rgba(0,0,0,0.3)]">
+      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 md:px-10">
         {/* LOGO */}
-        <Link href="/" className="relative h-12 w-[180px] shrink-0">
+        <Link href="/" className="relative h-14 w-[210px] shrink-0">
           <Image
             src="/header_logo.png"
             alt="Lúmina"
             fill
-            className="object-contain object-left drop-shadow-[0_10px_30px_rgba(34,211,238,0.25)]"
+            className="object-contain object-left drop-shadow-[0_10px_30px_rgba(217,54,98,0.2)]"
             priority
           />
         </Link>
@@ -37,11 +37,11 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={`relative transition-opacity hover:opacity-70 ${
-                  isActive ? "text-[var(--loomina-gold-light)]" : "text-[var(--loomina-text)]"
+                  isActive ? "text-[var(--loomina-burgundy-dark)]" : "text-[var(--loomina-text)]"
                 }`}
               >
                 {item.label}
-                {isActive && <span className="absolute -bottom-1 left-0 h-[2px] w-full bg-gradient-to-r from-[var(--loomina-gold)] to-[var(--loomina-burgundy)]"></span>}
+                {isActive && <span className="absolute -bottom-1 left-0 h-[2px] w-full bg-gradient-to-r from-[var(--loomina-burgundy)] to-[var(--loomina-gold)]"></span>}
               </Link>
             );
           })}

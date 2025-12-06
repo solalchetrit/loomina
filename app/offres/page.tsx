@@ -59,32 +59,32 @@ export default function Offres() {
                     <div className="grid md:grid-cols-[1.2fr,1fr] gap-8 items-start">
                         <div className="space-y-4">
                             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Services inclus</p>
-                            <h2 className="text-3xl font-semibold text-white">Toujours accompagnés, jamais seuls</h2>
+                            <h2 className="text-3xl font-semibold text-[var(--loomina-text)]">Toujours accompagnés, jamais seuls</h2>
                             <p className="text-[var(--loomina-text-light)] leading-relaxed">
                                 Chaque offre inclut un interlocuteur dédié, la sécurisation des données en Europe et des points de validation réguliers. Nous adaptons la cadence des entretiens à votre disponibilité et à votre confort.
                             </p>
                             <div className="grid md:grid-cols-2 gap-4 text-sm">
-                                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                                    <p className="font-semibold text-white">Coordination éditoriale</p>
+                                <div className="bg-white rounded-lg p-4 border border-[var(--loomina-burgundy)]/10 shadow-sm">
+                                    <p className="font-semibold text-[var(--loomina-text)]">Coordination éditoriale</p>
                                     <p className="text-[var(--loomina-text-light)] mt-2">Planification, suivi des interviews, propositions de chapitrage et relectures.</p>
                                 </div>
-                                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                                    <p className="font-semibold text-white">Support continu</p>
+                                <div className="bg-white rounded-lg p-4 border border-[var(--loomina-burgundy)]/10 shadow-sm">
+                                    <p className="font-semibold text-[var(--loomina-text)]">Support continu</p>
                                     <p className="text-[var(--loomina-text-light)] mt-2">Assistance sous 24h, possibilité d'ajouter des contributeurs familiaux et mise à jour du jumeau mémoriel.</p>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-gradient-to-br from-[#171b33] via-[#12192d] to-[#0b1327] text-white rounded-2xl p-8 space-y-4 border border-[var(--loomina-gold)]/30">
+                        <div className="bg-gradient-to-br from-[#ffe5da] via-[#fff3ec] to-[#e9fbf5] text-[var(--loomina-text)] rounded-2xl p-8 space-y-4 border border-[var(--loomina-burgundy)]/10">
                             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Besoin d'un format spécial ?</p>
                             <h3 className="text-2xl font-semibold">Options sur mesure</h3>
-                            <ul className="space-y-3 text-white/85">
-                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-gold)]">✦</span>Traduction bilingue ou édition internationale</li>
-                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-gold)]">✦</span>Ajout d'archives familiales (audio, photos, lettres)</li>
-                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-gold)]">✦</span>Réimpressions ou coffret collector</li>
+                            <ul className="space-y-3 text-[var(--loomina-text-light)]">
+                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-burgundy)]">✦</span>Traduction bilingue ou édition internationale</li>
+                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-burgundy)]">✦</span>Ajout d'archives familiales (audio, photos, lettres)</li>
+                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-burgundy)]">✦</span>Réimpressions ou coffret collector</li>
                             </ul>
                             <a
                                 href="mailto:offres@loomina.fr"
-                                className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-gold)] text-[#051226] font-semibold hover:brightness-110 transition"
+                                className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-burgundy)] text-white font-semibold hover:bg-[var(--loomina-burgundy-dark)] transition"
                             >
                                 Discuter d'une adaptation
                             </a>

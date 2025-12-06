@@ -23,14 +23,14 @@ const metrics = [
 
 export default function ImpactMetrics() {
   return (
-    <section className="w-full bg-[#080f1f] py-16 px-6 border-y border-white/5">
+    <section className="w-full bg-[var(--loomina-cream)] py-16 px-6 border-y border-[var(--loomina-burgundy)]/10">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">
               Confiance et impact
             </p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white leading-tight mt-2">
+            <h2 className="text-3xl md:text-4xl font-semibold text-[var(--loomina-text)] leading-tight mt-2">
               Des souvenirs qui traversent le temps
             </h2>
           </div>
@@ -43,13 +43,13 @@ export default function ImpactMetrics() {
           {metrics.map((metric) => (
             <div
               key={metric.label}
-              className="relative overflow-hidden rounded-2xl p-5 shadow-[0_30px_80px_-60px_rgba(124,58,237,0.8)] border border-white/10 bg-white/5 backdrop-blur"
+              className="relative overflow-hidden rounded-2xl p-5 shadow-[0_25px_70px_-55px_rgba(217,54,98,0.6)] border border-[var(--loomina-burgundy)]/10 bg-white"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(124,58,237,0.16),transparent_50%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(34,211,238,0.14),transparent_55%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(242,93,122,0.12),transparent_50%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(43,183,163,0.12),transparent_55%)]" />
               <div className="relative">
                 <p className="text-sm text-[var(--loomina-text-light)] mb-2">{metric.label}</p>
-                <p className="text-3xl md:text-4xl font-semibold text-white leading-tight">
+                <p className="text-3xl md:text-4xl font-semibold text-[var(--loomina-text)] leading-tight">
                   {metric.value}
                 </p>
                 <p className="text-sm text-[var(--loomina-text-light)] mt-2">{metric.detail}</p>
