@@ -48,6 +48,25 @@ const STEPS = [
       </svg>
     ),
   },
+  {
+    number: 4,
+    color: "bg-[#8B5CF6]", // Violet
+    iconColor: "text-[#8B5CF6]",
+    borderColor: "border-[#8B5CF6]/30",
+    title: "Séjour terminé",
+    description:
+      "La clé se désactive automatiquement et un récapitulatif de l'expérience est envoyé. Tout est sécurisé et transparent.",
+    footer: "Clés effacées en un clic",
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9.75 9.75 4.5 15l5.25 5.25m4.5-10.5L19.5 15l-5.25 5.25M21 4.5H3"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export default function HowItWorks() {
@@ -60,12 +79,12 @@ export default function HowItWorks() {
             Clés digitales. Simplicité. Efficacité
           </h2>
           <p className="text-lg text-neutral-600">
-            Trois étapes pour une expérience d'arrivée révolutionnaire
+            Quatre étapes pour une expérience d'arrivée révolutionnaire
           </p>
         </div>
 
-        {/* Grille des 3 cartes */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+        {/* Grille des 4 cartes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
           {STEPS.map((step) => (
             <div
               key={step.number}
