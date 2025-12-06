@@ -1,9 +1,25 @@
+import Image from "next/image";
+import FidjooFAQ from "@/components/FidjooFAQ";
+import Header from "@/components/Header";
+
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <h1 className="text-6xl font-bold">Bonjour tout le monde</h1>
-      </main>
+    <div className="min-h-screen w-full flex flex-col items-center bg-[#f2efeb]">
+      <Header />
+
+      <div className="flex flex-col items-center justify-center flex-grow py-20 gap-16">
+        <div className="relative w-[300px] h-[100px] md:w-[500px] md:h-[200px] shrink-0">
+          <Image
+            src="/logo.png"
+            alt="Title Logo"
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
+
+        <FidjooFAQ />
+      </div>
     </div>
   );
 }
