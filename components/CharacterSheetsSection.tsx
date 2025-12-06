@@ -1,79 +1,79 @@
 export default function CharacterSheetsSection() {
   return (
-    <section className="w-full bg-white py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)]">
+    <section className="w-full bg-[#080f1f] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] border-t border-white/5">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#f3edff] text-[#6f31c5] text-sm font-semibold rounded-full uppercase tracking-[0.08em]">
-            <span className="w-2 h-2 rounded-full bg-[#f0488c]"></span>
+          <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 text-[var(--loomina-gold-light)] text-sm font-semibold rounded-full uppercase tracking-[0.08em]">
+            <span className="w-2 h-2 rounded-full bg-[var(--loomina-gold)]"></span>
             Outil d'ancrage
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
             Chapitres prêts à remplir
           </h2>
-          <p className="text-lg text-neutral-600 leading-relaxed">
+          <p className="text-lg text-[var(--loomina-text-light)] leading-relaxed">
             Moments fondateurs, rencontres marquantes, voyages, habitudes... nous préparons des fiches simples pour organiser les souvenirs et choisir ce qui comptera dans le livre.
           </p>
           <div className="flex gap-4">
-            <span className="px-4 py-2 rounded-full bg-[#fdf2f7] text-[#f0488c] font-semibold text-sm">
-              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#f0488c]"></span>
+            <span className="px-4 py-2 rounded-full bg-white/5 text-[var(--loomina-gold-light)] font-semibold text-sm border border-white/10">
+              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[var(--loomina-gold)]"></span>
               Moments clés
             </span>
-            <span className="px-4 py-2 rounded-full bg-[#ebe8ff] text-[#6f31c5] font-semibold text-sm">
-              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#6f31c5]"></span>
+            <span className="px-4 py-2 rounded-full bg-white/5 text-[var(--loomina-burgundy)] font-semibold text-sm border border-white/10">
+              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[var(--loomina-burgundy)]"></span>
               Photos
             </span>
           </div>
         </div>
 
         <div className="relative">
-          <div className="absolute -left-6 -top-6 w-20 h-20 rounded-3xl bg-[#fdf2f7] opacity-70 blur-2xl"></div>
-          <div className="absolute -right-8 -bottom-10 w-24 h-24 rounded-full bg-[#e9f3ff] opacity-80 blur-3xl"></div>
-          <div className="relative bg-white rounded-3xl shadow-lg border border-[#e7e1ef] p-6 md:p-8">
+          <div className="absolute -left-6 -top-6 w-24 h-24 rounded-3xl bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.18),transparent_55%)] opacity-80 blur-2xl"></div>
+          <div className="absolute -right-8 -bottom-10 w-28 h-28 rounded-full bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.2),transparent_55%)] opacity-80 blur-3xl"></div>
+          <div className="relative bg-white/5 rounded-3xl shadow-[0_30px_80px_-60px_rgba(34,211,238,0.8)] border border-white/10 p-6 md:p-8 backdrop-blur">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-white border border-[#f1ecfa] rounded-2xl p-4 shadow-sm">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#ebe8ff] flex items-center justify-center">
-                    <span className="text-[#6f31c5] text-2xl">🙂</span>
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                    <span className="text-[var(--loomina-burgundy)] text-2xl">🙂</span>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Chapitre</p>
-                    <p className="font-semibold text-neutral-900">Enfance</p>
+                    <p className="text-xs text-[var(--loomina-text-light)] uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-white">Enfance</p>
                   </div>
                 </div>
-                <div className="space-y-3 text-sm text-neutral-600">
-                  <div className="h-2.5 bg-[#f7f4ff] rounded-full w-5/6"></div>
-                  <div className="h-2.5 bg-[#f7f4ff] rounded-full w-3/4"></div>
-                  <div className="h-2.5 bg-[#f7f4ff] rounded-full w-2/3"></div>
+                <div className="space-y-3 text-sm text-[var(--loomina-text-light)]">
+                  <div className="h-2.5 bg-white/10 rounded-full w-5/6"></div>
+                  <div className="h-2.5 bg-white/10 rounded-full w-3/4"></div>
+                  <div className="h-2.5 bg-white/10 rounded-full w-2/3"></div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#f1ecfa] rounded-2xl p-4 shadow-sm">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#ffeaf3] flex items-center justify-center">
-                    <span className="text-[#f0488c] text-2xl">🙂</span>
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                    <span className="text-[var(--loomina-gold)] text-2xl">🙂</span>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Chapitre</p>
-                    <p className="font-semibold text-neutral-900">Rencontres</p>
+                    <p className="text-xs text-[var(--loomina-text-light)] uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-white">Rencontres</p>
                   </div>
                 </div>
-                <div className="space-y-3 text-sm text-neutral-600">
-                  <div className="h-2.5 bg-[#fff4f9] rounded-full w-4/6"></div>
-                  <div className="h-2.5 bg-[#fff4f9] rounded-full w-5/6"></div>
-                  <div className="h-2.5 bg-[#fff4f9] rounded-full w-3/4"></div>
+                <div className="space-y-3 text-sm text-[var(--loomina-text-light)]">
+                  <div className="h-2.5 bg-white/10 rounded-full w-4/6"></div>
+                  <div className="h-2.5 bg-white/10 rounded-full w-5/6"></div>
+                  <div className="h-2.5 bg-white/10 rounded-full w-3/4"></div>
                 </div>
               </div>
 
-              <div className="sm:col-span-2 bg-white border border-[#f1ecfa] rounded-2xl p-4 shadow-sm">
+              <div className="sm:col-span-2 bg-white/5 border border-white/10 rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#ffe4d9] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="1.6"
-                      className="w-6 h-6 text-[#e35a14]"
+                      className="w-6 h-6 text-[var(--loomina-gold)]"
                     >
                       <path
                         strokeLinecap="round"
@@ -88,14 +88,14 @@ export default function CharacterSheetsSection() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Chapitre</p>
-                    <p className="font-semibold text-neutral-900">Transmission</p>
+                    <p className="text-xs text-[var(--loomina-text-light)] uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-white">Transmission</p>
                   </div>
                 </div>
-                <div className="space-y-3 text-sm text-neutral-600">
-                  <div className="h-2.5 bg-[#fff1e8] rounded-full w-11/12"></div>
-                  <div className="h-2.5 bg-[#fff1e8] rounded-full w-10/12"></div>
-                  <div className="h-2.5 bg-[#fff1e8] rounded-full w-9/12"></div>
+                <div className="space-y-3 text-sm text-[var(--loomina-text-light)]">
+                  <div className="h-2.5 bg-white/10 rounded-full w-11/12"></div>
+                  <div className="h-2.5 bg-white/10 rounded-full w-10/12"></div>
+                  <div className="h-2.5 bg-white/10 rounded-full w-9/12"></div>
                 </div>
               </div>
             </div>
