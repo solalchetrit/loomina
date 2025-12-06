@@ -21,11 +21,11 @@
 }
 
 body {
-  color: var(--foreground);
+  color: #000;
   background: var(--background);
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-plus-jakarta-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
