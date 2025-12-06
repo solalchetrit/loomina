@@ -34,17 +34,18 @@ const offers = [
 
 export default function OfferPreview() {
   return (
-    <section className="w-full bg-[var(--loomina-black)] text-[var(--loomina-gray-light)] py-20 px-6 border-y border-[var(--loomina-gray-light)]/10">
+    <section
+      className="w-full bg-[var(--loomina-black)] text-[var(--loomina-gray-light)] py-20 px-6 border-y border-[var(--loomina-gray-light)]/10"
+      id="offres"
+    >
       <div className="max-w-6xl mx-auto space-y-10">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Avant-goût des offres</p>
-            <h2 className="text-3xl md:text-4xl font-semibold leading-tight mt-2">
-              Choisissez le format qui vous ressemble
-            </h2>
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Les offres</p>
+            <h2 className="text-3xl md:text-4xl font-semibold leading-tight mt-2">Choisissez le format qui vous ressemble</h2>
           </div>
           <p className="text-[var(--loomina-gray-light)] max-w-xl leading-relaxed">
-            Deux formules, la même promesse : une histoire fidèle, relue par un humain et protégée dans le temps.
+            Deux formules claires pour livrer l'histoire : version numérique prête à partager ou livre relié complet.
           </p>
         </div>
 
