@@ -31,14 +31,18 @@ export default function Header() {
                     style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
                 >
                     {NAV_LINKS.map((item) => {
-                        const isActive = pathname === item.href;
+                        const isActive =
+                            pathname === item.href || pathname.startsWith(`${item.href}/`);
 
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
+                                aria-current={isActive ? "page" : undefined}
                                 className={`rounded-full px-3 py-2 transition-colors ${
-                                    isActive ? "text-black" : "text-black hover:text-black"
+                                    isActive
+                                        ? "text-[var(--loomina-burgundy)] underline decoration-[var(--loomina-gold)] decoration-2 underline-offset-4"
+                                        : "text-black hover:text-[var(--loomina-burgundy)]"
                                 }`}
                             >
                                 {item.label}
