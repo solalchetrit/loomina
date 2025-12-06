@@ -26,7 +26,10 @@ export default function Header() {
                     />
                 </Link>
 
-                <nav className="flex flex-1 flex-wrap items-center justify-end gap-6 text-xs font-semibold uppercase tracking-[0.12em] text-black">
+                <nav
+                    className="flex flex-1 flex-wrap items-center justify-end gap-x-10 gap-y-4 text-sm font-medium text-black"
+                    style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
+                >
                     {NAV_LINKS.map((item) => {
                         const isActive = pathname === item.href;
 
@@ -34,8 +37,8 @@ export default function Header() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`transition-colors ${
-                                    isActive ? "text-black" : "text-black/60 hover:text-black"
+                                className={`rounded-full px-3 py-2 transition-colors ${
+                                    isActive ? "text-black" : "text-black/70 hover:text-black"
                                 }`}
                             >
                                 {item.label}
