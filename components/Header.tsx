@@ -8,7 +8,7 @@ const NAV_LINKS = [
     { href: "/", label: "Accueil" },
     { href: "/mission", label: "Mission" },
     { href: "/offres", label: "Offres" },
-    { href: "/offres", label: "Découvrir" },
+    { href: "/accompagnement", label: "Accompagnement" },
 ];
 
 export default function Header() {

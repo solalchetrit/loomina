@@ -18,8 +18,8 @@ export default function Footer() {
                     <Link href="/offres" className="hover:text-[var(--loomina-gold)] transition-colors">
                         Nos Offres
                     </Link>
-                    <Link href="#" className="hover:text-[var(--loomina-gold)] transition-colors">
-                        Contact
+                    <Link href="/accompagnement" className="hover:text-[var(--loomina-gold)] transition-colors">
+                        Accompagnement
                     </Link>
                 </div>
 
