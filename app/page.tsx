@@ -1,11 +1,13 @@
 import FidjooFAQ from "@/components/FidjooFAQ";
 import CharacterSheetsSection from "@/components/CharacterSheetsSection";
 import FeatureHighlights from "@/components/FeatureHighlights";
+import OfferPreview from "@/components/OfferPreview";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import ImpactMetrics from "@/components/ImpactMetrics";
 import Testimonials from "@/components/Testimonials";
 import TrustBand from "@/components/TrustBand";
+import Commitments from "@/components/Commitments";
 
 export default function Home() {
   return (
@@ -14,8 +16,10 @@ export default function Home() {
       <TrustBand />
       <ImpactMetrics />
       <FeatureHighlights />
+      <Commitments />
       <HowItWorks />
       <CharacterSheetsSection />
+      <OfferPreview />
       <Testimonials />
 
       <section className="w-full bg-[#0c162b] py-20 px-6 relative overflow-hidden" id="faq">
