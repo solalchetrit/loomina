@@ -6,6 +6,7 @@ const STEPS = [
   {
     number: 1,
     color: "bg-[var(--loomina-gold)]",
+    numberTextColor: "text-[var(--loomina-black)]",
     iconColor: "text-[var(--loomina-gold)]",
     borderColor: "border-[var(--loomina-gold)]/30",
     title: "Préparation douce",
@@ -21,6 +22,7 @@ const STEPS = [
   {
     number: 2,
     color: "bg-[var(--loomina-black)]",
+    numberTextColor: "text-white",
     iconColor: "text-[var(--loomina-black)]",
     borderColor: "border-[var(--loomina-black)]/30",
     title: "Montage éditorial",
@@ -36,8 +38,9 @@ const STEPS = [
   {
     number: 3,
     color: "bg-[var(--loomina-gray-light)]",
+    numberTextColor: "text-[var(--loomina-black)]",
     iconColor: "text-[var(--loomina-black)]",
-    borderColor: "border-[var(--loomina-black)]/30",
+    borderColor: "border-[var(--loomina-black)]/25",
     title: "Livre prêt à offrir",
     description:
       "Vous validez la maquette. Nous imprimons et envoyons autant d'exemplaires que souhaité, avec une version audio en option.",
@@ -56,15 +59,18 @@ export default function HowItWorks() {
   return (
     <section
       id="comment"
-      className="bg-[var(--loomina-gray-light)] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] border-t border-[var(--loomina-black)]/10"
+      className="bg-gradient-to-br from-[var(--loomina-gray-light)] via-white to-[var(--loomina-gold-light)] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] border-t border-[var(--loomina-black)]/10"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20 space-y-4">
+        <div className="text-center mb-16 space-y-3">
+          <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border border-[var(--loomina-black)]/10 text-sm uppercase tracking-[0.2em] text-[var(--loomina-black)] font-semibold shadow-sm">
+            <span className="h-2 w-2 rounded-full bg-[var(--loomina-gold)]" aria-hidden />Processus signature
+          </p>
           <h2 className="text-4xl md:text-5xl font-bold text-[var(--loomina-black)] tracking-tight">
             Comment nous travaillons
           </h2>
-          <p className="text-lg text-[var(--loomina-black)]">
-            Trois étapes pour transformer des souvenirs en un livre vivant
+          <p className="text-lg text-[var(--loomina-gray-dark)] max-w-3xl mx-auto leading-relaxed">
+            Trois étapes pour transformer des souvenirs intimes en un bel objet qu'on est fier d'offrir.
           </p>
         </div>
 
@@ -72,16 +78,16 @@ export default function HowItWorks() {
           {STEPS.map((step) => (
             <div
               key={step.number}
-              className="relative bg-white rounded-[2rem] p-10 shadow-[0_30px_80px_-60px_rgba(217,54,98,0.55)] border border-[var(--loomina-black)]/10 flex flex-col h-full"
+              className="relative bg-white/90 rounded-[2rem] p-10 shadow-[0_40px_90px_-65px_rgba(15,16,20,0.6)] border border-[var(--loomina-black)]/10 flex flex-col h-full backdrop-blur"
             >
               <div
-                className={`absolute -top-5 -left-5 w-12 h-12 rounded-full ${step.color} text-[var(--loomina-black)] flex items-center justify-center text-lg font-bold shadow-lg border-4 border-white`}
+                className={`absolute -top-5 -left-5 w-12 h-12 rounded-full ${step.color} ${step.numberTextColor} flex items-center justify-center text-lg font-bold shadow-lg border-4 border-white`}
               >
                 {step.number}
               </div>
 
               <div
-                className={`w-16 h-16 rounded-2xl border ${step.borderColor} bg-[var(--loomina-gray-light)] flex items-center justify-center mb-8 ${step.iconColor}`}
+                className={`w-16 h-16 rounded-2xl border ${step.borderColor} bg-white/80 flex items-center justify-center mb-8 ${step.iconColor} shadow-sm`}
               >
                 {step.icon}
               </div>
@@ -95,8 +101,8 @@ export default function HowItWorks() {
                 </p>
               </div>
 
-              <div className="pt-6 border-t border-[var(--loomina-black)]/15 mt-auto">
-                <p className="text-sm font-semibold text-[var(--loomina-black)] uppercase tracking-wide">
+              <div className="pt-6 border-t border-[var(--loomina-black)]/10 mt-auto">
+                <p className="text-sm font-semibold text-[var(--loomina-gray-dark)] uppercase tracking-[0.14em]">
                   {step.footer}
                 </p>
               </div>
