@@ -18,12 +18,12 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-[var(--loomina-burgundy)]/10 bg-white/80 backdrop-blur-xl shadow-[0_12px_40px_-28px_rgba(0,0,0,0.3)]">
       <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 md:px-10">
         {/* LOGO */}
-        <Link href="/" className="relative h-14 w-[210px] shrink-0">
+        <Link href="/" className="relative h-16 w-[240px] shrink-0">
           <Image
             src="/header_logo.png"
             alt="Lúmina"
             fill
-            className="object-contain object-left drop-shadow-[0_10px_30px_rgba(217,54,98,0.2)]"
+            className="object-contain object-left drop-shadow-[0_10px_26px_rgba(176,79,97,0.18)]"
             priority
           />
         </Link>

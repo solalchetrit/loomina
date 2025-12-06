@@ -39,7 +39,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="w-full bg-gradient-to-r from-[#ffe5da] via-[#fff3ec] to-[#e9fbf5] text-[var(--loomina-text)] py-16 px-6 border-t border-[var(--loomina-burgundy)]/10">
+      <section className="w-full bg-gradient-to-r from-[#f1e6db] via-[#f7f2ee] to-[#e8eee9] text-[var(--loomina-text)] py-16 px-6 border-t border-[var(--loomina-burgundy)]/10">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-[2fr,1fr] gap-8 items-center">
           <div className="space-y-3">
             <p className="text-sm uppercase tracking-[0.2em] font-semibold text-[var(--loomina-gold)]">Passer à l'action</p>

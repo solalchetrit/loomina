@@ -67,7 +67,7 @@ export default function Accompagnement() {
                     ))}
                 </section>
 
-                <section className="bg-gradient-to-br from-[#ffe5da] via-[#fff3ec] to-[#e9fbf5] text-[var(--loomina-text)] rounded-2xl p-10 flex flex-col md:flex-row gap-8 items-center border border-[var(--loomina-burgundy)]/10">
+                <section className="bg-gradient-to-br from-[#f1e6db] via-[#f7f2ee] to-[#e8eee9] text-[var(--loomina-text)] rounded-2xl p-10 flex flex-col md:flex-row gap-8 items-center border border-[var(--loomina-burgundy)]/10">
                     <div className="space-y-3 max-w-3xl">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Ce que nous garantissons</p>
                         <h3 className="text-3xl font-semibold">Confidentialité, patience et soin éditorial</h3>
