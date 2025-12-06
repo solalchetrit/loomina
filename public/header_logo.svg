@@ -1,0 +1,8 @@
+<svg width="360" height="120" viewBox="0 0 360 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logoTitle">
+  <title id="logoTitle">Loomina logo</title>
+  <rect width="360" height="120" fill="none"/>
+  <text x="40" y="80" fill="#151515" font-family="'Times New Roman', 'Georgia', serif" font-size="64" font-weight="600" letter-spacing="0.5">
+    Loomina
+  </text>
+  <path d="M222 36 L229 50 L244 52 L232 62 L235 77 L222 69 L209 77 L212 62 L200 52 L215 50 Z" fill="#f2a12c" />
+</svg>
