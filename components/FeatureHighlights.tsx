@@ -5,12 +5,12 @@ const features = [
     tag: "Empathie augmentée",
   },
   {
-    title: "Montage sur-mesure",
-    description: "Nos éditeurs harmonisent les souvenirs, sélectionnent les photos et composent un livre qui vous ressemble.",
+    title: "Narration éditoriale",
+    description: "Des éditeurs transforment les voix en chapitres fluides, avec des repères temporels pour s'y retrouver.",
     tag: "Œil humain",
   },
   {
-    title: "Partage simple",
+    title: "Partage mémorable",
     description: "Livre relié, version numérique, extrait audio… choisissez les formats qui conviennent à votre famille.",
     tag: "Multi-supports",
   },
@@ -22,13 +22,14 @@ export default function FeatureHighlights() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Fonctionnalités clés</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Sections signature</p>
             <h2 className="text-3xl md:text-4xl font-semibold text-[var(--loomina-black)] leading-tight mt-2">
-              Un parcours pensé pour les familles
+              Ce qui rend notre page d'accueil incontournable
             </h2>
           </div>
           <p className="text-[var(--loomina-gray-dark)] max-w-xl leading-relaxed">
-            Nous combinons la technologie et le regard éditorial pour préserver les voix, les silences et les images qui font une vie.
+            Chaque bloc raconte l'expérience Loomina en quelques lignes : on rassure sur la méthode, on montre l'humain, et on
+            met en scène les formats finaux.
           </p>
         </div>
 
