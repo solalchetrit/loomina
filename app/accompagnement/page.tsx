@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Accompagnement Loomina | Étapes et garanties",
+    description:
+        "Découvrez le parcours complet : cadrage, collecte guidée par IA, écriture et transmission sécurisée avec un suivi humain.",
+};
+
 export default function Accompagnement() {
     const steps = [
         {
@@ -50,6 +58,21 @@ export default function Accompagnement() {
         {
             title: "Finitions sur mesure",
             content: "Papier, reliure, photos et annexes choisis avec vous pour un livre vraiment à votre image.",
+        },
+    ];
+
+    const logistics = [
+        {
+            title: "Planning transparent",
+            detail: "Durées annoncées pour chaque étape et points de contrôle validés avec vous.",
+        },
+        {
+            title: "Accès dédié",
+            detail: "Espace partagé pour suivre l'avancement, envoyer des photos et annoter les chapitres.",
+        },
+        {
+            title: "Suivi post-livraison",
+            detail: "Retouches mineures, réimpressions et mises à jour du jumeau mémoriel sur simple demande.",
         },
     ];
 
@@ -111,7 +134,7 @@ export default function Accompagnement() {
                                 Planifions une session découverte pour identifier la meilleure façon de préserver votre héritage.
                             </p>
                             <a
-                                href="mailto:contact@loomina.fr"
+                                href="mailto:contact@loomina.fr?subject=Planifier%20une%20session%20d%C3%A9couverte"
                                 className="block text-center w-full rounded-full bg-[var(--loomina-amber)] px-5 py-3 font-semibold text-[var(--loomina-ink)] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)] transition hover:brightness-110"
                             >
                                 Écrire à l'équipe
@@ -119,6 +142,21 @@ export default function Accompagnement() {
                             <p className="text-sm text-[var(--loomina-muted)] text-center">Réponse en moins de 24h, sans engagement.</p>
                         </div>
                     </div>
+                </section>
+
+                <section className="grid gap-4 md:grid-cols-3">
+                    {logistics.map((item) => (
+                        <div
+                            key={item.title}
+                            className="glow-ring h-full rounded-2xl border border-black/5 bg-white/90 p-7 space-y-2"
+                        >
+                            <p className="text-xs uppercase tracking-[0.26em] text-[var(--loomina-amber-strong)] font-semibold">
+                                Organisation
+                            </p>
+                            <h3 className="text-xl font-semibold text-[var(--loomina-ink)]">{item.title}</h3>
+                            <p className="text-[var(--loomina-muted)] leading-relaxed">{item.detail}</p>
+                        </div>
+                    ))}
                 </section>
             </div>
         </div>
