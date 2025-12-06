@@ -1,87 +1,87 @@
 export default function Offres() {
     return (
-        <div className="relative min-h-screen overflow-hidden bg-[var(--loomina-cream)] text-[var(--loomina-text)] py-24 px-6">
+        <div className="relative min-h-screen overflow-hidden bg-[var(--loomina-gray-light)] text-[var(--loomina-black)] py-24 px-6">
             <div className="relative max-w-6xl mx-auto space-y-16">
                 <header className="text-center space-y-4 max-w-3xl mx-auto">
                     <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Formats et accompagnement</p>
-                    <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-[var(--loomina-text)]">Nos offres pour transmettre</h1>
-                    <p className="text-lg text-[var(--loomina-text)] leading-relaxed">
+                    <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-[var(--loomina-black)]">Nos offres pour transmettre</h1>
+                    <p className="text-lg text-[var(--loomina-black)] leading-relaxed">
                         Deux expériences pour préserver votre histoire : une version numérique vivante ou un livre d'art imprimé, toujours guidés par notre équipe éditoriale.
                     </p>
                 </header>
 
                 <section className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                    <div className="bg-white border border-[var(--loomina-burgundy)]/10 p-10 rounded-2xl shadow-lg hover:border-[var(--loomina-gold)]/40 transition-colors flex flex-col">
+                    <div className="bg-white border border-[var(--loomina-black)]/10 p-10 rounded-2xl shadow-lg hover:border-[var(--loomina-gold)]/40 transition-colors flex flex-col">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Entretien continu</p>
-                        <h3 className="text-2xl font-semibold text-[var(--loomina-text)] mb-2">Écho Numérique</h3>
+                        <h3 className="text-2xl font-semibold text-[var(--loomina-black)] mb-2">Écho Numérique</h3>
                         <div className="text-4xl font-bold text-[var(--loomina-gold)] mb-6">118 €</div>
-                        <p className="text-[var(--loomina-text)] mb-6 flex-grow">
+                        <p className="text-[var(--loomina-black)] mb-6 flex-grow">
                             L'essentiel pour capturer votre voix et vos souvenirs dans un format digital interactif, accessible en permanence par vos proches.
                         </p>
-                        <ul className="space-y-3 mb-8 text-[var(--loomina-text)]">
+                        <ul className="space-y-3 mb-8 text-[var(--loomina-black)]">
                             <li className="flex items-start gap-3"><span className="text-[var(--loomina-gold)]">✦</span>Jumeau mémoriel illimité avec relances personnalisées</li>
                             <li className="flex items-start gap-3"><span className="text-[var(--loomina-gold)]">✦</span>Entretiens guidés + synthèse mensuelle relue par un éditeur</li>
                             <li className="flex items-start gap-3"><span className="text-[var(--loomina-gold)]">✦</span>Espace privé et chiffré pour partager avec la famille</li>
                         </ul>
-                        <button className="w-full py-3 rounded-full border border-[var(--loomina-gold)] text-[var(--loomina-burgundy)] font-medium hover:bg-[var(--loomina-gold)]/20 transition-colors">
+                        <button className="w-full py-3 rounded-full border border-[var(--loomina-gold)] text-[var(--loomina-black)] font-medium hover:bg-[var(--loomina-gold)]/20 transition-colors">
                             Choisir l'Écho
                         </button>
                     </div>
 
-                    <div className="relative bg-[var(--loomina-burgundy)] p-10 rounded-2xl border border-[var(--loomina-gold)]/60 shadow-lg flex flex-col text-[var(--loomina-cream)]">
+                    <div className="relative bg-[var(--loomina-black)] p-10 rounded-2xl border border-[var(--loomina-gold)]/60 shadow-lg flex flex-col text-[var(--loomina-gray-light)]">
                         <div className="relative">
-                            <div className="inline-flex items-center gap-2 bg-[var(--loomina-gold)] text-[var(--loomina-burgundy)] px-4 py-1 text-xs font-bold uppercase tracking-[0.25em] rounded-full shadow-lg">
+                            <div className="inline-flex items-center gap-2 bg-[var(--loomina-gold)] text-[var(--loomina-black)] px-4 py-1 text-xs font-bold uppercase tracking-[0.25em] rounded-full shadow-lg">
                                 ✦ Recommandé
                             </div>
-                            <p className="mt-6 text-sm uppercase tracking-[0.2em] text-[var(--loomina-cream)] font-semibold">Livre + numérique</p>
+                            <p className="mt-6 text-sm uppercase tracking-[0.2em] text-[var(--loomina-gray-light)] font-semibold">Livre + numérique</p>
                             <h3 className="text-2xl font-semibold mb-2">Héritage Complet</h3>
                             <div className="text-4xl font-bold text-[var(--loomina-gold)] mb-6">248 €</div>
                         </div>
-                        <p className="text-[var(--loomina-cream)] mb-6 flex-grow">
+                        <p className="text-[var(--loomina-gray-light)] mb-6 flex-grow">
                             L'expérience la plus aboutie : un livre relié, mis en page par notre studio, et un jumeau numérique pour continuer à échanger après l'impression.
                         </p>
-                        <ul className="space-y-3 mb-8 text-[var(--loomina-cream)]">
+                        <ul className="space-y-3 mb-8 text-[var(--loomina-gray-light)]">
                             <li className="flex items-start gap-3"><span className="text-[var(--loomina-gold)]">✦</span><strong>Livre physique haut de gamme (5 exemplaires)</strong></li>
                             <li className="flex items-start gap-3"><span className="text-[var(--loomina-gold)]">✦</span>Direction éditoriale + relectures humaines illimitées</li>
                             <li className="flex items-start gap-3"><span className="text-[var(--loomina-gold)]">✦</span>Mise en page artistique avec sélection photo et annexes</li>
                             <li className="flex items-start gap-3"><span className="text-[var(--loomina-gold)]">✦</span>Jumeau mémoriel privé pour prolonger l'histoire</li>
                         </ul>
-                        <button className="relative w-full py-4 rounded-full bg-[var(--loomina-gold)] text-[var(--loomina-burgundy)] font-semibold hover:brightness-110 transition-all shadow-md">
+                        <button className="relative w-full py-4 rounded-full bg-[var(--loomina-gold)] text-[var(--loomina-black)] font-semibold hover:brightness-110 transition-all shadow-md">
                             Commencer l'Héritage
                         </button>
                     </div>
                 </section>
 
-                <section className="bg-[var(--loomina-cream)] border border-[var(--loomina-burgundy)]/10 rounded-2xl p-8 md:p-10 shadow-lg">
+                <section className="bg-[var(--loomina-gray-light)] border border-[var(--loomina-black)]/10 rounded-2xl p-8 md:p-10 shadow-lg">
                     <div className="grid md:grid-cols-[1.2fr,1fr] gap-8 items-start">
                         <div className="space-y-4">
                             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Services inclus</p>
-                            <h2 className="text-3xl font-semibold text-[var(--loomina-text)]">Toujours accompagnés, jamais seuls</h2>
-                            <p className="text-[var(--loomina-text)] leading-relaxed">
+                            <h2 className="text-3xl font-semibold text-[var(--loomina-black)]">Toujours accompagnés, jamais seuls</h2>
+                            <p className="text-[var(--loomina-black)] leading-relaxed">
                                 Chaque offre inclut un interlocuteur dédié, la sécurisation des données en Europe et des points de validation réguliers. Nous adaptons la cadence des entretiens à votre disponibilité et à votre confort.
                             </p>
                             <div className="grid md:grid-cols-2 gap-4 text-sm">
-                                <div className="bg-white rounded-lg p-4 border border-[var(--loomina-burgundy)]/10 shadow-sm">
-                                    <p className="font-semibold text-[var(--loomina-text)]">Coordination éditoriale</p>
-                                    <p className="text-[var(--loomina-text)] mt-2">Planification, suivi des interviews, propositions de chapitrage et relectures.</p>
+                                <div className="bg-white rounded-lg p-4 border border-[var(--loomina-black)]/10 shadow-sm">
+                                    <p className="font-semibold text-[var(--loomina-black)]">Coordination éditoriale</p>
+                                    <p className="text-[var(--loomina-black)] mt-2">Planification, suivi des interviews, propositions de chapitrage et relectures.</p>
                                 </div>
-                                <div className="bg-white rounded-lg p-4 border border-[var(--loomina-burgundy)]/10 shadow-sm">
-                                    <p className="font-semibold text-[var(--loomina-text)]">Support continu</p>
-                                    <p className="text-[var(--loomina-text)] mt-2">Assistance sous 24h, possibilité d'ajouter des contributeurs familiaux et mise à jour du jumeau mémoriel.</p>
+                                <div className="bg-white rounded-lg p-4 border border-[var(--loomina-black)]/10 shadow-sm">
+                                    <p className="font-semibold text-[var(--loomina-black)]">Support continu</p>
+                                    <p className="text-[var(--loomina-black)] mt-2">Assistance sous 24h, possibilité d'ajouter des contributeurs familiaux et mise à jour du jumeau mémoriel.</p>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-[var(--loomina-cream)] text-[var(--loomina-text)] rounded-2xl p-8 space-y-4 border border-[var(--loomina-burgundy)]/10">
+                        <div className="bg-[var(--loomina-gray-light)] text-[var(--loomina-black)] rounded-2xl p-8 space-y-4 border border-[var(--loomina-black)]/10">
                             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Besoin d'un format spécial ?</p>
                             <h3 className="text-2xl font-semibold">Options sur mesure</h3>
-                            <ul className="space-y-3 text-[var(--loomina-text)]">
-                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-burgundy)]">✦</span>Traduction bilingue ou édition internationale</li>
-                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-burgundy)]">✦</span>Ajout d'archives familiales (audio, photos, lettres)</li>
-                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-burgundy)]">✦</span>Réimpressions ou coffret collector</li>
+                            <ul className="space-y-3 text-[var(--loomina-black)]">
+                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-black)]">✦</span>Traduction bilingue ou édition internationale</li>
+                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-black)]">✦</span>Ajout d'archives familiales (audio, photos, lettres)</li>
+                                <li className="flex gap-3 items-start"><span className="text-[var(--loomina-black)]">✦</span>Réimpressions ou coffret collector</li>
                             </ul>
                             <a
                                 href="mailto:offres@loomina.fr"
-                                className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-burgundy)] text-white font-semibold hover:brightness-110 transition"
+                                className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-black)] text-white font-semibold hover:brightness-110 transition"
                             >
                                 Discuter d'une adaptation
                             </a>

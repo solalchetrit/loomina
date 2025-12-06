@@ -1,24 +1,24 @@
 export default function CharacterSheetsSection() {
   return (
-    <section className="w-full bg-[var(--loomina-cream)] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] border-t border-[var(--loomina-burgundy)]/10">
+    <section className="w-full bg-[var(--loomina-gray-light)] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] border-t border-[var(--loomina-black)]/10">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-3 px-4 py-2 bg-white text-[var(--loomina-burgundy)] text-sm font-semibold rounded-full uppercase tracking-[0.08em] shadow-sm border border-[var(--loomina-burgundy)]/15">
-            <span className="w-2 h-2 rounded-full bg-[var(--loomina-burgundy)]"></span>
+          <div className="inline-flex items-center gap-3 px-4 py-2 bg-white text-[var(--loomina-black)] text-sm font-semibold rounded-full uppercase tracking-[0.08em] shadow-sm border border-[var(--loomina-black)]/15">
+            <span className="w-2 h-2 rounded-full bg-[var(--loomina-black)]"></span>
             Outil d'ancrage
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-[var(--loomina-text)] leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-[var(--loomina-black)] leading-tight">
             Chapitres prêts à remplir
           </h2>
-          <p className="text-lg text-[var(--loomina-text)] leading-relaxed">
+          <p className="text-lg text-[var(--loomina-black)] leading-relaxed">
             Moments fondateurs, rencontres marquantes, voyages, habitudes... nous préparons des fiches simples pour organiser les souvenirs et choisir ce qui comptera dans le livre.
           </p>
           <div className="flex gap-4">
-            <span className="px-4 py-2 rounded-full bg-white text-[var(--loomina-burgundy)] font-semibold text-sm border border-[var(--loomina-burgundy)]/15 shadow-sm">
-              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[var(--loomina-burgundy)]"></span>
+            <span className="px-4 py-2 rounded-full bg-white text-[var(--loomina-black)] font-semibold text-sm border border-[var(--loomina-black)]/15 shadow-sm">
+              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[var(--loomina-black)]"></span>
               Moments clés
             </span>
-            <span className="px-4 py-2 rounded-full bg-white text-[var(--loomina-gold)] font-semibold text-sm border border-[var(--loomina-burgundy)]/15 shadow-sm">
+            <span className="px-4 py-2 rounded-full bg-white text-[var(--loomina-gold)] font-semibold text-sm border border-[var(--loomina-black)]/15 shadow-sm">
               <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[var(--loomina-gold)]"></span>
               Photos
             </span>
@@ -26,43 +26,43 @@ export default function CharacterSheetsSection() {
         </div>
 
         <div className="relative">
-          <div className="relative bg-white rounded-3xl shadow-lg border border-[var(--loomina-burgundy)]/10 p-6 md:p-8 backdrop-blur">
+          <div className="relative bg-white rounded-3xl shadow-lg border border-[var(--loomina-black)]/10 p-6 md:p-8 backdrop-blur">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-[var(--loomina-cream)] border border-[var(--loomina-burgundy)]/10 rounded-2xl p-4 shadow-sm">
+              <div className="bg-[var(--loomina-gray-light)] border border-[var(--loomina-black)]/10 rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
-                    <span className="text-[var(--loomina-burgundy)] text-2xl">🙂</span>
+                    <span className="text-[var(--loomina-black)] text-2xl">🙂</span>
                   </div>
                   <div>
-                    <p className="text-xs text-[var(--loomina-text)] uppercase tracking-wide">Chapitre</p>
-                    <p className="font-semibold text-[var(--loomina-text)]">Enfance</p>
+                    <p className="text-xs text-[var(--loomina-black)] uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-[var(--loomina-black)]">Enfance</p>
                   </div>
                 </div>
-                <div className="space-y-3 text-sm text-[var(--loomina-text)]">
+                <div className="space-y-3 text-sm text-[var(--loomina-black)]">
                   <div className="h-2.5 bg-white rounded-full w-5/6"></div>
                   <div className="h-2.5 bg-white rounded-full w-3/4"></div>
                   <div className="h-2.5 bg-white rounded-full w-2/3"></div>
                 </div>
               </div>
 
-              <div className="bg-[var(--loomina-cream)] border border-[var(--loomina-burgundy)]/10 rounded-2xl p-4 shadow-sm">
+              <div className="bg-[var(--loomina-gray-light)] border border-[var(--loomina-black)]/10 rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
                     <span className="text-[var(--loomina-gold)] text-2xl">🙂</span>
                   </div>
                   <div>
-                    <p className="text-xs text-[var(--loomina-text)] uppercase tracking-wide">Chapitre</p>
-                    <p className="font-semibold text-[var(--loomina-text)]">Rencontres</p>
+                    <p className="text-xs text-[var(--loomina-black)] uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-[var(--loomina-black)]">Rencontres</p>
                   </div>
                 </div>
-                <div className="space-y-3 text-sm text-[var(--loomina-text)]">
+                <div className="space-y-3 text-sm text-[var(--loomina-black)]">
                   <div className="h-2.5 bg-white rounded-full w-4/6"></div>
                   <div className="h-2.5 bg-white rounded-full w-5/6"></div>
                   <div className="h-2.5 bg-white rounded-full w-3/4"></div>
                 </div>
               </div>
 
-              <div className="sm:col-span-2 bg-[var(--loomina-cream)] border border-[var(--loomina-burgundy)]/10 rounded-2xl p-4 shadow-sm">
+              <div className="sm:col-span-2 bg-[var(--loomina-gray-light)] border border-[var(--loomina-black)]/10 rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
                     <svg
@@ -86,11 +86,11 @@ export default function CharacterSheetsSection() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-[var(--loomina-text)] uppercase tracking-wide">Chapitre</p>
-                    <p className="font-semibold text-[var(--loomina-text)]">Transmission</p>
+                    <p className="text-xs text-[var(--loomina-black)] uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-[var(--loomina-black)]">Transmission</p>
                   </div>
                 </div>
-                <div className="space-y-3 text-sm text-[var(--loomina-text)]">
+                <div className="space-y-3 text-sm text-[var(--loomina-black)]">
                   <div className="h-2.5 bg-white rounded-full w-11/12"></div>
                   <div className="h-2.5 bg-white rounded-full w-10/12"></div>
                   <div className="h-2.5 bg-white rounded-full w-9/12"></div>
