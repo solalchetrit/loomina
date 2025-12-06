@@ -5,23 +5,22 @@ export default function CharacterSheetsSection() {
         <div className="space-y-6">
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#f3edff] text-[#6f31c5] text-sm font-semibold rounded-full uppercase tracking-[0.08em]">
             <span className="w-2 h-2 rounded-full bg-[#f0488c]"></span>
-            Section
+            Outil d'ancrage
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 leading-tight">
-            Fiches personnages prêtes à remplir
+            Chapitres prêts à remplir
           </h2>
           <p className="text-lg text-neutral-600 leading-relaxed">
-            Physique, caractère, évolution... Autant de caractéristiques auxquelles vous pensez lors de la création de vos personnages.
-            Remplissez-les dans une fiche dédiée et retrouvez ces infos facilement durant l&apos;écriture.
+            Moments fondateurs, rencontres marquantes, voyages, habitudes... nous préparons des fiches simples pour organiser les souvenirs et choisir ce qui comptera dans le livre.
           </p>
           <div className="flex gap-4">
             <span className="px-4 py-2 rounded-full bg-[#fdf2f7] text-[#f0488c] font-semibold text-sm">
               <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#f0488c]"></span>
-              Personnages
+              Moments clés
             </span>
             <span className="px-4 py-2 rounded-full bg-[#ebe8ff] text-[#6f31c5] font-semibold text-sm">
               <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#6f31c5]"></span>
-              Ancrage
+              Photos
             </span>
           </div>
         </div>
@@ -37,8 +36,8 @@ export default function CharacterSheetsSection() {
                     <span className="text-[#6f31c5] text-2xl">🙂</span>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Ancrage</p>
-                    <p className="font-semibold text-neutral-900">Camille</p>
+                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-neutral-900">Enfance</p>
                   </div>
                 </div>
                 <div className="space-y-3 text-sm text-neutral-600">
@@ -54,8 +53,8 @@ export default function CharacterSheetsSection() {
                     <span className="text-[#f0488c] text-2xl">🙂</span>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Ancrage</p>
-                    <p className="font-semibold text-neutral-900">Chloe</p>
+                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-neutral-900">Rencontres</p>
                   </div>
                 </div>
                 <div className="space-y-3 text-sm text-neutral-600">
@@ -89,8 +88,8 @@ export default function CharacterSheetsSection() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Ancrage</p>
-                    <p className="font-semibold text-neutral-900">Arthur</p>
+                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Chapitre</p>
+                    <p className="font-semibold text-neutral-900">Transmission</p>
                   </div>
                 </div>
                 <div className="space-y-3 text-sm text-neutral-600">
