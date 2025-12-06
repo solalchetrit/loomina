@@ -74,7 +74,7 @@ export default function Offres() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-gradient-to-br from-[#ffe5da] via-[#fff3ec] to-[#e9fbf5] text-[var(--loomina-text)] rounded-2xl p-8 space-y-4 border border-[var(--loomina-burgundy)]/10">
+                        <div className="bg-gradient-to-br from-[#f1e6db] via-[#f7f2ee] to-[#e8eee9] text-[var(--loomina-text)] rounded-2xl p-8 space-y-4 border border-[var(--loomina-burgundy)]/10">
                             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Besoin d'un format spécial ?</p>
                             <h3 className="text-2xl font-semibold">Options sur mesure</h3>
                             <ul className="space-y-3 text-[var(--loomina-text-light)]">

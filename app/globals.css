@@ -6,18 +6,18 @@
 }
 
 :root {
-  /* Palette lumineuse & éditoriale */
-  --loomina-burgundy: #f25d7a; /* Rose corail pour les actions fortes */
-  --loomina-burgundy-dark: #d93662;
-  --loomina-gold: #2bb7a3; /* Vert lagon pour les détails frais */
-  --loomina-gold-light: #b7f6e7;
-  --loomina-cream: #fff7ef; /* Fond doux éditorial */
-  --loomina-text: #1f2937;
-  --loomina-text-light: #4b5563;
+  /* Palette plus sobre et feutrée */
+  --loomina-burgundy: #d06a7a; /* Accent rosé assagi */
+  --loomina-burgundy-dark: #b04f61;
+  --loomina-gold: #5b9a88; /* Vert sauge doux pour les détails */
+  --loomina-gold-light: #d9eee6;
+  --loomina-cream: #f6f0e8; /* Fond ivoire feutré */
+  --loomina-text: #1f2933;
+  --loomina-text-light: #4a5563;
 
-  --background: radial-gradient(circle at 20% 20%, rgba(242, 93, 122, 0.16), transparent 32%),
-    radial-gradient(circle at 80% 10%, rgba(43, 183, 163, 0.14), transparent 28%),
-    #fff9f4;
+  --background: radial-gradient(circle at 20% 20%, rgba(208, 106, 122, 0.08), transparent 32%),
+    radial-gradient(circle at 80% 10%, rgba(91, 154, 136, 0.08), transparent 28%),
+    #faf6f1;
   --foreground: var(--loomina-text);
 }
 
