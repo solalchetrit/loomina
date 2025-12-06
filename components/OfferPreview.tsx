@@ -5,12 +5,12 @@ const offer = {
   price: "222 €",
   originalPrice: "279 €",
   description:
-    "Une édition unique pour vos souvenirs : entretiens guidés, mise en page soignée et exemplaires prêts à offrir.",
+    "Entretiens guidés, réécriture attentive et maquette élégante. Nous livrons un livre relié et sa version numérique prête à partager.",
   highlights: [
-    "5 exemplaires imprimés inclus (Papier Premium)",
-    "Accompagnement éditorial humain complet",
-    "Mise en page artistique & insertion photos",
-    "Version numérique du livre offerte (PDF)",
+    "5 exemplaires imprimés inclus (papier premium)",
+    "Co-écriture et relectures illimitées avec l'équipe Loomina",
+    "Mise en page lumineuse avec vos photos retouchées",
+    "Version numérique protégée et prête à envoyer",
   ],
   cta: "Préparer mon livre",
   href: "/offres",
@@ -25,9 +25,9 @@ export default function OfferPreview() {
           <p className="inline-flex items-center gap-2 self-center rounded-full bg-white/90 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--loomina-ink)] shadow-sm border border-black/5">
             <span className="h-2 w-2 rounded-full bg-[var(--loomina-amber-strong)]" /> Offre unique Loomina
           </p>
-          <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Un livre simple, un design cohérent</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Une offre limpide pour se concentrer sur l'essentiel</h2>
           <p className="text-[var(--loomina-muted)] leading-relaxed max-w-3xl mx-auto">
-            Une seule offre lisible : mêmes couleurs, boutons sobres, et un parcours clair. Vous savez exactement ce que vous recevez et comment votre récit avance.
+            Nous avons réduit les options pour garder un parcours simple : un accompagnement humain, un livre relié, un PDF sécurisé et un suivi jusqu'à la livraison chez vous.
           </p>
         </div>
 
@@ -39,6 +39,9 @@ export default function OfferPreview() {
               </div>
               <h3 className="text-3xl font-semibold">{offer.title}</h3>
               <p className="text-[var(--loomina-muted)] leading-relaxed">{offer.description}</p>
+              <div className="inline-flex items-center gap-2 rounded-full bg-[var(--loomina-cloud)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--loomina-ink)] border border-black/5">
+                Livraison moyenne : 3 semaines · Accompagnement humain garanti
+              </div>
             </div>
             <div className="flex flex-col items-end gap-2 self-start rounded-2xl bg-[var(--loomina-cloud)] px-4 py-3 border border-black/5 shadow-sm">
               <span className="text-sm text-[var(--loomina-muted)] line-through">{offer.originalPrice}</span>
