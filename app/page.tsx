@@ -1,5 +1,6 @@
 import Image from "next/image";
 import FidjooFAQ from "@/components/FidjooFAQ";
+import HowItWorks from "@/components/HowItWorks";
 
 export default function Home() {
   return (
@@ -16,6 +17,10 @@ export default function Home() {
         </div>
 
         <FidjooFAQ />
+      </div>
+
+      <div className="w-full">
+        <HowItWorks />
       </div>
     </div>
   );
