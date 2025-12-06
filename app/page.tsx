@@ -1,6 +1,7 @@
 import Image from "next/image";
 import FidjooFAQ from "@/components/FidjooFAQ";
 import HowItWorks from "@/components/HowItWorks";
+import CharacterSheetsSection from "@/components/CharacterSheetsSection";
 
 export default function Home() {
   return (
@@ -21,6 +22,7 @@ export default function Home() {
 
       <div className="w-full">
         <HowItWorks />
+        <CharacterSheetsSection />
       </div>
     </div>
   );
