@@ -6,22 +6,25 @@
 }
 
 :root {
-  --loomina-black: #0f1014;
-  --loomina-white: #ffffff;
-  --loomina-gray-light: #f7f0e8;
-  --loomina-gray-dark: #3c3432;
-  --loomina-gold: #e5a24f;
-  --loomina-gold-light: #f7dfc2;
-  --background: #fffaf3;
-  --foreground: var(--loomina-black);
+  --loomina-ink: #171717;
+  --loomina-cloud: #f7f4ef;
+  --loomina-sand: #efe7dd;
+  --loomina-haze: #e5dccf;
+  --loomina-amber: #eabf77;
+  --loomina-amber-strong: #c58c3c;
+  --loomina-forest: #1f3328;
+  --loomina-muted: #58524b;
+  --background: var(--loomina-cloud);
+  --foreground: var(--loomina-ink);
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: radial-gradient(circle at 20% 20%, #ffffff 0, #ffffff 14%, transparent 14%),
+    radial-gradient(circle at 80% 10%, #ffffff 0, #ffffff 12%, transparent 12%),
+    var(--background);
   margin: 0;
   padding: 0;
-  /* Application de la police par défaut */
   font-family: var(--font-plus-jakarta-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -29,5 +32,10 @@ body {
 
 /* Custom Utilities */
 .font-serif {
-  font-family: 'Playfair Display', serif;
+  font-family: "Playfair Display", serif;
+}
+
+.glow-ring {
+  box-shadow: 0 1px 0 rgba(23, 23, 23, 0.04), 0 20px 60px -40px rgba(23, 23, 23, 0.35),
+    0 0 0 1px rgba(23, 23, 23, 0.04);
 }
