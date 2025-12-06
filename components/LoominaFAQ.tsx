@@ -3,31 +3,33 @@ import { useState } from "react";
 
 const faqData = [
   {
-    question: "Comment se passent les entretiens ?",
+    question: "Comment se déroulent les entretiens ?",
     answer:
-      "Nous organisons un appel visio ou téléphone d'environ 45 minutes. L'IA propose des relances et un membre de notre équipe accompagne la conversation.",
+      "Nous prévoyons un appel vidéo ou téléphonique d'environ 45 minutes. Notre IA suggère des relances tandis qu'un accompagnant Loomina guide l'échange pour que la parole reste fluide.",
   },
   {
     question: "Qui relit et corrige les textes ?",
     answer:
-      "Chaque transcript est nettoyé par un éditeur Loomina : vérification des faits fournis, harmonisation du style, suppression des hésitations.",
+      "Chaque transcription est vérifiée par un éditeur Loomina : cohérence des faits fournis, reformulation douce, suppression des hésitations pour préserver la voix originale.",
   },
   {
     question: "Combien d'exemplaires puis-je commander ?",
-    answer: "Autant que vous le souhaitez : nous imprimons à la demande et fournissons toujours une version numérique.",
+    answer:
+      "Autant que nécessaire : nous imprimons à la demande et fournissons systématiquement une version numérique et audio pour partager facilement.",
     active: true,
   },
   {
     question: "Et si mon proche n'est pas à l'aise avec la technologie ?",
-    answer: "Nous pouvons passer par un simple appel téléphonique et envoyer un kit papier pour récupérer les photos.",
+    answer:
+      "Nous adaptons le dispositif : simple appel téléphonique, aide à distance pour récupérer les photos, et un accompagnement humain pour faciliter chaque étape.",
   },
   {
     question: "Sous combien de temps recevrai-je le livre ?",
-    answer: "Comptez en moyenne 3 jours après votre validation de la maquette finale.",
+    answer: "Après votre validation de la maquette finale, l'impression et l'envoi prennent en moyenne trois jours ouvrés.",
   },
 ];
 
-export default function FidjooFAQ() {
+export default function LoominaFAQ() {
     const [openIndex, setOpenIndex] = useState<number | null>(2);
 
     const toggleFAQ = (index: number) => {

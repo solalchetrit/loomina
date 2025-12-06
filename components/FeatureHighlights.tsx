@@ -22,14 +22,13 @@ export default function FeatureHighlights() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Sections signature</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Marque Loomina</p>
             <h2 className="text-3xl md:text-4xl font-semibold text-[var(--loomina-black)] leading-tight mt-2">
-              Ce qui rend notre page d'accueil incontournable
+              Ce qui différencie notre accompagnement
             </h2>
           </div>
           <p className="text-[var(--loomina-gray-dark)] max-w-xl leading-relaxed">
-            Chaque bloc raconte l'expérience Loomina en quelques lignes : on rassure sur la méthode, on montre l'humain, et on
-            met en scène les formats finaux.
+            Une même promesse sur toute la page : empathie des échanges, regard éditorial humain et formats pensés pour être partagés.
           </p>
         </div>
 

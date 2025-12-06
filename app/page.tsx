@@ -1,4 +1,4 @@
-import FidjooFAQ from "@/components/FidjooFAQ";
+import LoominaFAQ from "@/components/LoominaFAQ";
 import CharacterSheetsSection from "@/components/CharacterSheetsSection";
 import FeatureHighlights from "@/components/FeatureHighlights";
 import OfferPreview from "@/components/OfferPreview";
@@ -35,7 +35,7 @@ export default function Home() {
               Détails pratiques, accompagnement humain, délais : nous répondons aux questions les plus fréquentes.
             </p>
           </div>
-          <FidjooFAQ />
+          <LoominaFAQ />
         </div>
       </section>
 
