@@ -1,19 +1,19 @@
 export default function Mission() {
     return (
-        <div className="bg-[#f2efeb] min-h-screen py-24 px-6">
-            <div className="max-w-5xl mx-auto space-y-16">
+        <div className="relative min-h-screen overflow-hidden bg-[var(--background)] text-[var(--loomina-text)] py-24 px-6">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(124,58,237,0.15),transparent_38%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_12%,rgba(34,211,238,0.16),transparent_28%)]" />
+            <div className="relative max-w-5xl mx-auto space-y-16">
                 <header className="space-y-4 text-center md:text-left">
-                    <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Pourquoi Loomina existe</p>
-                    <h1 className="text-4xl md:text-5xl font-serif text-[var(--loomina-burgundy)] leading-tight">
-                        Garder la lumière allumée, pour toujours
-                    </h1>
+                    <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Pourquoi Loomina existe</p>
+                    <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-white">Garder la lumière allumée, pour toujours</h1>
                     <p className="text-lg text-[var(--loomina-text-light)] leading-relaxed max-w-3xl">
                         Nous créons des livres et des jumeaux mémoriels qui traversent les décennies. Notre mission est de préserver la voix, les valeurs et les nuances d'une vie, sans jamais trahir l'intention de ceux qui se confient.
                     </p>
                 </header>
 
-                <section className="bg-white rounded-lg shadow-sm border border-[var(--loomina-burgundy)]/10 p-8 md:p-10 space-y-6">
-                    <blockquote className="border-l-4 border-[var(--loomina-gold)] pl-6 italic text-[var(--loomina-burgundy)] text-2xl font-serif">
+                <section className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8 md:p-10 space-y-6 shadow-[0_20px_60px_-45px_rgba(0,0,0,0.7)]">
+                    <blockquote className="border-l-4 border-[var(--loomina-gold)] pl-6 italic text-2xl text-white">
                         "Nous ne sommes pas une entreprise technologique. Nous sommes des gardiens de mémoire."
                     </blockquote>
                     <p className="text-[var(--loomina-text-light)] leading-relaxed text-lg">
@@ -37,35 +37,35 @@ export default function Mission() {
                     }].map((value, index) => (
                         <div
                             key={index}
-                            className="bg-white h-full rounded-lg shadow-sm border border-[var(--loomina-burgundy)]/10 p-7 space-y-3"
+                            className="bg-white/5 h-full rounded-2xl border border-white/10 p-7 space-y-3 shadow-[0_18px_55px_-45px_rgba(0,0,0,0.8)]"
                         >
-                            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Notre boussole</p>
-                            <h3 className="text-2xl font-serif text-[var(--loomina-burgundy)]">{value.title}</h3>
+                            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Notre boussole</p>
+                            <h3 className="text-2xl font-semibold text-white">{value.title}</h3>
                             <p className="text-[var(--loomina-text-light)] leading-relaxed">{value.description}</p>
                         </div>
                     ))}
                 </section>
 
-                <section className="bg-[var(--loomina-burgundy)] text-white rounded-lg p-10 flex flex-col md:flex-row gap-10 items-center">
+                <section className="bg-gradient-to-br from-[#171b33] via-[#12192d] to-[#0b1327] text-white rounded-2xl p-10 flex flex-col md:flex-row gap-10 items-center border border-[var(--loomina-gold)]/30">
                     <div className="space-y-3 max-w-3xl">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Ce qui nous anime</p>
-                        <h3 className="text-3xl font-serif font-semibold">Allier technologie et humanité</h3>
-                        <p className="text-white/80 leading-relaxed">
+                        <h3 className="text-3xl font-semibold">Allier technologie et humanité</h3>
+                        <p className="text-white/85 leading-relaxed">
                             L'IA permet des heures d'écoute sans fatigue et une capacité d'analyse inégalée. Mais nous restons persuadés qu'aucun algorithme ne remplace l'empathie. C'est pourquoi chaque projet Loomina est suivi par une équipe éditoriale qui relit, réécrit, et s'assure que chaque page sonne juste.
                         </p>
-                        <p className="text-white/80 leading-relaxed">
+                        <p className="text-white/85 leading-relaxed">
                             Notre ambition : que votre histoire reste lumineuse, intacte et transmissible, pour ceux qui sont là aujourd'hui et ceux qui viendront demain.
                         </p>
                     </div>
                     <div className="w-full md:w-auto">
-                        <div className="bg-white text-[var(--loomina-burgundy)] rounded-lg shadow-lg p-6 space-y-3 max-w-sm">
-                            <p className="text-sm uppercase tracking-[0.2em] font-semibold">Envie d'en parler ?</p>
-                            <p className="text-lg leading-relaxed">
+                        <div className="bg-white text-[#0c1224] rounded-2xl shadow-2xl p-6 space-y-3 max-w-sm">
+                            <p className="text-sm uppercase tracking-[0.2em] font-semibold text-[var(--loomina-burgundy)]">Envie d'en parler ?</p>
+                            <p className="text-lg leading-relaxed text-[#0c1224]">
                                 Partagez vos besoins, nous construisons un parcours sur mesure pour vous ou vos proches.
                             </p>
                             <a
                                 href="mailto:mission@loomina.fr"
-                                className="block text-center w-full px-5 py-3 rounded-full bg-[var(--loomina-burgundy)] text-white font-semibold hover:brightness-110 transition"
+                                className="block text-center w-full px-5 py-3 rounded-full bg-[var(--loomina-gold)] text-[#051226] font-semibold hover:brightness-110 transition"
                             >
                                 Échanger avec l'équipe
                             </a>
