@@ -30,11 +30,11 @@ export default function ImpactMetrics() {
             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">
               Confiance et impact
             </p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-[var(--loomina-text)] leading-tight mt-2">
-              Des souvenirs qui traversent le temps
-            </h2>
-          </div>
-          <p className="text-[var(--loomina-text-light)] max-w-xl leading-relaxed">
+          <h2 className="text-3xl md:text-4xl font-semibold text-[var(--loomina-text)] leading-tight mt-2">
+            Des souvenirs qui traversent le temps
+          </h2>
+        </div>
+          <p className="text-[var(--loomina-text)] max-w-xl leading-relaxed">
             Nous accompagnons les familles pour que chaque anecdote, rires comme silences, trouve sa place dans un livre qui reste.
           </p>
         </div>
@@ -43,16 +43,14 @@ export default function ImpactMetrics() {
           {metrics.map((metric) => (
             <div
               key={metric.label}
-              className="relative overflow-hidden rounded-2xl p-5 shadow-[0_25px_70px_-55px_rgba(217,54,98,0.6)] border border-[var(--loomina-burgundy)]/10 bg-white"
+              className="relative overflow-hidden rounded-2xl p-5 shadow-lg border border-[var(--loomina-burgundy)]/10 bg-white"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(242,93,122,0.12),transparent_50%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(43,183,163,0.12),transparent_55%)]" />
               <div className="relative">
-                <p className="text-sm text-[var(--loomina-text-light)] mb-2">{metric.label}</p>
+                <p className="text-sm text-[var(--loomina-text)] mb-2">{metric.label}</p>
                 <p className="text-3xl md:text-4xl font-semibold text-[var(--loomina-text)] leading-tight">
                   {metric.value}
                 </p>
-                <p className="text-sm text-[var(--loomina-text-light)] mt-2">{metric.detail}</p>
+                <p className="text-sm text-[var(--loomina-text)] mt-2">{metric.detail}</p>
               </div>
             </div>
           ))}

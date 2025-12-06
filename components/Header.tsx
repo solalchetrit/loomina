@@ -20,7 +20,7 @@ export default function Header() {
         {/* LOGO */}
         <Link href="/" className="relative h-20 w-[260px] shrink-0">
           <Image
-            src="/header_logo.svg"
+            src="/header_logo.png"
             alt="Loomina"
             width={260}
             height={80}
@@ -39,7 +39,7 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={`relative transition-opacity hover:opacity-70 ${
-                  isActive ? "text-[var(--loomina-burgundy-dark)]" : "text-[var(--loomina-text)]"
+                  isActive ? "text-[var(--loomina-burgundy)]" : "text-[var(--loomina-text)]"
                 }`}
               >
                 {item.label}
