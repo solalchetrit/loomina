@@ -6,13 +6,13 @@
 }
 
 :root {
-  --loomina-black: #0a0a0a;
+  --loomina-black: #0f1014;
   --loomina-white: #ffffff;
-  --loomina-gray-light: #f4f4f5;
-  --loomina-gray-dark: #27272a;
-  --loomina-gold: #d4af37;
-  --loomina-gold-light: #f3e5c2;
-  --background: #ffffff;
+  --loomina-gray-light: #f7f0e8;
+  --loomina-gray-dark: #3c3432;
+  --loomina-gold: #e5a24f;
+  --loomina-gold-light: #f7dfc2;
+  --background: #fffaf3;
   --foreground: var(--loomina-black);
 }
 
