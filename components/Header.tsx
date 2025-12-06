@@ -27,7 +27,7 @@ export default function Header() {
                 </Link>
 
                 <nav
-                    className="flex flex-1 flex-wrap items-center justify-end gap-x-10 gap-y-4 text-sm font-medium text-black"
+                    className="flex flex-1 flex-wrap items-center justify-end gap-x-12 gap-y-4 text-sm font-medium text-black"
                     style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
                 >
                     {NAV_LINKS.map((item) => {
@@ -38,7 +38,7 @@ export default function Header() {
                                 key={item.href}
                                 href={item.href}
                                 className={`rounded-full px-3 py-2 transition-colors ${
-                                    isActive ? "text-black" : "text-black/70 hover:text-black"
+                                    isActive ? "text-black" : "text-black hover:text-black"
                                 }`}
                             >
                                 {item.label}
