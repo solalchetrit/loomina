@@ -35,20 +35,20 @@ export default function FidjooFAQ() {
     };
 
     return (
-        <div className="w-full max-w-[800px] mx-auto flex flex-col gap-5 font-[family-name:var(--font-quicksand)] text-[#0b0b0b]">
+        <div className="w-full max-w-[800px] mx-auto flex flex-col gap-5 font-[family-name:var(--font-quicksand)] text-white">
             {faqData.map((item, index) => {
                 const isOpen = openIndex === index;
                 return (
                     <div
                         key={index}
-                        className={`bg-[#f6f6f4] rounded-[12px] overflow-hidden transition-all duration-300 ${isOpen ? 'active' : ''}`}
+                        className={`bg-white/5 rounded-[16px] overflow-hidden transition-all duration-300 border border-white/10 backdrop-blur ${isOpen ? 'shadow-[0_25px_80px_-60px_rgba(34,211,238,0.9)]' : ''}`}
                     >
                         <button
                             onClick={() => toggleFAQ(index)}
-                            className={`w-full flex items-center justify-between p-[24px_32px] bg-transparent border-none cursor-pointer text-left font-bold text-[1.08rem] transition-colors duration-200 ${isOpen ? 'text-[#0b0b0b]' : 'text-[#0b0b0b]'} hover:text-[#000]`}
+                            className={`w-full flex items-center justify-between px-6 py-5 bg-transparent border-none cursor-pointer text-left font-bold text-[1.08rem] transition-colors duration-200 ${isOpen ? 'text-[var(--loomina-gold-light)]' : 'text-white'} hover:text-[var(--loomina-gold-light)]`}
                         >
                             <div className="flex items-center gap-[15px]">
-                                <span className="text-[#0b0b0b] text-[1.4rem] flex items-center">
+                                <span className="text-[var(--loomina-gold)] text-[1.4rem] flex items-center">
                                     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -57,7 +57,7 @@ export default function FidjooFAQ() {
                                 </span>
                                 <span>{item.question}</span>
                             </div>
-                            <span className={`text-[#444] transition-transform duration-300 ease-out flex items-center ${isOpen ? 'rotate-180' : ''}`}>
+                            <span className={`text-[var(--loomina-text-light)] transition-transform duration-300 ease-out flex items-center ${isOpen ? 'rotate-180' : ''}`}>
                                 <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
@@ -65,10 +65,10 @@ export default function FidjooFAQ() {
                         </button>
 
                         <div
-                            className={`overflow-hidden transition-[max-height] duration-300 ease-out text-[#222] leading-[1.7] bg-[#fbfaf8]`}
+                            className={`overflow-hidden transition-[max-height] duration-300 ease-out text-[var(--loomina-text-light)] leading-[1.7] bg-white/5`}
                             style={{ maxHeight: isOpen ? '500px' : '0' }}
                         >
-                            <p className="pb-[25px] pl-[69px] pr-[32px]">{item.answer}</p> {/* 30px + 15px + 24px icon approx = 69px padding left */}
+                            <p className="pb-[25px] pl-[69px] pr-[32px]">{item.answer}</p>
                         </div>
                     </div>
                 );

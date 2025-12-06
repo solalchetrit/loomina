@@ -6,21 +6,23 @@
 }
 
 :root {
-  /* Loomina Brand Colors */
-  --loomina-burgundy: #681829;
-  --loomina-burgundy-dark: #4a0f1d;
-  --loomina-gold: #D4AF37;
-  --loomina-gold-light: #F4D06F;
-  --loomina-cream: #F9F7F2;
-  --loomina-text: #2C1810;
-  --loomina-text-light: #5D4037;
+  /* Palette nocturne & irisée */
+  --loomina-burgundy: #7c3aed; /* Violet néon pour les actions fortes */
+  --loomina-burgundy-dark: #4c1d95;
+  --loomina-gold: #22d3ee; /* Cyan irisé pour les détails lumineux */
+  --loomina-gold-light: #a5f3fc;
+  --loomina-cream: #0b1224; /* Fond profond pour le verre */
+  --loomina-text: #e2e8f0;
+  --loomina-text-light: #94a3b8;
 
-  --background: var(--loomina-cream);
+  --background: radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.12), transparent 32%),
+    radial-gradient(circle at 80% 10%, rgba(34, 211, 238, 0.14), transparent 28%),
+    #050915;
   --foreground: var(--loomina-text);
 }
 
 body {
-  color: #000;
+  color: var(--loomina-text);
   background: var(--background);
   margin: 0;
   padding: 0;
