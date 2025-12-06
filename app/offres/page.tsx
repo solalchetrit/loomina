@@ -1,40 +1,26 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Offres Loomina | Livre et accompagnement numérique",
+    title: "Offre unique Loomina | Livre & accompagnement numérique",
     description:
-        "Deux offres pour préserver vos souvenirs : édition signature avec livre imprimé et écho numérique sécurisé pour la famille.",
+        "Une offre simple : livre imprimé et version numérique sécurisée, accompagnés par l'équipe Loomina pour transmettre vos souvenirs.",
 };
 
-const offers = [
-    {
-        title: "Édition Signature",
-        badge: "Livre & digital",
-        price: "222 €",
-        description:
-            "Votre histoire prend forme dans un livre imprimé et une version numérique animée. Vous êtes accompagné de la prise de notes jusqu'à la mise en page finale.",
-        highlights: [
-            "6 exemplaires imprimés en Finition Premium",
-            "Direction éditoriale et relectures humaines illimitées",
-            "Mise en page artisanale avec photos et couverture sur mesure",
-            "Accès privé au jumeau mémoriel numérique pour continuer à transmettre",
-        ],
-        cta: "Préparer mon livre",
-    },
-    {
-        title: "Écho Numérique",
-        badge: "Entretien continu",
-        price: "118 €",
-        description:
-            "L'essentiel pour démarrer : un journal interactif guidé, des relances personnalisées et un espace sécurisé à partager avec vos proches.",
-        highlights: [
-            "Entretiens guidés avec synthèse mensuelle",
-            "Relances intelligentes pour ne rien oublier",
-            "Espace privé et chiffré pour la famille",
-        ],
-        cta: "Choisir l'option numérique",
-    },
-];
+const offer = {
+    title: "Lumina, livre & numérique",
+    badge: "Offre unique",
+    price: "222 €",
+    originalPrice: "279 €",
+    description:
+        "Une formule claire : interviews guidés, réécriture avec votre voix, maquette artisanale et diffusion numérique sécurisée.",
+    highlights: [
+        "5 exemplaires imprimés inclus (papier premium)",
+        "Co-écriture et relectures illimitées avec l'équipe Loomina",
+        "Mise en page lumineuse avec vos photos retouchées",
+        "Version numérique protégée et prête à partager",
+    ],
+    cta: "Préparer mon livre Lumina",
+};
 
 const essentials = [
     {
@@ -73,79 +59,80 @@ export default function Offres() {
                 <div className="absolute -top-24 -right-10 h-48 w-48 rounded-full bg-[var(--loomina-amber)]/22 blur-3xl" aria-hidden />
                 <header className="text-center space-y-4 max-w-3xl mx-auto">
                     <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-[var(--loomina-amber-strong)] font-semibold">
-                        Offres Loomina
+                        Offre unique Loomina
                     </p>
-                    <h1 className="text-4xl md:text-5xl font-semibold leading-tight">Vos souvenirs, mis en beauté</h1>
+                    <h1 className="text-4xl md:text-5xl font-semibold leading-tight">Lumina : un seul parcours, tout compris</h1>
                     <p className="text-lg leading-relaxed text-[var(--loomina-muted)]">
-                        Deux offres, un même design apaisé. Palette constante, boutons doux, et explications courtes pour comprendre immédiatement votre accompagnement.
+                        Nous avons simplifié l'expérience : une seule offre, la même exigence éditoriale et une livraison qui inclut le livre imprimé et sa version numérique protégée.
                     </p>
                 </header>
 
-                <section className="grid md:grid-cols-2 gap-8">
-                    {offers.map((offer, index) => (
-                        <div
-                            key={offer.title}
-                            className={`glow-ring relative overflow-hidden rounded-3xl border border-black/5 flex flex-col h-full transition-transform duration-300 hover:-translate-y-1 ${
-                                index === 0 ? "bg-[var(--loomina-ink)] text-[var(--loomina-cloud)]" : "bg-white/90"
-                            }`}
-                        >
-                            <div className="p-8 space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <span
-                                        className={`inline-flex items-center gap-2 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] rounded-full border ${
-                                            index === 0
-                                                ? "bg-white/10 border-white/20 text-[var(--loomina-cloud)]"
-                                                : "bg-[var(--loomina-cloud)] border-black/6 text-[var(--loomina-ink)]"
-                                        }`}
-                                    >
-                                        ✦ {offer.badge}
-                                    </span>
-                                    <span className={`text-sm font-semibold ${index === 0 ? "text-[var(--loomina-amber)]" : "text-[var(--loomina-amber-strong)]"}`}>
-                                        Accompagnement dédié
-                                    </span>
-                                </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-2xl font-semibold">{offer.title}</h3>
-                                    <p className={`text-sm uppercase tracking-[0.18em] font-semibold ${index === 0 ? "text-[var(--loomina-amber)]" : "text-[var(--loomina-amber-strong)]"}`}>
-                                        Offre claire
-                                    </p>
-                                </div>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-bold text-[var(--loomina-amber)]">{offer.price}</span>
-                                    {index === 0 && (
-                                        <span className="text-xs uppercase tracking-[0.24em] bg-white/10 px-3 py-1 rounded-full border border-white/20">
-                                            Livre + numérique
-                                        </span>
-                                    )}
-                                </div>
-                                <p className={`leading-relaxed ${index === 0 ? "text-[var(--loomina-cloud)]/80" : "text-[var(--loomina-muted)]"}`}>
-                                    {offer.description}
-                                </p>
-                                <ul className="space-y-3 text-sm">
-                                    {offer.highlights.map((item) => (
-                                        <li key={item} className="flex items-start gap-3">
-                                            <span className={`mt-1 h-2 w-2 rounded-full ${index === 0 ? "bg-[var(--loomina-amber)]" : "bg-[var(--loomina-amber-strong)]"}`} />
-                                            <span className={`${index === 0 ? "text-[var(--loomina-cloud)]" : "text-[var(--loomina-ink)]"}`}>
-                                                {item}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
+                <section className="grid md:grid-cols-[1.15fr,0.85fr] gap-8 items-start">
+                    <div className="glow-ring relative overflow-hidden rounded-3xl border border-black/5 flex flex-col h-full bg-[var(--loomina-ink)] text-[var(--loomina-cloud)]">
+                        <div className="p-8 space-y-6">
+                            <div className="flex items-center justify-between">
+                                <span className="inline-flex items-center gap-2 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] rounded-full border bg-white/10 border-white/20 text-[var(--loomina-cloud)]">
+                                    ✦ {offer.badge}
+                                </span>
+                                <span className="text-sm font-semibold text-[var(--loomina-amber)]">Accompagnement dédié</span>
                             </div>
-                            <div className={`p-8 border-t ${index === 0 ? "border-white/10" : "border-black/5"}`}>
-                                <a
-                                    href={buildOfferMailto(offer.title)}
-                                    className={`block text-center w-full py-4 rounded-full font-semibold transition-all shadow-md ${
-                                        index === 0
-                                            ? "bg-[var(--loomina-amber)] text-[var(--loomina-ink)] hover:brightness-110"
-                                            : "bg-[var(--loomina-ink)] text-[var(--loomina-cloud)] hover:-translate-y-[1px]"
-                                    }`}
-                                >
-                                    {offer.cta}
-                                </a>
+                            <div className="space-y-2">
+                                <h3 className="text-2xl font-semibold">{offer.title}</h3>
+                                <p className="text-sm uppercase tracking-[0.18em] font-semibold text-[var(--loomina-amber)]">Offre claire</p>
                             </div>
+                            <div className="flex items-baseline gap-3">
+                                <span className="text-4xl font-bold text-[var(--loomina-amber)]">{offer.price}</span>
+                                <span className="text-sm text-[var(--loomina-cloud)]/70 line-through">{offer.originalPrice}</span>
+                                <span className="text-xs uppercase tracking-[0.24em] bg-white/10 px-3 py-1 rounded-full border border-white/20">
+                                    Livre + numérique
+                                </span>
+                            </div>
+                            <p className="leading-relaxed text-[var(--loomina-cloud)]/80">{offer.description}</p>
+                            <ul className="space-y-3 text-sm">
+                                {offer.highlights.map((item) => (
+                                    <li key={item} className="flex items-start gap-3">
+                                        <span className="mt-1 h-2 w-2 rounded-full bg-[var(--loomina-amber)]" />
+                                        <span className="text-[var(--loomina-cloud)]">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                    ))}
+                        <div className="p-8 border-t border-white/10">
+                            <a
+                                href={buildOfferMailto(offer.title)}
+                                className="block text-center w-full py-4 rounded-full font-semibold transition-all shadow-md bg-[var(--loomina-amber)] text-[var(--loomina-ink)] hover:brightness-110"
+                            >
+                                {offer.cta}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className="glow-ring rounded-3xl bg-white/90 border border-black/5 p-8 space-y-6 h-full flex flex-col">
+                        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[var(--loomina-cloud)] text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--loomina-ink)] border border-black/5">
+                            Inclus dans Lumina
+                        </div>
+                        <h3 className="text-2xl font-semibold">Ce que vous recevez</h3>
+                        <p className="text-[var(--loomina-muted)] leading-relaxed">
+                            De la première prise de notes à la remise des exemplaires, l'équipe Loomina reste votre interlocuteur unique. Nous gérons les interviews, la rédaction, la maquette et la version numérique sécurisée.
+                        </p>
+                        <ul className="space-y-3 text-sm text-[var(--loomina-ink)]">
+                            <li className="flex items-start gap-3">
+                                <span className="mt-1 h-2 w-2 rounded-full bg-[var(--loomina-amber-strong)]" />
+                                <span>Calendrier partagé et relances douces pour rester serein.</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <span className="mt-1 h-2 w-2 rounded-full bg-[var(--loomina-amber-strong)]" />
+                                <span>Relectures humaines illimitées jusqu'à validation finale.</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <span className="mt-1 h-2 w-2 rounded-full bg-[var(--loomina-amber-strong)]" />
+                                <span>Guide de partage familial pour offrir le livre et le lien numérique.</span>
+                            </li>
+                        </ul>
+                        <div className="mt-auto inline-flex items-center gap-2 rounded-full bg-[var(--loomina-cloud)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--loomina-ink)] border border-black/5">
+                            Réponse sous 48h · Impression incluse
+                        </div>
+                    </div>
                 </section>
 
                 <section className="grid lg:grid-cols-[1.2fr,0.9fr] gap-10 items-center bg-white/90 rounded-3xl p-10 border border-black/5 glow-ring">

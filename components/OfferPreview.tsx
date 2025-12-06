@@ -1,20 +1,20 @@
 import Link from "next/link";
 
 const offer = {
-  title: "Édition Signature",
+  title: "Lumina, livre & numérique",
   price: "222 €",
   originalPrice: "279 €",
   description:
-    "Entretiens guidés, réécriture attentive et maquette élégante. Nous livrons un livre relié et sa version numérique prête à partager.",
+    "Une formule unique : interviews guidés, réécriture attentive et maquette élégante. Nous livrons un livre relié et sa version numérique prête à partager.",
   highlights: [
     "5 exemplaires imprimés inclus (papier premium)",
     "Co-écriture et relectures illimitées avec l'équipe Loomina",
     "Mise en page lumineuse avec vos photos retouchées",
     "Version numérique protégée et prête à envoyer",
   ],
-  cta: "Préparer mon livre",
+  cta: "Préparer mon livre Lumina",
   href: "/offres",
-  badge: "Livre physique & numérique",
+  badge: "Offre unique",
 };
 
 export default function OfferPreview() {
