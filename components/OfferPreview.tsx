@@ -20,7 +20,7 @@ const offer = {
 export default function OfferPreview() {
   return (
     <section
-      className="relative w-full bg-[var(--background)] text-[var(--loomina-black)] py-16 px-6 border-y border-[var(--loomina-black)]/5"
+      className="relative w-full bg-white text-[var(--loomina-black)] py-16 px-6 border-y border-[var(--loomina-black)]/5"
       id="offres"
     >
       <div className="max-w-5xl mx-auto space-y-10">
