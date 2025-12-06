@@ -1,3 +1,5 @@
+import Reveal from "./ui/Reveal";
+
 const testimonials = [
   {
     quote:
@@ -34,19 +36,18 @@ export default function Testimonials() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((item) => (
-            <div
-              key={item.name}
-              className="relative overflow-hidden bg-white border border-[var(--loomina-black)]/10 rounded-3xl p-6 shadow-lg flex flex-col gap-4"
-            >
-              <div className="relative">
-                <p className="text-lg text-[var(--loomina-black)] leading-relaxed">“{item.quote}”</p>
-                <div className="pt-2 border-t border-[var(--loomina-black)]/15 mt-4">
-                  <p className="font-semibold text-[var(--loomina-black)]">{item.name}</p>
-                  <p className="text-sm text-[var(--loomina-black)]">{item.detail}</p>
+          {testimonials.map((item, index) => (
+            <Reveal key={item.name} delay={index * 0.08}>
+              <div className="relative overflow-hidden bg-white border border-[var(--loomina-black)]/10 rounded-3xl p-6 shadow-lg flex flex-col gap-4">
+                <div className="relative">
+                  <p className="text-lg text-[var(--loomina-black)] leading-relaxed">“{item.quote}”</p>
+                  <div className="pt-2 border-t border-[var(--loomina-black)]/15 mt-4">
+                    <p className="font-semibold text-[var(--loomina-black)]">{item.name}</p>
+                    <p className="text-sm text-[var(--loomina-black)]">{item.detail}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

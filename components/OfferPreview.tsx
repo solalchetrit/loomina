@@ -1,4 +1,5 @@
-import Link from "next/link";
+import MagicButton from "./ui/MagicButton";
+import Reveal from "./ui/Reveal";
 
 const offer = {
   title: "Lumina, livre & numérique",
@@ -31,7 +32,7 @@ export default function OfferPreview() {
           </p>
         </div>
 
-        <div className="relative overflow-hidden rounded-[28px] border border-black/6 bg-white/90 p-8 shadow-[0_28px_90px_-60px_rgba(0,0,0,0.45)] backdrop-blur">
+        <Reveal className="relative overflow-hidden rounded-[28px] border border-black/6 bg-white/90 p-8 shadow-[0_28px_90px_-60px_rgba(0,0,0,0.45)] backdrop-blur">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--loomina-cloud)] text-xs uppercase tracking-[0.18em] text-[var(--loomina-ink)] font-semibold border border-black/5">
@@ -56,24 +57,26 @@ export default function OfferPreview() {
           </div>
 
           <ul className="grid gap-3 text-[var(--loomina-ink)] md:grid-cols-2">
-            {offer.highlights.map((highlight) => (
-              <li key={highlight} className="flex items-start gap-3 rounded-2xl bg-[var(--loomina-cloud)] p-3 border border-black/5">
-                <span className="text-[var(--loomina-amber-strong)]">✦</span>
-                <span className="text-[var(--loomina-muted)]">{highlight}</span>
-              </li>
+            {offer.highlights.map((highlight, index) => (
+              <Reveal key={highlight} delay={index * 0.05}>
+                <li className="flex items-start gap-3 rounded-2xl bg-[var(--loomina-cloud)] p-3 border border-black/5">
+                  <span className="text-[var(--loomina-amber-strong)]">✦</span>
+                  <span className="text-[var(--loomina-muted)]">{highlight}</span>
+                </li>
+              </Reveal>
             ))}
           </ul>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            <Link
+            <MagicButton
               href={offer.href}
-              className="inline-flex items-center justify-center rounded-full bg-[var(--loomina-amber)] px-6 py-3 font-semibold text-[var(--loomina-ink)] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)] transition hover:brightness-110"
+              className="bg-[var(--loomina-amber)] text-[var(--loomina-ink)] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)] border border-black/10"
             >
               {offer.cta}
-            </Link>
+            </MagicButton>
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--loomina-muted)]">Réponse sous 48h</span>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
