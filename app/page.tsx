@@ -20,6 +20,25 @@ const promisePoints = [
   },
 ];
 
+const processSteps = [
+  {
+    title: "On vous guide dès le premier appel",
+    detail: "Un créateur Loomina prépare vos entretiens avec vous pour ne rien oublier des moments clés.",
+    badge: "Brief & repérage",
+  },
+  {
+    title: "Les entretiens deviennent un récit",
+    detail:
+      "Séances enregistrées en douceur, puis montage éditorial : les hésitations disparaissent, la voix reste intacte.",
+    badge: "Production",
+  },
+  {
+    title: "Un livre tangible pour transmettre",
+    detail: "Mise en page artistique, photos intégrées et exemplaires imprimés prêts à offrir en famille.",
+    badge: "Livraison",
+  },
+];
+
 export default function Home() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center bg-[var(--background)] text-[var(--loomina-black)]">
@@ -46,6 +65,46 @@ export default function Home() {
                 </div>
                 <h3 className="text-2xl font-semibold leading-tight">{point.title}</h3>
                 <p className="text-[var(--loomina-gray-dark)] leading-relaxed">{point.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full bg-gradient-to-b from-white to-[var(--loomina-gray-light)]/40 py-16 px-6">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+            <div className="space-y-3 max-w-3xl">
+              <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Comment ça marche</p>
+              <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Une méthode claire, pensée pour vos proches</h2>
+              <p className="text-[var(--loomina-gray-dark)] leading-relaxed">
+                Chaque étape est accompagnée par un humain. Vous parlez, nous orchestrons : le résultat est un livre que l'on conserve et que l'on partage.
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--loomina-black)] text-white text-sm font-semibold shadow-[0_12px_40px_-28px_rgba(0,0,0,0.35)]">
+              <span className="h-2 w-2 rounded-full bg-[var(--loomina-gold)]"></span>
+              3 semaines en moyenne, livraison comprise
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {processSteps.map((step, index) => (
+              <div
+                key={step.title}
+                className="relative h-full rounded-3xl border border-[var(--loomina-black)]/10 bg-white p-6 shadow-[0_24px_70px_-50px_rgba(0,0,0,0.4)]"
+              >
+                <div className="flex items-center justify-between mb-3 text-sm uppercase tracking-[0.16em] font-semibold text-[var(--loomina-gray-dark)]">
+                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--loomina-gray-light)] text-[var(--loomina-black)] border border-[var(--loomina-black)]/10">
+                    {step.badge}
+                  </span>
+                  <span className="text-[var(--loomina-gold)]">0{index + 1}</span>
+                </div>
+                <h3 className="text-2xl font-semibold text-[var(--loomina-black)] leading-tight">{step.title}</h3>
+                <p className="mt-3 text-[var(--loomina-gray-dark)] leading-relaxed">{step.detail}</p>
+                <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-[var(--loomina-black)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--loomina-gold)]"></span>
+                  Accompagnement Loomina inclus
+                </div>
               </div>
             ))}
           </div>
