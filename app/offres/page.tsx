@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Offres Loomina | Livre et accompagnement numérique",
+    description:
+        "Deux offres pour préserver vos souvenirs : édition signature avec livre imprimé et écho numérique sécurisé pour la famille.",
+};
+
 const offers = [
     {
         title: "Édition Signature",
@@ -46,6 +54,17 @@ const essentials = [
         text: "Formats imprimés et numériques pensés pour traverser le temps et se partager facilement en famille.",
     },
 ];
+
+const buildOfferMailto = (title: string) => {
+    const subject = encodeURIComponent(title);
+    const body = encodeURIComponent(
+        "Je souhaite en savoir plus sur l'offre " +
+            title +
+            ". Pouvez-vous m'indiquer les prochaines disponibilités ?",
+    );
+
+    return `mailto:contact@loomina.fr?subject=${subject}&body=${body}`;
+};
 
 export default function Offres() {
     return (
@@ -114,15 +133,16 @@ export default function Offres() {
                                 </ul>
                             </div>
                             <div className={`p-8 border-t ${index === 0 ? "border-white/10" : "border-black/5"}`}>
-                                <button
-                                    className={`w-full py-4 rounded-full font-semibold transition-all shadow-md ${
+                                <a
+                                    href={buildOfferMailto(offer.title)}
+                                    className={`block text-center w-full py-4 rounded-full font-semibold transition-all shadow-md ${
                                         index === 0
                                             ? "bg-[var(--loomina-amber)] text-[var(--loomina-ink)] hover:brightness-110"
                                             : "bg-[var(--loomina-ink)] text-[var(--loomina-cloud)] hover:-translate-y-[1px]"
                                     }`}
                                 >
                                     {offer.cta}
-                                </button>
+                                </a>
                             </div>
                         </div>
                     ))}
@@ -158,11 +178,56 @@ export default function Offres() {
                             <p className="text-sm text-[var(--loomina-amber)]">Projet terminé en 6 semaines</p>
                         </div>
                         <a
-                            href="mailto:offres@loomina.fr"
+                            href="mailto:contact@loomina.fr?subject=Discuter%20de%20mon%20projet%20Loomina"
                             className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-amber)] text-[var(--loomina-ink)] font-semibold hover:brightness-110 transition shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)]"
                         >
                             Parler avec l'équipe éditoriale
                         </a>
+                    </div>
+                </section>
+
+                <section className="glow-ring rounded-3xl border border-black/5 bg-white/90 p-8 space-y-6">
+                    <div className="flex flex-col gap-2 text-center md:text-left md:flex-row md:items-center md:justify-between">
+                        <div className="space-y-1">
+                            <p className="text-xs uppercase tracking-[0.24em] text-[var(--loomina-amber-strong)] font-semibold">
+                                Infos pratiques
+                            </p>
+                            <h2 className="text-2xl font-semibold text-[var(--loomina-ink)]">
+                                Ce qui est inclus dès le premier échange
+                            </h2>
+                        </div>
+                        <p className="text-sm text-[var(--loomina-muted)] max-w-xl">
+                            Nous précisons le planning, les droits et les livrables avant de commencer pour éviter toute zone d'ombre.
+                        </p>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-3">
+                        <div className="rounded-2xl border border-black/5 bg-[var(--loomina-cloud)] p-4 space-y-2">
+                            <p className="text-xs uppercase tracking-[0.22em] text-[var(--loomina-amber-strong)] font-semibold">
+                                Délais maîtrisés
+                            </p>
+                            <p className="text-[var(--loomina-ink)] font-semibold">Calendrier partagé</p>
+                            <p className="text-[var(--loomina-muted)] text-sm leading-relaxed">
+                                Dates d'interviews, validation des chapitres et remise des épreuves alignées dès la prise de brief.
+                            </p>
+                        </div>
+                        <div className="rounded-2xl border border-black/5 bg-[var(--loomina-cloud)] p-4 space-y-2">
+                            <p className="text-xs uppercase tracking-[0.22em] text-[var(--loomina-amber-strong)] font-semibold">
+                                Support continu
+                            </p>
+                            <p className="text-[var(--loomina-ink)] font-semibold">Réponse en moins de 24h</p>
+                            <p className="text-[var(--loomina-muted)] text-sm leading-relaxed">
+                                Un interlocuteur unique pour l'ensemble des étapes, disponible par e-mail ou visio.
+                            </p>
+                        </div>
+                        <div className="rounded-2xl border border-black/5 bg-[var(--loomina-cloud)] p-4 space-y-2">
+                            <p className="text-xs uppercase tracking-[0.22em] text-[var(--loomina-amber-strong)] font-semibold">
+                                Transparence juridique
+                            </p>
+                            <p className="text-[var(--loomina-ink)] font-semibold">Contrat et droits d'usage</p>
+                            <p className="text-[var(--loomina-muted)] text-sm leading-relaxed">
+                                Confidentialité contractuelle, choix des destinataires et possibilité de suppression complète des données.
+                            </p>
+                        </div>
                     </div>
                 </section>
             </div>

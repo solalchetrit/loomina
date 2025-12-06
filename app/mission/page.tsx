@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Mission Loomina | Transmission et sécurité",
+    description:
+        "Découvrez pourquoi Loomina existe : une approche humaine, sécurisée et claire pour préserver et transmettre vos histoires.",
+};
+
 export default function Mission() {
     const pillars = [
         {
@@ -11,6 +19,21 @@ export default function Mission() {
         {
             title: "Respect & sécurité",
             description: "Données chiffrées, hébergées en Europe, avec un contrôle total sur ce qui est partagé ou détruit.",
+        },
+    ];
+
+    const commitments = [
+        {
+            title: "Réponse rapide",
+            detail: "Retour en moins de 24h pour lancer ou ajuster votre projet.",
+        },
+        {
+            title: "Hébergement européen",
+            detail: "Serveurs et sauvegardes localisés en Europe, sans revente de données.",
+        },
+        {
+            title: "Contrats clairs",
+            detail: "Clauses de confidentialité fournies dès le premier échange, sans surprise ultérieure.",
         },
     ];
 
@@ -50,6 +73,21 @@ export default function Mission() {
                     ))}
                 </section>
 
+                <section className="grid gap-4 md:grid-cols-3">
+                    {commitments.map((item) => (
+                        <div
+                            key={item.title}
+                            className="glow-ring h-full rounded-2xl border border-black/5 bg-white/90 p-7 space-y-2"
+                        >
+                            <p className="text-xs uppercase tracking-[0.26em] text-[var(--loomina-amber-strong)] font-semibold">
+                                Engagement
+                            </p>
+                            <h3 className="text-xl font-semibold text-[var(--loomina-ink)]">{item.title}</h3>
+                            <p className="text-[var(--loomina-muted)] leading-relaxed">{item.detail}</p>
+                        </div>
+                    ))}
+                </section>
+
                 <section className="glow-ring flex flex-col items-center gap-10 rounded-3xl border border-black/5 bg-white/90 p-10 md:flex-row md:items-center md:justify-between">
                     <div className="space-y-3 max-w-3xl">
                         <p className="text-sm uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Ce qui nous anime</p>
@@ -68,7 +106,7 @@ export default function Mission() {
                                 Partagez vos besoins, nous construisons un parcours sur mesure pour vous ou vos proches.
                             </p>
                             <a
-                                href="mailto:mission@loomina.fr"
+                                href="mailto:contact@loomina.fr?subject=Echange%20sur%20la%20mission%20Loomina"
                                 className="block w-full rounded-full bg-[var(--loomina-amber)] px-5 py-3 text-center font-semibold text-[var(--loomina-ink)] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)] transition hover:brightness-110"
                             >
                                 Échanger avec l'équipe
