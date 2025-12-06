@@ -1,10 +1,10 @@
 export default function Accompagnement() {
     return (
-        <div className="bg-[#f2efeb] min-h-screen py-20 px-6 text-[var(--loomina-text)]">
+        <div className="bg-[var(--loomina-surface-muted)] min-h-screen py-20 px-6 text-[var(--loomina-text)]">
             <div className="max-w-6xl mx-auto space-y-16">
                 <header className="text-center space-y-6 max-w-3xl mx-auto">
                     <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Une présence humaine renforcée par l'IA</p>
-                    <h1 className="text-4xl md:text-5xl font-serif text-[var(--loomina-burgundy)] leading-tight">
+                    <h1 className="text-4xl md:text-5xl font-serif text-white leading-tight">
                         Un accompagnement complet pour raconter et préserver votre histoire
                     </h1>
                     <p className="text-lg text-[var(--loomina-text-light)] leading-relaxed">
@@ -13,9 +13,9 @@ export default function Accompagnement() {
                 </header>
 
                 <section className="grid md:grid-cols-2 gap-10">
-                    <div className="bg-white rounded-lg shadow-sm border border-[var(--loomina-burgundy)]/10 p-8 space-y-4">
+                    <div className="bg-[var(--loomina-cream)]/80 rounded-lg shadow-[0_22px_60px_-36px_rgba(0,0,0,0.85)] border border-[var(--loomina-border)] p-8 space-y-4 backdrop-blur">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Étape 1</p>
-                        <h2 className="text-2xl font-serif text-[var(--loomina-burgundy)]">Découverte et cadrage</h2>
+                        <h2 className="text-2xl font-serif text-white">Découverte et cadrage</h2>
                         <p className="text-[var(--loomina-text-light)] leading-relaxed">
                             Un premier rendez-vous pour cerner vos attentes, comprendre les événements clés à documenter et définir les voix à interviewer. Nous construisons ensemble le fil rouge de votre récit.
                         </p>
@@ -25,9 +25,9 @@ export default function Accompagnement() {
                         </ul>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-sm border border-[var(--loomina-burgundy)]/10 p-8 space-y-4">
+                    <div className="bg-[var(--loomina-cream)]/80 rounded-lg shadow-[0_22px_60px_-36px_rgba(0,0,0,0.85)] border border-[var(--loomina-border)] p-8 space-y-4 backdrop-blur">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Étape 2</p>
-                        <h2 className="text-2xl font-serif text-[var(--loomina-burgundy)]">Collecte guidée par IA</h2>
+                        <h2 className="text-2xl font-serif text-white">Collecte guidée par IA</h2>
                         <p className="text-[var(--loomina-text-light)] leading-relaxed">
                             Votre jumeau mémoriel écoute sans relâche, relance avec délicatesse et organise les souvenirs. Chaque session est supervisée par un rédacteur pour garantir chaleur et cohérence.
                         </p>
@@ -37,9 +37,9 @@ export default function Accompagnement() {
                         </ul>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-sm border border-[var(--loomina-burgundy)]/10 p-8 space-y-4">
+                    <div className="bg-[var(--loomina-cream)]/80 rounded-lg shadow-[0_22px_60px_-36px_rgba(0,0,0,0.85)] border border-[var(--loomina-border)] p-8 space-y-4 backdrop-blur">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Étape 3</p>
-                        <h2 className="text-2xl font-serif text-[var(--loomina-burgundy)]">Écriture et mise en forme</h2>
+                        <h2 className="text-2xl font-serif text-white">Écriture et mise en forme</h2>
                         <p className="text-[var(--loomina-text-light)] leading-relaxed">
                             Un auteur transforme les entretiens en un récit fluide, chapitre après chapitre. Nous vous partageons des épreuves pour ajuster les détails, les photos et la voix narrative.
                         </p>
@@ -49,9 +49,9 @@ export default function Accompagnement() {
                         </ul>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-sm border border-[var(--loomina-burgundy)]/10 p-8 space-y-4">
+                    <div className="bg-[var(--loomina-cream)]/80 rounded-lg shadow-[0_22px_60px_-36px_rgba(0,0,0,0.85)] border border-[var(--loomina-border)] p-8 space-y-4 backdrop-blur">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Étape 4</p>
-                        <h2 className="text-2xl font-serif text-[var(--loomina-burgundy)]">Transmission vivante</h2>
+                        <h2 className="text-2xl font-serif text-white">Transmission vivante</h2>
                         <p className="text-[var(--loomina-text-light)] leading-relaxed">
                             Vous recevez vos exemplaires imprimés ainsi que l'accès au jumeau mémoriel. Nous restons disponibles pour ajouter de nouveaux chapitres ou intégrer des contributions familiales.
                         </p>
@@ -62,7 +62,7 @@ export default function Accompagnement() {
                     </div>
                 </section>
 
-                <section className="bg-[var(--loomina-burgundy)] text-white rounded-lg p-10 flex flex-col md:flex-row gap-8 items-center">
+                <section className="bg-gradient-to-r from-[var(--loomina-burgundy-dark)] to-[var(--loomina-surface)] text-white rounded-lg p-10 flex flex-col md:flex-row gap-8 items-center shadow-[0_24px_60px_-36px_rgba(0,0,0,0.9)]">
                     <div className="space-y-3 max-w-3xl">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Ce que nous garantissons</p>
                         <h3 className="text-3xl font-serif font-semibold">Confidentialité, patience et soin éditorial</h3>

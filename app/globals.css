@@ -6,21 +6,26 @@
 }
 
 :root {
-  /* Loomina Brand Colors */
-  --loomina-burgundy: #681829;
-  --loomina-burgundy-dark: #4a0f1d;
-  --loomina-gold: #D4AF37;
-  --loomina-gold-light: #F4D06F;
-  --loomina-cream: #F9F7F2;
-  --loomina-text: #2C1810;
-  --loomina-text-light: #5D4037;
+  /* Loomina Midnight Aurora palette */
+  --loomina-burgundy: #7c5dff; /* Accent glow */
+  --loomina-burgundy-dark: #5c3ec6;
+  --loomina-gold: #40f3d2; /* Secondary mint accent */
+  --loomina-gold-light: #a3ffe8;
+  --loomina-cream: #0f182b; /* Deep surface */
+  --loomina-surface: #121d33;
+  --loomina-surface-muted: #0b1324;
+  --loomina-border: #1f2b44;
+  --loomina-text: #e6ebf5;
+  --loomina-text-light: #b4c0d7;
 
-  --background: var(--loomina-cream);
+  --background: radial-gradient(circle at 20% 20%, #1c2a4a 0%, #0a1020 35%),
+    radial-gradient(circle at 80% 0%, #182a45 0%, #0a0f1d 40%),
+    #0a0f1d;
   --foreground: var(--loomina-text);
 }
 
 body {
-  color: #000;
+  color: var(--foreground);
   background: var(--background);
   margin: 0;
   padding: 0;

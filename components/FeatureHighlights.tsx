@@ -18,12 +18,12 @@ const features = [
 
 export default function FeatureHighlights() {
   return (
-    <section className="w-full bg-[var(--loomina-cream)] py-20 px-6">
+    <section className="w-full bg-[var(--loomina-surface-muted)]/70 py-20 px-6 border-y border-[var(--loomina-border)] backdrop-blur-xl">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Fonctionnalités clés</p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-[var(--loomina-text)] leading-tight mt-2">
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Fonctionnalités clés</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white leading-tight mt-2">
               Un parcours pensé pour les familles
             </h2>
           </div>
@@ -36,12 +36,12 @@ export default function FeatureHighlights() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="bg-white rounded-3xl p-8 shadow-[0_18px_40px_-24px_rgba(0,0,0,0.2)] border border-[#eadfce]"
+              className="bg-[var(--loomina-cream)]/80 rounded-3xl p-8 shadow-[0_18px_40px_-24px_rgba(0,0,0,0.5)] border border-[var(--loomina-border)] backdrop-blur"
             >
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-[#eadfce] text-xs uppercase tracking-[0.14em] text-[var(--loomina-burgundy)] font-semibold">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/5 border border-[var(--loomina-border)] text-xs uppercase tracking-[0.14em] text-[var(--loomina-gold)] font-semibold">
                 {feature.tag}
               </span>
-              <h3 className="text-2xl font-semibold text-[var(--loomina-text)] mt-5 mb-3">{feature.title}</h3>
+              <h3 className="text-2xl font-semibold text-white mt-5 mb-3">{feature.title}</h3>
               <p className="text-[var(--loomina-text-light)] leading-relaxed">{feature.description}</p>
             </div>
           ))}

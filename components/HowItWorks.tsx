@@ -5,9 +5,9 @@ import React from "react";
 const STEPS = [
   {
     number: 1,
-    color: "bg-[#D4AF37]",
-    iconColor: "text-[#D4AF37]",
-    borderColor: "border-[#D4AF37]/40",
+    color: "bg-[var(--loomina-gold)]",
+    iconColor: "text-[var(--loomina-gold)]",
+    borderColor: "border-[var(--loomina-gold)]/30",
     title: "Préparation douce",
     description:
       "Un membre de votre famille partage ses souvenirs par téléphone ou visio, guidé par notre IA empathique et un accompagnant humain.",
@@ -20,9 +20,9 @@ const STEPS = [
   },
   {
     number: 2,
-    color: "bg-[#681829]",
-    iconColor: "text-[#681829]",
-    borderColor: "border-[#681829]/25",
+    color: "bg-[var(--loomina-burgundy)]",
+    iconColor: "text-[var(--loomina-burgundy)]",
+    borderColor: "border-[var(--loomina-burgundy)]/30",
     title: "Montage éditorial",
     description:
       "Nous nettoyons les enregistrements, retranscrivons, sélectionnons les meilleures photos et construisons une narration fluide.",
@@ -35,9 +35,9 @@ const STEPS = [
   },
   {
     number: 3,
-    color: "bg-[#4ADE80]",
-    iconColor: "text-[#4ADE80]",
-    borderColor: "border-[#4ADE80]/30",
+    color: "bg-[#7dd3fc]",
+    iconColor: "text-[#7dd3fc]",
+    borderColor: "border-[#7dd3fc]/30",
     title: "Livre prêt à offrir",
     description:
       "Vous validez la maquette. Nous imprimons et envoyons autant d'exemplaires que souhaité, avec une version audio en option.",
@@ -56,15 +56,15 @@ export default function HowItWorks() {
   return (
     <section
       id="comment"
-      className="bg-[#f9f9f9] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)]"
+      className="bg-[var(--loomina-surface-muted)]/75 py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] backdrop-blur border-y border-[var(--loomina-border)]"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header de section */}
         <div className="text-center mb-20 space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
             Comment nous travaillons
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-[var(--loomina-text-light)]">
             Trois étapes pour transformer des souvenirs en un livre vivant
           </p>
         </div>
@@ -74,35 +74,35 @@ export default function HowItWorks() {
           {STEPS.map((step) => (
             <div
               key={step.number}
-              className="relative bg-white rounded-[2rem] p-10 shadow-sm border border-black/[0.02] flex flex-col h-full"
+              className="relative bg-[var(--loomina-cream)]/85 rounded-[2rem] p-10 shadow-[0_25px_60px_-36px_rgba(0,0,0,0.9)] border border-[var(--loomina-border)] flex flex-col h-full backdrop-blur"
             >
               {/* Badge Numéro Flottant (Top Left) */}
               <div
-                className={`absolute -top-5 -left-5 w-12 h-12 rounded-full ${step.color} text-white flex items-center justify-center text-lg font-bold shadow-md border-4 border-[#f9f9f9]`}
+                className={`absolute -top-5 -left-5 w-12 h-12 rounded-full ${step.color} text-[var(--loomina-surface-muted)] flex items-center justify-center text-lg font-bold shadow-md border-4 border-[var(--loomina-surface)]`}
               >
                 {step.number}
               </div>
 
               {/* Icone Box */}
               <div
-                className={`w-16 h-16 rounded-2xl border ${step.borderColor} bg-white flex items-center justify-center mb-8 ${step.iconColor}`}
+                className={`w-16 h-16 rounded-2xl border ${step.borderColor} bg-[var(--loomina-surface)] flex items-center justify-center mb-8 ${step.iconColor}`}
               >
                 {step.icon}
               </div>
 
               {/* Contenu */}
               <div className="flex-grow">
-                <h3 className="text-2xl font-bold text-neutral-900 mb-4">
+                <h3 className="text-2xl font-bold text-white mb-4">
                   {step.title}
                 </h3>
-                <p className="text-neutral-600 leading-relaxed mb-8">
+                <p className="text-[var(--loomina-text-light)] leading-relaxed mb-8">
                   {step.description}
                 </p>
               </div>
 
               {/* Footer léger en bas de carte */}
-              <div className="pt-6 border-t border-gray-100 mt-auto">
-                <p className="text-sm font-semibold text-neutral-400 uppercase tracking-wide">
+              <div className="pt-6 border-t border-[var(--loomina-border)] mt-auto">
+                <p className="text-sm font-semibold text-[var(--loomina-text-light)] uppercase tracking-wide">
                   {step.footer}
                 </p>
               </div>
