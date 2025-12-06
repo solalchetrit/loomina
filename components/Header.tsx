@@ -4,42 +4,43 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// J'ai unifié tous les liens ici pour qu'ils aient le même traitement
 const NAV_LINKS = [
     { href: "/", label: "Accueil" },
     { href: "/mission", label: "Mission" },
     { href: "/offres", label: "Offres" },
-    { href: "/decouvrir", label: "Découvrir" }, // "Découvrir" est maintenant un lien simple
+    { href: "/decouvrir", label: "Découvrir" },
 ];
 
 export default function Header() {
     const pathname = usePathname();
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md">
-            <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 md:px-8">
+        // Z-index très élevé pour passer au dessus de tout
+        <header className="sticky top-0 z-[100] w-full border-b border-gray-200 bg-white/90 backdrop-blur-md">
+            <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
                 
-                {/* 1. Logo à Gauche */}
-                <Link href="/" className="relative flex h-10 w-32 shrink-0 items-center">
+                {/* 1. Logo - Utilisation de logo.png avec dimensions fixes */}
+                <Link href="/" className="flex items-center shrink-0">
                     <Image
-                        src="/header_logo.png" 
-                        alt="Lúmina"
-                        fill
-                        className="object-contain object-left"
+                        src="/logo.png" 
+                        alt="Lúmina Logo"
+                        width={150}
+                        height={50}
+                        className="object-contain"
                         priority
                     />
                 </Link>
 
-                {/* 2. Navigation Unifiée (Tout le monde a le même style) */}
-                <nav className="hidden md:flex items-center gap-12 font-[family-name:var(--font-plus-jakarta-sans)] font-medium text-sm text-neutral-600">
+                {/* 2. Navigation - VISIBLE PAR DÉFAUT (flex au lieu de hidden) */}
+                <nav className="flex items-center gap-8 font-[family-name:var(--font-plus-jakarta-sans)]">
                     {NAV_LINKS.map((item) => {
                         const isActive = pathname === item.href;
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`transition-colors duration-200 hover:text-black ${
-                                    isActive ? "text-black font-bold" : ""
+                                className={`text-sm font-bold transition-colors hover:text-gray-600 ${
+                                    isActive ? "text-black underline underline-offset-4" : "text-black"
                                 }`}
                             >
                                 {item.label}
@@ -47,18 +48,6 @@ export default function Header() {
                         );
                     })}
                 </nav>
-
-                {/* 3. Mobile Menu (Placeholder) - Optionnel si tu veux garder le côté épuré à droite */}
-                <div className="flex md:hidden">
-                    <button className="text-black">
-                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                        </svg>
-                    </button>
-                </div>
-                
-                {/* Bloc vide pour équilibrer le logo si on veut centrer le menu parfaitement, sinon on peut laisser vide */}
-                <div className="hidden md:block w-32"></div> 
             </div>
         </header>
     );
