@@ -8,39 +8,37 @@ const NAV_LINKS = [
     { href: "/", label: "Accueil" },
     { href: "/mission", label: "Mission" },
     { href: "/offres", label: "Offres" },
-    { href: "/decouvrir", label: "Découvrir" },
+    { href: "/offres", label: "Découvrir" }, // "Découvrir" pointe vers offres aussi, en style lien simple
 ];
 
 export default function Header() {
     const pathname = usePathname();
 
     return (
-        // Z-index très élevé pour passer au dessus de tout
-        <header className="sticky top-0 z-[100] w-full border-b border-gray-200 bg-white/90 backdrop-blur-md">
-            <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+        <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md shadow-sm">
+            <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 md:px-10">
                 
-                {/* 1. Logo - Utilisation de logo.png avec dimensions fixes */}
-                <Link href="/" className="flex items-center shrink-0">
+                {/* LOGO ORIGINAL RESTAURÉ */}
+                <Link href="/" className="relative h-[52px] w-[170px] shrink-0">
                     <Image
-                        src="/logo.png" 
-                        alt="Lúmina Logo"
-                        width={150}
-                        height={50}
-                        className="object-contain"
+                        src="/header_logo.png"
+                        alt="Lúmina"
+                        fill
+                        className="object-contain object-left"
                         priority
                     />
                 </Link>
 
-                {/* 2. Navigation - VISIBLE PAR DÉFAUT (flex au lieu de hidden) */}
-                <nav className="flex items-center gap-8 font-[family-name:var(--font-plus-jakarta-sans)]">
-                    {NAV_LINKS.map((item) => {
+                {/* NAVIGATION STYLE UNLOCKY (Noir, Gras, Espacé, Visible) */}
+                <nav className="flex items-center gap-10 font-[family-name:var(--font-plus-jakarta-sans)] text-sm font-bold text-black">
+                    {NAV_LINKS.map((item, index) => {
                         const isActive = pathname === item.href;
                         return (
                             <Link
-                                key={item.href}
+                                key={index}
                                 href={item.href}
-                                className={`text-sm font-bold transition-colors hover:text-gray-600 ${
-                                    isActive ? "text-black underline underline-offset-4" : "text-black"
+                                className={`transition-opacity hover:opacity-70 ${
+                                    isActive ? "opacity-100" : "opacity-90"
                                 }`}
                             >
                                 {item.label}
