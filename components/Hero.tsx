@@ -1,5 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
+
+import MagicButton from "./ui/MagicButton";
 
 export default function Hero() {
   return (
@@ -22,18 +23,18 @@ export default function Hero() {
               Interviews guidés, réécriture attentive, maquette prête à offrir : nous prenons le temps de comprendre vos souvenirs et de les transmettre avec douceur, en version imprimée et numérique.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                className="inline-flex items-center justify-center rounded-full bg-[var(--loomina-amber)] px-6 py-3 font-semibold text-[var(--loomina-ink)] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.6)] transition hover:brightness-110"
+              <MagicButton
                 href="#offres"
+                className="bg-[var(--loomina-amber)] text-[var(--loomina-ink)] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.6)] border border-black/10"
               >
                 Découvrir les offres
-              </Link>
-              <Link
-                className="inline-flex items-center justify-center rounded-full border border-black/8 bg-white px-6 py-3 font-semibold text-[var(--loomina-ink)] transition hover:-translate-y-[1px] hover:shadow-[0_16px_44px_-38px_rgba(0,0,0,0.65)]"
+              </MagicButton>
+              <MagicButton
                 href="mailto:contact@loomina.fr"
+                className="bg-white text-[var(--loomina-ink)] border border-black/10 shadow-[0_16px_44px_-38px_rgba(0,0,0,0.65)]"
               >
                 Organiser un premier appel
-              </Link>
+              </MagicButton>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               {["Interviews enregistrés avec bienveillance", "Maquette élégante et photos retouchées", "Livres reliés et version numérique sécurisée"].map((item) => (

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Reveal from "./ui/Reveal";
 
 const STEPS = [
   {
@@ -75,9 +76,10 @@ export default function HowItWorks() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-          {STEPS.map((step) => (
-            <div
+          {STEPS.map((step, index) => (
+            <Reveal
               key={step.number}
+              delay={index * 0.08}
               className="relative bg-white/90 rounded-[2rem] p-10 shadow-[0_40px_90px_-65px_rgba(15,16,20,0.6)] border border-[var(--loomina-black)]/10 flex flex-col h-full backdrop-blur"
             >
               <div
@@ -106,7 +108,7 @@ export default function HowItWorks() {
                   {step.footer}
                 </p>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

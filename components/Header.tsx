@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import MagicButton from "./ui/MagicButton";
 
 const NAV_LINKS = [
   { href: "/", label: "Accueil" },
@@ -46,12 +47,14 @@ export default function Header() {
               );
             })}
           </nav>
-          <a
-            href="mailto:contact@loomina.fr"
-            className="hidden sm:inline-flex items-center gap-2 rounded-full bg-[var(--loomina-amber)] px-4 py-2 text-sm font-semibold text-[var(--loomina-ink)] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)] transition hover:brightness-110"
-          >
-            Parler à une personne
-          </a>
+          <div className="hidden sm:inline-flex">
+            <MagicButton
+              href="mailto:contact@loomina.fr"
+              className="px-4 py-2 bg-[var(--loomina-black)] text-white border border-white/10 shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)]"
+            >
+              Parler à une personne
+            </MagicButton>
+          </div>
         </div>
       </div>
     </header>
