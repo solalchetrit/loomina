@@ -7,7 +7,7 @@ export default function Home() {
     <div className="min-h-screen w-full flex flex-col items-center bg-[#f2efeb]">
       <Header />
 
-      <div className="flex flex-col items-center justify-center flex-grow py-20 gap-16">
+      <div className="flex flex-col items-center justify-center flex-grow px-6 py-24 gap-20">
         <div className="relative w-[300px] h-[100px] md:w-[500px] md:h-[200px] shrink-0">
           <Image
             src="/logo.png"
