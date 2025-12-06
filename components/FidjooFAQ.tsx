@@ -2,31 +2,33 @@
 import { useState } from "react";
 
 const faqData = [
-    {
-        question: "What is Fidjoo?",
-        answer: "Fidjoo est une plateforme créative pour les enfants..."
-    },
-    {
-        question: "What age group is Fidjoo for?",
-        answer: "C'est parfait pour les enfants de 4 à 12 ans."
-    },
-    {
-        question: "Does Fidjoo work offline?",
-        answer: "Oui, l'application fonctionne parfaitement sans connexion internet une fois téléchargée.",
-        active: true // The user's code had this one active by default? or just marked in HTML
-    },
-    {
-        question: "What if my child doesn't read yet?",
-        answer: "L'interface est intuitive et utilise beaucoup de visuels et de guides vocaux."
-    },
-    {
-        question: "How much does Fidjoo cost?",
-        answer: "Nous avons plusieurs plans disponibles selon vos besoins."
-    }
+  {
+    question: "Comment se passent les entretiens ?",
+    answer:
+      "Nous organisons un appel visio ou téléphone d'environ 45 minutes. L'IA propose des relances et un membre de notre équipe accompagne la conversation.",
+  },
+  {
+    question: "Qui relit et corrige les textes ?",
+    answer:
+      "Chaque transcript est nettoyé par un éditeur Loomina : vérification des faits fournis, harmonisation du style, suppression des hésitations.",
+  },
+  {
+    question: "Combien d'exemplaires puis-je commander ?",
+    answer: "Autant que vous le souhaitez : nous imprimons à la demande et fournissons toujours une version numérique.",
+    active: true,
+  },
+  {
+    question: "Et si mon proche n'est pas à l'aise avec la technologie ?",
+    answer: "Nous pouvons passer par un simple appel téléphonique et envoyer un kit papier pour récupérer les photos.",
+  },
+  {
+    question: "Sous combien de temps recevrai-je le livre ?",
+    answer: "Comptez en moyenne 3 jours après votre validation de la maquette finale.",
+  },
 ];
 
 export default function FidjooFAQ() {
-    const [openIndex, setOpenIndex] = useState<number | null>(2); // Default to the 3rd item as per user HTML 'active' class example
+    const [openIndex, setOpenIndex] = useState<number | null>(2);
 
     const toggleFAQ = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
