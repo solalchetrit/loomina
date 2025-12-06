@@ -1,43 +1,78 @@
 export default function Mission() {
     return (
-        <div className="py-24 px-6 min-h-screen">
-            <div className="max-w-3xl mx-auto article-content">
-                <h1 className="text-5xl font-serif text-[var(--loomina-burgundy)] mb-12 text-center md:text-left">
-                    Garder la lumière allumée
-                </h1>
-
-                <div className="space-y-8 text-lg text-[var(--loomina-text-light)] leading-relaxed font-light">
-                    <p>
-                        <strong className="text-[var(--loomina-text)] font-serif text-2xl float-left mr-4 mt-[-6px]">L</strong>
-                        e temps efface parfois les contours des souvenirs, mais il ne devrait jamais effacer l'essence d'une vie.
-                        Chez Loomina, nous croyons que chaque histoire mérite de survivre à son conteur.
+        <div className="bg-[#f2efeb] min-h-screen py-24 px-6">
+            <div className="max-w-5xl mx-auto space-y-16">
+                <header className="space-y-4 text-center md:text-left">
+                    <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Pourquoi Loomina existe</p>
+                    <h1 className="text-4xl md:text-5xl font-serif text-[var(--loomina-burgundy)] leading-tight">
+                        Garder la lumière allumée, pour toujours
+                    </h1>
+                    <p className="text-lg text-[var(--loomina-text-light)] leading-relaxed max-w-3xl">
+                        Nous créons des livres et des jumeaux mémoriels qui traversent les décennies. Notre mission est de préserver la voix, les valeurs et les nuances d'une vie, sans jamais trahir l'intention de ceux qui se confient.
                     </p>
+                </header>
 
-                    <p>
-                        Notre mission est née d'un constat simple et douloureux : trop de vécus, de sagesses et d'anecdotes s'éteignent avec ceux qui les portent,
-                        laissant leurs proches avec le regret des questions jamais posées.
-                    </p>
-
-                    <blockquote className="border-l-4 border-[var(--loomina-gold)] pl-6 italic text-[var(--loomina-burgundy)] my-12 py-2 text-2xl font-serif">
+                <section className="bg-white rounded-lg shadow-sm border border-[var(--loomina-burgundy)]/10 p-8 md:p-10 space-y-6">
+                    <blockquote className="border-l-4 border-[var(--loomina-gold)] pl-6 italic text-[var(--loomina-burgundy)] text-2xl font-serif">
                         "Nous ne sommes pas une entreprise technologique. Nous sommes des gardiens de mémoire."
                     </blockquote>
-
-                    <h2 className="text-3xl font-serif text-[var(--loomina-burgundy)] mt-12 mb-6">Une alliance entre Coeur et Technologie</h2>
-                    <p>
-                        Nous avons conçu Loomina comme un hybride. Nous utilisons l'intelligence artificielle la plus avancée non pas pour remplacer l'humain,
-                        mais pour l'écouter avec une patience infinie. Notre IA empathique est là pour vous guider, pour réveiller des souvenirs endormis,
-                        sans jugement et sans fatigue.
+                    <p className="text-[var(--loomina-text-light)] leading-relaxed text-lg">
+                        Loomina est née d'un regret : celui des questions restées en suspens une fois qu'un proche est parti. Nous avons voulu offrir un espace d'écoute infinie, où l'IA amplifie l'attention humaine au lieu de la remplacer.
                     </p>
-
-                    <p>
-                        Mais la finalité reste profondément tangible : un livre. Un objet lourd, beau, qui sent le papier et l'encre.
-                        Un objet qu'on se transmet de main en main, de génération en génération.
+                    <p className="text-[var(--loomina-text-light)] leading-relaxed text-lg">
+                        Notre promesse est simple : capturer l'authenticité des récits et les transmettre avec la chaleur d'un livre d'art. Chaque projet est géré par une équipe éditoriale qui respecte votre rythme, vos sujets sensibles et votre voix.
                     </p>
+                </section>
 
-                    <div className="flex justify-center mt-16">
-                        <div className="h-1 w-24 bg-[var(--loomina-gold)] rounded-full"></div>
+                <section className="grid md:grid-cols-3 gap-8">
+                    {[{
+                        title: "Écoute radicale",
+                        description: "Des entretiens guidés par IA pour réveiller les souvenirs, toujours supervisés par un rédacteur qui veille au ton et au respect.",
+                    }, {
+                        title: "Transmission incarnée",
+                        description: "Un objet physique à feuilleter, des exemplaires pour la famille et un accès numérique vivant pour que l'histoire continue de s'écrire.",
+                    }, {
+                        title: "Respect & sécurité",
+                        description: "Des données chiffrées, hébergées en Europe, avec un contrôle total sur ce qui est partagé ou détruit à tout moment.",
+                    }].map((value, index) => (
+                        <div
+                            key={index}
+                            className="bg-white h-full rounded-lg shadow-sm border border-[var(--loomina-burgundy)]/10 p-7 space-y-3"
+                        >
+                            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-text-light)] font-semibold">Notre boussole</p>
+                            <h3 className="text-2xl font-serif text-[var(--loomina-burgundy)]">{value.title}</h3>
+                            <p className="text-[var(--loomina-text-light)] leading-relaxed">{value.description}</p>
+                        </div>
+                    ))}
+                </section>
+
+                <section className="bg-[var(--loomina-burgundy)] text-white rounded-lg p-10 flex flex-col md:flex-row gap-10 items-center">
+                    <div className="space-y-3 max-w-3xl">
+                        <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Ce qui nous anime</p>
+                        <h3 className="text-3xl font-serif font-semibold">Allier technologie et humanité</h3>
+                        <p className="text-white/80 leading-relaxed">
+                            L'IA permet des heures d'écoute sans fatigue et une capacité d'analyse inégalée. Mais nous restons persuadés qu'aucun algorithme ne remplace l'empathie. C'est pourquoi chaque projet Loomina est suivi par une équipe éditoriale qui relit, réécrit, et s'assure que chaque page sonne juste.
+                        </p>
+                        <p className="text-white/80 leading-relaxed">
+                            Notre ambition : que votre histoire reste lumineuse, intacte et transmissible, pour ceux qui sont là aujourd'hui et ceux qui viendront demain.
+                        </p>
                     </div>
-                </div>
+                    <div className="w-full md:w-auto">
+                        <div className="bg-white text-[var(--loomina-burgundy)] rounded-lg shadow-lg p-6 space-y-3 max-w-sm">
+                            <p className="text-sm uppercase tracking-[0.2em] font-semibold">Envie d'en parler ?</p>
+                            <p className="text-lg leading-relaxed">
+                                Partagez vos besoins, nous construisons un parcours sur mesure pour vous ou vos proches.
+                            </p>
+                            <a
+                                href="mailto:mission@loomina.fr"
+                                className="block text-center w-full px-5 py-3 rounded-full bg-[var(--loomina-burgundy)] text-white font-semibold hover:brightness-110 transition"
+                            >
+                                Échanger avec l'équipe
+                            </a>
+                            <p className="text-sm text-[var(--loomina-text-light)] text-center">Réponse en moins de 24h, sans engagement.</p>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     );
