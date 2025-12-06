@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, type HTMLMotionProps } from "framer-motion";
 import { useMemo, useState } from "react";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ReactNode } from "react";
 
-interface MagicButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface MagicButtonProps extends HTMLMotionProps<"button"> {
   href?: string;
   children: ReactNode;
   glow?: boolean;
