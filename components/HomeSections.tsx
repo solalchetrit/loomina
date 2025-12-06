@@ -45,14 +45,14 @@ export default function HomeSections() {
       <div className="max-w-6xl mx-auto space-y-14">
         <div className="text-center space-y-4">
           <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">
-            Un accueil qui raconte déjà l'histoire
+            Un parcours clair dès la première visite
           </p>
           <h2 className="text-3xl md:text-4xl font-semibold text-[var(--loomina-black)] leading-tight">
-            Les trois sections qui donnent le ton à la page d'accueil
+            Trois moments clés pour dérouler l'histoire familiale
           </h2>
           <p className="text-[var(--loomina-gray-dark)] max-w-3xl mx-auto leading-relaxed">
-            Nous réorganisons l'expérience en trois blocs clairs : inviter, rassurer et projeter. Chaque section parle le langage
-            des familles qui veulent transmettre avant que les souvenirs ne s'évanouissent.
+            Nous guidons chaque proche avec un fil rouge simple : un temps d'écoute, un atelier de mise en forme, puis des
+            supports prêts à offrir. L'accueil de la page reflète cette promesse pour rassurer et donner envie d'avancer.
           </p>
         </div>
 
@@ -85,13 +85,13 @@ export default function HomeSections() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-8 items-center bg-[var(--loomina-gray-light)] border border-[var(--loomina-black)]/10 rounded-[28px] p-10">
           <div className="space-y-4">
-            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-black)] font-semibold">Call to action</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-black)] font-semibold">Prêt à commencer</p>
             <h3 className="text-3xl font-semibold text-[var(--loomina-black)] leading-tight">
-              On ouvre la page avec un vrai parcours et on clôture avec un geste simple
+              Une page d'accueil qui invite à passer à l'action
             </h3>
             <p className="text-[var(--loomina-gray-dark)] leading-relaxed">
-              En un scroll, l'utilisateur comprend comment on l'accueille, ce qu'il vit ensuite, et ce qu'il reçoit. Il peut
-              réserver une session ou en savoir plus sans se perdre dans des sections génériques.
+              En un seul regard, vos proches visualisent l'accompagnement, le soin éditorial et le résultat. Ils peuvent réserver
+              une session ou continuer à explorer sans se perdre.
             </p>
           </div>
           <div className="flex flex-col gap-3">
@@ -99,7 +99,7 @@ export default function HomeSections() {
               href="#comment"
               className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-black)] text-white font-semibold shadow-[0_20px_60px_-35px_rgba(217,54,98,0.55)] hover:brightness-110 transition-colors"
             >
-              Découvrir le parcours concret
+              Découvrir le parcours Loomina
             </a>
             <a
               href="#faq"
@@ -107,7 +107,7 @@ export default function HomeSections() {
             >
               Lire les réponses clés
             </a>
-            <span className="text-[var(--loomina-black)] text-sm text-center">Un accueil pensé pour déclencher une action, pas un doute.</span>
+            <span className="text-[var(--loomina-black)] text-sm text-center">Une structure claire pour guider les familles vers la prochaine étape.</span>
           </div>
         </div>
       </div>
