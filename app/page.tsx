@@ -8,11 +8,13 @@ import ImpactMetrics from "@/components/ImpactMetrics";
 import Testimonials from "@/components/Testimonials";
 import TrustBand from "@/components/TrustBand";
 import Commitments from "@/components/Commitments";
+import HomeSections from "@/components/HomeSections";
 
 export default function Home() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center bg-[var(--background)] text-[var(--loomina-black)]">
       <Hero />
+      <HomeSections />
       <TrustBand />
       <ImpactMetrics />
       <FeatureHighlights />
