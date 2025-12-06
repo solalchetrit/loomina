@@ -13,20 +13,20 @@ export default function Hero() {
             Préservez les voix de votre famille, dans un livre qui ne s'éteint jamais
           </h1>
           <p className="text-lg text-[var(--loomina-gray-dark)] leading-relaxed max-w-xl">
-            Loomina combine des entretiens guidés, un montage éditorial et un accompagnement humain pour transmettre les souvenirs importants, sans perdre les détails.
+            Interviews guidées, montage éditorial, accompagnement humain : tout pour transmettre sans effort.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-4">
             <a
-              className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-black)] text-white font-semibold shadow-[0_20px_60px_-30px_rgba(0,0,0,0.4)] hover:brightness-110 transition-colors"
-              href="#comment"
+              className="inline-flex items-center justify-center px-5 py-3.5 rounded-full bg-[var(--loomina-gold)] text-[var(--loomina-black)] font-semibold leading-none shadow-[0_12px_40px_-28px_rgba(0,0,0,0.35)] hover:brightness-110 transition-colors"
+              href="#offres"
             >
-              Découvrir le parcours
+              Découvrir nos offres
             </a>
             <a
-              className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-gold)] text-[var(--loomina-black)] font-semibold shadow-[0_12px_40px_-28px_rgba(0,0,0,0.35)] hover:brightness-110 transition-colors"
-              href="#faq"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-black)] text-white font-semibold shadow-[0_20px_60px_-30px_rgba(0,0,0,0.4)] hover:brightness-110 transition-colors"
+              href="#exemple-audio"
             >
-              Poser une question
+              Écouter un exemple
             </a>
           </div>
           <div className="flex items-center gap-6 pt-2 text-[var(--loomina-gray-dark)]">
@@ -74,6 +74,15 @@ export default function Hero() {
               <Image src="/window.svg" alt="Aperçu du livre" width={520} height={320} className="w-full h-auto object-cover" />
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-6 flex justify-center">
+        <div
+          aria-hidden
+          className="h-14 w-10 rounded-full border border-[var(--loomina-black)]/20 flex items-start justify-center p-3 overflow-hidden"
+        >
+          <span className="h-2 w-2 rounded-full bg-[var(--loomina-gold)] animate-bounce" />
         </div>
       </div>
     </section>
