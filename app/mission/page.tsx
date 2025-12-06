@@ -37,35 +37,35 @@ export default function Mission() {
                     }].map((value, index) => (
                         <div
                             key={index}
-                            className="bg-white/5 h-full rounded-2xl border border-white/10 p-7 space-y-3 shadow-[0_18px_55px_-45px_rgba(0,0,0,0.8)]"
+                            className="bg-white h-full rounded-2xl border border-[var(--loomina-burgundy)]/10 p-7 space-y-3 shadow-[0_18px_55px_-45px_rgba(217,54,98,0.35)]"
                         >
                             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Notre boussole</p>
-                            <h3 className="text-2xl font-semibold text-white">{value.title}</h3>
+                            <h3 className="text-2xl font-semibold text-[var(--loomina-text)]">{value.title}</h3>
                             <p className="text-[var(--loomina-text-light)] leading-relaxed">{value.description}</p>
                         </div>
                     ))}
                 </section>
 
-                <section className="bg-gradient-to-br from-[#171b33] via-[#12192d] to-[#0b1327] text-white rounded-2xl p-10 flex flex-col md:flex-row gap-10 items-center border border-[var(--loomina-gold)]/30">
+                <section className="bg-gradient-to-br from-[#ffe5da] via-[#fff3ec] to-[#e9fbf5] text-[var(--loomina-text)] rounded-2xl p-10 flex flex-col md:flex-row gap-10 items-center border border-[var(--loomina-burgundy)]/10">
                     <div className="space-y-3 max-w-3xl">
                         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold">Ce qui nous anime</p>
                         <h3 className="text-3xl font-semibold">Allier technologie et humanité</h3>
-                        <p className="text-white/85 leading-relaxed">
+                        <p className="text-[var(--loomina-text-light)] leading-relaxed">
                             L'IA permet des heures d'écoute sans fatigue et une capacité d'analyse inégalée. Mais nous restons persuadés qu'aucun algorithme ne remplace l'empathie. C'est pourquoi chaque projet Loomina est suivi par une équipe éditoriale qui relit, réécrit, et s'assure que chaque page sonne juste.
                         </p>
-                        <p className="text-white/85 leading-relaxed">
+                        <p className="text-[var(--loomina-text-light)] leading-relaxed">
                             Notre ambition : que votre histoire reste lumineuse, intacte et transmissible, pour ceux qui sont là aujourd'hui et ceux qui viendront demain.
                         </p>
                     </div>
                     <div className="w-full md:w-auto">
-                        <div className="bg-white text-[#0c1224] rounded-2xl shadow-2xl p-6 space-y-3 max-w-sm">
+                        <div className="bg-white text-[var(--loomina-text)] rounded-2xl shadow-2xl p-6 space-y-3 max-w-sm">
                             <p className="text-sm uppercase tracking-[0.2em] font-semibold text-[var(--loomina-burgundy)]">Envie d'en parler ?</p>
-                            <p className="text-lg leading-relaxed text-[#0c1224]">
+                            <p className="text-lg leading-relaxed text-[var(--loomina-text)]">
                                 Partagez vos besoins, nous construisons un parcours sur mesure pour vous ou vos proches.
                             </p>
                             <a
                                 href="mailto:mission@loomina.fr"
-                                className="block text-center w-full px-5 py-3 rounded-full bg-[var(--loomina-gold)] text-[#051226] font-semibold hover:brightness-110 transition"
+                                className="block text-center w-full px-5 py-3 rounded-full bg-[var(--loomina-burgundy)] text-white font-semibold hover:bg-[var(--loomina-burgundy-dark)] transition"
                             >
                                 Échanger avec l'équipe
                             </a>

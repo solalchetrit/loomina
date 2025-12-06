@@ -18,14 +18,14 @@ const features = [
 
 export default function FeatureHighlights() {
   return (
-    <section className="w-full bg-[#0b1224] py-20 px-6 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(124,58,237,0.12),transparent_45%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(34,211,238,0.14),transparent_40%)]" />
+    <section className="w-full bg-[var(--loomina-cream)] py-20 px-6 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_40%,rgba(242,93,122,0.12),transparent_45%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(43,183,163,0.12),transparent_40%)]" />
       <div className="relative max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold)] font-semibold">Fonctionnalités clés</p>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white leading-tight mt-2">
+            <h2 className="text-3xl md:text-4xl font-semibold text-[var(--loomina-text)] leading-tight mt-2">
               Un parcours pensé pour les familles
             </h2>
           </div>
@@ -38,15 +38,15 @@ export default function FeatureHighlights() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="relative overflow-hidden bg-white/5 rounded-3xl p-8 shadow-[0_30px_80px_-60px_rgba(124,58,237,0.75)] border border-white/10 backdrop-blur"
+              className="relative overflow-hidden bg-white rounded-3xl p-8 shadow-[0_30px_80px_-60px_rgba(217,54,98,0.55)] border border-[var(--loomina-burgundy)]/10"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(165,243,252,0.12),transparent_55%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_90%,rgba(124,58,237,0.1),transparent_55%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(183,246,231,0.14),transparent_55%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_90%,rgba(242,93,122,0.1),transparent_55%)]" />
               <div className="relative space-y-3">
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-[0.14em] text-[var(--loomina-gold-light)] font-semibold">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-[var(--loomina-cream)] border border-[var(--loomina-burgundy)]/20 text-xs uppercase tracking-[0.14em] text-[var(--loomina-burgundy-dark)] font-semibold">
                   {feature.tag}
                 </span>
-                <h3 className="text-2xl font-semibold text-white">{feature.title}</h3>
+                <h3 className="text-2xl font-semibold text-[var(--loomina-text)]">{feature.title}</h3>
                 <p className="text-[var(--loomina-text-light)] leading-relaxed">{feature.description}</p>
               </div>
             </div>

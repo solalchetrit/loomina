@@ -2,7 +2,7 @@ const logos = ["France Mémoire", "Fondations privées", "Musées partenaires", 
 
 export default function TrustBand() {
   return (
-    <section className="w-full bg-[#0b1224] py-10 px-6 border-y border-white/5">
+    <section className="w-full bg-[var(--loomina-cream)] py-10 px-6 border-y border-[var(--loomina-burgundy)]/10">
       <div className="max-w-6xl mx-auto flex flex-col gap-4">
         <p className="text-sm uppercase tracking-[0.2em] text-[var(--loomina-gold-light)] font-semibold text-center">
           Ils nous font confiance
