@@ -4,35 +4,35 @@ import OfferPreview from "@/components/OfferPreview";
 const promisePoints = [
   {
     icon: "🎙️",
-    title: "Capture paisible",
-    text: "Des questions courtes, des silences respectés et un accompagnement humain pour guider la voix.",
+    title: "Interviews guidés",
+    text: "Un interlocuteur humain, des relances douces et l'enregistrement intégral pour ne rien perdre de votre ton.",
   },
   {
     icon: "📖",
-    title: "Edition limpide",
-    text: "Montage éditorial discret, relectures humaines et maquette épurée pour magnifier chaque chapitre.",
+    title: "Edition artisanale",
+    text: "Réécriture claire, choix typographiques élégants et mise en page avec vos photos préférées.",
   },
   {
     icon: "🔐",
     title: "Transmission sereine",
-    text: "Livre relié et version numérique protégée. Vous choisissez ce qui se partage et ce qui reste intime.",
+    text: "Livre relié prêt à offrir, PDF protégé et un espace privé pour partager avec la famille.",
   },
 ];
 
 const processSteps = [
   {
-    title: "On prépare le récit",
-    detail: "Brief commun, repérage des souvenirs importants et calendrier doux pour avancer sans pression.",
+    title: "On prépare votre récit",
+    detail: "Nous définissons ensemble les thèmes clés, les personnes à interviewer et un calendrier réaliste.",
     badge: "Repérage",
   },
   {
-    title: "Vous parlez, nous orchestrons",
-    detail: "Entretiens enregistrés, relances adaptées par l'IA et montage éditorial qui respecte le ton.",
+    title: "Vous parlez, nous écrivons",
+    detail: "Les entretiens sont transcrits, réécrits avec votre voix, puis relus avec vous avant la mise en page.",
     badge: "Production",
   },
   {
     title: "On livre pour transmettre",
-    detail: "Livre relié, exemplaires prêts à offrir et accès privé au jumeau mémoriel pour prolonger l'histoire.",
+    detail: "Vous recevez le livre relié, le PDF sécurisé et un guide pour partager facilement avec les proches.",
     badge: "Livraison",
   },
 ];
@@ -46,9 +46,9 @@ export default function Home() {
         <div className="mx-auto max-w-6xl space-y-10">
           <div className="text-center space-y-3">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">La promesse Loomina</p>
-            <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Une méthode calme, des livres qui durent</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Un livre qui ressemble vraiment à la personne</h2>
             <p className="text-[var(--loomina-muted)] max-w-2xl mx-auto">
-              On retire le superflu : un accompagnement clair, des mêmes couleurs et des boutons simples pour suivre chaque étape.
+              Nous combinons technologie et présence humaine pour faire ressortir la voix, les photos et les messages que vous souhaitez transmettre.
             </p>
           </div>
 
@@ -74,9 +74,9 @@ export default function Home() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-3 max-w-3xl">
               <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Comment ça se passe</p>
-              <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Chaque étape reste douce et lisible</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold leading-tight">On avance avec vous, du premier appel au livre relié</h2>
               <p className="text-[var(--loomina-muted)] leading-relaxed">
-                Nous gardons la même palette, les mêmes boutons et une lecture simplifiée. Vous savez où vous en êtes, sans jamais sentir la technique.
+                Vous gardez la main sur chaque étape : préparation, interviews, relectures, puis maquette finale. Nous faisons le lien entre vos mots et un objet que l'on a envie de transmettre.
               </p>
             </div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 border border-black/5 text-sm font-semibold shadow-sm">
@@ -112,9 +112,9 @@ export default function Home() {
         <div className="mx-auto max-w-5xl grid grid-cols-1 gap-8 lg:grid-cols-[1.05fr,0.95fr] items-center">
           <div className="space-y-4">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Exemple audio</p>
-            <h3 className="text-3xl md:text-4xl font-semibold leading-tight">La douceur d'une voix, sans artifices</h3>
+            <h3 className="text-3xl md:text-4xl font-semibold leading-tight">La voix reste intacte et lisible</h3>
             <p className="text-[var(--loomina-muted)] leading-relaxed max-w-xl">
-              Une capsule courte pour entendre la sobriété du montage. Tout est traité avec la même palette calme.
+              Un extrait brut pour entendre notre manière de guider les entretiens : rythme calme, silences respectés et montage léger.
             </p>
           </div>
 
