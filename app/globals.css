@@ -1,19 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Liaison de la variable Next.js avec Tailwind v4 */
+  --font-plus-jakarta-sans: var(--font-plus-jakarta-sans);
+}
 
 :root {
   /* Loomina Brand Colors */
   --loomina-burgundy: #681829;
-  /* Deep, warm burgundy */
   --loomina-burgundy-dark: #4a0f1d;
   --loomina-gold: #D4AF37;
-  /* Classic metallic gold */
   --loomina-gold-light: #F4D06F;
   --loomina-cream: #F9F7F2;
-  /* Paper/Off-white for background */
   --loomina-text: #2C1810;
-  /* Deep brown/black for text */
   --loomina-text-light: #5D4037;
 
   --background: var(--loomina-cream);
@@ -25,24 +24,13 @@ body {
   background: var(--background);
   margin: 0;
   padding: 0;
-  font-family: var(--font-plus-jakarta-sans), system-ui, -apple-system, sans-serif;
+  /* Application de la police par défaut */
+  font-family: var(--font-plus-jakarta-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Utilities for Typography */
+/* Custom Utilities */
 .font-serif {
   font-family: 'Playfair Display', serif;
-}
-
-.text-gold {
-  color: var(--loomina-gold);
-}
-
-.bg-burgundy {
-  background-color: var(--loomina-burgundy);
-}
-
-.text-burgundy {
-  color: var(--loomina-burgundy);
 }
