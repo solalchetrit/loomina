@@ -23,7 +23,7 @@ export default function Header() {
           className="flex items-center gap-4 rounded-full px-4 py-2 transition hover:-translate-y-[1px] hover:shadow-[0_18px_50px_-40px_rgba(0,0,0,0.55)]"
         >
           <div className="relative h-16 w-52 md:h-20 md:w-64">
-            <Image src="/header_logo.png" alt="Logo Loomina" fill className="object-contain" priority sizes="16rem" />
+            <Image src="/logo.png" alt="Logo Loomina" fill className="object-contain" priority sizes="16rem" />
           </div>
           <div className="hidden md:block leading-tight">
             <p className="text-[11px] uppercase tracking-[0.32em] text-[var(--loomina-amber-strong)] font-semibold">Mémoire vivante</p>
