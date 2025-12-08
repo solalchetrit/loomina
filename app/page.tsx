@@ -84,6 +84,8 @@ export default function Home() {
       <section className="relative w-full bg-black px-6 py-20 text-white overflow-hidden">
         <StarDecoration position="top-right" className="opacity-60" />
         <StarDecoration position="bottom-left" className="opacity-40 scale-75" />
+        <StarDecoration position="top-left" className="opacity-30 scale-75" />
+        <StarDecoration position="bottom-right" className="opacity-30" />
         <div className="mx-auto max-w-6xl space-y-12 relative z-10">
           <div className="text-center space-y-4">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">La promesse Loomina</p>
@@ -152,6 +154,8 @@ export default function Home() {
       <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden">
         <StarDecoration position="top-left" className="opacity-50 scale-90" />
         <StarDecoration position="bottom-right" className="opacity-50" />
+        <StarDecoration position="top-right" className="opacity-30" />
+        <StarDecoration position="bottom-left" className="opacity-25 scale-75" />
         <div className="mx-auto max-w-6xl space-y-12 relative z-10">
           <div className="space-y-4 text-center">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">
@@ -225,6 +229,8 @@ export default function Home() {
       {/* Section Audio : NOIR */}
       <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden" id="exemple-audio">
         <StarDecoration position="top-right" className="-top-20 -right-20 opacity-40 w-96 h-96" />
+        <StarDecoration position="bottom-left" className="opacity-30" />
+        <StarDecoration position="top-left" className="opacity-20 scale-75" />
         <div className="mx-auto max-w-5xl grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr,0.95fr] items-center relative z-10">
           <div className="space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Exemple audio</p>
