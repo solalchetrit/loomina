@@ -22,8 +22,8 @@ export default function Header() {
           href="/"
           className="flex items-center gap-4 rounded-full py-2 pl-0 pr-4 transition hover:-translate-y-[1px] hover:shadow-[0_18px_50px_-40px_rgba(0,0,0,0.55)]"
         >
-          <div className="relative h-12 w-44 md:h-14 md:w-56">
-            <Image src="/header-logo-trimmed.png" alt="Logo Loomina" fill className="object-contain object-left" priority sizes="(max-width: 768px) 176px, 224px" />
+          <div className="relative h-10 w-36 md:h-12 md:w-48 -mt-1">
+            <Image src="/header-logo-trimmed.png" alt="Logo Loomina" fill className="object-contain object-left" priority sizes="(max-width: 768px) 144px, 192px" />
           </div>
         </Link>
 
