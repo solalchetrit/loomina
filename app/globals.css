@@ -6,23 +6,21 @@
 }
 
 :root {
-  --loomina-ink: #171717;
-  --loomina-cloud: #f7f4ef;
-  --loomina-sand: #efe7dd;
-  --loomina-haze: #e5dccf;
+  --loomina-ink: #000000;
+  --loomina-cloud: #f5f5f5; /* Light neutral gray */
+  --loomina-sand: #e5e5e5;
+  --loomina-haze: #d4d4d4;
   --loomina-amber: #eabf77;
   --loomina-amber-strong: #c58c3c;
   --loomina-forest: #1f3328;
-  --loomina-muted: #58524b;
-  --background: var(--loomina-cloud);
+  --loomina-muted: #666666;
+  --background: #ffffff;
   --foreground: var(--loomina-ink);
 }
 
 body {
   color: var(--foreground);
-  background: radial-gradient(circle at 20% 20%, #ffffff 0, #ffffff 14%, transparent 14%),
-    radial-gradient(circle at 80% 10%, #ffffff 0, #ffffff 12%, transparent 12%),
-    var(--background);
+  background: var(--background);
   margin: 0;
   padding: 0;
   font-family: var(--font-plus-jakarta-sans), system-ui, sans-serif;
