@@ -37,20 +37,20 @@ export default function LoominaFAQ() {
     };
 
     return (
-        <div className="w-full max-w-[800px] mx-auto flex flex-col gap-5 font-[family-name:var(--font-quicksand)] text-white">
+        <div className="w-full max-w-[800px] mx-auto flex flex-col gap-5 font-[family-name:var(--font-quicksand)] text-[var(--loomina-black)]">
             {faqData.map((item, index) => {
                 const isOpen = openIndex === index;
                 return (
                     <div
                         key={index}
-                        className={`bg-white/5 rounded-[16px] overflow-hidden transition-all duration-300 border border-white/10 backdrop-blur ${isOpen ? 'shadow-xl shadow-black/30' : 'shadow-sm shadow-black/20'}`}
+                        className={`bg-[var(--loomina-gray-light)] rounded-[16px] overflow-hidden transition-all duration-300 border border-[var(--loomina-black)]/10 ${isOpen ? 'shadow-lg' : 'shadow-sm'}`}
                     >
                         <button
                             onClick={() => toggleFAQ(index)}
-                            className={`w-full flex items-center justify-between px-6 py-5 bg-transparent border-none cursor-pointer text-left font-bold text-[1.08rem] transition-colors duration-200 ${isOpen ? 'text-white' : 'text-neutral-100'} hover:text-white`}
+                            className={`w-full flex items-center justify-between px-6 py-5 bg-transparent border-none cursor-pointer text-left font-bold text-[1.08rem] transition-colors duration-200 ${isOpen ? 'text-[var(--loomina-black)]' : 'text-[var(--loomina-black)]'} hover:text-[var(--loomina-black)]`}
                         >
                             <div className="flex items-center gap-[15px]">
-                                <span className="text-[var(--loomina-amber-strong)] text-[1.4rem] flex items-center">
+                                <span className="text-[var(--loomina-gold)] text-[1.4rem] flex items-center">
                                     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -59,7 +59,7 @@ export default function LoominaFAQ() {
                                 </span>
                                 <span>{item.question}</span>
                             </div>
-                            <span className={`text-[var(--loomina-amber-strong)] transition-transform duration-300 ease-out flex items-center ${isOpen ? 'rotate-180' : ''}`}>
+                            <span className={`text-[var(--loomina-gold)] transition-transform duration-300 ease-out flex items-center ${isOpen ? 'rotate-180' : ''}`}>
                                 <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
@@ -67,7 +67,7 @@ export default function LoominaFAQ() {
                         </button>
 
                         <div
-                            className={`overflow-hidden transition-[max-height] duration-300 ease-out text-neutral-100 leading-[1.7] bg-white/5`}
+                            className={`overflow-hidden transition-[max-height] duration-300 ease-out text-[var(--loomina-black)] leading-[1.7] bg-[var(--loomina-gray-light)]`}
                             style={{ maxHeight: isOpen ? '500px' : '0' }}
                         >
                             <p className="pb-[25px] pl-[69px] pr-[32px]">{item.answer}</p>
