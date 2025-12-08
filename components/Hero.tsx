@@ -22,14 +22,14 @@ export default function Hero() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <MagicButton
                 href="#offres"
-                className="bg-black text-white shadow-lg border border-black hover:bg-neutral-800"
+                className="bg-black text-white shadow-lg border border-black hover:bg-neutral-800 w-full sm:w-auto justify-center"
               >
                 Commencer mon récit
               </MagicButton>
               <MagicButton
                 href="tel:+33600000000"
                 variant="secondary"
-                className="bg-white text-black border border-black/10 shadow-md hover:bg-neutral-50 !text-black"
+                className="bg-white text-black border border-black/10 shadow-md hover:bg-neutral-50 !text-black w-full sm:w-auto justify-center"
               >
                 📞 Appeler Loomina
               </MagicButton>
