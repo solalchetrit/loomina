@@ -53,16 +53,20 @@ export default function OfferPreview({ variant = "light" }: OfferPreviewProps) {
     ? "bg-white/10 text-white border border-white/10"
     : "bg-neutral-100 text-black border border-black/5";
   const accentBorder = isDark ? "border-white/10" : "border-black/10";
-  const cardSubtleBg = isDark ? "bg-white/5" : "bg-neutral-50";
+  const cardSubtleBg = isDark ? "bg-white/10 border-white/10 text-white" : "bg-neutral-50 border-black/10 text-black";
   const accentText = isDark ? "text-white" : "text-black";
   const mutedText = isDark ? "text-neutral-200" : "text-neutral-600";
   const highlightText = isDark ? "text-neutral-100" : "text-neutral-700";
   const priceText = isDark ? "text-[var(--loomina-amber)]" : "text-[var(--loomina-amber-strong)]";
-  const secondaryBadge = isDark ? "bg-white/10 text-white border border-white/10" : "bg-neutral-50 text-black border border-black/5";
+  const secondaryBadge = isDark
+    ? "bg-white/10 text-white border border-white/10"
+    : "bg-neutral-50 text-black border border-black/5";
   const highlightCardBg = isDark ? "bg-white/5" : "bg-neutral-50";
   const footerBorder = isDark ? "border-white/10" : "border-black/5";
   const infoBorder = isDark ? "border-white/10" : "border-black/5";
   const infoBg = isDark ? "bg-white/5" : "bg-neutral-50";
+  const containerBg = isDark ? "bg-white/5 text-white" : "bg-white/90 text-black";
+  const subtleNote = isDark ? "text-neutral-300" : "text-neutral-500";
 
   return (
     <section
@@ -85,7 +89,7 @@ export default function OfferPreview({ variant = "light" }: OfferPreviewProps) {
         </div>
 
         <Reveal
-          className={`relative overflow-hidden rounded-[28px] border ${accentBorder} bg-white/90 p-8 shadow-2xl backdrop-blur ${isDark ? "text-black" : "text-black"}`}
+          className={`relative overflow-hidden rounded-[28px] border ${accentBorder} ${containerBg} p-8 shadow-2xl backdrop-blur`}
         >
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="space-y-4">
@@ -94,25 +98,25 @@ export default function OfferPreview({ variant = "light" }: OfferPreviewProps) {
               >
                 {offer.badge}
               </div>
-              <h3 className="text-3xl font-bold text-black">{offer.title}</h3>
-              <p className="text-neutral-600 leading-relaxed text-lg">{offer.description}</p>
+              <h3 className={`text-3xl font-bold ${accentText}`}>{offer.title}</h3>
+              <p className={`${mutedText} leading-relaxed text-lg`}>{offer.description}</p>
               <div
                 className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] ${secondaryBadge}`}
               >
                 Livraison moyenne : 3 semaines · Accompagnement humain garanti
               </div>
             </div>
-            <div className={`flex flex-col items-end gap-2 self-start rounded-2xl ${cardSubtleBg} px-4 py-3 border ${accentBorder} shadow-sm`}>
-              <span className="text-sm text-neutral-400 line-through">{offer.originalPrice}</span>
-              <div className="flex items-center gap-3">
-                <p className={`text-5xl font-bold ${priceText}`}>{offer.price}</p>
-                <span className="inline-flex items-center px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] rounded-full bg-[var(--loomina-amber)] text-black shadow-sm">
-                  Offre de lancement
-                </span>
+              <div className={`flex flex-col items-end gap-2 self-start rounded-2xl ${cardSubtleBg} px-4 py-3 shadow-sm`}>
+                <span className={`${subtleNote} text-sm line-through`}>{offer.originalPrice}</span>
+                <div className="flex items-center gap-3">
+                  <p className={`text-5xl font-bold ${priceText}`}>{offer.price}</p>
+                  <span className="inline-flex items-center px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] rounded-full bg-[var(--loomina-amber)] text-black shadow-sm">
+                    Offre de lancement
+                  </span>
+                </div>
+                <p className={`text-xs font-semibold ${subtleNote}`}>Impression incluse</p>
               </div>
-              <p className="text-xs font-semibold text-neutral-500">Impression incluse</p>
             </div>
-          </div>
 
           <ul className={`grid gap-3 md:grid-cols-2 mt-8 ${accentText}`}>
             {offer.highlights.map((highlight, index) => (

@@ -49,15 +49,23 @@ export default function Header() {
 
         <div className="ml-auto flex items-center gap-4 sm:gap-6">
           <nav className="hidden items-center gap-2 rounded-full border border-black/5 bg-white/85 px-2 py-1 text-sm font-semibold text-[var(--loomina-ink)] shadow-sm sm:flex md:gap-3 md:px-4">
-            {NAV_LINKS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-full px-3 py-2 transition hover:bg-[var(--loomina-cloud)] md:px-4"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((item) => {
+              const isHome = item.label === "Accueil";
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`rounded-full px-3 py-2 transition md:px-4 ${
+                    isHome
+                      ? "bg-[var(--loomina-black)] text-white shadow-[0_16px_45px_-28px_rgba(0,0,0,0.5)] hover:bg-neutral-900"
+                      : "hover:bg-[var(--loomina-cloud)]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <MagicButton
