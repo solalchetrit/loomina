@@ -1,9 +1,10 @@
 import Link from "next/link";
 
 const footerLinks = [
-  { href: "/mission", label: "Mission" },
-  { href: "/offres", label: "Offres" },
-  { href: "/accompagnement", label: "Accompagnement" },
+  { href: "#mission", label: "Mission" },
+  { href: "#offres", label: "Offres" },
+  { href: "#accompagnement", label: "Accompagnement" },
+  { href: "#contact", label: "Contact" },
 ];
 
 export default function Footer() {
@@ -27,7 +28,7 @@ export default function Footer() {
               Écrire à l'équipe Loomina
             </a>
             <Link
-              href="/offres"
+              href="#offres"
               className="inline-flex items-center justify-center rounded-full border border-black/6 bg-white px-5 py-3 font-semibold text-[var(--loomina-ink)] transition hover:-translate-y-[1px] hover:shadow-[0_16px_44px_-38px_rgba(0,0,0,0.65)]"
             >
               Voir les offres

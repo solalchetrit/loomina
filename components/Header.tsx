@@ -1,20 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
 import MagicButton from "./ui/MagicButton";
 
 const NAV_LINKS = [
-  { href: "/", label: "Accueil" },
-  { href: "/mission", label: "Mission" },
-  { href: "/offres", label: "Offres" },
-  { href: "/accompagnement", label: "Accompagnement" },
+  { href: "#top", label: "Accueil" },
+  { href: "#mission", label: "Mission" },
+  { href: "#accompagnement", label: "Accompagnement" },
+  { href: "#offres", label: "Offres" },
+  { href: "#contact", label: "Contact" },
 ];
 
 export default function Header() {
-  const pathname = usePathname();
-
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/80 backdrop-blur-xl shadow-[0_12px_50px_-36px_rgba(0,0,0,0.35)]">
       <div className="mx-auto flex h-20 max-w-7xl items-center px-4 md:h-24 md:px-8">
@@ -38,21 +36,15 @@ export default function Header() {
           </div>
 
           <nav className="order-2 flex items-center gap-2 rounded-full border border-black/5 bg-white/85 px-2 py-1 text-sm font-semibold shadow-sm md:gap-3 md:px-4">
-            {NAV_LINKS.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`rounded-full px-3 py-2 transition hover:bg-[var(--loomina-cloud)] md:px-4 ${isActive
-                    ? "bg-[var(--loomina-cloud)] text-[var(--loomina-amber-strong)] border border-black/5"
-                    : "text-[var(--loomina-ink)]"
-                    }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+            {NAV_LINKS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-full px-3 py-2 transition hover:bg-[var(--loomina-cloud)] md:px-4 text-[var(--loomina-ink)]"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
       </div>

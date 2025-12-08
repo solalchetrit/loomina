@@ -14,9 +14,31 @@ const offer = {
     "Version numérique protégée et prête à envoyer",
   ],
   cta: "Préparer mon livre Lumina",
-  href: "/offres",
+  href: "mailto:contact@loomina.fr?subject=Pr%C3%A9parer%20mon%20livre%20Lumina",
   badge: "Offre unique",
 };
+
+const essentials = [
+  { title: "Accompagnement humain", text: "Un interlocuteur unique pour planifier, interviewer et relire avec vous." },
+  { title: "Sérénité juridique", text: "Confidentialité contractuelle, données hébergées en Europe et sauvegardes régulières." },
+  { title: "Esthétique soignée", text: "Choix typographiques et retouches légères pour un rendu élégant et cohérent." },
+  { title: "Transmission durable", text: "Formats imprimés et numériques pensés pour traverser le temps et se partager facilement." },
+];
+
+const practicalInfos = [
+  {
+    title: "Calendrier partagé",
+    description: "Dates d'interviews, validation des chapitres et remise des épreuves alignées dès la prise de brief.",
+  },
+  {
+    title: "Réponse en moins de 24h",
+    description: "Un interlocuteur unique pour l'ensemble des étapes, disponible par e-mail ou visio.",
+  },
+  {
+    title: "Contrat et droits",
+    description: "Confidentialité, choix des destinataires et possibilité de suppression complète des données.",
+  },
+];
 
 export default function OfferPreview() {
   return (
@@ -67,6 +89,15 @@ export default function OfferPreview() {
             ))}
           </ul>
 
+          <div className="grid gap-4 md:grid-cols-4 mt-10">
+            {essentials.map((item) => (
+              <div key={item.title} className="rounded-2xl border border-black/5 bg-neutral-50 p-4 space-y-2">
+                <p className="text-sm uppercase tracking-[0.18em] text-[var(--loomina-amber-strong)] font-semibold">{item.title}</p>
+                <p className="text-neutral-600 text-sm leading-relaxed">{item.text}</p>
+              </div>
+            ))}
+          </div>
+
           <div className="flex flex-wrap items-center gap-4 pt-8 border-t border-black/5 mt-8">
             <MagicButton
               href={offer.href}
@@ -75,6 +106,15 @@ export default function OfferPreview() {
               {offer.cta}
             </MagicButton>
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-500">Réponse sous 48h</span>
+          </div>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-3 border border-black/5 rounded-[24px] p-6 bg-neutral-50">
+            {practicalInfos.map((info) => (
+              <div key={info.title} className="space-y-2">
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--loomina-amber-strong)] font-semibold">{info.title}</p>
+                <p className="text-neutral-700 text-sm leading-relaxed">{info.description}</p>
+              </div>
+            ))}
           </div>
         </Reveal>
       </div>

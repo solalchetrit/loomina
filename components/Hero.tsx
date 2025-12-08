@@ -2,7 +2,7 @@ import MagicButton from "./ui/MagicButton";
 
 export default function Hero() {
   return (
-    <section className="relative w-full overflow-hidden px-6 pb-14 pt-10 bg-white">
+    <section className="relative w-full overflow-hidden px-6 pb-14 pt-10 bg-white" id="top">
       <div className="mx-auto max-w-5xl p-8 md:p-12">
         <div className="grid grid-cols-1 items-center gap-10">
             <div className="space-y-7">
@@ -29,7 +29,7 @@ export default function Hero() {
               <MagicButton
                 href="mailto:contact@loomina.fr"
                 variant="secondary"
-                className="bg-white text-black border border-black/10 shadow-md hover:bg-neutral-50"
+                className="bg-white text-black border border-black/10 shadow-md hover:bg-neutral-50 !text-black"
               >
                 Organiser un premier appel
               </MagicButton>
