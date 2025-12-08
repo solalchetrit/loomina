@@ -41,9 +41,11 @@ const practicalInfos = [
 ];
 
 export default function OfferPreview() {
+  const sectionSpacing = "px-6 py-20 md:py-24 lg:py-28";
+
   return (
-    <section className="relative w-full px-6 py-24 bg-white" id="offres">
-      <div className="mx-auto max-w-5xl space-y-12">
+    <section className={`relative w-full bg-white ${sectionSpacing}`} id="offres">
+      <div className="mx-auto max-w-6xl space-y-12">
         <div className="flex flex-col gap-4 text-center">
           <p className="inline-flex items-center gap-2 self-center rounded-full bg-neutral-100 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-black shadow-sm border border-black/5">
             <span className="h-2 w-2 rounded-full bg-[var(--loomina-amber-strong)]" /> Offre unique Loomina

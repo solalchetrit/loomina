@@ -2,8 +2,8 @@ import MagicButton from "./ui/MagicButton";
 
 export default function Hero() {
   return (
-    <section className="relative w-full overflow-hidden px-6 pb-14 pt-10 bg-white" id="top">
-      <div className="mx-auto max-w-5xl p-8 md:p-12">
+    <section className="relative w-full overflow-hidden bg-white px-6 pb-16 pt-12 md:pb-20 md:pt-16 lg:pb-24 lg:pt-20" id="top">
+      <div className="mx-auto max-w-6xl rounded-[28px] border border-black/5 bg-white/80 p-8 shadow-lg md:p-12">
         <div className="grid grid-cols-1 items-center gap-10">
             <div className="space-y-7">
               <div className="inline-flex items-center gap-3 rounded-full bg-neutral-100 px-4 py-2 text-sm font-semibold text-black border border-black/5">
