@@ -25,7 +25,7 @@ function MagicButtonContent({ children, glow, className = "", variant = "primary
   const variantClasses = useMemo(
     () =>
       variant === "primary"
-        ? "bg-[var(--loomina-forest)] text-white shadow-[0_25px_60px_-38px_rgba(31,51,40,0.55)] border border-[var(--loomina-outline-strong)] hover:bg-[var(--loomina-forest)]/95"
+        ? "bg-[var(--loomina-forest)] text-white shadow-[0_25px_60px_-38px_rgba(15,17,21,0.6)] border border-[var(--loomina-outline-strong)] hover:bg-[var(--loomina-forest)]/95"
         : "bg-[var(--loomina-surface)] text-[var(--loomina-ink)] border border-[var(--loomina-outline)] shadow-md hover:bg-[var(--loomina-surface-muted)]",
     [variant]
   );

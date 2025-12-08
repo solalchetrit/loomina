@@ -12,7 +12,7 @@
   --loomina-haze: #d7d0c2;
   --loomina-amber: #e3bb79;
   --loomina-amber-strong: #c48b3f;
-  --loomina-forest: #1f3328;
+  --loomina-forest: #0f1115;
   --loomina-muted: #5c5b57;
   --loomina-ink-soft: #1f2026;
   --loomina-black: var(--loomina-ink); /* Alias pour corriger les anciens usages */
@@ -24,7 +24,7 @@
   --loomina-outline: rgba(15, 17, 21, 0.08);
   --loomina-outline-strong: rgba(15, 17, 21, 0.16);
   --loomina-amber-veil: rgba(196, 139, 63, 0.12);
-  --loomina-forest-veil: rgba(31, 51, 40, 0.12);
+  --loomina-forest-veil: rgba(15, 17, 21, 0.12);
   --background: var(--loomina-cloud);
   --foreground: var(--loomina-ink);
 
