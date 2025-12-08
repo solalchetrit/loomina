@@ -2,6 +2,8 @@ import Hero from "@/components/Hero";
 import OfferPreview from "@/components/OfferPreview";
 import StarDecoration from "@/components/ui/StarDecoration";
 
+const sectionSpacing = "px-6 py-20 md:py-24 lg:py-28";
+
 const promisePoints = [
   {
     icon: "🎙️",
@@ -119,7 +121,7 @@ export default function Home() {
       <Hero />
 
       {/* Mission & promesse : NOIR */}
-      <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden" id="mission">
+      <section className={`relative w-full bg-black ${sectionSpacing} text-white overflow-hidden`} id="mission">
         <StarDecoration position="top-right" className="opacity-60" />
         <StarDecoration position="bottom-left" className="opacity-40 scale-75" />
         <StarDecoration position="top-left" className="opacity-30 scale-75" />
@@ -177,7 +179,7 @@ export default function Home() {
       </section>
 
       {/* Section Process : BLANC */}
-      <section className="w-full bg-white px-6 py-24 text-black" id="accompagnement">
+      <section className={`w-full bg-white ${sectionSpacing} text-black`} id="accompagnement">
         <div className="mx-auto max-w-6xl space-y-12">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-4 max-w-3xl">
@@ -215,7 +217,7 @@ export default function Home() {
       </section>
 
       {/* Section Détails : NOIR */}
-      <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden" id="details">
+      <section className={`relative w-full bg-black ${sectionSpacing} text-white overflow-hidden`} id="details">
         <StarDecoration position="top-left" className="opacity-50 scale-90" />
         <StarDecoration position="bottom-right" className="opacity-50" />
         <StarDecoration position="top-right" className="opacity-30" />
@@ -291,7 +293,7 @@ export default function Home() {
       <OfferPreview />
 
       {/* Garanties : NOIR */}
-      <section className="w-full bg-black px-6 py-24 text-white" id="garanties">
+      <section className={`w-full bg-black ${sectionSpacing} text-white`} id="garanties">
         <div className="mx-auto max-w-6xl space-y-12">
           <div className="space-y-4 text-center">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Ce que nous garantissons</p>
@@ -332,11 +334,11 @@ export default function Home() {
       </section>
 
       {/* Section Audio : BLANC */}
-      <section className="relative w-full bg-white px-6 py-24 text-black overflow-hidden" id="exemple-audio">
+      <section className={`relative w-full bg-white ${sectionSpacing} text-black overflow-hidden`} id="exemple-audio">
         <StarDecoration position="top-right" className="-top-20 -right-20 opacity-20 w-96 h-96" />
         <StarDecoration position="bottom-left" className="opacity-15" />
         <StarDecoration position="top-left" className="opacity-10 scale-75" />
-        <div className="mx-auto max-w-5xl grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr,0.95fr] items-center relative z-10">
+        <div className="mx-auto max-w-6xl grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr,0.95fr] items-center relative z-10">
           <div className="space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Exemple audio</p>
             <h3 className="text-3xl md:text-4xl font-semibold leading-tight">La voix reste intacte et lisible</h3>
@@ -356,8 +358,8 @@ export default function Home() {
       </section>
 
       {/* Contact : NOIR */}
-      <section className="w-full bg-black px-6 py-20 text-white" id="contact">
-        <div className="mx-auto max-w-5xl space-y-6 text-center">
+      <section className={`w-full bg-black px-6 py-16 md:py-20 lg:py-24 text-white`} id="contact">
+        <div className="mx-auto max-w-6xl space-y-6 text-center">
           <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Prendre contact</p>
           <h3 className="text-3xl md:text-4xl font-semibold leading-tight">Parlons de votre livre ou de celui d'un proche</h3>
           <p className="text-neutral-300 max-w-2xl mx-auto leading-relaxed text-lg">
