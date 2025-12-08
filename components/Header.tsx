@@ -17,13 +17,13 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/80 backdrop-blur-xl shadow-[0_12px_50px_-36px_rgba(0,0,0,0.35)]">
-      <div className="mx-auto flex h-20 max-w-7xl items-center px-4 md:h-24 md:px-8">
+      <div className="mx-auto flex h-24 max-w-7xl items-center px-4 md:h-32 md:px-8">
         <Link
           href="/"
           className="flex items-center gap-4 rounded-full px-4 py-2 transition hover:-translate-y-[1px] hover:shadow-[0_18px_50px_-40px_rgba(0,0,0,0.55)]"
         >
-          <div className="relative h-16 w-52 md:h-24 md:w-80">
-            <Image src="/header-logo-new.png" alt="Logo Loomina" fill className="object-contain" priority sizes="(max-width: 768px) 208px, 320px" />
+          <div className="relative h-20 w-60 md:h-28 md:w-96">
+            <Image src="/header-logo-new.png" alt="Logo Loomina" fill className="object-contain" priority sizes="(max-width: 768px) 240px, 384px" />
           </div>
         </Link>
 
