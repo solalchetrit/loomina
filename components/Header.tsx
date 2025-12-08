@@ -6,6 +6,7 @@ import MagicButton from "./ui/MagicButton";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
+  { href: "#top", label: "Accueil" },
   { href: "#offres", label: "Offres" },
   { href: "#faq", label: "FAQ" },
 ];
