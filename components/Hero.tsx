@@ -5,18 +5,18 @@ export default function Hero() {
     <section className="relative w-full overflow-hidden px-6 pb-14 pt-10 bg-white">
       <div className="mx-auto max-w-5xl p-8 md:p-12">
         <div className="grid grid-cols-1 items-center gap-10">
-          <div className="space-y-7">
-            <div className="inline-flex items-center gap-3 rounded-full bg-neutral-100 px-4 py-2 text-sm font-semibold text-black border border-black/5">
-              <span className="h-2.5 w-2.5 rounded-full bg-black" />
-              Loomina accompagne vos souvenirs
-            </div>
-            <div className="space-y-4">
-              <p className="text-xs uppercase tracking-[0.34em] text-neutral-500 font-semibold">Livre mémoriel humain</p>
-              <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-black">
-                Votre histoire prend la parole avec une équipe qui vous écoute
-              </h1>
-            </div>
-            <p className="text-lg text-neutral-600 leading-relaxed max-w-2xl">
+            <div className="space-y-7">
+              <div className="inline-flex items-center gap-3 rounded-full bg-neutral-100 px-4 py-2 text-sm font-semibold text-black border border-black/5">
+                <span className="h-2.5 w-2.5 rounded-full bg-black" />
+                Loomina accompagne vos souvenirs
+              </div>
+              <div className="space-y-4">
+                <p className="text-xs uppercase tracking-[0.34em] text-neutral-600 font-semibold">Livre mémoriel humain</p>
+                <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-black">
+                  Votre histoire prend la parole avec une équipe qui vous écoute
+                </h1>
+              </div>
+              <p className="text-lg text-neutral-600 leading-relaxed max-w-2xl">
               Interviews guidés, réécriture attentive, maquette prête à offrir : nous prenons le temps de comprendre vos souvenirs et de les transmettre avec douceur, en version imprimée et numérique.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -28,6 +28,7 @@ export default function Hero() {
               </MagicButton>
               <MagicButton
                 href="mailto:contact@loomina.fr"
+                variant="secondary"
                 className="bg-white text-black border border-black/10 shadow-md hover:bg-neutral-50"
               >
                 Organiser un premier appel
@@ -40,7 +41,7 @@ export default function Hero() {
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-6 pt-2 text-neutral-500">
+            <div className="flex flex-wrap items-center gap-6 pt-2 text-neutral-600">
               <div>
                 <p className="text-3xl font-semibold text-black">4.9/5</p>
                 <p className="text-sm">sur les projets accompagnés</p>
