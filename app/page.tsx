@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import OfferPreview from "@/components/OfferPreview";
+import StarDecoration from "@/components/ui/StarDecoration";
 
 const promisePoints = [
   {
@@ -80,8 +81,10 @@ export default function Home() {
       <Hero />
 
       {/* Section Promesse : NOIR */}
-      <section className="w-full bg-black px-6 py-20 text-white">
-        <div className="mx-auto max-w-6xl space-y-12">
+      <section className="relative w-full bg-black px-6 py-20 text-white overflow-hidden">
+        <StarDecoration position="top-right" className="opacity-60" />
+        <StarDecoration position="bottom-left" className="opacity-40 scale-75" />
+        <div className="mx-auto max-w-6xl space-y-12 relative z-10">
           <div className="text-center space-y-4">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">La promesse Loomina</p>
             <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Un livre qui ressemble vraiment à la personne</h2>
@@ -146,8 +149,10 @@ export default function Home() {
       </section>
 
       {/* Section Détails : NOIR */}
-      <section className="w-full bg-black px-6 py-24 text-white">
-        <div className="mx-auto max-w-6xl space-y-12">
+      <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden">
+        <StarDecoration position="top-left" className="opacity-50 scale-90" />
+        <StarDecoration position="bottom-right" className="opacity-50" />
+        <div className="mx-auto max-w-6xl space-y-12 relative z-10">
           <div className="space-y-4 text-center">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">
               On s'occupe des détails
@@ -218,8 +223,9 @@ export default function Home() {
       <OfferPreview />
 
       {/* Section Audio : NOIR */}
-      <section className="w-full bg-black px-6 py-24 text-white" id="exemple-audio">
-        <div className="mx-auto max-w-5xl grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr,0.95fr] items-center">
+      <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden" id="exemple-audio">
+        <StarDecoration position="top-right" className="-top-20 -right-20 opacity-40 w-96 h-96" />
+        <div className="mx-auto max-w-5xl grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr,0.95fr] items-center relative z-10">
           <div className="space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Exemple audio</p>
             <h3 className="text-3xl md:text-4xl font-semibold leading-tight">La voix reste intacte et lisible</h3>
