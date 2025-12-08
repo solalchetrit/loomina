@@ -22,12 +22,12 @@ export default function Header() {
           href="/"
           className="flex items-center gap-4 rounded-full px-4 py-2 transition hover:-translate-y-[1px] hover:shadow-[0_18px_50px_-40px_rgba(0,0,0,0.55)]"
         >
-          <div className="relative h-16 w-52 md:h-20 md:w-64">
-            <Image src="/logo.png" alt="Logo Loomina" fill className="object-contain" priority sizes="16rem" />
+          <div className="relative h-12 w-40 md:h-14 md:w-48">
+            <Image src="/header-logo-new.png" alt="Logo Loomina" fill className="object-contain" priority sizes="(max-width: 768px) 160px, 192px" />
           </div>
-          <div className="hidden md:block leading-tight">
-            <p className="text-[11px] uppercase tracking-[0.32em] text-[var(--loomina-amber-strong)] font-semibold">Mémoire vivante</p>
-            <p className="text-base font-semibold text-[var(--loomina-ink)]">Une maison pour vos histoires</p>
+          <div className="hidden md:block leading-tight pl-4 border-l border-black/10 ml-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--loomina-amber-strong)] font-semibold">Mémoire vivante</p>
+            <p className="text-sm font-medium text-[var(--loomina-ink)]">Une maison pour vos histoires</p>
           </div>
         </Link>
 
@@ -48,11 +48,10 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-full px-3 py-2 transition hover:bg-[var(--loomina-cloud)] md:px-4 ${
-                    isActive
+                  className={`rounded-full px-3 py-2 transition hover:bg-[var(--loomina-cloud)] md:px-4 ${isActive
                       ? "bg-[var(--loomina-cloud)] text-[var(--loomina-amber-strong)] border border-black/5"
                       : "text-[var(--loomina-ink)]"
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </Link>
