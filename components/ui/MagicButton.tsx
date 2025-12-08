@@ -10,21 +10,30 @@ interface MagicButtonProps extends HTMLMotionProps<"button"> {
   children: ReactNode;
   glow?: boolean;
   className?: string;
+  variant?: "primary" | "secondary";
 }
 
 const springConfig = { stiffness: 260, damping: 20, mass: 0.6 };
 
-function MagicButtonContent({ children, glow, className = "", ...rest }: Omit<MagicButtonProps, "href">) {
+function MagicButtonContent({ children, glow, className = "", variant = "primary", ...rest }: Omit<MagicButtonProps, "href">) {
   const [hovered, setHovered] = useState(false);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const springX = useSpring(x, springConfig);
   const springY = useSpring(y, springConfig);
 
-  const background = useMemo(
+  const variantClasses = useMemo(
     () =>
-      "bg-[var(--loomina-black)] text-white shadow-[0_22px_60px_-40px_rgba(0,0,0,0.85)] border border-white/10",
-    []
+      variant === "primary"
+        ? "bg-[var(--loomina-forest)] text-white shadow-[0_25px_60px_-38px_rgba(15,17,21,0.6)] border border-[var(--loomina-outline-strong)] hover:bg-[var(--loomina-forest)]/95"
+        : "bg-[var(--loomina-surface)] text-[var(--loomina-ink)] border border-[var(--loomina-outline)] shadow-md hover:bg-[var(--loomina-surface-muted)]",
+    [variant]
+  );
+
+  const buttonClasses = useMemo(
+    () =>
+      `group relative inline-flex items-center justify-center overflow-hidden rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--loomina-amber-strong)] focus-visible:ring-offset-[var(--loomina-surface)] ${variantClasses} ${className}`,
+    [className, variantClasses]
   );
 
   const handleMouseMove = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -47,7 +56,7 @@ function MagicButtonContent({ children, glow, className = "", ...rest }: Omit<Ma
   return (
     <motion.button
       type="button"
-      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 ${background} ${className}`}
+      className={buttonClasses}
       style={{ x: springX, y: springY }}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
@@ -73,11 +82,11 @@ function MagicButtonContent({ children, glow, className = "", ...rest }: Omit<Ma
   );
 }
 
-export default function MagicButton({ href, children, glow = true, className, ...rest }: MagicButtonProps) {
+export default function MagicButton({ href, children, glow = true, className, variant = "primary", ...rest }: MagicButtonProps) {
   if (href) {
     return (
       <Link href={href} className="inline-flex">
-        <MagicButtonContent className={className} glow={glow} {...rest}>
+        <MagicButtonContent className={className} glow={glow} variant={variant} {...rest}>
           {children}
         </MagicButtonContent>
       </Link>
@@ -85,7 +94,7 @@ export default function MagicButton({ href, children, glow = true, className, ..
   }
 
   return (
-    <MagicButtonContent className={className} glow={glow} {...rest}>
+    <MagicButtonContent className={className} glow={glow} variant={variant} {...rest}>
       {children}
     </MagicButtonContent>
   );

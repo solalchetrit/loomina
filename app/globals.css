@@ -6,23 +6,41 @@
 }
 
 :root {
-  --loomina-ink: #171717;
-  --loomina-cloud: #f7f4ef;
-  --loomina-sand: #efe7dd;
-  --loomina-haze: #e5dccf;
-  --loomina-amber: #eabf77;
-  --loomina-amber-strong: #c58c3c;
-  --loomina-forest: #1f3328;
-  --loomina-muted: #58524b;
+  --loomina-ink: #0f1115;
+  --loomina-cloud: #f5f3ef; /* Fond clair principal inspiré papier ivoire */
+  --loomina-sand: #ebe6dc;
+  --loomina-haze: #d7d0c2;
+  --loomina-amber: #e3bb79;
+  --loomina-amber-strong: #c48b3f;
+  --loomina-forest: #0f1115;
+  --loomina-muted: #5c5b57;
+  --loomina-ink-soft: #1f2026;
+  --loomina-black: var(--loomina-ink); /* Alias pour corriger les anciens usages */
+  --loomina-gray-light: #f0ede6;
+  --loomina-gray-dark: #32302c;
+  --loomina-gold: #d6a45b;
+  --loomina-surface: #ffffff;
+  --loomina-surface-muted: #f0ede6;
+  --loomina-outline: rgba(15, 17, 21, 0.08);
+  --loomina-outline-strong: rgba(15, 17, 21, 0.16);
+  --loomina-amber-veil: rgba(196, 139, 63, 0.12);
+  --loomina-forest-veil: rgba(15, 17, 21, 0.12);
   --background: var(--loomina-cloud);
   --foreground: var(--loomina-ink);
+
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem; /* Match l'en-tête sticky sur bureau */
+}
+
+@media (max-width: 767px) {
+  :root {
+    scroll-padding-top: 5rem; /* Ajusté pour la hauteur de l'en-tête mobile */
+  }
 }
 
 body {
   color: var(--foreground);
-  background: radial-gradient(circle at 20% 20%, #ffffff 0, #ffffff 14%, transparent 14%),
-    radial-gradient(circle at 80% 10%, #ffffff 0, #ffffff 12%, transparent 12%),
-    var(--background);
+  background: var(--background);
   margin: 0;
   padding: 0;
   font-family: var(--font-plus-jakarta-sans), system-ui, sans-serif;
@@ -38,4 +56,16 @@ body {
 .glow-ring {
   box-shadow: 0 1px 0 rgba(23, 23, 23, 0.04), 0 20px 60px -40px rgba(23, 23, 23, 0.35),
     0 0 0 1px rgba(23, 23, 23, 0.04);
+}
+
+/* Palette d'accentuation réutilisable */
+.surface-card {
+  background: var(--loomina-surface);
+  border: 1px solid var(--loomina-outline);
+  box-shadow: 0 28px 60px -40px rgba(15, 17, 21, 0.22);
+}
+
+.section-shell {
+  /* Commentaire : gabarit global pour l'espacement vertical des sections */
+  @apply py-20 md:py-24 lg:py-28;
 }

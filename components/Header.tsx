@@ -1,57 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
 import MagicButton from "./ui/MagicButton";
+import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
-  { href: "/", label: "Accueil" },
-  { href: "/mission", label: "Mission" },
-  { href: "/offres", label: "Offres" },
-  { href: "/accompagnement", label: "Accompagnement" },
+  { href: "#top", label: "Accueil" },
+  { href: "#offres", label: "Offres" },
+  { href: "#faq", label: "FAQ" },
 ];
 
 export default function Header() {
-  const pathname = usePathname();
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setHasScrolled(window.scrollY > 6);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/80 backdrop-blur-xl shadow-[0_12px_50px_-36px_rgba(0,0,0,0.35)]">
-      <div className="mx-auto flex h-20 max-w-7xl items-center px-4 md:h-24 md:px-8">
+    <header
+      className={`sticky top-0 z-50 w-full border-b border-black/5 transition-colors duration-300 ${
+        hasScrolled
+          ? "bg-white/95 backdrop-blur-xl shadow-[0_12px_50px_-36px_rgba(0,0,0,0.35)]"
+          : "bg-white/75 backdrop-blur-xl shadow-[0_18px_50px_-40px_rgba(0,0,0,0.35)]"
+      }`}
+    >
+      <div className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:h-[4.5rem] md:h-20 md:px-6 lg:h-24">
         <Link
           href="/"
-          className="flex items-center gap-4 rounded-full px-4 py-2 transition hover:-translate-y-[1px] hover:shadow-[0_18px_50px_-40px_rgba(0,0,0,0.55)]"
+          className="flex items-center gap-3 rounded-full py-2 pr-4 transition hover:-translate-y-[1px] hover:shadow-[0_18px_50px_-40px_rgba(0,0,0,0.55)]"
+          aria-label="Retour à l'accueil Loomina"
         >
-          <div className="relative h-16 w-52 md:h-20 md:w-64">
-            <Image src="/header_logo.svg" alt="Logo Loomina" fill className="object-contain" priority sizes="16rem" />
-          </div>
-          <div className="hidden md:block leading-tight">
-            <p className="text-[11px] uppercase tracking-[0.32em] text-[var(--loomina-amber-strong)] font-semibold">Mémoire vivante</p>
-            <p className="text-base font-semibold text-[var(--loomina-ink)]">Une maison pour vos histoires</p>
+          <div className="relative h-9 w-32 md:h-10 md:w-40">
+            <Image
+              src="/header-logo-trimmed.png"
+              alt="Logo Loomina"
+              fill
+              className="object-contain object-left"
+              priority
+              sizes="(max-width: 768px) 160px, 200px"
+            />
           </div>
         </Link>
 
-        <div className="ml-auto flex flex-1 items-center justify-end gap-3 md:gap-4">
-          <div className="hidden sm:inline-flex md:order-1">
-            <MagicButton
-              href="mailto:contact@loomina.fr"
-              className="px-4 py-2 bg-[var(--loomina-black)] text-white border border-white/10 shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)] md:px-5"
-            >
-              Parler à une personne
-            </MagicButton>
-          </div>
-
-          <nav className="order-2 flex items-center gap-2 rounded-full border border-black/5 bg-white/85 px-2 py-1 text-sm font-semibold shadow-sm md:gap-3 md:px-4">
+        <div className="ml-auto flex items-center gap-4 sm:gap-6">
+          <nav className="hidden items-center gap-2 rounded-full border border-black/5 bg-white/85 px-2 py-1 text-sm font-semibold text-[var(--loomina-ink)] shadow-sm sm:flex md:gap-3 md:px-4">
             {NAV_LINKS.map((item) => {
-              const isActive = pathname === item.href;
+              const isHome = item.label === "Accueil";
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-full px-3 py-2 transition hover:bg-[var(--loomina-cloud)] md:px-4 ${
-                    isActive
-                      ? "bg-[var(--loomina-cloud)] text-[var(--loomina-amber-strong)] border border-black/5"
-                      : "text-[var(--loomina-ink)]"
+                  className={`rounded-full px-3 py-2 transition md:px-4 ${
+                    isHome
+                      ? "bg-[var(--loomina-black)] text-white shadow-[0_16px_45px_-28px_rgba(0,0,0,0.5)] hover:bg-neutral-900"
+                      : "hover:bg-[var(--loomina-cloud)]"
                   }`}
                 >
                   {item.label}
@@ -59,6 +67,13 @@ export default function Header() {
               );
             })}
           </nav>
+
+          <MagicButton
+            href="tel:+33756830514"
+            className="bg-[var(--loomina-black)] px-4 py-2 text-sm font-semibold text-white shadow-[0_18px_50px_-36px_rgba(0,0,0,0.55)] border border-white/10 sm:px-5"
+          >
+            Appeler l'équipe
+          </MagicButton>
         </div>
       </div>
     </header>

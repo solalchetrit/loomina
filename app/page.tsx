@@ -1,234 +1,118 @@
 import Hero from "@/components/Hero";
 import OfferPreview from "@/components/OfferPreview";
+import LoominaFAQ from "@/components/LoominaFAQ";
 
-const promisePoints = [
+const steps = [
   {
-    icon: "🎙️",
-    title: "Interviews guidés",
-    text: "Un interlocuteur humain, des relances douces et l'enregistrement intégral pour ne rien perdre de votre ton.",
+    title: "On s'appelle",
+    description:
+      "15 minutes pour comprendre l'histoire à raconter et rassurer la personne qui sera interviewée.",
   },
   {
-    icon: "📖",
-    title: "Edition artisanale",
-    text: "Réécriture claire, choix typographiques élégants et mise en page avec vos photos préférées.",
+    title: "On écrit",
+    description:
+      "Les conversations sont guidées, réécrites avec douceur et rassemblées dans une maquette claire.",
   },
   {
-    icon: "🔐",
-    title: "Transmission sereine",
-    text: "Livre relié prêt à offrir, PDF protégé et un espace privé pour partager avec la famille.",
-  },
-];
-
-const processSteps = [
-  {
-    title: "On prépare votre récit",
-    detail: "Nous définissons ensemble les thèmes clés, les personnes à interviewer et un calendrier réaliste.",
-    badge: "Repérage",
-  },
-  {
-    title: "Vous parlez, nous écrivons",
-    detail: "Les entretiens sont transcrits, réécrits avec votre voix, puis relus avec vous avant la mise en page.",
-    badge: "Production",
-  },
-  {
-    title: "On livre pour transmettre",
-    detail: "Vous recevez le livre relié, le PDF sécurisé et un guide pour partager facilement avec les proches.",
-    badge: "Livraison",
-  },
-];
-
-const carePillars = [
-  {
-    title: "Une éditrice pour vous",
-    description: "Un seul interlocuteur qui suit vos rendez-vous, coordonne les relectures et prend soin des détails.",
-  },
-  {
-    title: "Photos guidées",
-    description: "Sélection et retouche légère pour garder vos images lumineuses sans dénaturer vos souvenirs.",
-  },
-  {
-    title: "Notation discrète",
-    description: "Repères dans les transcriptions pour indiquer les émotions, les silences ou les passages sensibles.",
-  },
-  {
-    title: "Relecture en duo",
-    description: "Vous relisez avec nous : nous ajustons ensemble la voix, les tournures et les titres des chapitres.",
-  },
-];
-
-const sharingFormats = [
-  {
-    title: "Coffret prêt à offrir",
-    detail: "Livres reliés protégés, signets inclus et petit mot imprimé si vous souhaitez l'ajouter.",
-    tag: "Objet fini",
-  },
-  {
-    title: "Espace privé",
-    detail: "Lien sécurisé pour partager la version numérique avec les proches sans inscription compliquée.",
-    tag: "Numérique",
-  },
-  {
-    title: "Guide de partage",
-    detail: "Quelques pistes pour organiser une lecture familiale ou une remise en main propre sereine.",
-    tag: "Transmission",
+    title: "Vous recevez",
+    description:
+      "Le livre relié et sa version numérique sécurisée, prêts à être offerts à la famille.",
   },
 ];
 
 export default function Home() {
+  const container = "mx-auto w-full max-w-6xl px-6";
+  const sectionSpacing = "section-shell";
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center text-[var(--loomina-ink)]">
+    <div className="w-full bg-[var(--loomina-cloud)] text-[var(--loomina-ink)]">
       <Hero />
 
-      <section className="w-full bg-white/70 backdrop-blur px-6 py-16">
-        <div className="mx-auto max-w-6xl space-y-10">
-          <div className="text-center space-y-3">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">La promesse Loomina</p>
-            <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Un livre qui ressemble vraiment à la personne</h2>
-            <p className="text-[var(--loomina-muted)] max-w-2xl mx-auto">
-              Nous combinons technologie et présence humaine pour faire ressortir la voix, les photos et les messages que vous souhaitez transmettre.
+      <section className={`${sectionSpacing} bg-[var(--loomina-forest)] text-white`} id="comment">
+        <div className={`${container} space-y-10 text-center`}>
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--loomina-amber)]">Parcours en 3 étapes</p>
+            <h2 className="text-3xl font-semibold md:text-4xl">Comment se passe un livre Loomina ?</h2>
+            <p className="text-lg leading-relaxed text-white/80 md:text-xl">
+              Un entonnoir clair pour avancer sans menus ni distractions : un appel, une écriture accompagnée, puis la livraison.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {promisePoints.map((point) => (
+          {/* Commentaire : grille de cartes numérotées pour rythmer la lecture */}
+          <div className="grid gap-6 md:grid-cols-3">
+            {steps.map((step, index) => (
               <div
-                key={point.title}
-                className="glow-ring rounded-3xl bg-[var(--loomina-cloud)] p-6 space-y-3 border border-black/5"
+                key={step.title}
+                className="flex h-full flex-col gap-4 rounded-3xl border border-white/10 bg-white/10 px-6 py-8 text-left shadow-[0_20px_60px_-50px_rgba(0,0,0,0.7)] backdrop-blur"
               >
-                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-2xl shadow-inner" aria-hidden>
-                  {point.icon}
-                </div>
-                <h3 className="text-xl font-semibold leading-tight">{point.title}</h3>
-                <p className="text-[var(--loomina-muted)] leading-relaxed">{point.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="w-full px-6 py-16">
-        <div className="mx-auto max-w-6xl space-y-10">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="space-y-3 max-w-3xl">
-              <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Comment ça se passe</p>
-              <h2 className="text-3xl md:text-4xl font-semibold leading-tight">On avance avec vous, du premier appel au livre relié</h2>
-              <p className="text-[var(--loomina-muted)] leading-relaxed">
-                Vous gardez la main sur chaque étape : préparation, interviews, relectures, puis maquette finale. Nous faisons le lien entre vos mots et un objet que l'on a envie de transmettre.
-              </p>
-            </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 border border-black/5 text-sm font-semibold shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-[var(--loomina-amber-strong)]" />
-              3 semaines en moyenne, livraison comprise
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {processSteps.map((step, index) => (
-              <div key={step.title} className="flex h-full flex-col gap-4 rounded-3xl border border-black/5 bg-white/80 p-6 glow-ring">
-                <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] font-semibold text-[var(--loomina-muted)]">
-                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--loomina-cloud)] text-[var(--loomina-ink)] border border-black/5">
-                    {step.badge}
+                <div className="flex items-center justify-between text-sm font-semibold text-white/80">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em]">
+                    Étape {index + 1}
                   </span>
-                  <span className="text-[var(--loomina-amber-strong)]">0{index + 1}</span>
+                  <span className="h-3 w-3 rounded-full bg-[var(--loomina-amber)]" />
                 </div>
-                <h3 className="text-xl font-semibold leading-tight">{step.title}</h3>
-                <p className="text-[var(--loomina-muted)] leading-relaxed">{step.detail}</p>
-                <div className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-[var(--loomina-ink)]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--loomina-amber-strong)]" />
-                  Accompagnement Loomina inclus
-                </div>
+                <h3 className="text-xl font-semibold text-white">{step.title}</h3>
+                <p className="text-base leading-relaxed text-white/80">{step.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="w-full bg-white/75 backdrop-blur px-6 py-16">
-        <div className="mx-auto max-w-6xl space-y-10">
-          <div className="space-y-3 text-center">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">
-              On s'occupe des détails
-            </p>
-            <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Plus de soin éditorial, moins de gestion pour vous</h2>
-            <p className="text-[var(--loomina-muted)] max-w-3xl mx-auto leading-relaxed">
-              Nous orchestrons les rendez-vous, la mise en page et la livraison pour que vous profitiez surtout du plaisir de raconter.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.05fr,0.95fr]">
-            <div className="rounded-3xl border border-black/5 bg-white/85 p-6 glow-ring space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[var(--loomina-cloud)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--loomina-ink)] border border-black/5">
-                Soin éditorial
-              </div>
-              <h3 className="text-2xl font-semibold">Une équipe resserrée pour vous écouter</h3>
-              <p className="text-[var(--loomina-muted)] leading-relaxed">
-                Les interviews sont préparés en amont, les transcriptions relues, et votre éditrice garde le même fil conducteur tout au long du projet.
-              </p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {carePillars.map((pillar) => (
-                  <div
-                    key={pillar.title}
-                    className="rounded-2xl border border-black/5 bg-[var(--loomina-cloud)] p-4 shadow-inner space-y-2"
-                  >
-                    <p className="text-sm uppercase tracking-[0.12em] text-[var(--loomina-amber-strong)] font-semibold">
-                      {pillar.title}
-                    </p>
-                    <p className="text-[var(--loomina-muted)] text-sm leading-relaxed">{pillar.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-black/5 bg-[var(--loomina-cloud)]/80 p-6 glow-ring space-y-5">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--loomina-ink)] border border-black/5">
-                Transmission
-              </div>
-              <h3 className="text-2xl font-semibold">On prépare le moment où vous partagerez le livre</h3>
-              <p className="text-[var(--loomina-muted)] leading-relaxed">
-                Votre récit est pensé pour être offert : de la maquette jusqu'à l'envoi, nous anticipons comment il sera lu et conservé.
-              </p>
-              <div className="space-y-3">
-                {sharingFormats.map((format) => (
-                  <div
-                    key={format.title}
-                    className="flex items-start gap-3 rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm"
-                  >
-                    <div className="inline-flex items-center rounded-full bg-[var(--loomina-amber)]/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--loomina-amber-strong)]">
-                      {format.tag}
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-lg font-semibold text-[var(--loomina-ink)]">{format.title}</p>
-                      <p className="text-[var(--loomina-muted)] text-sm leading-relaxed">{format.detail}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="rounded-2xl border border-black/5 bg-white/85 p-4 text-sm text-[var(--loomina-muted)]">
-                Chaque étape est documentée : vous recevez un petit récapitulatif après chaque session pour suivre la progression sans y penser.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <OfferPreview />
-
-      <section className="w-full px-6 py-16" id="exemple-audio">
-        <div className="mx-auto max-w-5xl grid grid-cols-1 gap-8 lg:grid-cols-[1.05fr,0.95fr] items-center">
+      <section className={`${sectionSpacing} bg-[var(--loomina-cloud)]`} id="exemple-audio">
+        <div className={`${container} grid grid-cols-1 items-center gap-10 rounded-[30px] border border-[var(--loomina-outline)] bg-[var(--loomina-surface)] p-8 shadow-[0_32px_80px_-65px_rgba(15,17,21,0.5)] md:grid-cols-[1.05fr,0.95fr]`}>
           <div className="space-y-4">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Exemple audio</p>
-            <h3 className="text-3xl md:text-4xl font-semibold leading-tight">La voix reste intacte et lisible</h3>
-            <p className="text-[var(--loomina-muted)] leading-relaxed max-w-xl">
-              Un extrait brut pour entendre notre manière de guider les entretiens : rythme calme, silences respectés et montage léger.
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--loomina-amber-strong)]">Exemple audio</p>
+            <h3 className="text-3xl font-semibold leading-tight text-[var(--loomina-ink)] md:text-4xl">Écouter avant de s'engager</h3>
+            <p className="text-lg leading-relaxed text-[var(--loomina-ink-soft)]">
+              Une minute d'entretien brut pour entendre la façon dont nous guidons la parole : rythme calme, voix respectée, montage léger.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-black/5 bg-white/80 p-6 glow-ring space-y-3">
-            <audio controls className="w-full">
+          <div className="flex flex-col gap-3 rounded-2xl border border-[var(--loomina-outline)] bg-[var(--loomina-cloud)]/70 p-6 shadow-inner">
+            <audio controls className="w-full" aria-label="Exemple audio Loomina">
               <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
               Votre navigateur ne supporte pas la lecture audio.
             </audio>
-            <p className="text-sm text-[var(--loomina-muted)]">1 minute pour entendre la qualité Loomina.</p>
+            <p className="text-sm text-[var(--loomina-muted)]">Appuyer sur lecture pour entendre l'approche Loomina.</p>
+          </div>
+        </div>
+      </section>
+
+      <OfferPreview variant="dark" />
+
+      <section className={`${sectionSpacing} bg-[var(--loomina-cloud)]`} id="faq">
+        <div className={`${container} flex flex-col gap-8 text-center`}>
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--loomina-amber-strong)]">FAQ</p>
+            <h3 className="text-3xl font-semibold md:text-4xl">Vos freins, nos réponses rapides</h3>
+            <p className="text-lg leading-relaxed text-[var(--loomina-ink-soft)]">
+              Prix, technique, confidentialité : nous réglons les doutes essentiels pour que vous puissiez lancer l'appel sereinement.
+            </p>
+          </div>
+          <LoominaFAQ />
+        </div>
+      </section>
+
+      <section className={`${sectionSpacing} bg-[var(--loomina-forest)]`} id="contact">
+        <div className={`${container} flex flex-col gap-6 rounded-[28px] border border-white/15 bg-white/5 p-8 text-center text-white shadow-[0_32px_80px_-60px_rgba(0,0,0,0.65)]`}>
+          <h3 className="text-2xl font-semibold md:text-3xl">Prêt à démarrer ?</h3>
+          <p className="text-lg leading-relaxed text-white/80">
+            Un membre de l'équipe vous rappelle en moins de 24h pour caler le premier échange.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="tel:+33756830514"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[var(--loomina-ink)] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.45)] transition hover:-translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--loomina-amber-strong)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--loomina-forest)]"
+            >
+              Appeler l'équipe Loomina
+            </a>
+            <a
+              href="mailto:contact@loomina.fr?subject=Organiser%20un%20appel%20Loomina"
+              className="inline-flex items-center justify-center rounded-full border border-white/30 bg-transparent px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-[1px] hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--loomina-forest)]"
+            >
+              Écrire à l'équipe
+            </a>
           </div>
         </div>
       </section>
