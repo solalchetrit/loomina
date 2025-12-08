@@ -25,14 +25,14 @@ function MagicButtonContent({ children, glow, className = "", variant = "primary
   const variantClasses = useMemo(
     () =>
       variant === "primary"
-        ? "bg-[var(--loomina-black)] text-white shadow-[0_22px_60px_-40px_rgba(0,0,0,0.85)] border border-white/10"
-        : "bg-white text-black border border-black/10 shadow-md hover:bg-neutral-50",
+        ? "bg-[var(--loomina-forest)] text-white shadow-[0_25px_60px_-38px_rgba(31,51,40,0.55)] border border-[var(--loomina-outline-strong)] hover:bg-[var(--loomina-forest)]/95"
+        : "bg-[var(--loomina-surface)] text-[var(--loomina-ink)] border border-[var(--loomina-outline)] shadow-md hover:bg-[var(--loomina-surface-muted)]",
     [variant]
   );
 
   const buttonClasses = useMemo(
     () =>
-      `group relative inline-flex items-center justify-center overflow-hidden rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--loomina-black)] focus-visible:ring-offset-white ${variantClasses} ${className}`,
+      `group relative inline-flex items-center justify-center overflow-hidden rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--loomina-amber-strong)] focus-visible:ring-offset-[var(--loomina-surface)] ${variantClasses} ${className}`,
     [className, variantClasses]
   );
 

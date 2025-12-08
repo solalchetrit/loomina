@@ -6,15 +6,26 @@
 }
 
 :root {
-  --loomina-ink: #000000;
-  --loomina-cloud: #f5f5f5; /* Light neutral gray */
-  --loomina-sand: #e5e5e5;
-  --loomina-haze: #d4d4d4;
-  --loomina-amber: #eabf77;
-  --loomina-amber-strong: #c58c3c;
+  --loomina-ink: #0f1115;
+  --loomina-cloud: #f5f3ef; /* Fond clair principal inspiré papier ivoire */
+  --loomina-sand: #ebe6dc;
+  --loomina-haze: #d7d0c2;
+  --loomina-amber: #e3bb79;
+  --loomina-amber-strong: #c48b3f;
   --loomina-forest: #1f3328;
-  --loomina-muted: #666666;
-  --background: #ffffff;
+  --loomina-muted: #5c5b57;
+  --loomina-ink-soft: #1f2026;
+  --loomina-black: var(--loomina-ink); /* Alias pour corriger les anciens usages */
+  --loomina-gray-light: #f0ede6;
+  --loomina-gray-dark: #32302c;
+  --loomina-gold: #d6a45b;
+  --loomina-surface: #ffffff;
+  --loomina-surface-muted: #f0ede6;
+  --loomina-outline: rgba(15, 17, 21, 0.08);
+  --loomina-outline-strong: rgba(15, 17, 21, 0.16);
+  --loomina-amber-veil: rgba(196, 139, 63, 0.12);
+  --loomina-forest-veil: rgba(31, 51, 40, 0.12);
+  --background: var(--loomina-cloud);
   --foreground: var(--loomina-ink);
 
   scroll-behavior: smooth;
@@ -45,4 +56,16 @@ body {
 .glow-ring {
   box-shadow: 0 1px 0 rgba(23, 23, 23, 0.04), 0 20px 60px -40px rgba(23, 23, 23, 0.35),
     0 0 0 1px rgba(23, 23, 23, 0.04);
+}
+
+/* Palette d'accentuation réutilisable */
+.surface-card {
+  background: var(--loomina-surface);
+  border: 1px solid var(--loomina-outline);
+  box-shadow: 0 28px 60px -40px rgba(15, 17, 21, 0.22);
+}
+
+.section-shell {
+  /* Commentaire : gabarit global pour l'espacement vertical des sections */
+  @apply py-20 md:py-24 lg:py-28;
 }
