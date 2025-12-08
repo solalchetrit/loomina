@@ -3,29 +3,24 @@ import { useState } from "react";
 
 const faqData = [
   {
-    question: "Comment se déroulent les entretiens ?",
+    question: "Combien coûte l'accompagnement ?",
     answer:
-      "Nous prévoyons un appel vidéo ou téléphonique d'environ 45 minutes. Notre IA suggère des relances tandis qu'un accompagnant Loomina guide l'échange pour que la parole reste fluide.",
+      "L'offre Lumina est affichée en toute transparence : 222 € impression incluse pour 5 exemplaires et les versions numérique et audio.",
   },
   {
-    question: "Qui relit et corrige les textes ?",
+    question: "Qui lit mes souvenirs en dehors de l'équipe ?",
     answer:
-      "Chaque transcription est vérifiée par un éditeur Loomina : cohérence des faits fournis, reformulation douce, suppression des hésitations pour préserver la voix originale.",
+      "Personne sans votre accord. Les données restent hébergées en Europe, sous contrat de confidentialité, et peuvent être supprimées sur simple demande.",
   },
   {
-    question: "Combien d'exemplaires puis-je commander ?",
+    question: "Faut-il être à l'aise avec la technologie ?",
     answer:
-      "Autant que nécessaire : nous imprimons à la demande et fournissons systématiquement une version numérique et audio pour partager facilement.",
+      "Non. Nous pouvons tout réaliser par téléphone, récupérer les photos pour vous et vous guider étape par étape sans plateforme compliquée.",
     active: true,
   },
   {
-    question: "Et si mon proche n'est pas à l'aise avec la technologie ?",
-    answer:
-      "Nous adaptons le dispositif : simple appel téléphonique, aide à distance pour récupérer les photos, et un accompagnement humain pour faciliter chaque étape.",
-  },
-  {
-    question: "Sous combien de temps recevrai-je le livre ?",
-    answer: "Après votre validation de la maquette finale, l'impression et l'envoi prennent en moyenne trois jours ouvrés.",
+    question: "Combien de temps pour recevoir le livre ?",
+    answer: "En moyenne trois semaines : prise de brief, entretiens guidés, maquette, puis impression et envoi suivis.",
   },
 ];
 

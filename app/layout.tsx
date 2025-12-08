@@ -22,10 +22,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${plusJakartaSans.variable} antialiased min-h-screen bg-[var(--background)] text-[var(--foreground)]`}>
-        <Header />
-        {children}
-        <Footer />
+      <body
+        className={`${plusJakartaSans.variable} antialiased min-h-screen bg-white text-[var(--loomina-ink)]`}
+      >
+        <div className="flex min-h-screen flex-col">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
