@@ -8,34 +8,34 @@ export default function Hero() {
             <div className="space-y-7">
               <div className="inline-flex items-center gap-3 rounded-full bg-neutral-100 px-4 py-2 text-sm font-semibold text-black border border-black/5">
                 <span className="h-2.5 w-2.5 rounded-full bg-black" />
-                Loomina accompagne vos souvenirs
+                ✨ Vos souvenirs méritent d'être éternels
               </div>
               <div className="space-y-4">
-                <p className="text-xs uppercase tracking-[0.34em] text-neutral-600 font-semibold">Livre mémoriel humain</p>
+                <p className="text-xs uppercase tracking-[0.34em] text-neutral-600 font-semibold">BIOGRAPHIE VOCALE & ÉDITION D'ART</p>
                 <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-black">
-                  Votre histoire prend la parole avec une équipe qui vous écoute
+                  Racontez simplement. Nous écrivons pour toujours.
                 </h1>
               </div>
               <p className="text-lg text-neutral-600 leading-relaxed max-w-2xl">
-              Interviews guidés, réécriture attentive, maquette prête à offrir : nous prenons le temps de comprendre vos souvenirs et de les transmettre avec douceur, en version imprimée et numérique.
+              Transformez vos conversations téléphoniques en un magnifique ouvrage autobiographique. Sans écrire une seule ligne, offrez à vos proches le récit de votre vie, sublimé par l'IA et finalisé par des éditeurs experts.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <MagicButton
                 href="#offres"
                 className="bg-black text-white shadow-lg border border-black hover:bg-neutral-800"
               >
-                Découvrir les offres
+                Voir les formats de livre
               </MagicButton>
               <MagicButton
                 href="mailto:contact@loomina.fr"
                 variant="secondary"
                 className="bg-white text-black border border-black/10 shadow-md hover:bg-neutral-50 !text-black"
               >
-                Organiser un premier appel
+                Commencer mon récit
               </MagicButton>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
-              {["Interviews enregistrés avec bienveillance", "Maquette élégante et photos retouchées", "Livres reliés et version numérique sécurisée"].map((item) => (
+              {["Zéro écriture requise", "Conversation naturelle", "Rendu librairie luxe"].map((item) => (
                 <div key={item} className="rounded-2xl border border-black/5 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
                   {item}
                 </div>
@@ -44,17 +44,17 @@ export default function Hero() {
             <div className="flex flex-wrap items-center gap-6 pt-2 text-neutral-600">
               <div>
                 <p className="text-3xl font-semibold text-black">4.9/5</p>
-                <p className="text-sm">sur les projets accompagnés</p>
+                <p className="text-sm">sur les familles conquises</p>
               </div>
               <div className="hidden h-12 w-px bg-black/10 sm:block" />
               <div>
                 <p className="text-3xl font-semibold text-black">2-3 semaines</p>
-                <p className="text-sm">pour un livre prêt à offrir</p>
+                <p className="text-sm">pour recevoir votre livre</p>
               </div>
               <div className="hidden h-12 w-px bg-black/10 sm:block" />
               <div>
                 <p className="text-3xl font-semibold text-black">100% humain</p>
-                <p className="text-sm">contrôle éditorial par notre équipe</p>
+                <p className="text-sm">relecture par un éditeur</p>
               </div>
             </div>
           </div>
