@@ -31,7 +31,7 @@ export default function Hero() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <MagicButton
                 href="#offres"
-                className="w-full justify-center bg-[var(--loomina-forest)] text-white shadow-[0_24px_70px_-50px_rgba(31,51,40,0.8)]"
+                className="w-full justify-center bg-[var(--loomina-forest)] text-white shadow-[0_24px_70px_-50px_rgba(15,17,21,0.8)]"
               >
                 Commencer mon récit
               </MagicButton>
