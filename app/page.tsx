@@ -1,6 +1,9 @@
 import Hero from "@/components/Hero";
+import HomeSections from "@/components/HomeSections";
+import LoominaFAQ from "@/components/LoominaFAQ";
 import OfferPreview from "@/components/OfferPreview";
 import StarDecoration from "@/components/ui/StarDecoration";
+import Testimonials from "@/components/Testimonials";
 
 const promisePoints = [
   {
@@ -17,24 +20,6 @@ const promisePoints = [
     icon: "🔐",
     title: "Transmission sereine",
     text: "Livre relié prêt à offrir, PDF protégé et un espace privé pour partager avec la famille.",
-  },
-];
-
-const processSteps = [
-  {
-    title: "On prépare votre récit",
-    detail: "Nous définissons ensemble les thèmes clés, les personnes à interviewer et un calendrier réaliste.",
-    badge: "Repérage",
-  },
-  {
-    title: "Vous parlez, nous écrivons",
-    detail: "Les entretiens sont transcrits, réécrits avec votre voix, puis relus avec vous avant la mise en page.",
-    badge: "Production",
-  },
-  {
-    title: "On livre pour transmettre",
-    detail: "Vous recevez le livre relié, le PDF sécurisé et un guide pour partager facilement avec les proches.",
-    badge: "Livraison",
   },
 ];
 
@@ -77,11 +62,11 @@ const sharingFormats = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center bg-white text-black">
+    <div className="min-h-screen w-full flex flex-col items-center bg-gradient-to-b from-[#05060d] via-[#0b0f1a] to-[#0e111c] text-white">
       <Hero />
 
-      {/* Section Promesse : NOIR */}
-      <section className="relative w-full bg-black px-6 py-20 text-white overflow-hidden">
+      {/* Section Promesse */}
+      <section className="relative w-full px-6 py-20 text-white overflow-hidden" id="promesse">
         <StarDecoration position="top-right" className="opacity-60" />
         <StarDecoration position="bottom-left" className="opacity-40 scale-75" />
         <StarDecoration position="top-left" className="opacity-30 scale-75" />
@@ -90,7 +75,7 @@ export default function Home() {
           <div className="text-center space-y-4">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">La promesse Loomina</p>
             <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Un livre qui ressemble vraiment à la personne</h2>
-            <p className="text-neutral-400 max-w-2xl mx-auto text-lg">
+            <p className="text-neutral-300 max-w-2xl mx-auto text-lg">
               Nous combinons technologie et présence humaine pour faire ressortir la voix, les photos et les messages que vous souhaitez transmettre.
             </p>
           </div>
@@ -99,59 +84,24 @@ export default function Home() {
             {promisePoints.map((point) => (
               <div
                 key={point.title}
-                className="rounded-3xl bg-neutral-900 p-8 space-y-4 border border-white/10 hover:border-white/20 transition-colors"
+                className="rounded-3xl bg-white/5 p-8 space-y-4 border border-white/10 hover:border-white/20 transition-colors backdrop-blur"
               >
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-2xl border border-white/10" aria-hidden>
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-2xl border border-white/10" aria-hidden>
                   {point.icon}
                 </div>
                 <h3 className="text-xl font-semibold leading-tight">{point.title}</h3>
-                <p className="text-neutral-400 leading-relaxed">{point.text}</p>
+                <p className="text-neutral-300 leading-relaxed">{point.text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Section Process : BLANC */}
-      <section className="w-full bg-white px-6 py-24 text-black">
-        <div className="mx-auto max-w-6xl space-y-12">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="space-y-4 max-w-3xl">
-              <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Comment ça se passe</p>
-              <h2 className="text-3xl md:text-4xl font-semibold leading-tight">On avance avec vous, du premier appel au livre relié</h2>
-              <p className="text-neutral-600 leading-relaxed text-lg">
-                Vous gardez la main sur chaque étape : préparation, interviews, relectures, puis maquette finale. Nous faisons le lien entre vos mots et un objet que l'on a envie de transmettre.
-              </p>
-            </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 border border-black/5 text-sm font-semibold shadow-sm text-black">
-              <span className="h-2 w-2 rounded-full bg-[var(--loomina-amber-strong)]" />
-              3 semaines en moyenne, livraison comprise
-            </div>
-          </div>
+      {/* Parcours fusionné */}
+      <HomeSections />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {processSteps.map((step, index) => (
-              <div key={step.title} className="flex h-full flex-col gap-5 rounded-3xl border border-neutral-200 bg-white p-8 hover:shadow-lg transition-shadow">
-                <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] font-semibold text-neutral-500">
-                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 text-black border border-black/5">
-                    {step.badge}
-                  </span>
-                  <span className="text-[var(--loomina-amber-strong)]">0{index + 1}</span>
-                </div>
-                <h3 className="text-xl font-semibold leading-tight">{step.title}</h3>
-                <p className="text-neutral-600 leading-relaxed">{step.detail}</p>
-                <div className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-black">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--loomina-amber-strong)]" />
-                  Accompagnement Loomina inclus
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section Détails : NOIR */}
-      <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden">
+      {/* Section Détails */}
+      <section className="relative w-full px-6 py-24 text-white overflow-hidden" id="soin">
         <StarDecoration position="top-left" className="opacity-50 scale-90" />
         <StarDecoration position="bottom-right" className="opacity-50" />
         <StarDecoration position="top-right" className="opacity-30" />
@@ -162,7 +112,7 @@ export default function Home() {
               On s'occupe des détails
             </p>
             <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Plus de soin éditorial, moins de gestion pour vous</h2>
-            <p className="text-neutral-400 max-w-3xl mx-auto leading-relaxed text-lg">
+            <p className="text-neutral-300 max-w-3xl mx-auto leading-relaxed text-lg">
               Nous orchestrons les rendez-vous, la mise en page et la livraison pour que vous profitiez surtout du plaisir de raconter.
             </p>
           </div>
@@ -173,7 +123,7 @@ export default function Home() {
                 Soin éditorial
               </div>
               <h3 className="text-2xl font-semibold">Une équipe resserrée pour vous écouter</h3>
-              <p className="text-neutral-400 leading-relaxed">
+              <p className="text-neutral-300 leading-relaxed">
                 Les interviews sont préparés en amont, les transcriptions relues, et votre éditrice garde le même fil conducteur tout au long du projet.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -185,7 +135,7 @@ export default function Home() {
                     <p className="text-sm uppercase tracking-[0.12em] text-[var(--loomina-amber-strong)] font-semibold">
                       {pillar.title}
                     </p>
-                    <p className="text-neutral-400 text-sm leading-relaxed">{pillar.description}</p>
+                    <p className="text-neutral-300 text-sm leading-relaxed">{pillar.description}</p>
                   </div>
                 ))}
               </div>
@@ -196,7 +146,7 @@ export default function Home() {
                 Transmission
               </div>
               <h3 className="text-2xl font-semibold">On prépare le moment où vous partagerez le livre</h3>
-              <p className="text-neutral-400 leading-relaxed">
+              <p className="text-neutral-300 leading-relaxed">
                 Votre récit est pensé pour être offert : de la maquette jusqu'à l'envoi, nous anticipons comment il sera lu et conservé.
               </p>
               <div className="space-y-4">
@@ -210,7 +160,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-1">
                       <p className="text-lg font-semibold text-white">{format.title}</p>
-                      <p className="text-neutral-400 text-sm leading-relaxed">{format.detail}</p>
+                      <p className="text-neutral-300 text-sm leading-relaxed">{format.detail}</p>
                     </div>
                   </div>
                 ))}
@@ -223,11 +173,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Offer Preview restera en blanc via son composant */}
       <OfferPreview />
 
-      {/* Section Audio : NOIR */}
-      <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden" id="exemple-audio">
+      <section className="w-full px-6 py-16" id="resultat">
+        <div className="max-w-5xl mx-auto text-center space-y-6">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Ce que vous recevez</p>
+          <h3 className="text-3xl md:text-4xl font-semibold leading-tight">Un livre, un audio, un espace à partager</h3>
+          <p className="text-neutral-300 leading-relaxed max-w-3xl mx-auto">
+            L'ensemble est pensé comme un coffret mémoriel : les voix restent accessibles, les photos sont mises en valeur et vous disposez d'un espace numérique pour transmettre à toute la famille.
+          </p>
+        </div>
+      </section>
+
+      {/* Section Audio */}
+      <section className="relative w-full px-6 py-24 text-white overflow-hidden" id="exemple-audio">
         <StarDecoration position="top-right" className="-top-20 -right-20 opacity-40 w-96 h-96" />
         <StarDecoration position="bottom-left" className="opacity-30" />
         <StarDecoration position="top-left" className="opacity-20 scale-75" />
@@ -235,7 +194,7 @@ export default function Home() {
           <div className="space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Exemple audio</p>
             <h3 className="text-3xl md:text-4xl font-semibold leading-tight">La voix reste intacte et lisible</h3>
-            <p className="text-neutral-400 leading-relaxed max-w-xl text-lg">
+            <p className="text-neutral-300 leading-relaxed max-w-xl text-lg">
               Un extrait brut pour entendre notre manière de guider les entretiens : rythme calme, silences respectés et montage léger.
             </p>
           </div>
@@ -246,6 +205,45 @@ export default function Home() {
               Votre navigateur ne supporte pas la lecture audio.
             </audio>
             <p className="text-sm text-neutral-500">1 minute pour entendre la qualité Loomina.</p>
+          </div>
+        </div>
+      </section>
+
+      <Testimonials />
+
+      <section className="w-full px-6 pb-20" id="faq">
+        <div className="max-w-5xl mx-auto space-y-8 text-center">
+          <div className="space-y-3">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-[var(--loomina-amber-strong)] font-semibold">Questions fréquentes</p>
+            <h3 className="text-3xl md:text-4xl font-semibold leading-tight">On répond avant même le premier appel</h3>
+            <p className="text-neutral-300 leading-relaxed max-w-2xl mx-auto">
+              Découvrez comment on organise les interviews, qui s'occupe des relectures et à quel rythme vous recevez les exemplaires imprimés et numériques.
+            </p>
+          </div>
+          <LoominaFAQ />
+        </div>
+      </section>
+
+      <section className="w-full px-6 pb-20">
+        <div className="max-w-4xl mx-auto rounded-[28px] border border-white/10 bg-white/5 p-10 text-center space-y-4 backdrop-blur">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-[var(--loomina-amber-strong)] font-semibold">Prêt à commencer</p>
+          <h3 className="text-3xl md:text-4xl font-semibold leading-tight">Un dernier clic pour lancer votre livre</h3>
+          <p className="text-neutral-300 leading-relaxed">
+            Nous revenons vers vous sous 48h pour caler la première session d'écoute et préparer les photos. La page reste fluide : pas besoin de changer de section pour trouver le bon bouton.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+            <a
+              href="#offres"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-white text-black font-semibold shadow-[0_20px_60px_-35px_rgba(0,0,0,0.65)] hover:bg-neutral-200 transition-colors"
+            >
+              Commencer maintenant
+            </a>
+            <a
+              href="mailto:contact@loomina.fr"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-transparent text-white font-semibold border border-white/20 hover:bg-white/10 transition-colors"
+            >
+              Parler à une éditrice
+            </a>
           </div>
         </div>
       </section>
