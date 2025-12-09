@@ -1,4 +1,6 @@
 import Hero from "@/components/Hero";
+import StarDecoration from "@/components/ui/StarDecoration";
+import HowItWorks from "@/components/HowItWorks";
 import MagicButton from "@/components/ui/MagicButton";
 
 // --- DATA ---
@@ -17,28 +19,7 @@ const pillars = [
   },
 ];
 
-const steps = [
-  {
-    step: "01",
-    title: "L'Appel",
-    description: "Tout commence par un simple coup de fil. Notre IA vous guide avec bienveillance pour structurer votre pensée et raconter les moments marquants de votre vie.",
-  },
-  {
-    step: "02",
-    title: "La Rédaction",
-    description: "Vos enregistrements vocaux sont transformés en chapitres. Notre technologie sublime votre oralité pour en faire un texte écrit agréable à lire et fidèle à votre personnalité.",
-  },
-  {
-    step: "03",
-    title: "L'Essentiel",
-    description: "La technologie s'efface au profit de l'émotion. Pas d'écran, pas de clavier. Votre voix est le seul outil nécessaire pour écrire la légende de votre vie.",
-  },
-  {
-    step: "04",
-    title: "La Transmission",
-    description: "Recevez chez vous bien plus qu'un livre : un trésor familial. Un ouvrage relié avec soin, conçu pour faire voyager votre histoire de génération en génération.",
-  },
-];
+
 
 const offer = {
   title: "L'Héritage Loomina",
@@ -85,37 +66,8 @@ export default function Home() {
         </section>
       </div>
 
-      {/* --- SECTION 3: LE PARCOURS (BLANC) --- */}
-      <div id="process" className="w-full scroll-mt-24">
-        <section className="w-full bg-white px-6 py-20 md:py-24 text-black">
-          <div className="mx-auto max-w-5xl space-y-12">
-            <div className="text-center max-w-2xl mx-auto space-y-4">
-              <h2 className="text-3xl md:text-4xl font-bold">Du simple appel au livre d'une vie</h2>
-              <p className="text-neutral-500">Une approche simplifiée à l'extrême : nous gérons la technique, vous racontez l'histoire.</p>
-            </div>
-
-            {/* Grille Compacte 2x2 - Design "Cool" & Premium - Stacked on Mobile */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-              {steps.map((block) => (
-                <div
-                  key={block.step}
-                  className="group flex flex-col gap-4 p-6 rounded-xl transition-all duration-500 hover:bg-neutral-50 hover:translate-x-2 cursor-default border-l-2 border-transparent hover:border-[var(--loomina-amber)]"
-                >
-                  <span className="text-6xl font-serif italic text-neutral-100 group-hover:text-[var(--loomina-amber)] transition-colors duration-500 -ml-1">
-                    {block.step}.
-                  </span>
-                  <div>
-                    <h3 className="text-2xl font-serif font-medium text-black mb-3">{block.title}</h3>
-                    <p className="text-neutral-500 leading-relaxed text-sm">
-                      {block.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
+      {/* --- SECTION 3: LE PARCOURS (TIMELINE) --- */}
+      <HowItWorks />
 
 
 

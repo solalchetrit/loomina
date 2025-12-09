@@ -1,56 +1,39 @@
 "use client";
 
-import React from "react";
-import Reveal from "./ui/Reveal";
-
 const STEPS = [
   {
-    number: 1,
-    color: "bg-[var(--loomina-gold)]",
-    numberTextColor: "text-[var(--loomina-black)]",
-    iconColor: "text-[var(--loomina-gold)]",
-    borderColor: "border-[var(--loomina-gold)]/30",
-    title: "Préparation douce",
-    description:
-      "Un membre de votre famille partage ses souvenirs par téléphone ou visio, guidé par notre IA empathique et un accompagnant humain.",
-    footer: "Lancement en 48h",
+    title: "L'Inscription",
+    description: "Tout commence par une simple commande. Vous recevez votre coffret de bienvenue et l'accès à votre espace personnel sécurisé.",
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
       </svg>
     ),
   },
   {
-    number: 2,
-    color: "bg-[var(--loomina-black)]",
-    numberTextColor: "text-white",
-    iconColor: "text-[var(--loomina-black)]",
-    borderColor: "border-[var(--loomina-black)]/30",
-    title: "Montage éditorial",
-    description:
-      "Nous nettoyons les enregistrements, retranscrivons, sélectionnons les meilleures photos et construisons une narration fluide.",
-    footer: "Relecture humaine systématique",
+    title: "Les Conversations",
+    description: "À votre rythme, vous échangez par téléphone avec notre IA empathique. Elle vous écoute, vous guide et ravive vos souvenirs oubliés.",
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
       </svg>
     ),
   },
   {
-    number: 3,
-    color: "bg-[var(--loomina-gray-light)]",
-    numberTextColor: "text-[var(--loomina-black)]",
-    iconColor: "text-[var(--loomina-black)]",
-    borderColor: "border-[var(--loomina-black)]/25",
-    title: "Livre prêt à offrir",
-    description:
-      "Vous validez la maquette. Nous imprimons et envoyons autant d'exemplaires que souhaité, avec une version audio en option.",
-    footer: "Maquette + audio inclus",
+    title: "La Rédaction",
+    description: "Nos algorithmes transforment votre voix en une prose élégante. Un éditeur humain repasse ensuite pour garantir la fluidité et le style.",
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75c-2.708 0-5.416.879-7.5 2.636L12 21.75l7.5-12.364C17.416 7.629 14.708 6.75 12 6.75Z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75c-1.445 0-2.89.24-4.253.72L12 21.75l4.253-14.28A12.063 12.063 0 0 0 12 6.75Z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="m12 6.75 2.72-4.698a9.045 9.045 0 0 0-5.44 0L12 6.75Z" />
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+  },
+  {
+    title: "L'Héritage",
+    description: "Vous recevez chez vous un magnifique livre relié, prêt à être transmis. Votre histoire est désormais éternelle.",
+    icon: (
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     ),
   },
@@ -58,57 +41,45 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section
-      id="comment"
-      className="bg-gradient-to-br from-[var(--loomina-gray-light)] via-white to-[var(--loomina-gold-light)] py-24 px-6 font-[family-name:var(--font-plus-jakarta-sans)] border-t border-[var(--loomina-black)]/10"
-    >
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16 space-y-3">
-          <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border border-[var(--loomina-black)]/10 text-sm uppercase tracking-[0.2em] text-[var(--loomina-black)] font-semibold shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-[var(--loomina-gold)]" aria-hidden />Processus signature
-          </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-[var(--loomina-black)] tracking-tight">
-            Comment nous travaillons
+    <section id="process" className="relative py-24 bg-white overflow-hidden">
+      <div className="max-w-5xl mx-auto px-6 relative">
+        {/* En-tête de section */}
+        <div className="text-center mb-20">
+          <span className="text-[var(--loomina-gold)] text-sm font-bold tracking-widest uppercase mb-2 block">
+            Comment ça marche
+          </span>
+          <h2 className="text-4xl md:text-5xl font-serif text-[var(--loomina-ink)]">
+            Votre histoire, étape par étape
           </h2>
-          <p className="text-lg text-[var(--loomina-gray-dark)] max-w-3xl mx-auto leading-relaxed">
-            Trois étapes pour transformer des souvenirs intimes en un bel objet qu'on est fier d'offrir.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+        {/* Ligne Centrale (Le Fil) */}
+        <div className="absolute left-6 md:left-1/2 top-40 bottom-20 w-px bg-gradient-to-b from-transparent via-[var(--loomina-gold)]/50 to-transparent md:-translate-x-1/2"></div>
+
+        {/* Liste des étapes */}
+        <div className="space-y-16">
           {STEPS.map((step, index) => (
-            <Reveal
-              key={step.number}
-              delay={index * 0.08}
-              className="relative bg-white/90 rounded-[2rem] p-10 shadow-[0_40px_90px_-65px_rgba(15,16,20,0.6)] border border-[var(--loomina-black)]/10 flex flex-col h-full backdrop-blur"
-            >
-              <div
-                className={`absolute -top-5 -left-5 w-12 h-12 rounded-full ${step.color} ${step.numberTextColor} flex items-center justify-center text-lg font-bold shadow-lg border-4 border-white`}
-              >
-                {step.number}
-              </div>
+            <div key={index} className={`relative flex flex-col md:flex-row items-center md:items-start gap-8 ${index % 2 === 0 ? "md:flex-row-reverse" : ""
+              }`}>
 
-              <div
-                className={`w-16 h-16 rounded-2xl border ${step.borderColor} bg-white/80 flex items-center justify-center mb-8 ${step.iconColor} shadow-sm`}
-              >
-                {step.icon}
-              </div>
-
-              <div className="flex-grow">
-                <h3 className="text-2xl font-bold text-[var(--loomina-black)] mb-4">
+              {/* Contenu Texte (Alternance) */}
+              <div className={`flex-1 text-left md:text-${index % 2 === 0 ? "left" : "right"} pl-12 md:pl-0`}>
+                <h3 className="text-2xl font-serif text-[var(--loomina-black)] mb-3">
                   {step.title}
                 </h3>
-                <p className="text-[var(--loomina-black)] leading-relaxed mb-8">
+                <p className="text-neutral-500 leading-relaxed max-w-md ml-0 md:ml-auto">
                   {step.description}
                 </p>
               </div>
 
-              <div className="pt-6 border-t border-[var(--loomina-black)]/10 mt-auto">
-                <p className="text-sm font-semibold text-[var(--loomina-gray-dark)] uppercase tracking-[0.14em]">
-                  {step.footer}
-                </p>
+              {/* Point Central (Connecteur) */}
+              <div className="absolute left-6 md:left-1/2 -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-white border border-[var(--loomina-gold)] text-[var(--loomina-gold)] shadow-[0_0_15px_rgba(234,191,119,0.3)] z-10">
+                {step.icon}
               </div>
-            </Reveal>
+
+              {/* Espace vide pour l'équilibre visuel */}
+              <div className="flex-1 hidden md:block"></div>
+            </div>
           ))}
         </div>
       </div>
