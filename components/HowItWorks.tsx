@@ -47,26 +47,26 @@ export default function HowItWorks() {
   return (
     <section id="process" className="relative py-24 bg-white text-[var(--loomina-black)]">
       <div className="max-w-4xl mx-auto px-6">
-        {/* En-tête */}
-        <div className="text-center mb-20 space-y-4">
-          <span className="text-[var(--loomina-gold)] text-sm font-bold tracking-widest uppercase">
-            Le Sommaire
+        {/* En-tête de section */}
+        <div className="text-center mb-20">
+          <span className="text-[var(--loomina-gold)] text-sm font-bold tracking-widest uppercase mb-2 block">
+            Comment ça marche
           </span>
-          <h2 className="text-4xl md:text-5xl font-serif">
-            Votre histoire, chapitre après chapitre
+          <h2 className="text-4xl md:text-5xl font-serif text-[var(--loomina-ink)]">
+            Votre histoire, étape par étape
           </h2>
         </div>
 
-        {/* Liste style "Sommaire" */}
+        {/* Liste style "Sommaire" simplifiée */}
         <div className="border-t border-black/10">
           {STEPS.map((step, index) => (
             <div
               key={index}
               className="group flex flex-col md:flex-row md:items-baseline gap-4 md:gap-12 py-10 border-b border-black/10 transition-colors hover:bg-neutral-50/50"
             >
-              {/* Numéro de Chapitre */}
-              <div className="text-sm font-bold tracking-widest text-[var(--loomina-gold)] w-24 shrink-0 uppercase">
-                Chapitre {step.chapter}
+              {/* Numéro Simple */}
+              <div className="text-xl font-serif text-[var(--loomina-gold)] w-12 shrink-0">
+                {step.chapter}.
               </div>
 
               {/* Contenu */}
