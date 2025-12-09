@@ -27,13 +27,13 @@ export default function Header() {
         </Link>
 
         {/* Clean Navigation */}
-        {/* Clean Navigation - Mobile Scrollable */}
-        <nav className="flex items-center gap-6 overflow-x-auto no-scrollbar w-full md:w-auto px-6 md:px-0 pb-4 md:pb-0 absolute md:relative top-20 md:top-0 left-0 md:left-auto bg-white md:bg-transparent border-b md:border-none border-neutral-100 md:justify-end">
+        {/* Clean Navigation - Mobile Scrollable & Desktop Capsule */}
+        <nav className="flex items-center gap-1 md:gap-2 overflow-x-auto no-scrollbar w-full md:w-auto px-6 md:px-6 pb-4 md:pb-2 pt-2 md:pt-2 absolute md:relative top-20 md:top-0 left-0 md:left-auto bg-white/95 md:bg-neutral-100/50 md:backdrop-blur-md md:rounded-full md:border md:border-black/5 border-b md:border-none border-neutral-100 md:justify-end transition-all">
           {NAV_LINKS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-neutral-600 transition-colors hover:text-black tracking-wide whitespace-nowrap"
+              className="text-sm font-medium text-neutral-600 transition-colors hover:text-black tracking-wide whitespace-nowrap px-3 py-1.5 hover:bg-white rounded-full"
             >
               {item.label}
             </Link>

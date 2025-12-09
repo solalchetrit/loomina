@@ -24,7 +24,7 @@ export default function Footer() {
               src="/header-logo-trimmed.png"
               alt="Loomina Éditions"
               fill
-              className="object-contain object-left invert brightness-0"
+              className="object-contain object-center md:object-left invert brightness-0"
             />
           </div>
 
