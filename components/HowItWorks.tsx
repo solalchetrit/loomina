@@ -63,7 +63,7 @@ export default function HowItWorks() {
               }`}>
 
               {/* Contenu Texte (Alternance) */}
-              <div className={`flex-1 w-full text-left md:text-${index % 2 === 0 ? "left" : "right"} pl-28 md:pl-0 ${index % 2 === 0 ? "md:pr-24" : "md:pl-24"}`}>
+              <div className={`flex-1 w-full text-left md:text-${index % 2 === 0 ? "left" : "right"} pl-28 md:pl-0 ${index % 2 === 0 ? "md:pl-24" : "md:pr-24"}`}>
                 <h3 className="text-2xl font-serif text-[var(--loomina-black)] mb-3">
                   {step.title}
                 </h3>
