@@ -61,13 +61,18 @@ export default function Home() {
       {/* --- SECTION 2: CONVICTION (NOIR) --- */}
       <div id="mission" className="w-full">
         <section className="relative w-full bg-black px-6 py-20 md:py-28 text-white overflow-hidden">
-          {/* --- DÉCORATION CONSTELLATION --- */}
-          {/* Coin haut droit, visible */}
-          <StarDecoration position="top-right" className="opacity-40 scale-100" />
-          {/* Coin bas gauche, plus discret */}
-          <StarDecoration position="bottom-left" className="opacity-20 scale-75" />
-          {/* Coin haut gauche, très subtil */}
-          <StarDecoration position="top-left" className="opacity-10 scale-50" />
+          {/* --- CONSTELLATION --- */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {/* Etoile Principale (Haut Droite) */}
+            <StarDecoration position="top-right" className="opacity-30 scale-100" />
+
+            {/* Etoile Secondaire (Bas Gauche) */}
+            <StarDecoration position="bottom-left" className="opacity-20 scale-75 translate-y-12 -translate-x-12" />
+
+            {/* Etoiles Lointaines (Petites touches) */}
+            <StarDecoration position="top-left" className="opacity-10 scale-50" />
+            <StarDecoration position="bottom-right" className="opacity-15 scale-50 translate-y-24" />
+          </div>
 
           <div className="mx-auto max-w-5xl flex flex-col gap-16 relative z-10">
             {/* La Citation Centrale */}
@@ -139,13 +144,18 @@ export default function Home() {
 
           {/* Colonne Droite : Player Audio */}
           <div className="bg-neutral-900 rounded-3xl p-8 border border-white/10 shadow-2xl relative">
-            {/* --- DÉCORATION CONSTELLATION --- */}
-            {/* Coin haut droit, visible */}
-            <StarDecoration position="top-right" className="opacity-40 scale-100" />
-            {/* Coin bas gauche, plus discret */}
-            <StarDecoration position="bottom-left" className="opacity-20 scale-75" />
-            {/* Coin haut gauche, très subtil */}
-            <StarDecoration position="top-left" className="opacity-10 scale-50" />
+            {/* --- CONSTELLATION --- */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {/* Etoile Principale (Haut Droite) */}
+              <StarDecoration position="top-right" className="opacity-30 scale-100" />
+
+              {/* Etoile Secondaire (Bas Gauche) */}
+              <StarDecoration position="bottom-left" className="opacity-20 scale-75 translate-y-12 -translate-x-12" />
+
+              {/* Etoiles Lointaines (Petites touches) */}
+              <StarDecoration position="top-left" className="opacity-10 scale-50" />
+              <StarDecoration position="bottom-right" className="opacity-15 scale-50 translate-y-24" />
+            </div>
             <div className="space-y-4">
               <p className="text-xs uppercase text-neutral-500 tracking-widest mb-4">Extrait brut de session</p>
               <audio controls className="w-full invert hue-rotate-180 opacity-90 hover:opacity-100 transition-opacity">
