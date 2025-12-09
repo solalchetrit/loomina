@@ -17,7 +17,7 @@ export default function Hero() {
         </p>
 
         {/* Actions - Espacées */}
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-center pt-6">
+        <div className="flex flex-col items-center justify-center gap-5 sm:flex-row sm:items-center sm:justify-center pt-6">
           <MagicButton
             href="#offres"
             size="lg"
