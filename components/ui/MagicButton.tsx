@@ -47,27 +47,25 @@ function MagicButtonContent({ children, glow, className = "", ...rest }: Omit<Ma
   return (
     <motion.button
       type="button"
-      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 ${background} ${className}`}
+      // On garde les classes de base, mais on assure un look propre
+      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-8 py-4 text-lg font-semibold tracking-wide transition-all duration-300 ${background} ${className}`}
       style={{ x: springX, y: springY }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 260, damping: 18 }}
+      whileHover={{ scale: 1.02 }} // Scale très léger pour le côté premium
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleMouseLeave}
       {...rest}
     >
-      <motion.span
-        aria-hidden
-        className="pointer-events-none absolute -left-1/2 top-0 h-full w-full rotate-12 bg-gradient-to-r from-transparent via-white/50 to-transparent"
-        initial={{ x: "-120%" }}
-        animate={{ x: hovered ? ["-120%", "120%"] : "-120%" }}
-        transition={{ duration: 0.8, ease: "easeInOut", repeat: hovered ? Infinity : 0 }}
-        style={{ opacity: glow ? shineOpacity : 0.65 * shineOpacity }}
+      {/* Background subtil au hover au lieu de la diagonale */}
+      <span
+        className={`absolute inset-0 bg-white/10 transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`}
       />
-      <span className="relative flex items-center gap-2">
+
+      {/* Contenu sans bordure interne */}
+      <span className="relative flex items-center gap-2 z-10">
         {children}
-        <span className="pointer-events-none absolute inset-0 rounded-full border border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]" aria-hidden />
       </span>
     </motion.button>
   );

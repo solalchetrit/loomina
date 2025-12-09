@@ -7,11 +7,6 @@ export default function Hero() {
     <section className="relative w-full overflow-hidden px-6 pb-20 pt-16 bg-white">
       <div className="mx-auto max-w-4xl p-8 md:p-12 flex flex-col items-center text-center">
         <div className="space-y-8">
-          <div className="inline-flex items-center gap-3 rounded-full bg-neutral-50 px-4 py-2 text-sm font-semibold text-black border border-black/5 shadow-sm">
-            <span className="h-2.5 w-2.5 rounded-full bg-black animate-pulse" />
-            GARDIENS DE LA MÉMOIRE FAMILIALE
-          </div>
-
           <div className="space-y-6">
             <p className="text-xs uppercase tracking-[0.34em] text-neutral-500 font-semibold">Livre mémoriel humain</p>
             <h1 className="text-5xl md:text-6xl font-bold leading-tight text-black tracking-tight">
