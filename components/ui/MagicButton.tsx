@@ -32,17 +32,17 @@ function MagicButtonContent({
 
   const variantClasses: Record<NonNullable<MagicButtonProps["variant"]>, string> = {
     primary:
-      "bg-[var(--loomina-black)] text-white border border-transparent hover:bg-black/90 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.55)]",
+      "bg-[var(--loomina-black)] text-white border border-[var(--loomina-black)] hover:bg-black/90 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.55)]",
     secondary:
-      "bg-white text-[var(--loomina-black)] border border-neutral-200 hover:border-[var(--loomina-black)]/25 hover:bg-neutral-50 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.25)]",
+      "bg-white text-[var(--loomina-black)] border border-[var(--loomina-black)]/10 hover:border-[var(--loomina-black)]/25 hover:bg-white/90 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.18)]",
     ghost:
-      "bg-transparent text-[var(--loomina-black)] border border-[var(--loomina-black)]/15 hover:bg-[var(--loomina-gray-light)]",
+      "bg-transparent text-[var(--loomina-black)] border border-[var(--loomina-black)]/20 hover:border-[var(--loomina-black)]/35 hover:bg-[var(--loomina-gray-light)]/60",
   };
 
   const sizeClasses: Record<NonNullable<MagicButtonProps["size"]>, string> = {
-    sm: "px-4 py-2 text-xs",
-    md: "px-6 py-3 text-sm",
-    lg: "px-8 py-4 text-base",
+    sm: "px-4 py-2.5 text-sm",
+    md: "px-6 py-3.5 text-base",
+    lg: "px-8 py-4 text-lg",
   };
 
   const glowClasses = glow ? "shadow-[0_18px_40px_-24px_rgba(0,0,0,0.35)]" : "shadow-none";
@@ -67,7 +67,7 @@ function MagicButtonContent({
   return (
     <motion.button
       type="button"
-      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full font-sans font-semibold tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--loomina-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-white ${variantClasses[variant]} ${sizeClasses[size]} ${glowClasses} ${className}`}
+      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full font-sans font-semibold tracking-[0.02em] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--loomina-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-white ${variantClasses[variant]} ${sizeClasses[size]} ${glowClasses} ${className}`}
       style={{ x: springX, y: springY }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.95 }}
