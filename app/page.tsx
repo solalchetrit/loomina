@@ -1,5 +1,5 @@
 import Hero from "@/components/Hero";
-import StarDecoration from "@/components/ui/StarDecoration";
+import MagicButton from "@/components/ui/MagicButton";
 
 // --- DATA ---
 const pillars = [
@@ -150,12 +150,13 @@ export default function Home() {
                 </ul>
 
                 <div className="pt-4">
-                  <a
+                  <MagicButton
                     href="mailto:contact@loomina.fr?subject=Commande%20Loomina"
-                    className="inline-block bg-white text-black font-sans font-medium text-lg px-12 py-4 rounded-full hover:scale-105 transition-transform"
+                    variant="secondary"
+                    size="lg"
                   >
                     Commander mon livre
-                  </a>
+                  </MagicButton>
                 </div>
               </div>
             </div>

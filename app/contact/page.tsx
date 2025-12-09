@@ -39,12 +39,14 @@ export default function ContactPage() {
                             <textarea required id="message" name="message" rows={6} className="w-full bg-white border border-neutral-200 rounded-lg p-3 outline-none focus:border-[var(--loomina-amber)] transition-colors" placeholder="Bonjour, je souhaiterais en savoir plus sur..." />
                         </div>
 
-                        <button
+                        <MagicButton
                             type="submit"
-                            className="w-full bg-black text-white font-medium rounded-full py-4 hover:bg-neutral-800 transition-all"
+                            className="w-full justify-center"
+                            variant="primary"
+                            size="lg"
                         >
                             Envoyer mon message
-                        </button>
+                        </MagicButton>
                     </form>
 
                     <div className="text-center pt-8 border-t border-neutral-100">

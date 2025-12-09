@@ -20,13 +20,15 @@ export default function Hero() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-center pt-6">
           <MagicButton
             href="#offres"
-            className="bg-black text-white px-10 py-5 text-lg font-sans font-medium"
+            size="lg"
+            variant="primary"
           >
             Commencer mon livre
           </MagicButton>
           <MagicButton
             href="tel:+33159169357"
-            className="bg-white text-black border border-neutral-200 hover:bg-neutral-50 px-10 py-5 text-lg font-sans font-medium"
+            size="lg"
+            variant="secondary"
           >
             Appeler Loomina
           </MagicButton>

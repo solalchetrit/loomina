@@ -1,4 +1,5 @@
 import React from "react";
+import MagicButton from "./ui/MagicButton";
 
 const sections = [
   {
@@ -95,18 +96,12 @@ export default function HomeSections() {
             </p>
           </div>
           <div className="flex flex-col gap-3">
-            <a
-              href="#comment"
-              className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-[var(--loomina-black)] text-white font-semibold shadow-[0_20px_60px_-35px_rgba(217,54,98,0.55)] hover:brightness-110 transition-colors"
-            >
+            <MagicButton href="#comment" variant="primary" className="w-full justify-center">
               Découvrir le parcours Loomina
-            </a>
-            <a
-              href="#faq"
-              className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-white text-[var(--loomina-black)] font-semibold border border-[var(--loomina-black)]/10 hover:brightness-110 transition-colors"
-            >
+            </MagicButton>
+            <MagicButton href="#faq" variant="secondary" className="w-full justify-center">
               Lire les réponses clés
-            </a>
+            </MagicButton>
             <span className="text-[var(--loomina-black)] text-sm text-center">Une structure claire pour guider les familles vers la prochaine étape.</span>
           </div>
         </div>
