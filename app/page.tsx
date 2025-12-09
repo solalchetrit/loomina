@@ -61,7 +61,13 @@ export default function Home() {
       {/* --- SECTION 2: CONVICTION (NOIR) --- */}
       <div id="mission" className="w-full">
         <section className="relative w-full bg-black px-6 py-20 md:py-28 text-white overflow-hidden">
-          <StarDecoration position="top-right" className="opacity-40" />
+          {/* --- DÉCORATION CONSTELLATION --- */}
+          {/* Coin haut droit, visible */}
+          <StarDecoration position="top-right" className="opacity-40 scale-100" />
+          {/* Coin bas gauche, plus discret */}
+          <StarDecoration position="bottom-left" className="opacity-20 scale-75" />
+          {/* Coin haut gauche, très subtil */}
+          <StarDecoration position="top-left" className="opacity-10 scale-50" />
 
           <div className="mx-auto max-w-5xl flex flex-col gap-16 relative z-10">
             {/* La Citation Centrale */}
@@ -133,7 +139,13 @@ export default function Home() {
 
           {/* Colonne Droite : Player Audio */}
           <div className="bg-neutral-900 rounded-3xl p-8 border border-white/10 shadow-2xl relative">
-            <StarDecoration position="top-right" className="scale-50 opacity-50" />
+            {/* --- DÉCORATION CONSTELLATION --- */}
+            {/* Coin haut droit, visible */}
+            <StarDecoration position="top-right" className="opacity-40 scale-100" />
+            {/* Coin bas gauche, plus discret */}
+            <StarDecoration position="bottom-left" className="opacity-20 scale-75" />
+            {/* Coin haut gauche, très subtil */}
+            <StarDecoration position="top-left" className="opacity-10 scale-50" />
             <div className="space-y-4">
               <p className="text-xs uppercase text-neutral-500 tracking-widest mb-4">Extrait brut de session</p>
               <audio controls className="w-full invert hue-rotate-180 opacity-90 hover:opacity-100 transition-opacity">
