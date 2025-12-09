@@ -2,31 +2,46 @@
 import { useState } from "react";
 
 const faqData = [
-  {
-    question: "Comment se déroulent les entretiens ?",
-    answer:
-      "Nous prévoyons un appel vidéo ou téléphonique d'environ 45 minutes. Notre IA suggère des relances tandis qu'un accompagnant Loomina guide l'échange pour que la parole reste fluide.",
-  },
-  {
-    question: "Qui relit et corrige les textes ?",
-    answer:
-      "Chaque transcription est vérifiée par un éditeur Loomina : cohérence des faits fournis, reformulation douce, suppression des hésitations pour préserver la voix originale.",
-  },
-  {
-    question: "Combien d'exemplaires puis-je commander ?",
-    answer:
-      "Autant que nécessaire : nous imprimons à la demande et fournissons systématiquement une version numérique et audio pour partager facilement.",
-    active: true,
-  },
-  {
-    question: "Et si mon proche n'est pas à l'aise avec la technologie ?",
-    answer:
-      "Nous adaptons le dispositif : simple appel téléphonique, aide à distance pour récupérer les photos, et un accompagnement humain pour faciliter chaque étape.",
-  },
-  {
-    question: "Sous combien de temps recevrai-je le livre ?",
-    answer: "Après votre validation de la maquette finale, l'impression et l'envoi prennent en moyenne trois jours ouvrés.",
-  },
+    {
+        question: "Qu'est-ce que Loomina ?",
+        answer:
+            "Loomina est un service de biographie hybride. Nous utilisons une IA empathique pour capturer votre histoire de vive voix et la transformer en un livre physique haut de gamme et un jumeau mémoriel interactif.",
+    },
+    {
+        question: "Comment se déroulent les entretiens ?",
+        answer:
+            "Nous prévoyons un appel vidéo ou téléphonique d'environ 45 minutes. Notre IA suggère des relances tandis qu'un accompagnant Loomina guide l'échange pour que la parole reste fluide.",
+    },
+    {
+        question: "Quel est le prix ?",
+        answer:
+            "Une seule offre Loomina : 222€ en lancement. Elle inclut les interviews guidés, la rédaction, la maquette, 5 exemplaires imprimés et la version numérique sécurisée.",
+    },
+    {
+        question: "Qui relit et corrige les textes ?",
+        answer:
+            "Chaque transcription est vérifiée par un éditeur Loomina : cohérence des faits fournis, reformulation douce, suppression des hésitations pour préserver la voix originale.",
+    },
+    {
+        question: "Mes données sont-elles privées ?",
+        answer:
+            "Absolument. Vos souvenirs sont cryptés et stockés dans un coffre-fort numérique sécurisé. Vous seul décidez avec qui les partager.",
+    },
+    {
+        question: "Combien d'exemplaires puis-je commander ?",
+        answer:
+            "Autant que nécessaire : nous imprimons à la demande et fournissons systématiquement une version numérique et audio pour partager facilement.",
+        active: true,
+    },
+    {
+        question: "Et si mon proche n'est pas à l'aise avec la technologie ?",
+        answer:
+            "Nous adaptons le dispositif : simple appel téléphonique, aide à distance pour récupérer les photos, et un accompagnement humain pour faciliter chaque étape.",
+    },
+    {
+        question: "Sous combien de temps recevrai-je le livre ?",
+        answer: "Après votre validation de la maquette finale, l'impression et l'envoi prennent en moyenne trois jours ouvrés.",
+    },
 ];
 
 export default function LoominaFAQ() {
