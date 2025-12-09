@@ -94,15 +94,18 @@ export default function Home() {
               <p className="text-neutral-500">Une approche simplifiée à l'extrême : nous gérons la technique, vous racontez l'histoire.</p>
             </div>
 
-            {/* Grille Compacte 2x2 */}
-            <div className="grid md:grid-cols-2 gap-6">
+            {/* Grille Compacte 2x2 - Design "Cool" & Premium */}
+            <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
               {steps.map((block) => (
-                <div key={block.step} className="flex flex-col gap-4 py-6 border-l-2 border-neutral-100 pl-8 hover:border-[var(--loomina-amber)] transition-colors duration-500">
-                  <span className="text-4xl font-serif text-[var(--loomina-amber)] opacity-50 font-medium">
-                    {block.step}
+                <div
+                  key={block.step}
+                  className="group flex flex-col gap-4 p-6 rounded-xl transition-all duration-500 hover:bg-neutral-50 hover:translate-x-2 cursor-default border-l-2 border-transparent hover:border-[var(--loomina-amber)]"
+                >
+                  <span className="text-6xl font-serif italic text-neutral-100 group-hover:text-[var(--loomina-amber)] transition-colors duration-500 -ml-1">
+                    {block.step}.
                   </span>
                   <div>
-                    <h3 className="text-xl font-bold text-black mb-2">{block.title}</h3>
+                    <h3 className="text-2xl font-serif font-medium text-black mb-3">{block.title}</h3>
                     <p className="text-neutral-500 leading-relaxed text-sm">
                       {block.description}
                     </p>
