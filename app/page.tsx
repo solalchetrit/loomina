@@ -20,23 +20,23 @@ const pillars = [
 const steps = [
   {
     step: "01",
-    title: "L'Échange",
-    description: "Tout commence par une conversation. Notre IA vous guide avec douceur pour réveiller vos souvenirs, sans jugement.",
+    title: "L'Appel",
+    description: "Tout commence par un simple coup de fil. Notre IA vous guide avec bienveillance pour structurer votre pensée et raconter les moments marquants de votre vie.",
   },
   {
     step: "02",
-    title: "Le Tissage",
-    description: "La magie opère. Nous transformons vos paroles en un texte fluide, fidèle à votre ton et à vos émotions.",
+    title: "La Rédaction",
+    description: "Vos enregistrements vocaux sont transformés en chapitres. Notre technologie sublime votre oralité pour en faire un texte écrit agréable à lire et fidèle à votre personnalité.",
   },
   {
     step: "03",
-    title: "L'Héritage",
-    description: "Vous recevez chez vous le livre de votre vie. Un objet tangible, relié, prêt à être lu par vos enfants.",
+    title: "L'Essentiel",
+    description: "La technologie s'efface au profit de l'émotion. Pas d'écran, pas de clavier. Votre voix est le seul outil nécessaire pour écrire la légende de votre vie.",
   },
   {
     step: "04",
-    title: "Zéro Technique",
-    description: "Oubliez les logiciels. Vous n'avez besoin que d'un téléphone. Nous nous occupons de tout le reste.",
+    title: "La Transmission",
+    description: "Recevez chez vous bien plus qu'un livre : un trésor familial. Un ouvrage relié avec soin, conçu pour faire voyager votre histoire de génération en génération.",
   },
 ];
 
