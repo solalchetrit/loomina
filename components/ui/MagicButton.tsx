@@ -50,7 +50,7 @@ function MagicButtonContent({ children, glow, className = "", ...rest }: Omit<Ma
       className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-8 py-4 text-base font-medium tracking-wide transition-all duration-300 ${background} ${className}`}
       style={{ x: springX, y: springY }}
       whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ scale: 0.95 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
