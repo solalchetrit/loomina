@@ -87,18 +87,8 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* --- SCROLL INDICATOR --- */}
-        <motion.div
-          style={{ opacity: opacityArrow }}
-          className="absolute bottom-10 flex flex-col items-center gap-2 pointer-events-none"
-        >
-          <span className="text-[var(--loomina-gold)] text-xs uppercase tracking-[0.2em]">Découvrir</span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-px h-12 bg-gradient-to-b from-[var(--loomina-gold)] to-transparent"
-          />
-        </motion.div>
+        {/* --- INCITATION AU SCROLL (RETIRÉ) --- */}
+        {/* <motion.div ... /> removed as requested for pure look */}
 
         {/* --- BACKGROUND --- */}
         <div className="absolute inset-x-0 top-0 h-full w-full -z-10 bg-[radial-gradient(circle_at_center,_white_0%,_#f8f8f8_100%)] opacity-80"></div>
