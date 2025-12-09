@@ -1,19 +1,19 @@
 import Hero from "@/components/Hero";
 import StarDecoration from "@/components/ui/StarDecoration";
 
-// --- DATA FROM MISSION PAGE (for Mission Section) ---
+// --- SECTION MISSION ---
 const pillars = [
   {
-    title: "Écoute radicale",
-    description: "Des entretiens guidés par IA, toujours supervisés par un rédacteur qui veille au ton et au respect.",
+    title: "L'Oralité retrouvée",
+    description: "Plus besoin d'écrire. Notre IA est une oreille attentive qui recueille vos confidences au téléphone, à votre rythme.",
   },
   {
-    title: "Transmission incarnée",
-    description: "Un objet physique à feuilleter, des exemplaires pour la famille et un accès numérique vivant.",
+    title: "L'Objet éternel",
+    description: "Nous transformons le moment éphémère de la parole en un livre physique de haute qualité qui traversera les générations.",
   },
   {
-    title: "Respect & sécurité",
-    description: "Données chiffrées, hébergées en Europe, avec un contrôle total sur ce qui est partagé ou détruit.",
+    title: "L'Essence capturée",
+    description: "Nous ne capturons pas seulement les faits, mais aussi votre voix, vos expressions et votre personnalité.",
   },
 ];
 
@@ -32,42 +32,42 @@ const commitments = [
   },
 ];
 
-// --- DATA FROM ACCOMPAGNEMENT PAGE (for Process Section) ---
+// --- SECTION PROCESS ---
 const steps = [
   {
     step: "Étape 1",
-    title: "Découverte et cadrage",
-    description: "Un premier rendez-vous pour cerner vos attentes et définir les voix à interviewer. Nous dessinons le fil rouge du récit.",
+    title: "L'Échange téléphonique",
+    description: "Tout commence par une conversation. Notre Intelligence Artificielle vous guide avec douceur pour réveiller vos souvenirs.",
     bullets: [
-      "Analyse des sujets sensibles et du ton à adopter",
-      "Plan d'entretien personnalisé et calendrier partagé",
+      "Disponible 24/7 selon votre rythme",
+      "Une écoute bienveillante sans jugement",
     ],
   },
   {
     step: "Étape 2",
-    title: "Collecte guidée par IA",
-    description: "Votre jumeau mémoriel écoute sans relâche et relance avec délicatesse. Chaque session est supervisée par un rédacteur.",
+    title: "Le Tissage du récit",
+    description: "La magie opère. Nous transformons vos paroles en un texte fluide, fidèle à votre ton et à vos émotions.",
     bullets: [
-      "Questions adaptatives en fonction de vos réponses",
-      "Transcription sécurisée et vérification humaine",
+      "Respect total de votre phrasé",
+      "Mise en forme professionnelle et structurée",
     ],
   },
   {
     step: "Étape 3",
-    title: "Écriture et mise en forme",
-    description: "Un auteur transforme les entretiens en un récit fluide. Nous ajustons les photos et la voix narrative avec vous.",
+    title: "L'Héritage physique",
+    description: "Vous recevez chez vous le livre de votre vie. Un objet tangible, prêt à être lu par vos enfants et petits-enfants.",
     bullets: [
-      "Mise en page artisanale et palette personnalisée",
-      "Validation itérative avant impression",
+      "Impression de haute qualité",
+      "Un trésor pour la mémoire familiale",
     ],
   },
   {
-    step: "Étape 4",
-    title: "Transmission vivante",
-    description: "Livre imprimé, jumeau mémoriel et contributions familiales possibles. Nous restons disponibles pour enrichir l'histoire.",
+    step: "Simplicité",
+    title: "Zéro contrainte",
+    description: "Oubliez les logiciels compliqués. Vous n'avez besoin que d'un téléphone. Nous nous occupons de tout le reste.",
     bullets: [
-      "Livraison suivie et service de réimpression à la demande",
-      "Accès privé pour les proches avec droits paramétrables",
+      "Aucune compétence technique requise",
+      "Un processus fluide de A à Z",
     ],
   },
 ];
@@ -110,21 +110,21 @@ const sharingFormats = [
   },
 ];
 
-// --- DATA FROM OFFRES PAGE (for Offers Section) ---
+// --- SECTION OFFRE ---
 const offer = {
-  title: "Lumina, livre & numérique",
-  badge: "Offre unique",
-  price: "222 €",
-  originalPrice: "279 €",
+  title: "L'Héritage Loomina",
+  badge: "Formule unique",
+  price: "239 €",
+  originalPrice: "",
   description:
-    "Une formule claire : interviews guidés, réécriture avec votre voix, maquette artisanale et diffusion numérique sécurisée.",
+    "La transmission ne doit pas être un luxe. Un tarif unique qui englobe l'intégralité de l'expérience, de la première parole à la dernière page.",
   highlights: [
-    "5 exemplaires imprimés inclus (papier premium)",
-    "Co-écriture et relectures illimitées avec l'équipe Loomina",
-    "Mise en page lumineuse avec vos photos retouchées",
-    "Version numérique protégée et prête à partager",
+    "Heures d'échanges téléphoniques illimitées",
+    "Travail complet d'écriture et de mise en forme",
+    "Fabrication et livraison de votre livre physique",
+    "L'investissement unique pour une trace indélébile",
   ],
-  cta: "Préparer mon livre Lumina",
+  cta: "Commander mon livre maintenant",
 };
 
 const buildOfferMailto = (title: string) => {
@@ -144,7 +144,7 @@ export default function Home() {
     <div className="min-h-screen w-full flex flex-col items-center bg-white text-black">
       <Hero />
 
-      {/* --- SECTION 2: MISSION (NOIR) --- replacing "Promesse" */}
+      {/* --- SECTION 2: MISSION (NOIR) --- */}
       <div id="mission" className="w-full">
         <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden">
           <StarDecoration position="top-right" className="opacity-60" />
@@ -152,16 +152,16 @@ export default function Home() {
 
           <div className="relative mx-auto flex max-w-6xl flex-col gap-16 z-10">
             <header className="space-y-4 text-center">
-              <p className="text-sm uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Pourquoi Loomina existe</p>
-              <h2 className="text-4xl md:text-5xl font-semibold leading-tight">Garder la lumière allumée, avec simplicité</h2>
+              <p className="text-sm uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Notre Conviction</p>
+              <h2 className="text-4xl md:text-5xl font-semibold leading-tight">Les souvenirs ne devraient jamais s'effacer.</h2>
               <p className="text-lg text-neutral-400 leading-relaxed max-w-3xl mx-auto">
-                Nous épurons le design pour mettre Loomina en avant. Notre mission : préserver la voix, les valeurs et les nuances d'une vie, avec un parcours lisible et des couleurs constantes.
+                Trop souvent, les histoires restent bloquées par la barrière de l'écriture. Loomina brise ce silence en remettant l'oralité au cœur de la transmission.
               </p>
             </header>
 
             <section className="rounded-3xl border border-white/10 bg-neutral-900 p-8 md:p-10 space-y-6">
               <blockquote className="border-l-4 border-[var(--loomina-amber-strong)] pl-6 italic text-2xl text-white">
-                "Nous ne sommes pas une entreprise technologique. Nous sommes des gardiens de mémoire."
+                "Il n'y a pas de vie ordinaire, il n'y a que des histoires qui attendent d'être racontées."
               </blockquote>
               <p className="text-neutral-400 leading-relaxed text-lg">
                 Loomina est née d'un regret : celui des questions restées en suspens une fois qu'un proche est parti. Nous avons voulu offrir un espace d'écoute infinie, où l'IA amplifie l'attention humaine au lieu de la remplacer.
@@ -186,8 +186,8 @@ export default function Home() {
         <section className="w-full bg-white px-6 py-24 text-black">
           <div className="mx-auto max-w-6xl space-y-16">
             <header className="text-center space-y-6 max-w-3xl mx-auto">
-              <p className="text-sm uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Une présence humaine renforcée par l'IA</p>
-              <h2 className="text-4xl md:text-5xl font-semibold leading-tight">Un accompagnement complet pour raconter et préserver votre histoire</h2>
+              <p className="text-sm uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">La technologie au service de l'émotion</p>
+              <h2 className="text-4xl md:text-5xl font-semibold leading-tight">Du simple appel téléphonique au livre de votre vie</h2>
               <p className="text-lg text-neutral-600 leading-relaxed">
                 Nous simplifions chaque écran pour que Loomina soit lisible partout : mêmes boutons, mêmes couleurs, et un chemin clair de la première conversation jusqu'au livre entre vos mains.
               </p>
@@ -230,7 +230,7 @@ export default function Home() {
               <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">
                 On s'occupe des détails
               </p>
-              <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Plus de soin éditorial, moins de gestion pour vous</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold leading-tight">Nous gérons la technique, vous racontez l'histoire.</h2>
               <p className="text-neutral-400 max-w-3xl mx-auto leading-relaxed text-lg">
                 Nous orchestrons les rendez-vous, la mise en page et la livraison pour que vous profitiez surtout du plaisir de raconter.
               </p>
@@ -292,9 +292,9 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr,0.95fr] items-center border-t border-white/10 pt-16">
             <div className="space-y-5">
               <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Exemple audio</p>
-              <h3 className="text-3xl md:text-4xl font-semibold leading-tight">La voix reste intacte et lisible</h3>
+              <h3 className="text-3xl md:text-4xl font-semibold leading-tight">Écoutez la différence</h3>
               <p className="text-neutral-400 leading-relaxed max-w-xl text-lg">
-                Un extrait brut pour entendre notre manière de guider les entretiens : rythme calme, silences respectés et montage léger.
+                Découvrez comment nous passons de la voix brute au récit écrit, en gardant toute l'émotion.
               </p>
             </div>
 
@@ -318,9 +318,9 @@ export default function Home() {
               <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-[var(--loomina-amber-strong)] font-semibold">
                 Offre unique Loomina
               </p>
-              <h2 className="text-4xl md:text-5xl font-semibold leading-tight">Lumina : un seul parcours, tout compris</h2>
+              <h2 className="text-4xl md:text-5xl font-semibold leading-tight">Une approche simple et transparente</h2>
               <p className="text-lg leading-relaxed text-neutral-600">
-                Nous avons simplifié l'expérience : une seule offre, la même exigence éditoriale et une livraison qui inclut le livre imprimé et sa version numérique protégée.
+                Pas de coûts cachés. Un seul paiement pour un héritage qui traversera les générations.
               </p>
             </header>
 

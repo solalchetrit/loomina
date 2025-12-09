@@ -9,18 +9,18 @@ export default function Hero() {
         <div className="space-y-8">
           <div className="inline-flex items-center gap-3 rounded-full bg-neutral-50 px-4 py-2 text-sm font-semibold text-black border border-black/5 shadow-sm">
             <span className="h-2.5 w-2.5 rounded-full bg-black animate-pulse" />
-            Loomina accompagne vos souvenirs
+            GARDIENS DE LA MÉMOIRE FAMILIALE
           </div>
 
           <div className="space-y-6">
             <p className="text-xs uppercase tracking-[0.34em] text-neutral-500 font-semibold">Livre mémoriel humain</p>
             <h1 className="text-5xl md:text-6xl font-bold leading-tight text-black tracking-tight">
-              Votre histoire prend la parole avec une équipe qui vous écoute
+              Loomina : Chaque vie mérite d'être lue
             </h1>
           </div>
 
           <p className="text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto">
-            Interviews guidés, réécriture attentive, maquette prête à offrir : nous prenons le temps de comprendre vos souvenirs et de les transmettre avec douceur.
+            Il n'y a pas de vie ordinaire. Transformez vos souvenirs en un livre éternel, simplement en nous les racontant au téléphone.
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center pt-4">
@@ -28,13 +28,13 @@ export default function Hero() {
               href="#offres"
               className="bg-black text-white shadow-xl border border-black hover:bg-neutral-800 px-8 py-4 text-lg"
             >
-              Commencer mon histoire
+              Commencer mon livre
             </MagicButton>
             <MagicButton
-              href="tel:+33600000000"
+              href="#audio-details"
               className="bg-white !text-black border border-black/10 shadow-lg hover:bg-neutral-50 px-8 py-4 text-lg font-bold"
             >
-              Appeler Loomina
+              Écouter un extrait
             </MagicButton>
           </div>
 
