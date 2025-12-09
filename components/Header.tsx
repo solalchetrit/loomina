@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 
 const NAV_LINKS = [
   { href: "#mission", label: "Notre Mission" },
@@ -13,9 +13,24 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 50) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  });
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white shadow-sm transition-all duration-300">
+    <motion.header
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: isVisible ? 0 : -100, opacity: isVisible ? 1 : 0 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+      className="fixed top-0 z-50 w-full border-b border-black/5 bg-white shadow-sm"
+    >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
         <Link href="/" className="relative z-10 flex shrink-0 items-center">
           <div className="relative h-8 w-40">
@@ -111,6 +126,6 @@ export default function Header() {
           )}
         </AnimatePresence>
       </div>
-    </header>
+    </motion.header>
   );
 }
