@@ -94,8 +94,8 @@ export default function Home() {
               <p className="text-neutral-500">Une approche simplifiée à l'extrême : nous gérons la technique, vous racontez l'histoire.</p>
             </div>
 
-            {/* Grille Compacte 2x2 - Design "Cool" & Premium */}
-            <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
+            {/* Grille Compacte 2x2 - Design "Cool" & Premium - Stacked on Mobile */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
               {steps.map((block) => (
                 <div
                   key={block.step}
@@ -129,7 +129,7 @@ export default function Home() {
               <p className="text-xl text-neutral-500">Transmettre ne devrait pas être un luxe compliqué.</p>
             </div>
 
-            <div className="bg-black text-white rounded-lg p-10 md:p-14 relative overflow-hidden">
+            <div className="bg-black text-white rounded-lg p-6 md:p-14 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-[var(--loomina-amber)]"></div>
 
               <div className="space-y-8 relative z-10">
@@ -152,7 +152,7 @@ export default function Home() {
                 <div className="pt-4">
                   <a
                     href="mailto:contact@loomina.fr?subject=Commande%20Loomina"
-                    className="inline-block bg-white text-black font-bold text-lg px-12 py-4 rounded-full hover:scale-105 transition-transform"
+                    className="inline-block bg-white text-black font-sans font-medium text-lg px-12 py-4 rounded-full hover:scale-105 transition-transform"
                   >
                     Commander mon livre
                   </a>

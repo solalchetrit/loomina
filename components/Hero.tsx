@@ -2,7 +2,7 @@ import MagicButton from "./ui/MagicButton";
 
 export default function Hero() {
   return (
-    <section className="relative w-full overflow-hidden px-6 pt-32 pb-20 bg-white">
+    <section className="relative w-full overflow-hidden px-6 pt-24 md:pt-32 pb-20 bg-white">
       <div className="mx-auto max-w-5xl flex flex-col items-center text-center space-y-10">
 
         {/* Titre Principal - Noir, massif mais élégant */}
@@ -20,13 +20,13 @@ export default function Hero() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-center pt-6">
           <MagicButton
             href="#offres"
-            className="bg-black text-white px-10 py-5 text-lg"
+            className="bg-black text-white px-10 py-5 text-lg font-sans font-medium"
           >
             Commencer mon livre
           </MagicButton>
           <MagicButton
             href="tel:+33159169357"
-            className="bg-white !text-black border border-neutral-200 hover:bg-neutral-50 px-10 py-5 text-lg"
+            className="bg-white text-black border border-neutral-200 hover:bg-neutral-50 px-10 py-5 text-lg font-sans font-medium"
           >
             Appeler Loomina
           </MagicButton>

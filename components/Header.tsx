@@ -27,12 +27,13 @@ export default function Header() {
         </Link>
 
         {/* Clean Navigation */}
-        <nav className="flex items-center gap-6 md:gap-8">
+        {/* Clean Navigation - Mobile Scrollable */}
+        <nav className="flex items-center gap-6 overflow-x-auto no-scrollbar w-full md:w-auto px-6 md:px-0 pb-4 md:pb-0 absolute md:relative top-20 md:top-0 left-0 md:left-auto bg-white md:bg-transparent border-b md:border-none border-neutral-100 md:justify-end">
           {NAV_LINKS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-neutral-600 transition-colors hover:text-black tracking-wide"
+              className="text-sm font-medium text-neutral-600 transition-colors hover:text-black tracking-wide whitespace-nowrap"
             >
               {item.label}
             </Link>

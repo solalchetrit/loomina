@@ -31,7 +31,7 @@ export default function Footer() {
           {/* Bouton : Fond Blanc, Police NOIRE (explicite) */}
           <MagicButton
             href="/contact"
-            className="bg-white !text-black border-none hover:bg-neutral-200 px-6 py-2 text-xs font-semibold tracking-wide"
+            className="bg-white text-black border-none hover:bg-neutral-200 px-6 py-2 text-xs font-sans font-medium tracking-wide"
           >
             Nous écrire
           </MagicButton>
