@@ -146,7 +146,7 @@ export default function Home() {
 
       {/* --- SECTION 2: MISSION (NOIR) --- */}
       <div id="mission" className="w-full">
-        <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden">
+        <section className="relative w-full bg-black px-6 py-16 text-white overflow-hidden">
           <StarDecoration position="top-right" className="opacity-60" />
           <StarDecoration position="bottom-left" className="opacity-40 scale-75" />
 
@@ -183,8 +183,8 @@ export default function Home() {
 
       {/* --- SECTION 3: PROCESS / ACCOMPAGNEMENT (BLANC) --- */}
       <div id="process" className="w-full">
-        <section className="w-full bg-white px-6 py-24 text-black">
-          <div className="mx-auto max-w-6xl space-y-16">
+        <section className="w-full bg-white px-6 py-16 text-black">
+          <div className="mx-auto max-w-6xl space-y-12">
             <header className="text-center space-y-6 max-w-3xl mx-auto">
               <p className="text-sm uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">La technologie au service de l'émotion</p>
               <h2 className="text-4xl md:text-5xl font-semibold leading-tight">Du simple appel téléphonique au livre de votre vie</h2>
@@ -197,7 +197,7 @@ export default function Home() {
               {steps.map((block) => (
                 <div
                   key={block.step}
-                  className="rounded-3xl border border-black/5 bg-neutral-50 p-8 space-y-4 hover:shadow-lg transition-shadow"
+                  className="rounded-3xl border border-black/5 bg-neutral-50 p-6 space-y-4 hover:shadow-lg transition-shadow"
                 >
                   <p className="text-sm uppercase tracking-[0.26em] text-[var(--loomina-amber-strong)] font-semibold">{block.step}</p>
                   <h3 className="text-2xl font-semibold text-black">{block.title}</h3>
@@ -218,11 +218,11 @@ export default function Home() {
       </div>
 
       {/* --- SECTION 4: DETAILS & AUDIO (NOIR) --- */}
-      <section className="relative w-full bg-black px-6 py-24 text-white overflow-hidden" id="audio-details">
+      <section className="relative w-full bg-black px-6 py-16 text-white overflow-hidden" id="audio-details">
         <StarDecoration position="top-left" className="opacity-50 scale-90" />
         <StarDecoration position="bottom-right" className="opacity-50" />
 
-        <div className="mx-auto max-w-6xl space-y-24 relative z-10">
+        <div className="mx-auto max-w-6xl space-y-12 relative z-10">
 
           {/* Details Part */}
           <div className="space-y-12">
@@ -289,7 +289,7 @@ export default function Home() {
           </div>
 
           {/* Audio Part */}
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr,0.95fr] items-center border-t border-white/10 pt-16">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr,0.95fr] items-center border-t border-white/10 pt-8">
             <div className="space-y-5">
               <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--loomina-amber-strong)] font-semibold">Exemple audio</p>
               <h3 className="text-3xl md:text-4xl font-semibold leading-tight">Écoutez la différence</h3>
@@ -312,7 +312,7 @@ export default function Home() {
 
       {/* --- SECTION 5: OFFRES (BLANC) --- */}
       <div id="offres" className="w-full">
-        <section className="w-full bg-white px-6 py-24 text-black">
+        <section className="w-full bg-white px-6 py-16 text-black">
           <div className="mx-auto max-w-6xl space-y-16">
             <header className="text-center space-y-4 max-w-3xl mx-auto">
               <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-[var(--loomina-amber-strong)] font-semibold">
