@@ -1,24 +1,27 @@
-```typescript
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plus-jakarta-sans",
-});
-
+// Configuration Serif (Titres "Livre")
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  variable: "--font-serif",
+  display: "swap",
+});
+
+// Configuration Sans-Serif (Texte courant) - Ajout du poids "300" pour la finesse
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Loomina",
-  description: "Loomina, gardien de la mémoire familliale.",
+  title: "Loomina - Votre histoire, éternelle",
+  description: "Livre autobiographique par téléphone.",
 };
 
 export default function RootLayout({
@@ -28,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="scroll-smooth">
-      <body className={`${ plusJakartaSans.variable } ${ playfair.variable } antialiased min - h - screen bg - [var(--background)]text - [var(--foreground)]`}>
+      <body className={`${plusJakartaSans.variable} ${playfair.variable} antialiased min-h-screen bg-white text-black font-light selection:bg-[var(--loomina-amber)] selection:text-white`}>
         <Header />
         {children}
         <Footer />
@@ -36,4 +39,3 @@ export default function RootLayout({
     </html>
   );
 }
-```

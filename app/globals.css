@@ -2,29 +2,28 @@
 
 @theme {
   /* Liaison de la variable Next.js avec Tailwind v4 */
-  --font-plus-jakarta-sans: var(--font-plus-jakarta-sans);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
 }
 
 :root {
   --loomina-ink: #000000;
   --loomina-cloud: #f5f5f5;
-  /* Light neutral gray */
   --loomina-sand: #e5e5e5;
   --loomina-haze: #d4d4d4;
   --loomina-amber: #eabf77;
   --loomina-amber-strong: #c58c3c;
-  --loomina-forest: #1f3328;
-  --loomina-muted: #666666;
+  --foreground: #1a1a1a;
   --background: #ffffff;
-  --foreground: var(--loomina-ink);
 }
 
 body {
+  font-family: var(--font-sans);
+  font-weight: 300;
   color: var(--foreground);
   background: var(--background);
   margin: 0;
   padding: 0;
-  font-family: var(--font-plus-jakarta-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.015em;
@@ -32,8 +31,15 @@ body {
 }
 
 /* Custom Utilities */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
 .font-serif {
-  font-family: var(--font-playfair), serif;
+  font-family: var(--font-serif);
+  font-weight: 400;
 }
 
 .glow-ring {

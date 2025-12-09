@@ -25,10 +25,10 @@ export default function Hero() {
             Commencer mon livre
           </MagicButton>
           <MagicButton
-            href="#audio-details"
-            className="bg-white !text-black border border-black/10 hover:bg-neutral-50 px-10 py-5 text-lg"
+            href="tel:+33159169357"
+            className="bg-white !text-black border border-neutral-200 hover:bg-neutral-50 px-10 py-5 text-lg"
           >
-            Écouter un extrait
+            Appeler Loomina
           </MagicButton>
         </div>
 
