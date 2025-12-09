@@ -59,7 +59,7 @@ export default function Hero() {
         {/* --- CONTENU COMPLET HERO (Section 1) --- */}
         <motion.div
           style={{ opacity: opacityContent, y: yContent }}
-          className="absolute top-1/2 md:top-[60%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8 mt-20 md:mt-0"
+          className="absolute top-[65%] md:top-[75%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8"
         >
           <h1 className="text-4xl md:text-7xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
             Votre histoire, <br />
@@ -78,12 +78,12 @@ export default function Hero() {
             >
               Commencer l'écriture
             </Link>
-            <a
-              href="tel:+33159069357"
+            <Link
+              href="#offres"
               className="px-8 py-3.5 rounded-full bg-white text-[var(--loomina-ink)] border border-neutral-200 font-sans font-medium text-base transition-all hover:bg-neutral-50 hover:border-neutral-300"
             >
-              Parler à un conseiller
-            </a>
+              Je teste Loomina
+            </Link>
           </div>
         </motion.div>
 
