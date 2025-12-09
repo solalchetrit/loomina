@@ -32,11 +32,11 @@ function MagicButtonContent({
 
   const variantClasses: Record<NonNullable<MagicButtonProps["variant"]>, string> = {
     primary:
-      "bg-gradient-to-r from-[#FFC95C] via-[#FF9A7A] to-[#F65C9A] text-black border border-black/5 hover:shadow-[0_22px_48px_-18px_rgba(246,92,154,0.55)]",
+      "text-white bg-gradient-to-r from-[#ff9646] via-[#ff6f63] to-[#e13b7a] border border-transparent shadow-[0_18px_42px_-22px_rgba(225,59,122,0.65)] hover:shadow-[0_28px_60px_-24px_rgba(225,59,122,0.75)]",
     secondary:
-      "bg-white text-[var(--loomina-black)] border border-[var(--loomina-black)]/15 hover:border-[var(--loomina-black)]/30 hover:bg-white/90 shadow-[0_14px_42px_-26px_rgba(0,0,0,0.35)]",
+      "text-[var(--loomina-black)] bg-white border border-[var(--loomina-black)]/15 shadow-[0_12px_36px_-26px_rgba(0,0,0,0.35)] hover:border-[var(--loomina-black)]/30 hover:bg-white/90 hover:shadow-[0_16px_44px_-24px_rgba(0,0,0,0.35)]",
     ghost:
-      "bg-transparent text-[var(--loomina-black)] border border-[var(--loomina-black)]/10 hover:border-[var(--loomina-black)]/30 hover:bg-[var(--loomina-gray-light)]",
+      "text-[var(--loomina-black)] bg-gradient-to-r from-[var(--loomina-gray-light)] to-white border border-[var(--loomina-black)]/10 hover:border-[var(--loomina-black)]/25 hover:shadow-[0_10px_34px_-26px_rgba(0,0,0,0.3)]",
   };
 
   const sizeClasses: Record<NonNullable<MagicButtonProps["size"]>, string> = {
@@ -45,7 +45,7 @@ function MagicButtonContent({
     lg: "px-8 py-4 text-base",
   };
 
-  const glowClasses = glow ? "shadow-[0_18px_40px_-24px_rgba(0,0,0,0.35)]" : "shadow-none";
+  const glowClasses = glow ? "shadow-[0_18px_42px_-28px_rgba(0,0,0,0.4)]" : "shadow-none";
 
   const handleMouseMove = (event: React.MouseEvent<HTMLButtonElement>) => {
     const { currentTarget, clientX, clientY } = event;
@@ -77,8 +77,8 @@ function MagicButtonContent({
       onMouseLeave={handleMouseLeave}
       {...rest}
     >
-      <span className={`absolute inset-0 bg-white/20 transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`} />
-      <span className="relative flex items-center gap-2 z-10 drop-shadow-sm">{children}</span>
+      <span className={`absolute inset-0 bg-white/15 transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`} />
+      <span className="relative z-10 flex items-center gap-2 drop-shadow-sm">{children}</span>
     </motion.button>
   );
 }
