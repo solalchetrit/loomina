@@ -1,4 +1,3 @@
-```
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -18,7 +17,7 @@ export default function Hero() {
   const opacityText = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
-    <section 
+    <section
       ref={containerRef}
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-white pt-20"
     >
@@ -33,10 +32,10 @@ export default function Hero() {
         {/* Floating Animation Wrapper */}
         <motion.div
           animate={{ y: [0, -15, 0] }}
-          transition={{ 
-            duration: 4, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
           }}
         >
           <Image
@@ -51,7 +50,7 @@ export default function Hero() {
       </motion.div>
 
       {/* --- TEXTE (REVEAL) --- */}
-      <motion.div 
+      <motion.div
         style={{ opacity: opacityText }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -61,7 +60,7 @@ export default function Hero() {
         <h1 className="font-serif text-3xl md:text-5xl font-medium text-[var(--loomina-ink)] tracking-wide">
           Chaque vie mérite d'être lue.
         </h1>
-        
+
         {/* Scroll Indicator */}
         <motion.div
           animate={{ y: [0, 10, 0] }}
@@ -78,4 +77,3 @@ export default function Hero() {
     </section>
   );
 }
-```
