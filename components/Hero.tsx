@@ -1,62 +1,40 @@
-import Image from "next/image";
-
 import MagicButton from "./ui/MagicButton";
 
 export default function Hero() {
   return (
-    <section className="relative w-full overflow-hidden px-6 pb-20 pt-16 bg-white">
-      <div className="mx-auto max-w-4xl p-8 md:p-12 flex flex-col items-center text-center">
-        <div className="space-y-8">
-          <div className="space-y-6">
-            <p className="text-xs uppercase tracking-[0.34em] text-neutral-500 font-semibold">Livre mémoriel humain</p>
-            <h1 className="text-5xl md:text-6xl font-bold leading-tight text-black tracking-tight">
-              Loomina : Chaque vie mérite d'être lue
-            </h1>
-          </div>
+    <section className="relative w-full overflow-hidden px-6 pt-32 pb-20 bg-white">
+      <div className="mx-auto max-w-5xl flex flex-col items-center text-center space-y-10">
 
-          <p className="text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto">
-            Il n'y a pas de vie ordinaire. Transformez vos souvenirs en un livre éternel, simplement en nous les racontant au téléphone.
-          </p>
+        {/* Titre Principal - Noir, massif mais élégant */}
+        <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] text-black tracking-tight">
+          Loomina : <br className="hidden md:block" />
+          <span className="text-neutral-800">Chaque vie mérite d'être lue.</span>
+        </h1>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center pt-4">
-            <MagicButton
-              href="#offres"
-              className="bg-black text-white shadow-xl border border-black hover:bg-neutral-800 px-8 py-4 text-lg"
-            >
-              Commencer mon livre
-            </MagicButton>
-            <MagicButton
-              href="#audio-details"
-              className="bg-white !text-black border border-black/10 shadow-lg hover:bg-neutral-50 px-8 py-4 text-lg font-bold"
-            >
-              Écouter un extrait
-            </MagicButton>
-          </div>
+        {/* Sous-titre - Gris chaud, largeur limitée pour la lecture */}
+        <p className="text-xl md:text-2xl text-neutral-500 leading-relaxed max-w-2xl mx-auto font-light">
+          Il n'y a pas de vie ordinaire. Transformez vos souvenirs en un livre éternel, simplement en nous les racontant au téléphone.
+        </p>
 
-          <div className="grid gap-4 sm:grid-cols-3 pt-8 w-full max-w-3xl mx-auto">
-            {["Interviews enregistrés avec bienveillance", "Maquette élégante et photos retouchées", "Livres reliés et version numérique sécurisée"].map((item) => (
-              <div key={item} className="rounded-2xl border border-black/5 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 shadow-sm">
-                {item}
-              </div>
-            ))}
-          </div>
+        {/* Actions - Espacées */}
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-center pt-6">
+          <MagicButton
+            href="#offres"
+            className="bg-black text-white px-10 py-5 text-lg"
+          >
+            Commencer mon livre
+          </MagicButton>
+          <MagicButton
+            href="#audio-details"
+            className="bg-white !text-black border border-black/10 hover:bg-neutral-50 px-10 py-5 text-lg"
+          >
+            Écouter un extrait
+          </MagicButton>
+        </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-8 pt-6 text-neutral-500">
-            <div>
-              <p className="text-3xl font-bold text-black">4.9/5</p>
-              <p className="text-sm font-medium">sur les projets accompagnés</p>
-            </div>
-            <div className="hidden h-12 w-px bg-black/10 sm:block" />
-            <div>
-              <p className="text-3xl font-bold text-black">2-3 semaines</p>
-              <p className="text-sm font-medium">pour un livre prêt à offrir</p>
-            </div>
-            <div className="hidden h-12 w-px bg-black/10 sm:block" />
-            <div>
-              <p className="text-3xl font-bold text-black">100% humain</p>
-              <p className="text-sm font-medium">contrôle éditorial par notre équipe</p>
-            </div>
-          </div>
+        {/* Preuve sociale minimaliste */}
+        <div className="pt-12 opacity-60 text-sm font-medium text-neutral-400 uppercase tracking-widest">
+          Biographies réalisées pour +150 familles
         </div>
       </div>
     </section>

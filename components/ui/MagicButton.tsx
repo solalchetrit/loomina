@@ -47,10 +47,9 @@ function MagicButtonContent({ children, glow, className = "", ...rest }: Omit<Ma
   return (
     <motion.button
       type="button"
-      // On garde les classes de base, mais on assure un look propre
-      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-8 py-4 text-lg font-semibold tracking-wide transition-all duration-300 ${background} ${className}`}
+      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-8 py-4 text-base font-medium tracking-wide transition-all duration-300 ${background} ${className}`}
       style={{ x: springX, y: springY }}
-      whileHover={{ scale: 1.02 }} // Scale très léger pour le côté premium
+      whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
       onMouseMove={handleMouseMove}
@@ -58,15 +57,8 @@ function MagicButtonContent({ children, glow, className = "", ...rest }: Omit<Ma
       onMouseLeave={handleMouseLeave}
       {...rest}
     >
-      {/* Background subtil au hover au lieu de la diagonale */}
-      <span
-        className={`absolute inset-0 bg-white/10 transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`}
-      />
-
-      {/* Contenu sans bordure interne */}
-      <span className="relative flex items-center gap-2 z-10">
-        {children}
-      </span>
+      <span className={`absolute inset-0 bg-white/20 transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`} />
+      <span className="relative flex items-center gap-2 z-10">{children}</span>
     </motion.button>
   );
 }
