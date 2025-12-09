@@ -39,32 +39,7 @@ export default function Home() {
     <div className="min-h-screen w-full flex flex-col items-center bg-white text-black">
       <Hero />
 
-      {/* --- SECTION 2: CONVICTION (NOIR) --- */}
-      <div id="mission" className="w-full scroll-mt-24">
-        <section className="relative w-full bg-black px-6 py-20 md:py-28 text-white overflow-hidden">
 
-
-          <div className="mx-auto max-w-5xl flex flex-col gap-16 relative z-10">
-            {/* La Citation Centrale */}
-            <div className="text-center space-y-8">
-              <p className="text-xs uppercase tracking-[0.3em] text-[var(--loomina-amber-strong)]">Notre raison d'être</p>
-              <h2 className="text-3xl md:text-5xl font-serif leading-tight text-neutral-200 italic">
-                "Trop souvent, les souvenirs s'effacent ou restent bloqués par la barrière de l'écriture. Loomina brise ce silence."
-              </h2>
-            </div>
-
-            {/* Les 3 Piliers - Épurés */}
-            <div className="grid gap-10 md:grid-cols-3 border-t border-white/10 pt-16">
-              {pillars.map((value) => (
-                <div key={value.title} className="space-y-3">
-                  <h3 className="text-xl font-semibold text-white">{value.title}</h3>
-                  <p className="text-neutral-400 leading-relaxed text-sm">{value.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
 
       {/* --- SECTION 3: LE PARCOURS (TIMELINE) --- */}
       <HowItWorks />
