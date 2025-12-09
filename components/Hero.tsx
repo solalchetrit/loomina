@@ -45,10 +45,10 @@ export default function Hero() {
           >
             {/* Added unoptimized to ensure display if Next.js image optimization fails locally */}
             <Image
-              src="/hero-book.png"
+              src="/hero-book-v2.png"
               alt="Livre Loomina"
-              width={800}
-              height={600}
+              width={819}
+              height={1024}
               className="w-full h-auto object-contain drop-shadow-2xl"
               priority
               unoptimized
