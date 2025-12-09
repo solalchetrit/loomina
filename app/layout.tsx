@@ -2,6 +2,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -26,9 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="scroll-smooth">
-      <body className={`${ plusJakartaSans.variable } ${ playfair.variable } antialiased`}>
+      <body className={`${ plusJakartaSans.variable } ${ playfair.variable } antialiased min - h - screen bg - [var(--background)]text - [var(--foreground)]`}>
+        <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );
 }
+```
