@@ -1,6 +1,5 @@
 import Hero from "@/components/Hero";
 import StarDecoration from "@/components/ui/StarDecoration";
-import { cn } from "@/lib/utils";
 
 // --- DATA FROM MISSION PAGE (for Mission Section) ---
 const pillars = [
