@@ -32,12 +32,12 @@ export default function Hero() {
       ref={containerRef}
       className="relative h-[200vh] bg-white"
     >
-      <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden px-4">
+      <div className="sticky top-0 h-[100dvh] flex flex-col items-center justify-center overflow-hidden px-4">
 
         {/* --- LE LIVRE (STAR) --- */}
         <motion.div
           style={{ scale: scaleBook, y: yBook }}
-          className="relative z-10 w-full max-w-md md:max-w-xl"
+          className="relative z-10 w-full max-w-md md:max-w-xl will-change-transform"
         >
           <motion.div
             animate={{ y: [0, -15, 0] }}
