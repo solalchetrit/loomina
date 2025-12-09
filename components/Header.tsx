@@ -6,10 +6,9 @@ import Image from "next/image";
 import MagicButton from "./ui/MagicButton";
 
 const NAV_LINKS = [
-  { href: "/", label: "Accueil" },
-  { href: "/mission", label: "Mission" },
-  { href: "/offres", label: "Offres" },
-  { href: "/accompagnement", label: "Accompagnement" },
+  { href: "#mission", label: "Mission" },
+  { href: "#process", label: "Accompagnement" },
+  { href: "#offres", label: "Offres" },
 ];
 
 export default function Header() {

@@ -32,7 +32,7 @@ export default function Hero() {
             </MagicButton>
             <MagicButton
               href="tel:+33600000000"
-              className="bg-white text-black border border-black/10 shadow-lg hover:bg-neutral-50 px-8 py-4 text-lg font-bold"
+              className="bg-white !text-black border border-black/10 shadow-lg hover:bg-neutral-50 px-8 py-4 text-lg font-bold"
             >
               Appeler Loomina
             </MagicButton>
