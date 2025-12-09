@@ -97,10 +97,16 @@ export default function Home() {
             {/* Grille Compacte 2x2 */}
             <div className="grid md:grid-cols-2 gap-6">
               {steps.map((block) => (
-                <div key={block.step} className="group rounded-2xl bg-neutral-50 p-8 hover:bg-neutral-100 transition-colors border border-black/5">
-                  <span className="text-xs font-bold text-[var(--loomina-amber-strong)] mb-4 block tracking-widest">{block.step}</span>
-                  <h3 className="text-xl font-bold text-black mb-2">{block.title}</h3>
-                  <p className="text-neutral-600 leading-relaxed text-sm">{block.description}</p>
+                <div key={block.step} className="flex flex-col gap-4 py-6 border-l-2 border-neutral-100 pl-8 hover:border-[var(--loomina-amber)] transition-colors duration-500">
+                  <span className="text-4xl font-serif text-[var(--loomina-amber)] opacity-50 font-medium">
+                    {block.step}
+                  </span>
+                  <div>
+                    <h3 className="text-xl font-bold text-black mb-2">{block.title}</h3>
+                    <p className="text-neutral-500 leading-relaxed text-sm">
+                      {block.description}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -153,7 +159,7 @@ export default function Home() {
               <p className="text-xl text-neutral-500">Transmettre ne devrait pas être un luxe compliqué.</p>
             </div>
 
-            <div className="bg-black text-white rounded-[2rem] p-10 md:p-14 shadow-2xl relative overflow-hidden">
+            <div className="bg-black text-white rounded-lg p-10 md:p-14 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-[var(--loomina-amber)]"></div>
 
               <div className="space-y-8 relative z-10">

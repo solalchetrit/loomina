@@ -33,7 +33,7 @@ body {
 
 /* Custom Utilities */
 .font-serif {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-playfair), serif;
 }
 
 .glow-ring {

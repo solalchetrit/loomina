@@ -23,7 +23,7 @@ function MagicButtonContent({ children, glow, className = "", ...rest }: Omit<Ma
 
   const background = useMemo(
     () =>
-      "bg-[var(--loomina-black)] text-white shadow-[0_22px_60px_-40px_rgba(0,0,0,0.85)] border border-white/10",
+      "bg-black text-white hover:bg-neutral-800 border border-transparent",
     []
   );
 
