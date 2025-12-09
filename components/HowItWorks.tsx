@@ -59,26 +59,26 @@ export default function HowItWorks() {
         {/* Liste des étapes */}
         <div className="space-y-16">
           {STEPS.map((step, index) => (
-            <div key={index} className={`relative flex flex-col md:flex-row items-center md:items-start gap-8 ${index % 2 === 0 ? "md:flex-row-reverse" : ""
+            <div key={index} className={`relative flex flex-col md:flex-row items-center gap-8 ${index % 2 === 0 ? "md:flex-row-reverse" : ""
               }`}>
 
               {/* Contenu Texte (Alternance) */}
-              <div className={`flex-1 text-left md:text-${index % 2 === 0 ? "left" : "right"} pl-12 md:pl-0`}>
+              <div className={`flex-1 w-full text-left md:text-${index % 2 === 0 ? "left" : "right"} pl-20 md:pl-0 ${index % 2 === 0 ? "md:pr-24" : "md:pl-24"}`}>
                 <h3 className="text-2xl font-serif text-[var(--loomina-black)] mb-3">
                   {step.title}
                 </h3>
-                <p className="text-neutral-500 leading-relaxed max-w-md ml-0 md:ml-auto">
+                <p className={`text-neutral-500 leading-relaxed max-w-md ${index % 2 === 0 ? "mr-auto" : "ml-auto"}`}>
                   {step.description}
                 </p>
               </div>
 
               {/* Point Central (Connecteur) */}
-              <div className="absolute left-6 md:left-1/2 -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-white border border-[var(--loomina-gold)] text-[var(--loomina-gold)] shadow-[0_0_15px_rgba(234,191,119,0.3)] z-10">
+              <div className="absolute left-6 md:left-1/2 -translate-x-1/2 top-0 md:top-0 flex items-center justify-center w-12 h-12 rounded-full bg-white border border-[var(--loomina-gold)] text-[var(--loomina-gold)] shadow-[0_0_15px_rgba(234,191,119,0.3)] z-10">
                 {step.icon}
               </div>
 
               {/* Espace vide pour l'équilibre visuel */}
-              <div className="flex-1 hidden md:block"></div>
+              <div className="flex-1 hidden md:block w-1/2 md:pl-12"></div>
             </div>
           ))}
         </div>
