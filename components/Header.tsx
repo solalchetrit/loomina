@@ -14,7 +14,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white shadow-sm transition-all duration-300">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
         <Link href="/" className="relative z-10 flex shrink-0 items-center">
-          <div className="relative h-10 w-36 md:h-12 md:w-48 -mt-1">
+          <div className="relative h-8 w-40">
             <Image
               src="/header-logo-trimmed.png"
               alt="Logo Loomina"
