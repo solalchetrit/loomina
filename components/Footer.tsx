@@ -14,7 +14,7 @@ export default function Footer() {
       {/* Ligne décorative en bas */}
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div className="w-full px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center justify-between gap-8">
 
         {/* Partie Gauche : Logo & Bouton alignés */}
         <div className="flex flex-col sm:flex-row items-center gap-8">
