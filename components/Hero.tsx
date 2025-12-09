@@ -34,10 +34,7 @@ export default function Hero() {
           </MagicButton>
         </div>
 
-        {/* Preuve sociale minimaliste */}
-        <div className="pt-12 opacity-60 text-sm font-medium text-neutral-400 uppercase tracking-widest">
-          Biographies réalisées pour +150 familles
-        </div>
+
       </div>
     </section>
   );
