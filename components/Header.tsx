@@ -70,23 +70,24 @@ export default function Header() {
           </Link>
         </nav>
 
-        {/* --- MOBILE BURGER BUTTON --- */}
+        {/* --- MOBILE BURGER BUTTON (MINIMALIST) --- */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden relative z-50 flex items-center justify-center w-10 h-10 rounded-full bg-neutral-100/50 border border-black/5"
+          className="md:hidden relative z-50 flex items-center justify-center w-10 h-10 -mr-2"
+          aria-label="Menu"
         >
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 w-6">
             <motion.span
               animate={isOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-              className="w-5 h-0.5 bg-black block transition-transform"
+              className="w-full h-0.5 bg-black block origin-center transition-transform duration-300 ease-out"
             />
             <motion.span
-              animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-              className="w-5 h-0.5 bg-black block transition-opacity"
+              animate={isOpen ? { opacity: 0, scale: 0.5 } : { opacity: 1, scale: 1 }}
+              className="w-full h-0.5 bg-black block transition-all duration-300 ease-out"
             />
             <motion.span
-              animate={isOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-              className="w-5 h-0.5 bg-black block transition-transform"
+              animate={isOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }} // Adjusted y offset for cleaner X
+              className="w-full h-0.5 bg-black block origin-center transition-transform duration-300 ease-out"
             />
           </div>
         </button>

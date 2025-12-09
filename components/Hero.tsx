@@ -78,12 +78,12 @@ export default function Hero() {
             >
               Commencer l'écriture
             </Link>
-            <Link
-              href="#offres"
+            <a
+              href="tel:+33159169357"
               className="px-8 py-3.5 rounded-full bg-white text-[var(--loomina-ink)] border border-neutral-200 font-sans font-medium text-base transition-all hover:bg-neutral-50 hover:border-neutral-300"
             >
               Je teste Loomina
-            </Link>
+            </a>
           </div>
         </motion.div>
 
