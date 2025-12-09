@@ -37,7 +37,7 @@ export default function Hero() {
         {/* --- LE LIVRE (STAR) --- */}
         <motion.div
           style={{ scale: scaleBook, y: yBook }}
-          className="relative z-10 w-full max-w-md md:max-w-xl will-change-transform"
+          className="relative z-10 w-full max-w-lg md:max-w-3xl will-change-transform"
         >
           <motion.div
             animate={{ y: [0, -15, 0] }}
@@ -49,7 +49,7 @@ export default function Hero() {
               alt="Livre Loomina"
               width={819}
               height={1024}
-              className="w-full h-auto object-contain drop-shadow-2xl"
+              className="w-full h-auto object-contain drop-shadow-2xl mix-blend-multiply"
               priority
               unoptimized
             />
@@ -91,9 +91,10 @@ export default function Hero() {
         {/* <motion.div ... /> removed as requested for pure look */}
 
         {/* --- BACKGROUND --- */}
-        <div className="absolute inset-x-0 top-0 h-full w-full -z-10 bg-[radial-gradient(circle_at_center,_white_0%,_#f8f8f8_100%)] opacity-80"></div>
-        {/* Subtle Gold Glow behind book */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[var(--loomina-gold)] rounded-full blur-[120px] opacity-10 -z-10 pointer-events-none"></div>
+        {/* Pure white background to blend with image */}
+        <div className="absolute inset-x-0 top-0 h-full w-full -z-10 bg-white"></div>
+        {/* Subtle Gold Glow behind book - kept but reduced opacity to avoid background clash */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--loomina-gold)] rounded-full blur-[120px] opacity-5 -z-10 pointer-events-none"></div>
       </div>
     </section>
   );
