@@ -27,13 +27,39 @@ export default function Header() {
         </Link>
 
         {/* Clean Navigation */}
-        {/* Clean Navigation - Mobile Scrollable & Desktop Capsule */}
-        <nav className="flex items-center gap-1 md:gap-2 overflow-x-auto no-scrollbar w-full md:w-auto px-6 md:px-6 pb-4 md:pb-2 pt-2 md:pt-2 absolute md:relative top-20 md:top-0 left-0 md:left-auto bg-white/95 md:bg-neutral-100/50 md:backdrop-blur-md md:rounded-full md:border md:border-black/5 border-b md:border-none border-neutral-100 md:justify-end transition-all">
+        {/* Navigation Premium - Capsule unifiée */}
+        <nav className="hidden md:flex items-center gap-1 p-1 bg-white/80 backdrop-blur-md border border-neutral-200/60 rounded-full shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
           {NAV_LINKS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-neutral-600 transition-colors hover:text-black tracking-wide whitespace-nowrap px-3 py-1.5 hover:bg-white rounded-full"
+              className="
+                px-5 py-2 rounded-full
+                text-sm font-medium text-neutral-600 
+                transition-all duration-300 ease-out
+                hover:text-black hover:bg-neutral-100/80
+              "
+            >
+              {item.label}
+            </Link>
+          ))}
+
+          {/* Bouton d'action distinct (Optionnel mais recommandé pour casser la monotonie) */}
+          <Link
+            href="#contact"
+            className="ml-2 px-5 py-2 rounded-full bg-[var(--loomina-ink)] text-white text-sm font-medium transition-transform hover:scale-105"
+          >
+            Commencer
+          </Link>
+        </nav>
+
+        {/* Version Mobile simplifiée (Menu Burger à prévoir idéalement, ou garder le scroll simple sans le style capsule) */}
+        <nav className="md:hidden flex overflow-x-auto no-scrollbar w-full absolute top-20 left-0 bg-white border-b border-neutral-100 py-3 px-4 gap-4">
+          {NAV_LINKS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-sm font-medium text-neutral-600 whitespace-nowrap"
             >
               {item.label}
             </Link>
