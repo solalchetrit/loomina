@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useSpring, type HTMLMotionProps } from "framer-motion";
-import { useState } from "react";
+import { motion, type HTMLMotionProps } from "framer-motion";
 import type { ReactNode } from "react";
 
 interface MagicButtonProps extends HTMLMotionProps<"button"> {
@@ -14,8 +13,6 @@ interface MagicButtonProps extends HTMLMotionProps<"button"> {
   size?: "sm" | "md" | "lg";
 }
 
-const springConfig = { stiffness: 260, damping: 20, mass: 0.6 };
-
 function MagicButtonContent({
   children,
   glow = true,
@@ -24,61 +21,35 @@ function MagicButtonContent({
   size = "md",
   ...rest
 }: Omit<MagicButtonProps, "href">) {
-  const [hovered, setHovered] = useState(false);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, springConfig);
-  const springY = useSpring(y, springConfig);
-
   const variantClasses: Record<NonNullable<MagicButtonProps["variant"]>, string> = {
     primary:
-      "bg-[var(--loomina-black)] text-white border border-[var(--loomina-black)] hover:bg-black/90 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.55)]",
+      "bg-[var(--loomina-ink)] text-white border border-[var(--loomina-ink)] hover:bg-black/90 active:bg-black",
     secondary:
-      "bg-white text-[var(--loomina-black)] border border-[var(--loomina-black)]/10 hover:border-[var(--loomina-black)]/25 hover:bg-white/90 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.18)]",
+      "bg-white text-[var(--loomina-ink)] border border-[var(--loomina-ink)] hover:bg-[var(--loomina-cloud)] active:bg-[var(--loomina-sand)]",
     ghost:
-      "bg-transparent text-[var(--loomina-black)] border border-[var(--loomina-black)]/20 hover:border-[var(--loomina-black)]/35 hover:bg-[var(--loomina-gray-light)]/60",
+      "bg-transparent text-[var(--loomina-ink)] border border-transparent hover:border-[var(--loomina-ink)]/40 hover:bg-[var(--loomina-cloud)]",
   };
 
   const sizeClasses: Record<NonNullable<MagicButtonProps["size"]>, string> = {
     sm: "px-4 py-2.5 text-sm",
-    md: "px-6 py-3.5 text-base",
-    lg: "px-8 py-4 text-lg",
+    md: "px-5 py-3 text-base",
+    lg: "px-6 py-3.5 text-lg",
   };
 
-  const glowClasses = glow ? "shadow-[0_18px_40px_-24px_rgba(0,0,0,0.35)]" : "shadow-none";
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const { currentTarget, clientX, clientY } = event;
-    const rect = currentTarget.getBoundingClientRect();
-    const relativeX = clientX - (rect.left + rect.width / 2);
-    const relativeY = clientY - (rect.top + rect.height / 2);
-    x.set(relativeX * 0.12);
-    y.set(relativeY * 0.12);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    setHovered(false);
-  };
-
-  const shineOpacity = hovered ? 1 : 0;
+  const glowClasses = glow ? "shadow-[0_15px_40px_-28px_rgba(0,0,0,0.35)]" : "shadow-sm";
+  const baseClasses =
+    "group inline-flex items-center justify-center gap-2 rounded-lg font-sans font-semibold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--loomina-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
   return (
     <motion.button
       type="button"
-      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full font-sans font-semibold tracking-[0.02em] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--loomina-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-white ${variantClasses[variant]} ${sizeClasses[size]} ${glowClasses} ${className}`}
-      style={{ x: springX, y: springY }}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={handleMouseLeave}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${glowClasses} ${className}`}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 320, damping: 22 }}
       {...rest}
     >
-      <span className={`absolute inset-0 bg-white/15 transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`} />
-      <span className="relative flex items-center gap-2 z-10">{children}</span>
+      {children}
     </motion.button>
   );
 }
