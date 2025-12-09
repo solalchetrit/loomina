@@ -59,7 +59,7 @@ export default function Home() {
       <Hero />
 
       {/* --- SECTION 2: CONVICTION (NOIR) --- */}
-      <div id="mission" className="w-full">
+      <div id="mission" className="w-full scroll-mt-24">
         <section className="relative w-full bg-black px-6 py-20 md:py-28 text-white overflow-hidden">
 
 
@@ -86,7 +86,7 @@ export default function Home() {
       </div>
 
       {/* --- SECTION 3: LE PARCOURS (BLANC) --- */}
-      <div id="process" className="w-full">
+      <div id="process" className="w-full scroll-mt-24">
         <section className="w-full bg-white px-6 py-20 md:py-24 text-black">
           <div className="mx-auto max-w-5xl space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-4">
@@ -117,43 +117,10 @@ export default function Home() {
         </section>
       </div>
 
-      {/* --- SECTION 4: L'EXPÉRIENCE AUDIO (NOIR COMPACT) --- */}
-      <section className="w-full bg-black px-6 py-20 text-white" id="audio-details">
-        <div className="mx-auto max-w-5xl grid md:grid-cols-2 gap-12 md:gap-20 items-center">
 
-          {/* Colonne Gauche : Texte */}
-          <div className="space-y-6">
-            <div className="inline-block rounded-full border border-white/20 px-3 py-1 text-[10px] uppercase tracking-widest text-neutral-300">
-              Technologie & Émotion
-            </div>
-            <h2 className="text-3xl md:text-4xl font-semibold">Écoutez la différence.</h2>
-            <p className="text-neutral-400 text-lg leading-relaxed">
-              Nous ne faisons pas que transcrire. Nous captons les silences, les hésitations et les rires pour tisser un récit qui vous ressemble vraiment.
-              <br /><br />
-              <span className="text-white text-sm">✦ Votre voix reste intacte, votre histoire devient éternelle.</span>
-            </p>
-          </div>
-
-          {/* Colonne Droite : Player Audio */}
-          <div className="bg-neutral-900 rounded-3xl p-8 border border-white/10 shadow-2xl relative">
-
-            <div className="space-y-4">
-              <p className="text-xs uppercase text-neutral-500 tracking-widest mb-4">Extrait brut de session</p>
-              <audio controls className="w-full invert hue-rotate-180 opacity-90 hover:opacity-100 transition-opacity">
-                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
-              </audio>
-              <div className="pt-2 flex justify-between text-xs text-neutral-600">
-                <span>0:00</span>
-                <span>1:24</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
 
       {/* --- SECTION 5: OFFRE UNIQUE (BLANC CENTRÉ) --- */}
-      <div id="offres" className="w-full">
+      <div id="offres" className="w-full scroll-mt-24">
         <section className="w-full bg-white px-6 py-20 md:py-28 text-black border-t border-neutral-100">
           <div className="mx-auto max-w-3xl text-center space-y-10">
 
