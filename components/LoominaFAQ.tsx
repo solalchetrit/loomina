@@ -10,7 +10,7 @@ const faqData = [
     {
         question: "Comment se déroulent les entretiens ?",
         answer:
-            "Nous prévoyons un appel vidéo ou téléphonique d'environ 45 minutes. Notre IA suggère des relances tandis qu'un accompagnant Loomina guide l'échange pour que la parole reste fluide.",
+            "L'échange se fait uniquement avec notre IA par téléphone. Elle mène la conversation, vous écoute et vous relance de manière autonome pour écrire votre livre.",
     },
     {
         question: "Quel est le prix ?",
