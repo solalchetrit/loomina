@@ -12,7 +12,7 @@ const faqData = [
     },
     {
         question: "Quel est le prix ?",
-        answer: "Une seule offre Lumina : 219€ en lancement. Elle inclut les interviews guidés, la rédaction, la maquette, 5 exemplaires imprimés et la version numérique sécurisée."
+        answer: "Une seule offre Loomina : 219€ en lancement. Elle inclut les interviews guidés, la rédaction, la maquette, 5 exemplaires imprimés et la version numérique sécurisée."
     },
     {
         question: "Mes données sont-elles privées ?",
@@ -32,7 +32,7 @@ export default function FAQ() {
     };
 
     return (
-        <div className="w-full max-w-3xl px-4 pb-32 font-[family-name:var(--font-inter)]"> {/* Use Inter for clean look */}
+        <div className="w-full max-w-3xl px-4 pb-32 font-sans"> {/* Use standardized font */}
             <div className="space-y-4">
                 {faqData.map((item, index) => (
                     <div

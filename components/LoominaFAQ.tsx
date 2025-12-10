@@ -5,12 +5,12 @@ const faqData = [
     {
         question: "Qu'est-ce que Loomina ?",
         answer:
-            "Loomina est un service de biographie hybride. Nous utilisons une IA empathique pour capturer votre histoire de vive voix et la transformer en un livre physique haut de gamme et un jumeau mémoriel interactif.",
+            "Loomina est un service de biographie hybride. Nous utilisons Loomina pour capturer votre histoire de vive voix et la transformer en un livre physique haut de gamme et un jumeau mémoriel interactif.",
     },
     {
         question: "Comment se déroulent les entretiens ?",
         answer:
-            "Il n'y a aucune limite de temps. Les échanges avec l'IA durent aussi longtemps que vous le souhaitez. Vous pouvez réaliser autant de sessions que nécessaire, à votre propre rythme, pour raconter toute votre histoire.",
+            "Il n'y a aucune limite de temps. Les échanges avec Loomina durent aussi longtemps que vous le souhaitez. Vous pouvez réaliser autant de sessions que nécessaire, à votre propre rythme, pour raconter toute votre histoire.",
     },
     {
         question: "Quel est le prix ?",
@@ -36,7 +36,7 @@ const faqData = [
     {
         question: "Et si mon proche n'est pas à l'aise avec la technologie ?",
         answer:
-            "Nous adaptons le dispositif : simple appel téléphonique, aide à distance pour récupérer les photos, et un accompagnement humain pour faciliter chaque étape.",
+            "C'est justement la force de Loomina : il n'y a aucune application à installer ni interface à maîtriser. Il suffit de composer un numéro de téléphone ordinaire. Loomina décroche, écoute et se charge de tout rédiger.",
     },
     {
         question: "Sous combien de temps recevrai-je le livre ?",
@@ -52,7 +52,7 @@ export default function LoominaFAQ() {
     };
 
     return (
-        <div className="w-full max-w-[800px] mx-auto flex flex-col gap-5 font-[family-name:var(--font-quicksand)] text-[var(--loomina-black)]">
+        <div className="w-full max-w-800px mx-auto flex flex-col gap-5 font-sans text-[var(--loomina-black)]">
             {faqData.map((item, index) => {
                 const isOpen = openIndex === index;
                 return (
