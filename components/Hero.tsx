@@ -16,7 +16,7 @@ export default function Hero() {
   // 0% - 40%: Book is Solo, Centered, Large.
   // 40% - 100%: Book moves up/scales down. Content fades in.
 
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.2, 0.8]);
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.5, 0.9]);
   const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -100]); // Moves up
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]); // Fades out slightly at very end if needed, or stays.
 
@@ -32,12 +32,12 @@ export default function Hero() {
       ref={containerRef}
       className="relative h-[200vh] bg-white"
     >
-      <div className="sticky top-0 h-[100dvh] flex flex-col items-center justify-center overflow-hidden px-4">
+      <div className="sticky top-0 h-[100vh] flex flex-col items-center justify-center overflow-hidden px-4">
 
         {/* --- LE LIVRE (STAR) --- */}
         <motion.div
           style={{ scale: scaleBook, y: yBook }}
-          className="relative z-10 w-full max-w-lg md:max-w-3xl will-change-transform"
+          className="relative z-10 w-full max-w-2xl md:max-w-3xl will-change-transform"
         >
           <motion.div
             animate={{ y: [0, -15, 0] }}
