@@ -23,7 +23,7 @@ const pillars = [
 
 const offer = {
   title: "L'Héritage Loomina",
-  price: "239 €",
+  price: "219 €",
   description: "Un tarif unique pour une tranquillité d'esprit totale. De la première parole à la dernière page.",
   highlights: [
     "Entretiens téléphoniques illimités",

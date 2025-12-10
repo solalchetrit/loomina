@@ -15,7 +15,7 @@ const faqData = [
     {
         question: "Quel est le prix ?",
         answer:
-            "Une seule offre Loomina : 222€ en lancement. Elle inclut les interviews guidés, la rédaction, la maquette, 5 exemplaires imprimés et la version numérique sécurisée.",
+            "Une seule offre Loomina : 219€ en lancement. Elle inclut les interviews guidés, la rédaction, la maquette, 5 exemplaires imprimés et la version numérique sécurisée.",
     },
     {
         question: "Qui relit et corrige les textes ?",

@@ -12,7 +12,7 @@ const faqData = [
     },
     {
         question: "Quel est le prix ?",
-        answer: "Une seule offre Lumina : 222€ en lancement. Elle inclut les interviews guidés, la rédaction, la maquette, 5 exemplaires imprimés et la version numérique sécurisée."
+        answer: "Une seule offre Lumina : 219€ en lancement. Elle inclut les interviews guidés, la rédaction, la maquette, 5 exemplaires imprimés et la version numérique sécurisée."
     },
     {
         question: "Mes données sont-elles privées ?",
