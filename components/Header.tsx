@@ -33,14 +33,14 @@ export default function Header() {
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
         <Link href="/" className="relative z-10 flex shrink-0 items-center">
-          <div className="relative h-8 w-40">
+          <div className="relative h-12 w-12">
             <Image
-              src="/header-logo-trimmed.png"
+              src="/logo-pictogram.png"
               alt="Logo Loomina"
               fill
-              className="object-contain object-left"
+              className="object-contain"
               priority
-              sizes="(max-width: 768px) 144px, 192px"
+              sizes="48px"
             />
           </div>
         </Link>

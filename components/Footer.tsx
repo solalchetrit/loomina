@@ -18,11 +18,11 @@ export default function Footer() {
 
         {/* Partie Gauche : Logo & Bouton alignés */}
         <div className="flex flex-col sm:flex-row items-center gap-8">
-          <div className="relative h-8 w-40">
+          <div className="relative h-12 w-12">
             <Link href="/" className="relative block w-full h-full">
               {/* Logo Blanc (inversé) */}
               <Image
-                src="/header-logo-trimmed.png"
+                src="/logo-pictogram.png"
                 alt="Loomina Éditions"
                 fill
                 className="object-contain object-center md:object-left invert brightness-0"
