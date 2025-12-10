@@ -62,7 +62,7 @@ export default function Hero() {
         {/* --- CONTENU MODIFIÉ --- */}
         <motion.div
           style={{ opacity: opacityContent, y: yContent }}
-          className="absolute top-[75%] md:top-[75%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8"
+          className="absolute top-[60%] md:top-[65%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8"
         >
           {/* Ajout de mots-clés dans le sur-titre */}
           <span className="text-[var(--loomina-gold)] font-sans font-bold text-xs md:text-sm tracking-[0.2em] uppercase mb-3 block">
