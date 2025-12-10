@@ -5,7 +5,7 @@ import { useRef } from "react";
 
 const STEPS = [
   {
-    chapter: "01",
+    chapter: "1",
     title: "L'Inscription",
     description: "Tout commence par une simple commande. Vous recevez votre coffret de bienvenue et l'accès à votre espace personnel sécurisé.",
     icon: (
@@ -15,7 +15,7 @@ const STEPS = [
     ),
   },
   {
-    chapter: "02",
+    chapter: "2",
     title: "Les Conversations",
     description: "À votre rythme, vous échangez par téléphone avec notre IA empathique. Elle vous écoute, vous guide et ravive vos souvenirs oubliés.",
     icon: (
@@ -25,7 +25,7 @@ const STEPS = [
     ),
   },
   {
-    chapter: "03",
+    chapter: "3",
     title: "La Rédaction",
     description: "Nos algorithmes transforment votre voix en une prose élégante. Un éditeur humain repasse ensuite pour garantir la fluidité et le style.",
     icon: (
@@ -35,7 +35,7 @@ const STEPS = [
     ),
   },
   {
-    chapter: "04",
+    chapter: "4",
     title: "L'Héritage",
     description: "Vous recevez chez vous un magnifique livre relié, prêt à être transmis. Votre histoire est désormais éternelle.",
     icon: (
@@ -57,17 +57,17 @@ const StepItem = ({ step, index, scrollYProgress, totalSteps }: { step: any, ind
   const isActive = useTransform(scrollYProgress, [stepStart, stepStart + 0.1], [0, 1]);
 
   // Transform values for styling
-  const color = useTransform(isActive, [0, 1], ["#a3a3a3", "#c58c3c"]); // neutral-400 to loomina-amber-strong (darker grey start)
-  const scale = useTransform(isActive, [0, 1], [1, 1.35]); // Larger pop
-  const opacity = useTransform(isActive, [0, 1], [0.5, 1]); // More visible when inactive
-  const shadow = useTransform(isActive, [0, 1], ["0 0 0 0px rgba(0,0,0,0)", "0 0 20px 2px rgba(197, 140, 60, 0.4)"]); // Gold glow
+  const color = useTransform(isActive, [0, 1], ["#d4d4d4", "#c58c3c"]); // Back to lighter, subtler grey
+  const scale = useTransform(isActive, [0, 1], [1, 1.25]); // Back to 1.25
+  const opacity = useTransform(isActive, [0, 1], [0.3, 1]); // Back to 0.3 for inactive
+  // const shadow = useTransform(isActive, [0, 1], ["0 0 0 0px rgba(0,0,0,0)", "0 0 20px 2px rgba(197, 140, 60, 0.4)"]); // Gold glow
 
   return (
     <div className="relative pl-12 md:pl-24 py-12 group">
       {/* Icon Circle that sits on the timeline */}
       <motion.div
-        style={{ scale, borderColor: color, color: color, opacity, boxShadow: shadow }}
-        className="absolute left-[9px] md:left-[11px] top-12 -translate-x-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center z-10"
+        style={{ scale, borderColor: color, color: color, opacity }}
+        className="absolute left-[9px] md:left-[11px] top-12 -translate-x-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center z-10 transition-shadow duration-500 shadow-sm"
       >
         {step.icon}
       </motion.div>
@@ -115,11 +115,11 @@ export default function HowItWorks() {
         {/* Timeline Container */}
         <div ref={containerRef} className="relative">
           {/* Vertical Lines */}
-          <div className="absolute left-[9px] md:left-[11px] top-12 bottom-24 w-[3px] bg-neutral-200 -translate-x-1/2"></div>
+          <div className="absolute left-[9px] md:left-[11px] top-12 bottom-24 w-[2px] bg-neutral-100 -translate-x-1/2"></div>
 
           <motion.div
             style={{ scaleY: scrollYProgress }}
-            className="absolute left-[9px] md:left-[11px] top-12 bottom-24 w-[3px] bg-[var(--loomina-amber)] -translate-x-1/2 origin-top z-0"
+            className="absolute left-[9px] md:left-[11px] top-12 bottom-24 w-[2px] bg-[var(--loomina-amber)] -translate-x-1/2 origin-top z-0"
           />
 
           {/* Steps */}
