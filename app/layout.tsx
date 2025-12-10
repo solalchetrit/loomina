@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="scroll-smooth">
-      <body className={`${plusJakartaSans.variable} ${playfair.variable} antialiased min-h-screen bg-white text-black font-light selection:bg-[var(--loomina-amber)] selection:text-white`}>
+      <body className={`${plusJakartaSans.variable} ${playfair.variable} antialiased min-h-screen bg-white text-black font-sans selection:bg-[var(--loomina-amber)] selection:text-white`}>
         <Header />
         {children}
         <Footer />

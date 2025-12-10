@@ -69,7 +69,7 @@ export default function Hero() {
             <span className="italic text-[var(--loomina-gold)]">éternelle.</span>
           </h1>
 
-          <p className="mx-auto max-w-2xl text-lg md:text-xl text-neutral-600 leading-relaxed font-light px-4">
+          <p className="mx-auto max-w-2xl text-lg md:text-xl text-neutral-600 leading-relaxed px-4">
             Nous transformons vos souvenirs en un chef-d'œuvre littéraire. <br className="hidden md:block" />
             Sans effort. Juste votre voix.
           </p>
