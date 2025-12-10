@@ -2,6 +2,7 @@ import Hero from "@/components/Hero";
 import StarDecoration from "@/components/ui/StarDecoration";
 import HowItWorks from "@/components/HowItWorks";
 import MagicButton from "@/components/ui/MagicButton";
+import { STRIPE_CONFIG } from "@/config/stripe";
 
 // --- DATA ---
 const pillars = [
@@ -103,10 +104,13 @@ export default function Home() {
 
                   <div className="w-full">
                     <MagicButton
-                      href="mailto:contact@loomina.fr?subject=Commande%20Loomina"
+                      href={STRIPE_CONFIG.PAYMENT_LINK}
                       variant="secondary"
                       size="lg"
                       className="w-full shadow-lg shadow-amber-500/20"
+                      as="a"
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
                       Commander mon livre
                     </MagicButton>

@@ -4,13 +4,16 @@ import Link from "next/link";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import type { ReactNode } from "react";
 
-interface MagicButtonProps extends HTMLMotionProps<"button"> {
+interface MagicButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   href?: string;
   children: ReactNode;
   glow?: boolean;
   className?: string;
   variant?: "primary" | "secondary" | "ghost";
   size?: "sm" | "md" | "lg";
+  as?: "button" | "a";
+  target?: string;
+  rel?: string;
 }
 
 function MagicButtonContent({
@@ -20,7 +23,7 @@ function MagicButtonContent({
   variant = "primary",
   size = "md",
   ...rest
-}: Omit<MagicButtonProps, "href">) {
+}: Omit<MagicButtonProps, "href" | "as">) {
   const variantClasses: Record<NonNullable<MagicButtonProps["variant"]>, string> = {
     primary:
       "bg-[var(--loomina-ink)] text-white border border-[var(--loomina-ink)] hover:bg-black/90 active:bg-black",
@@ -41,22 +44,33 @@ function MagicButtonContent({
     "group inline-flex items-center justify-center gap-2 rounded-lg font-sans font-semibold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--loomina-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
   return (
-    <motion.button
-      type="button"
+    <motion.div
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${glowClasses} ${className}`}
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 320, damping: 22 }}
-      {...rest}
     >
+      {/* We use a div wrapper for motion effects, but the interactive element is the parent Link or a tag */}
       {children}
-    </motion.button>
+    </motion.div>
   );
 }
 
-export default function MagicButton({ href, children, glow = true, className, ...rest }: MagicButtonProps) {
+export default function MagicButton({ href, children, glow = true, className, as, target, rel, ...rest }: MagicButtonProps) {
   const wrapperClassName = className?.includes("w-full") ? "inline-flex w-full" : "inline-flex";
 
+  // Case 1: External Link (as="a")
+  if (as === "a" && href) {
+    return (
+      <a href={href} className={wrapperClassName} target={target} rel={rel}>
+        <MagicButtonContent className={className} glow={glow} {...rest}>
+          {children}
+        </MagicButtonContent>
+      </a>
+    );
+  }
+
+  // Case 2: Internal Link (default behavior if href exists)
   if (href) {
     return (
       <Link href={href} className={wrapperClassName}>
@@ -67,9 +81,12 @@ export default function MagicButton({ href, children, glow = true, className, ..
     );
   }
 
+  // Case 3: Button (default behavior if no href)
   return (
-    <MagicButtonContent className={className} glow={glow} {...rest}>
-      {children}
-    </MagicButtonContent>
+    <button className={wrapperClassName} {...rest}>
+      <MagicButtonContent className={className} glow={glow} {...rest}>
+        {children}
+      </MagicButtonContent>
+    </button>
   );
 }
