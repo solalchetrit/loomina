@@ -23,9 +23,9 @@ export default function Hero() {
 
   // --- ANIMATION TIMELINE (Scroll 0 -> 1) ---
   const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.6, 1.0]);
-  const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -150]);
+  const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -50]); // Reduced upward movement to avoid top cutoff
   // Move right ONLY on desktop
-  const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", isDesktop ? "50%" : "0%"]);
+  const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", isDesktop ? "40%" : "0%"]); // Reduced X slightly to avoid right cutoff
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]);
 
   // Content Reveal
@@ -64,7 +64,7 @@ export default function Hero() {
         {/* --- CONTENU COMPLET HERO (Section 1) --- */}
         <motion.div
           style={{ opacity: opacityContent, y: yContent }}
-          className="absolute top-[75%] md:top-1/2 md:-translate-y-1/2 z-20 flex flex-col items-center md:items-start text-center md:text-left w-full max-w-6xl md:grid md:grid-cols-2 px-6 md:px-12 pointer-events-none md:pointer-events-auto"
+          className="absolute top-[75%] md:top-1/2 md:-translate-y-1/2 z-20 flex flex-col items-center md:items-start text-center md:text-left w-full max-w-7xl md:grid md:grid-cols-2 px-6 md:px-12 pointer-events-none md:pointer-events-auto gap-12 md:gap-32"
         >
           {/* Left Column for Text (Desktop) */}
           <div className="flex flex-col items-center md:items-start space-y-8">
