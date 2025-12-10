@@ -6,7 +6,6 @@ import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 
 const NAV_LINKS = [
-  { href: "#mission", label: "Notre Mission" },
   { href: "#process", label: "Le Parcours" },
   { href: "#offres", label: "Offre" },
 ];
