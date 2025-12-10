@@ -49,7 +49,7 @@ export default function Hero() {
               alt="Livre Loomina"
               width={819}
               height={1024}
-              className="w-full h-auto object-contain drop-shadow-2xl mix-blend-multiply"
+              className="w-full h-auto object-contain mix-blend-multiply"
               priority
               unoptimized
             />
