@@ -16,9 +16,10 @@ export default function Hero() {
   // 0% - 40%: Book is Solo, Centered, Large.
   // 40% - 100%: Book moves up/scales down. Content fades in.
 
-  // Increased start scale from 1.6 to 1.85 (+15%)
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.85, 1.0]);
-  const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -150]);
+  // Scale adjusted for new wider container (max-w-5xl). 1.4 * 5xl is huge.
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.4, 0.9]);
+  // Starts lower (50px) to give "less air" at top, moves up to -150
+  const yBook = useTransform(scrollYProgress, [0, 0.5], [50, -150]);
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]);
 
   // Content Reveal
@@ -38,7 +39,7 @@ export default function Hero() {
         {/* --- LE LIVRE (STAR) --- */}
         <motion.div
           style={{ scale: scaleBook, y: yBook }}
-          className="relative z-10 w-full max-w-2xl md:max-w-3xl will-change-transform"
+          className="relative z-10 w-full max-w-2xl md:max-w-5xl will-change-transform"
         >
           <motion.div
             animate={{ y: [0, -20, 0] }} // Increased float amplitude (was -8)
