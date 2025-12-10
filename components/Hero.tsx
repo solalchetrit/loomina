@@ -46,15 +46,13 @@ export default function Hero() {
             animate={{ y: [0, -20, 0] }} // Increased float amplitude (was -8)
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} // Slightly faster duration for more "alive" feel
           >
-            {/* Added unoptimized to ensure display if Next.js image optimization fails locally */}
             <Image
               src="/hero-book-v2.png"
-              alt="Livre Loomina"
+              alt="Exemple de livre autobiographique Loomina relié et imprimé"
               width={819}
               height={1024}
               className="w-full h-auto object-contain mix-blend-multiply"
               priority
-              unoptimized
             />
           </motion.div>
         </motion.div>

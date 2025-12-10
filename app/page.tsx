@@ -54,7 +54,9 @@ export default function Home() {
 
             <div className="space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight">L'Excellence, tout simplement.</h2>
-              <p className="text-xl text-neutral-500">Transmettre ne devrait pas être un luxe compliqué.</p>
+              <p className="text-xl text-neutral-500">
+                Transmettre ne devrait pas être un luxe compliqué. Écrire vos mémoires, capturer vos souvenirs et recueillir vos confidences : notre biographe IA s'occupe de tout.
+              </p>
             </div>
 
             <div className="bg-neutral-900 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-[var(--loomina-amber)]/30 shadow-2xl shadow-[var(--loomina-amber)]/5">
