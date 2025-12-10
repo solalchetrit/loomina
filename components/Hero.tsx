@@ -16,7 +16,7 @@ export default function Hero() {
   // 0% - 40%: Book is Solo, Centered, Large.
   // 40% - 100%: Book moves up/scales down. Content fades in.
 
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.7, 1.0]); // Increased scale again for mobile impact
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.6, 1.0]); // Adjusted scale -5% (1.7 -> 1.6)
   const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -150]); // Moves up MORE to avoid overlap
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]); // Fades out slightly at very end if needed, or stays.
 
@@ -40,8 +40,8 @@ export default function Hero() {
           className="relative z-10 w-full max-w-2xl md:max-w-3xl will-change-transform"
         >
           <motion.div
-            animate={{ y: [0, -10, 0] }} // Reduced float range to minimize jitter feel
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, -8, 0] }} // Reduced float amplitude even more for stability
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }} // Slower duration for smoothness
           >
             {/* Added unoptimized to ensure display if Next.js image optimization fails locally */}
             <Image
