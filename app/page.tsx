@@ -22,16 +22,18 @@ const pillars = [
 
 
 
+// --- DATA MODIFIÉE ---
+// On garde la structure mais on enrichit le texte pour le SEO
 const offer = {
-  title: "L'Héritage Loomina",
+  title: "Le Coffret Biographie Complet", // Plus explicite que "L'Héritage Loomina"
   price: "219 €",
-  description: "Un tarif unique pour une tranquillité d'esprit totale. De la première parole à la dernière page.",
-  highlights: [
-    "Entretiens téléphoniques illimités",
-    "Rédaction et correction professionnelle",
-    "Mise en page et insertion photos",
-    "Impression et livraison du livre",
-    "Version numérique privée incluse"
+  description: "Un tarif tout compris pour éditer vos mémoires. De la collecte de vos souvenirs jusqu'à la livraison de votre livre imprimé.",
+  highlights: [ // Ces points sont utilisés plus bas dans le JSX, on peut les laisser ici pour référence
+    "Entretiens biographiques illimités",
+    "Rédaction par IA et correction pro",
+    "Mise en page éditoriale et photos",
+    "Impression du livre incluse",
+    "Version numérique (Ebook) offerte"
   ],
 };
 
@@ -40,29 +42,27 @@ export default function Home() {
     <div className="min-h-screen w-full flex flex-col items-center bg-white text-black">
       <Hero />
 
-
-
-      {/* --- SECTION 3: LE PARCOURS (TIMELINE) --- */}
+      {/* --- SECTION 3: LE PARCOURS --- */}
       <HowItWorks />
 
-
-
-      {/* --- SECTION 5: OFFRE UNIQUE (BLANC CENTRÉ) --- */}
+      {/* --- SECTION 5: OFFRE (MODIFIÉE) --- */}
       <div id="offres" className="w-full scroll-mt-24">
         <section className="w-full bg-white px-6 py-20 md:py-28 text-black border-t border-neutral-100">
           <div className="mx-auto max-w-3xl text-center space-y-10">
 
             <div className="space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">L'Excellence, tout simplement.</h2>
-              <p className="text-xl text-neutral-500">Transmettre ne devrait pas être un luxe compliqué.</p>
+              {/* H2 Optimisé SEO : "Offre", "Livre de vie" */}
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Votre livre de vie, clé en main.</h2>
+              <p className="text-xl text-neutral-500">Transmettre son histoire n'a jamais été aussi simple et accessible.</p>
             </div>
 
             <div className="bg-neutral-900 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-[var(--loomina-amber)]/30 shadow-2xl shadow-[var(--loomina-amber)]/5">
-              {/* Glow Effect Top Right */}
+              {/* ... (Glow Effect) ... */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--loomina-amber)_0%,_transparent_70%)] opacity-20 blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
 
+
               <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
-                {/* Left Column: Promise & Details */}
+                {/* Left Column */}
                 <div className="space-y-8 text-left">
                   <div>
                     <h3 className="text-3xl font-serif text-white mb-4">{offer.title}</h3>
@@ -70,21 +70,22 @@ export default function Home() {
                   </div>
 
                   <ul className="space-y-4 text-neutral-300">
+                    {/* Liste à puces avec mots-clés sémantiques */}
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
-                      <span className="flex-1">Entretiens téléphoniques illimités</span>
+                      <span className="flex-1"><strong>Entretiens illimités</strong> avec votre biographe IA</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
-                      <span className="flex-1">Rédaction et correction professionnelle</span>
+                      <span className="flex-1">Rédaction, correction et style littéraire</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
-                      <span className="flex-1">Mise en page sur mesure</span>
+                      <span className="flex-1">Mise en page sur mesure avec vos <strong>photos</strong></span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
-                      <span className="flex-1">Impression et livraison du livre</span>
+                      <span className="flex-1"><strong>Impression</strong> et livraison à domicile</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
@@ -93,10 +94,10 @@ export default function Home() {
                   </ul>
                 </div>
 
-                {/* Right Column: Price & Action */}
+                {/* Right Column ... */}
                 <div className="flex flex-col items-center justify-center text-center space-y-8 md:border-l border-white/5 md:pl-12">
                   <div className="space-y-2">
-                    <span className="text-neutral-500 text-sm uppercase tracking-widest font-medium">Offre de lancement</span>
+                    <span className="text-neutral-500 text-sm uppercase tracking-widest font-medium">Prix de lancement</span>
                     <div className="text-7xl md:text-8xl font-serif font-medium bg-clip-text text-transparent bg-gradient-to-b from-[#ffecc8] to-[#c58c3c]">
                       {offer.price}
                     </div>
@@ -109,16 +110,16 @@ export default function Home() {
                       size="lg"
                       className="w-full shadow-lg shadow-amber-500/20"
                     >
-                      Commander mon livre
+                      Commander ma biographie
                     </MagicButton>
-                    <p className="text-neutral-500 text-xs mt-4">Paiement 100% sécurisé</p>
+                    <p className="text-neutral-500 text-xs mt-4">Paiement 100% sécurisé via Stripe</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <p className="text-xs text-neutral-400 max-w-md mx-auto">
-              Paiement sécurisé. Satisfaction garantie ou remboursé lors du premier entretien.
+              Satisfait ou remboursé après le premier entretien. Un cadeau idéal pour vos parents et grands-parents.
             </p>
 
           </div>

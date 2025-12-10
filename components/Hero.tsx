@@ -59,22 +59,25 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* --- CONTENU COMPLET HERO (Section 1) --- */}
+        {/* --- CONTENU MODIFIÉ --- */}
         <motion.div
           style={{ opacity: opacityContent, y: yContent }}
           className="absolute top-[75%] md:top-[75%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8"
         >
+          {/* Ajout de mots-clés dans le sur-titre */}
           <span className="text-[var(--loomina-gold)] font-sans font-bold text-xs md:text-sm tracking-[0.2em] uppercase mb-3 block">
-            La première biographie rédigée 100% par téléphone
+            La 1ère IA biographe pour écrire vos mémoires par téléphone
           </span>
+
+          {/* H1 Optimisé : Contient "Biographie" et "Livre" */}
           <h1 className="text-4xl md:text-7xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
-            Votre histoire, <br />
+            Votre biographie, <br />
             <span className="italic text-[var(--loomina-gold)]">éternelle.</span>
           </h1>
 
+          {/* Description enrichie sémantiquement */}
           <p className="mx-auto max-w-2xl text-lg md:text-xl text-neutral-600 leading-relaxed px-4">
-            Nous transformons vos souvenirs en un chef-d'œuvre littéraire. <br className="hidden md:block" />
-            Sans effort. Juste votre voix.
+            Ne laissez pas vos souvenirs s'effacer. Nous transformons vos entretiens téléphoniques en un <strong>livre autobiographique</strong> d'exception, sans que vous n'ayez rien à écrire.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -82,13 +85,13 @@ export default function Hero() {
               href="/order"
               className="px-8 py-3.5 rounded-full bg-[var(--loomina-ink)] text-white font-sans font-medium text-base transition-all hover:bg-black hover:scale-105 shadow-lg shadow-black/10 inline-block"
             >
-              Commencer l'écriture
+              Commander mon livre
             </Link>
             <a
               href="tel:+33159169357"
               className="px-8 py-3.5 rounded-full bg-white text-[var(--loomina-ink)] border border-neutral-200 font-sans font-medium text-base transition-all hover:bg-neutral-50 hover:border-neutral-300"
             >
-              Je teste Loomina
+              Essayer gratuitement
             </a>
           </div>
         </motion.div>
