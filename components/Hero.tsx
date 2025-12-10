@@ -22,11 +22,11 @@ export default function Hero() {
   });
 
   // --- ANIMATION TIMELINE (Scroll 0 -> 1) ---
-  // Scale: 1.6 (start) -> 0.85 (end) - Smaller to fit better on right
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.6, 0.85]);
+  // Scale: 1.6 (start) -> 1.2 (end) - Larger as requested
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.6, 1.2]);
   const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -50]); // Reduced upward movement to avoid top cutoff
-  // Move right ONLY on desktop
-  const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", isDesktop ? "30%" : "0%"]); // Reduced to 30% to avoid cutoff
+  // Move right ONLY on desktop - increased to 60% to push far right
+  const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", isDesktop ? "60%" : "0%"]);
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]);
 
   // Content Reveal
