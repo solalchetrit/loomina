@@ -16,8 +16,8 @@ export default function Hero() {
   // 0% - 40%: Book is Solo, Centered, Large.
   // 40% - 100%: Book moves up/scales down. Content fades in.
 
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.5, 0.9]);
-  const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -100]); // Moves up
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.7, 1.0]); // Increased scale again for mobile impact
+  const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -150]); // Moves up MORE to avoid overlap
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]); // Fades out slightly at very end if needed, or stays.
 
   // Content Reveal
@@ -40,8 +40,8 @@ export default function Hero() {
           className="relative z-10 w-full max-w-2xl md:max-w-3xl will-change-transform"
         >
           <motion.div
-            animate={{ y: [0, -15, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, -10, 0] }} // Reduced float range to minimize jitter feel
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
             {/* Added unoptimized to ensure display if Next.js image optimization fails locally */}
             <Image
@@ -59,7 +59,7 @@ export default function Hero() {
         {/* --- CONTENU COMPLET HERO (Section 1) --- */}
         <motion.div
           style={{ opacity: opacityContent, y: yContent }}
-          className="absolute top-[65%] md:top-[75%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8"
+          className="absolute top-[75%] md:top-[75%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8"
         >
           <span className="text-[var(--loomina-gold)] font-sans font-bold text-xs md:text-sm tracking-[0.2em] uppercase mb-3 block">
             La première biographie rédigée 100% par téléphone
