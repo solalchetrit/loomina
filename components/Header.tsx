@@ -62,12 +62,12 @@ export default function Header() {
             </Link>
           ))}
 
-          <Link
-            href="#contact"
-            className="ml-2 px-5 py-2 rounded-full bg-[var(--loomina-ink)] text-white text-sm font-medium transition-transform hover:scale-105"
+          <a
+            href="tel:+33159169357"
+            className="hidden md:inline-flex px-6 py-2.5 rounded-full bg-[var(--loomina-ink)] text-white font-sans font-medium text-sm transition-all hover:bg-black hover:scale-105 shadow-md shadow-black/5"
           >
             Commencer
-          </Link>
+          </a>
         </nav>
 
         {/* --- MOBILE BURGER BUTTON (MINIMALIST) --- */}
