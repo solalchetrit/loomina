@@ -56,34 +56,48 @@ export default function Home() {
               <p className="text-xl text-neutral-500">Transmettre ne devrait pas être un luxe compliqué.</p>
             </div>
 
-            <div className="bg-black text-white rounded-lg p-6 md:p-14 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-[var(--loomina-amber)]"></div>
+            <div className="bg-neutral-900 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-white/10 shadow-2xl">
+              {/* Glow Effect Top Right */}
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--loomina-amber)_0%,_transparent_70%)] opacity-20 blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
 
-              <div className="space-y-8 relative z-10">
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2">{offer.title}</h3>
-                  <div className="text-6xl font-bold text-[var(--loomina-amber)] tracking-tighter my-4">{offer.price}</div>
-                  <p className="text-neutral-400 max-w-md mx-auto">{offer.description}</p>
+              <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
+                {/* Left Column: Promise & Details */}
+                <div className="space-y-8 text-left">
+                  <div>
+                    <h3 className="text-3xl font-serif text-white mb-4">{offer.title}</h3>
+                    <p className="text-neutral-400 leading-relaxed text-lg">{offer.description}</p>
+                  </div>
+
+                  <ul className="space-y-4 text-neutral-300">
+                    {offer.highlights.map((item) => (
+                      <li key={item} className="flex items-start gap-3">
+                        <span className="text-[var(--loomina-amber)] text-lg">★</span>
+                        <span className="flex-1">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <hr className="border-white/10" />
+                {/* Right Column: Price & Action */}
+                <div className="flex flex-col items-center justify-center text-center space-y-8 md:border-l border-white/5 md:pl-12">
+                  <div className="space-y-2">
+                    <span className="text-neutral-500 text-sm uppercase tracking-widest font-medium">Offre de lancement</span>
+                    <div className="text-7xl md:text-8xl font-serif font-medium bg-clip-text text-transparent bg-gradient-to-b from-[#ffecc8] to-[#c58c3c]">
+                      {offer.price}
+                    </div>
+                  </div>
 
-                <ul className="grid sm:grid-cols-2 gap-4 text-left mx-auto max-w-lg text-sm text-neutral-300">
-                  {offer.highlights.map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <span className="text-[var(--loomina-amber)] mt-1">✓</span> {item}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="pt-4">
-                  <MagicButton
-                    href="mailto:contact@loomina.fr?subject=Commande%20Loomina"
-                    variant="secondary"
-                    size="lg"
-                  >
-                    Commander mon livre
-                  </MagicButton>
+                  <div className="w-full">
+                    <MagicButton
+                      href="mailto:contact@loomina.fr?subject=Commande%20Loomina"
+                      variant="secondary"
+                      size="lg"
+                      className="w-full shadow-lg shadow-amber-500/20"
+                    >
+                      Commander mon livre
+                    </MagicButton>
+                    <p className="text-neutral-500 text-xs mt-4">Paiement 100% sécurisé</p>
+                  </div>
                 </div>
               </div>
             </div>
