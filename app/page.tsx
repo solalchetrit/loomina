@@ -8,15 +8,15 @@ import { STRIPE_CONFIG } from "@/config/stripe";
 const pillars = [
   {
     title: "L'Oralité retrouvée",
-    description: "Plus besoin d'écrire. Notre IA est une oreille attentive qui recueille vos confidences au téléphone, à votre rythme.",
+    description: "Plus besoin d'écrire soi-même. Notre IA biographe est une oreille attentive qui recueille vos confidences et souvenirs au téléphone, à votre rythme.",
   },
   {
     title: "L'Objet éternel",
-    description: "Nous transformons le moment éphémère de la parole en un livre physique de haute qualité qui traversera les générations.",
+    description: "Nous transformons le moment éphémère de la parole en un livre physique de haute qualité, véritable trésor de mémoire qui traversera les générations.",
   },
   {
     title: "L'Essence capturée",
-    description: "Nous ne capturons pas seulement les faits, mais aussi votre voix, vos expressions et votre personnalité.",
+    description: "Nous ne capturons pas seulement les faits, mais aussi votre voix, vos expressions et votre personnalité dans ce récit de vie unique.",
   },
 ];
 
@@ -54,9 +54,7 @@ export default function Home() {
 
             <div className="space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight">L'Excellence, tout simplement.</h2>
-              <p className="text-xl text-neutral-500">
-                Transmettre ne devrait pas être un luxe compliqué. Écrire vos mémoires, capturer vos souvenirs et recueillir vos confidences : notre biographe IA s'occupe de tout.
-              </p>
+              <p className="text-xl text-neutral-500">Transmettre ne devrait pas être un luxe compliqué.</p>
             </div>
 
             <div className="bg-neutral-900 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-[var(--loomina-amber)]/30 shadow-2xl shadow-[var(--loomina-amber)]/5">

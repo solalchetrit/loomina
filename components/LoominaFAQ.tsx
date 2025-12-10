@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-export const faqData = [
+const faqData = [
     {
         question: "Qu'est-ce que Loomina ?",
         answer:
@@ -60,7 +60,7 @@ export default function LoominaFAQ() {
                         key={index}
                         className={`bg-[var(--loomina-gray-light)] rounded-[16px] overflow-hidden transition-all duration-300 border border-[var(--loomina-black)]/10 ${isOpen ? 'shadow-lg' : 'shadow-sm'}`}
                     >
-                        <h3 className="m-0 text-inherit font-inherit">
+                        <h3 className="w-full m-0 p-0 text-[1.08rem]">
                             <button
                                 onClick={() => toggleFAQ(index)}
                                 className={`w-full flex items-center justify-between px-6 py-5 bg-transparent border-none cursor-pointer text-left font-bold text-[1.08rem] transition-colors duration-200 ${isOpen ? 'text-[var(--loomina-black)]' : 'text-[var(--loomina-black)]'} hover:text-[var(--loomina-black)]`}
