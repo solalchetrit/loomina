@@ -25,7 +25,7 @@ export default function Hero() {
   // Scale: 1.6 -> 1.0 (Reset to natural size but container is huge now)
   const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.6, 1.0]);
   const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
-  // Move right: With 65vw width, moving 25% puts it optimally on the right without major cutoff
+  // Move right: With full width, 25% is a significant shift
   const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", isDesktop ? "25%" : "0%"]);
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]);
 
@@ -43,7 +43,7 @@ export default function Hero() {
         {/* --- LE LIVRE (STAR) --- */}
         <motion.div
           style={{ scale: scaleBook, y: yBook, x: xBook }}
-          className="relative z-10 w-full max-w-2xl md:max-w-[65vw] will-change-transform"
+          className="relative z-10 w-full max-w-none will-change-transform"
         >
           <motion.div
             animate={{ y: [0, -8, 0] }}
@@ -65,7 +65,7 @@ export default function Hero() {
         {/* --- CONTENU COMPLET HERO (Section 1) --- */}
         <motion.div
           style={{ opacity: opacityContent, y: yContent }}
-          className="absolute top-[75%] md:top-1/2 md:-translate-y-1/2 z-20 flex flex-col items-center md:items-start text-center md:text-left w-full max-w-[1920px] md:grid md:grid-cols-2 px-6 md:px-24 pointer-events-none md:pointer-events-auto gap-12 md:gap-24"
+          className="absolute top-[75%] md:top-1/2 md:-translate-y-1/2 z-20 flex flex-col items-center md:items-start text-center md:text-left w-full max-w-none md:grid md:grid-cols-2 px-6 md:px-12 pointer-events-none md:pointer-events-auto gap-12 md:gap-24"
         >
           {/* Left Column for Text (Desktop) */}
           <div className="flex flex-col items-center md:items-start space-y-8">
