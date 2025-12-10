@@ -61,12 +61,12 @@ export default function Header() {
             </Link>
           ))}
 
-          <a
-            href="tel:+33159169357"
+          <Link
+            href="/order"
             className="hidden md:inline-flex px-6 py-2.5 rounded-full bg-[var(--loomina-ink)] text-white font-sans font-medium text-sm transition-all hover:bg-black hover:scale-105 shadow-md shadow-black/5"
           >
             Commencer
-          </a>
+          </Link>
         </nav>
 
         {/* --- MOBILE BURGER BUTTON (MINIMALIST) --- */}
@@ -115,7 +115,7 @@ export default function Header() {
                 <div className="w-12 h-px bg-neutral-200 my-4"></div>
 
                 <Link
-                  href="#contact"
+                  href="/order"
                   onClick={() => setIsOpen(false)}
                   className="px-8 py-4 rounded-full bg-[var(--loomina-ink)] text-white text-lg font-medium shadow-lg hover:scale-105 transition-transform"
                 >

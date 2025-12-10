@@ -78,14 +78,12 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <a
-              href={STRIPE_CONFIG.PAYMENT_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/order"
               className="px-8 py-3.5 rounded-full bg-[var(--loomina-ink)] text-white font-sans font-medium text-base transition-all hover:bg-black hover:scale-105 shadow-lg shadow-black/10 inline-block"
             >
               Commencer l'écriture
-            </a>
+            </Link>
             <a
               href="tel:+33159169357"
               className="px-8 py-3.5 rounded-full bg-white text-[var(--loomina-ink)] border border-neutral-200 font-sans font-medium text-base transition-all hover:bg-neutral-50 hover:border-neutral-300"
