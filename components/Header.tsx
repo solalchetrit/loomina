@@ -45,32 +45,51 @@ export default function Header() {
         </Link>
 
         {/* --- DESKTOP NAVIGATION (Capsule) --- */}
-        <nav className="hidden md:flex items-center gap-1 p-1 bg-white/80 backdrop-blur-md border border-neutral-200/60 rounded-full shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
+        {/* --- DESKTOP NAVIGATION (Capsule) --- */}
+        <nav className="hidden md:flex items-center gap-2 p-1.5 bg-white/90 backdrop-blur-md border border-neutral-200/60 rounded-full shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)]">
           {NAV_LINKS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className="
-                px-5 py-2 rounded-full
+                px-5 py-2.5 rounded-full
                 text-sm font-medium text-neutral-600 
                 transition-all duration-300 ease-out
-                hover:text-black hover:bg-neutral-100/80
+                hover:text-black hover:bg-neutral-100
               "
             >
               {item.label}
             </Link>
           ))}
 
+          {/* Séparateur visuel optionnel */}
+          <div className="h-6 w-px bg-neutral-200 mx-1"></div>
+
+          {/* Bouton Se connecter - Style Secondaire (Outline) */}
           <Link
             href="/dashboard"
-            className="hidden md:inline-flex px-4 py-2 text-sm font-medium text-neutral-500 hover:text-black transition-colors"
+            className="
+              hidden md:inline-flex px-5 py-2.5 rounded-full 
+              border border-neutral-200 bg-white
+              text-sm font-medium text-neutral-700 
+              transition-all duration-300 
+              hover:border-neutral-400 hover:text-black hover:shadow-sm
+            "
           >
             Se connecter
           </Link>
 
+          {/* Bouton Commencer - Style Primaire (Mise en valeur) */}
           <Link
             href="/order"
-            className="hidden md:inline-flex px-6 py-2.5 rounded-full bg-[var(--loomina-ink)] text-white font-sans font-medium text-sm transition-all hover:bg-black hover:scale-105 shadow-md shadow-black/5"
+            className="
+              hidden md:inline-flex px-6 py-2.5 rounded-full 
+              bg-[var(--loomina-ink)] text-white 
+              font-sans font-medium text-sm 
+              transition-all duration-300 
+              shadow-md shadow-black/10
+              hover:bg-[var(--loomina-amber-strong)] hover:text-white hover:scale-105 hover:shadow-lg
+            "
           >
             Commencer
           </Link>
@@ -107,7 +126,7 @@ export default function Header() {
               exit={{ opacity: 0, y: -20 }}
               className="fixed inset-0 z-40 bg-white/95 backdrop-blur-xl flex flex-col items-center justify-center md:hidden"
             >
-              <nav className="flex flex-col items-center gap-8">
+              <nav className="flex flex-col items-center gap-6">
                 {NAV_LINKS.map((item) => (
                   <Link
                     key={item.href}
@@ -124,7 +143,7 @@ export default function Header() {
                 <Link
                   href="/dashboard"
                   onClick={() => setIsOpen(false)}
-                  className="text-xl font-medium text-neutral-500 hover:text-black transition-colors"
+                  className="px-8 py-3 rounded-full border border-neutral-300 text-lg font-medium text-neutral-700 hover:border-black hover:text-black transition-colors"
                 >
                   Se connecter
                 </Link>
@@ -132,7 +151,7 @@ export default function Header() {
                 <Link
                   href="/order"
                   onClick={() => setIsOpen(false)}
-                  className="px-8 py-4 rounded-full bg-[var(--loomina-ink)] text-white text-lg font-medium shadow-lg hover:scale-105 transition-transform"
+                  className="px-8 py-4 rounded-full bg-[var(--loomina-ink)] text-white text-lg font-medium shadow-lg active:scale-95 transition-transform"
                 >
                   Commencer
                 </Link>
