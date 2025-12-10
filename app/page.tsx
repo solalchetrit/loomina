@@ -52,11 +52,11 @@ export default function Home() {
           <div className="mx-auto max-w-3xl text-center space-y-10">
 
             <div className="space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Une formule, tout inclus.</h2>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">L'Excellence, tout simplement.</h2>
               <p className="text-xl text-neutral-500">Transmettre ne devrait pas être un luxe compliqué.</p>
             </div>
 
-            <div className="bg-neutral-900 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-white/10 shadow-2xl">
+            <div className="bg-neutral-900 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-[var(--loomina-amber)]/30 shadow-2xl shadow-[var(--loomina-amber)]/5">
               {/* Glow Effect Top Right */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--loomina-amber)_0%,_transparent_70%)] opacity-20 blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
 
@@ -69,12 +69,26 @@ export default function Home() {
                   </div>
 
                   <ul className="space-y-4 text-neutral-300">
-                    {offer.highlights.map((item) => (
-                      <li key={item} className="flex items-start gap-3">
-                        <span className="text-[var(--loomina-amber)] text-lg">★</span>
-                        <span className="flex-1">{item}</span>
-                      </li>
-                    ))}
+                    <li className="flex items-start gap-3">
+                      <span className="text-[var(--loomina-amber)] text-lg">★</span>
+                      <span className="flex-1">Entretiens téléphoniques illimités</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-[var(--loomina-amber)] text-lg">★</span>
+                      <span className="flex-1">Rédaction et correction professionnelle</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-[var(--loomina-amber)] text-lg">★</span>
+                      <span className="flex-1">Mise en page sur mesure</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-[var(--loomina-amber)] text-lg">★</span>
+                      <span className="flex-1">Impression et livraison du livre</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-[var(--loomina-amber)] text-lg">★</span>
+                      <span className="flex-1">Version numérique privée incluse</span>
+                    </li>
                   </ul>
                 </div>
 
