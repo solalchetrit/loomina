@@ -10,7 +10,7 @@ const faqData = [
     {
         question: "Comment se déroulent les entretiens ?",
         answer:
-            "L'échange se fait uniquement avec notre IA par téléphone. Elle mène la conversation, vous écoute et vous relance de manière autonome pour écrire votre livre.",
+            "Il n'y a aucune limite de temps. Les échanges avec l'IA durent aussi longtemps que vous le souhaitez. Vous pouvez réaliser autant de sessions que nécessaire, à votre propre rythme, pour raconter toute votre histoire.",
     },
     {
         question: "Quel est le prix ?",
