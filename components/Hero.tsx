@@ -3,11 +3,20 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { STRIPE_CONFIG } from "@/config/stripe";
 
 export default function Hero() {
   const containerRef = useRef(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
@@ -17,15 +26,28 @@ export default function Hero() {
   // 0% - 40%: Book is Solo, Centered, Large.
   // 40% - 100%: Book moves up/scales down. Content fades in.
 
-  // Scale adjusted for new wider container (max-w-5xl). 1.4 * 5xl is huge.
+  // Scale adjusted for new wider container (max-w-5xl).
   const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.4, 0.9]);
-  // Starts lower (50px) to give "less air" at top, moves up to -150
+
+  // Y Movement
   const yBook = useTransform(scrollYProgress, [0, 0.5], [50, -150]);
-  const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]);
+
+  // X Movement (Desktop Only) - Book moves Right
+  const xBookDesktop = useTransform(scrollYProgress, [0.2, 0.8], ["0%", "50%"]);
+
+  // Opacity for Book shouldn't fade out completely on desktop split view, or should it?
+  // Original: [0.8, 1], [1, 0] -> Fades out at end.
+  // User wants: "se déplacer et se fixer". So it should stay visible.
+  // Let's keep opacity logical: if it splits, it stays.
+  const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, isDesktop ? 1 : 0]);
 
   // Content Reveal
   const opacityContent = useTransform(scrollYProgress, [0.3, 0.6], [0, 1]);
+  // Y Content
   const yContent = useTransform(scrollYProgress, [0.3, 0.6], [50, 0]);
+
+  // X Movement (Desktop Only) - Content moves Left
+  const xContentDesktop = useTransform(scrollYProgress, [0.2, 0.8], ["0%", "-50%"]);
 
   // Scroll Indicator Fade
   const opacityArrow = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
@@ -39,7 +61,11 @@ export default function Hero() {
 
         {/* --- LE LIVRE (STAR) --- */}
         <motion.div
-          style={{ scale: scaleBook, y: yBook }}
+          style={{
+            scale: scaleBook,
+            y: yBook,
+            x: isDesktop ? xBookDesktop : 0
+          }}
           className="relative z-10 w-full max-w-2xl md:max-w-5xl will-change-transform"
         >
           <motion.div
@@ -61,7 +87,11 @@ export default function Hero() {
 
         {/* --- CONTENU MODIFIÉ --- */}
         <motion.div
-          style={{ opacity: opacityContent, y: yContent }}
+          style={{
+            opacity: opacityContent,
+            y: yContent,
+            x: isDesktop ? xContentDesktop : 0
+          }}
           className="absolute top-[60%] md:top-[65%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8"
         >
           {/* Ajout de mots-clés dans le sur-titre */}
