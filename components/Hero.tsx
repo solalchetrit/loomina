@@ -18,6 +18,7 @@ export default function Hero() {
 
   const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.6, 1.0]); // Adjusted scale -5% (1.7 -> 1.6)
   const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -150]); // Moves up MORE to avoid overlap
+  const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", "50%"]); // Moves right on scroll
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]); // Fades out slightly at very end if needed, or stays.
 
   // Content Reveal
@@ -36,7 +37,7 @@ export default function Hero() {
 
         {/* --- LE LIVRE (STAR) --- */}
         <motion.div
-          style={{ scale: scaleBook, y: yBook }}
+          style={{ scale: scaleBook, y: yBook, x: xBook }}
           className="relative z-10 w-full max-w-2xl md:max-w-3xl will-change-transform"
         >
           <motion.div
