@@ -61,6 +61,9 @@ export default function Hero() {
           style={{ opacity: opacityContent, y: yContent }}
           className="absolute top-[65%] md:top-[75%] -translate-y-1/2 z-20 flex flex-col items-center text-center w-full max-w-4xl space-y-8"
         >
+          <span className="text-[var(--loomina-gold)] font-sans font-bold text-xs md:text-sm tracking-[0.2em] uppercase mb-3 block">
+            La première biographie rédigée 100% par téléphone
+          </span>
           <h1 className="text-4xl md:text-7xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
             Votre histoire, <br />
             <span className="italic text-[var(--loomina-gold)]">éternelle.</span>
