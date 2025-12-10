@@ -62,6 +62,13 @@ export default function Header() {
           ))}
 
           <Link
+            href="/dashboard"
+            className="hidden md:inline-flex px-4 py-2 text-sm font-medium text-neutral-500 hover:text-black transition-colors"
+          >
+            Se connecter
+          </Link>
+
+          <Link
             href="/order"
             className="hidden md:inline-flex px-6 py-2.5 rounded-full bg-[var(--loomina-ink)] text-white font-sans font-medium text-sm transition-all hover:bg-black hover:scale-105 shadow-md shadow-black/5"
           >
@@ -113,6 +120,14 @@ export default function Header() {
                 ))}
 
                 <div className="w-12 h-px bg-neutral-200 my-4"></div>
+
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="text-xl font-medium text-neutral-500 hover:text-black transition-colors"
+                >
+                  Se connecter
+                </Link>
 
                 <Link
                   href="/order"
