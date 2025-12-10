@@ -52,7 +52,7 @@ export default function LoominaFAQ() {
     };
 
     return (
-        <div className="w-full max-w-800px mx-auto flex flex-col gap-5 font-sans text-[var(--loomina-black)]">
+        <div className="w-full max-w-3xl mx-auto flex flex-col gap-5 font-sans text-[var(--loomina-black)]">
             {faqData.map((item, index) => {
                 const isOpen = openIndex === index;
                 return (
