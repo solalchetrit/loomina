@@ -20,7 +20,7 @@ const faqData = [
     },
     {
         question: "Combien de temps faut-il pour créer le livre ?",
-        answer: "Cela dépend de vous ! Certains terminent en quelques heures d'interview, d'autres prennent des semaines. Une fois l'interview finie, notre IA rédige et met en page le livre instantanément."
+        answer: "Cela dépend de vous ! Certains terminent en quelques heures d'interview, d'autres prennent des semaines. Une fois vos entretiens terminés, comptez environ 2 à 3 semaines pour la rédaction complète et la mise en page de votre ouvrage."
     }
 ];
 
