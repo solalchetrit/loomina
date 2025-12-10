@@ -22,11 +22,11 @@ export default function Hero() {
   });
 
   // --- ANIMATION TIMELINE (Scroll 0 -> 1) ---
-  // Scale: 1.6 (start) -> 1.2 (end) - Larger as requested
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.6, 1.2]);
-  const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -50]); // Reduced upward movement to avoid top cutoff
-  // Move right ONLY on desktop - increased to 60% to push far right
-  const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", isDesktop ? "60%" : "0%"]);
+  // Scale: 1.6 -> 1.0 (Reset to natural size but container is huge now)
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.6, 1.0]);
+  const yBook = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
+  // Move right: With 65vw width, moving 25% puts it optimally on the right without major cutoff
+  const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", isDesktop ? "25%" : "0%"]);
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]);
 
   // Content Reveal
@@ -38,12 +38,12 @@ export default function Hero() {
       ref={containerRef}
       className="relative h-[200vh] bg-white"
     >
-      <div className="sticky top-0 h-[100vh] flex flex-col items-center justify-center overflow-hidden px-4">
+      <div className="sticky top-0 h-[100vh] flex flex-col items-center justify-center overflow-hidden w-full">
 
         {/* --- LE LIVRE (STAR) --- */}
         <motion.div
           style={{ scale: scaleBook, y: yBook, x: xBook }}
-          className="relative z-10 w-full max-w-2xl md:max-w-3xl will-change-transform"
+          className="relative z-10 w-full max-w-2xl md:max-w-[65vw] will-change-transform"
         >
           <motion.div
             animate={{ y: [0, -8, 0] }}
