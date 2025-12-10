@@ -2,86 +2,101 @@
 
 import { motion } from "framer-motion";
 import MagicButton from "@/components/ui/MagicButton";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function SuccessPage() {
+    const [userName, setUserName] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Retrieve the user's name from storage (set in /order)
+        const storedName = localStorage.getItem("loomina_user_firstname");
+        if (storedName) {
+            setUserName(storedName);
+        }
+    }, []);
+
     return (
-        <div className="min-h-screen bg-neutral-950 text-white selection:bg-[var(--loomina-amber)] selection:text-white flex flex-col pt-32 pb-20 px-6">
+        <div className="min-h-screen bg-white text-black selection:bg-[var(--loomina-amber)] selection:text-white flex flex-col pt-32 pb-20 px-6">
 
-            {/* Background Ambience */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-[-20%] left-[20%] w-[50%] h-[50%] bg-[var(--loomina-amber)]/10 blur-[150px] rounded-full"></div>
-            </div>
+            <div className="max-w-3xl mx-auto w-full flex flex-col flex-1 items-center justify-center space-y-12">
 
-            <div className="relative z-10 max-w-3xl mx-auto w-full flex flex-col flex-1 items-center justify-center space-y-12">
-
-                {/* Success Message */}
+                {/* Success Header */}
                 <div className="text-center space-y-6">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.6 }}
-                        className="text-6xl mb-4"
+                        className="text-6xl mb-4 text-[var(--loomina-amber-strong)]"
                     >
-                        ✨
+                        ★
                     </motion.div>
                     <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.1 }}
-                        className="text-4xl md:text-5xl font-serif text-white"
+                        className="text-5xl md:text-6xl font-serif text-black tracking-tight"
                     >
-                        Félicitations, <br /> votre commande est validée.
+                        Commande validée.
                     </motion.h1>
                     <motion.p
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-neutral-400 text-lg"
+                        className="text-neutral-500 text-xl font-serif italic"
                     >
-                        Votre voyage narratif commence maintenant.
+                        "Le voyage commence."
                     </motion.p>
                 </div>
 
-                {/* Access Card */}
+                {/* Editorial Access Card */}
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.3 }}
-                    className="w-full max-w-lg bg-neutral-900 border border-[var(--loomina-amber)]/30 rounded-2xl p-8 md:p-12 relative overflow-hidden shadow-2xl shadow-[var(--loomina-amber)]/10"
+                    className="w-full max-w-lg bg-[#ffffff] border border-neutral-200 p-10 md:p-14 relative shadow-[0_20px_40px_-10px_rgba(0,0,0,0.05)]"
                 >
-                    {/* Card Decor */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--loomina-amber)]/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                    {/* Corner Accents (Editorial Look) */}
+                    <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-neutral-300"></div>
+                    <div className="absolute top-4 right-4 w-4 h-4 border-t border-r border-neutral-300"></div>
+                    <div className="absolute bottom-4 left-4 w-4 h-4 border-b border-l border-neutral-300"></div>
+                    <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-neutral-300"></div>
 
-                    <div className="relative z-10 text-center space-y-8">
-                        <div>
-                            <span className="text-[var(--loomina-amber)] text-xs tracking-[0.2em] uppercase font-bold">Carte d'Accès</span>
-                            <h2 className="text-2xl font-serif text-white mt-2">Votre Ligne Biographe</h2>
+                    <div className="relative z-10 text-center space-y-10">
+                        <div className="uppercase tracking-[0.3em] text-[10px] text-neutral-400 font-sans">
+                            Carte d'Accès Officielle
                         </div>
 
-                        <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                            <p className="text-neutral-400 text-sm mb-4">
-                                Pour commencer votre livre, appelez simplement notre IA biographe au numéro suivant :
+                        <div className="space-y-6">
+                            <p className="text-lg leading-relaxed text-black font-serif">
+                                {userName ? (
+                                    <>
+                                        Pour commencer,<br />
+                                        <span className="font-semibold text-xl">{userName}</span> peut appeler dès maintenant.
+                                    </>
+                                ) : "Pour commencer votre livre, appelez simplement notre IA biographe au numéro suivant :"}
                             </p>
-                            <a href="tel:+33159169357" className="block text-3xl md:text-4xl font-bold text-white hover:text-[var(--loomina-amber)] transition-colors tracking-wide">
-                                01 59 16 93 57
-                            </a>
+
+                            <div className="py-6 border-t border-b border-neutral-100">
+                                <a href="tel:+33159169357" className="block text-4xl md:text-5xl font-serif text-black hover:text-[var(--loomina-amber-strong)] transition-colors">
+                                    01 59 16 93 57
+                                </a>
+                            </div>
                         </div>
 
-                        <div className="text-xs text-neutral-500">
-                            Accessible 24h/24 et 7j/7. <br />
-                            Code d'accès non requis, votre numéro est reconnu.
+                        <div className="text-xs text-neutral-400 font-sans leading-relaxed">
+                            Service accessible 24h/24 et 7j/7.<br />
+                            Votre numéro est déjà enregistré, l'IA vous reconnaîtra.
                         </div>
                     </div>
                 </motion.div>
 
-                {/* Home Button */}
+                {/* Return Button */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.6 }}
                 >
-                    <MagicButton href="/" variant="ghost" className="text-neutral-400 hover:text-white">
+                    <MagicButton href="/" variant="ghost" className="text-black hover:bg-neutral-50">
                         Retour à l'accueil
                     </MagicButton>
                 </motion.div>
