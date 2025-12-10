@@ -57,16 +57,17 @@ const StepItem = ({ step, index, scrollYProgress, totalSteps }: { step: any, ind
   const isActive = useTransform(scrollYProgress, [stepStart, stepStart + 0.1], [0, 1]);
 
   // Transform values for styling
-  const color = useTransform(isActive, [0, 1], ["#d4d4d4", "#c58c3c"]); // neutral-300 to loomina-amber-strong
-  const scale = useTransform(isActive, [0, 1], [1, 1.25]);
-  const opacity = useTransform(isActive, [0, 1], [0.3, 1]);
+  const color = useTransform(isActive, [0, 1], ["#a3a3a3", "#c58c3c"]); // neutral-400 to loomina-amber-strong (darker grey start)
+  const scale = useTransform(isActive, [0, 1], [1, 1.35]); // Larger pop
+  const opacity = useTransform(isActive, [0, 1], [0.5, 1]); // More visible when inactive
+  const shadow = useTransform(isActive, [0, 1], ["0 0 0 0px rgba(0,0,0,0)", "0 0 20px 2px rgba(197, 140, 60, 0.4)"]); // Gold glow
 
   return (
     <div className="relative pl-12 md:pl-24 py-12 group">
       {/* Icon Circle that sits on the timeline */}
       <motion.div
-        style={{ scale, borderColor: color, color: color, opacity }}
-        className="absolute left-[9px] md:left-[11px] top-12 -translate-x-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center z-10 transition-shadow duration-500 shadow-sm"
+        style={{ scale, borderColor: color, color: color, opacity, boxShadow: shadow }}
+        className="absolute left-[9px] md:left-[11px] top-12 -translate-x-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center z-10"
       >
         {step.icon}
       </motion.div>
@@ -114,11 +115,11 @@ export default function HowItWorks() {
         {/* Timeline Container */}
         <div ref={containerRef} className="relative">
           {/* Vertical Lines */}
-          <div className="absolute left-[9px] md:left-[11px] top-12 bottom-24 w-[2px] bg-neutral-100 -translate-x-1/2"></div>
+          <div className="absolute left-[9px] md:left-[11px] top-12 bottom-24 w-[3px] bg-neutral-200 -translate-x-1/2"></div>
 
           <motion.div
             style={{ scaleY: scrollYProgress }}
-            className="absolute left-[9px] md:left-[11px] top-12 bottom-24 w-[2px] bg-[var(--loomina-amber)] -translate-x-1/2 origin-top z-0"
+            className="absolute left-[9px] md:left-[11px] top-12 bottom-24 w-[3px] bg-[var(--loomina-amber)] -translate-x-1/2 origin-top z-0"
           />
 
           {/* Steps */}
