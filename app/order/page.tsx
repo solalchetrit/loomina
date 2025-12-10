@@ -36,14 +36,14 @@ export default function OrderPage() {
     const handleSubmit = () => {
         if (!isFormValid) return;
 
-        // Save relevant data to localStorage for the success page
-        // If it's a gift, we might want to store who it's for, but for the success page
-        // we want to display the name of the beneficiary if possible.
-        // The prompt says: "Pour commencer, [Prénom] peut appeler..." 
-        // So we store the FirstName entered in the form.
+        // Save relevant data to localStorage as a JSON object
+        const orderData = {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            isGift: selectedOption === "gift"
+        };
 
-        localStorage.setItem("loomina_user_firstname", formData.firstName);
-        localStorage.setItem("loomina_is_gift", selectedOption === "gift" ? "true" : "false");
+        localStorage.setItem("loomina_order_data", JSON.stringify(orderData));
 
         // Redirect to Stripe
         window.location.href = STRIPE_CONFIG.PAYMENT_LINK;

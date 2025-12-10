@@ -2,101 +2,113 @@
 
 import { motion } from "framer-motion";
 import MagicButton from "@/components/ui/MagicButton";
+import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function SuccessPage() {
-    const [userName, setUserName] = useState<string | null>(null);
+    const [userData, setUserData] = useState<{ firstName: string; lastName: string } | null>(null);
 
     useEffect(() => {
-        // Retrieve the user's name from storage (set in /order)
-        const storedName = localStorage.getItem("loomina_user_firstname");
-        if (storedName) {
-            setUserName(storedName);
+        // Retrieve the user's data from storage
+        const storedData = localStorage.getItem("loomina_order_data");
+        if (storedData) {
+            try {
+                const parsed = JSON.parse(storedData);
+                setUserData(parsed);
+            } catch (e) {
+                console.error("Failed to parse order data", e);
+            }
         }
     }, []);
 
     return (
         <div className="min-h-screen bg-white text-black selection:bg-[var(--loomina-amber)] selection:text-white flex flex-col pt-32 pb-20 px-6">
 
-            <div className="max-w-3xl mx-auto w-full flex flex-col flex-1 items-center justify-center space-y-12">
+            <div className="max-w-4xl mx-auto w-full flex flex-col flex-1 items-center justify-center space-y-16">
 
-                {/* Success Header */}
-                <div className="text-center space-y-6">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6 }}
-                        className="text-6xl mb-4 text-[var(--loomina-amber-strong)]"
-                    >
-                        ★
-                    </motion.div>
-                    <motion.h1
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                        className="text-5xl md:text-6xl font-serif text-black tracking-tight"
-                    >
-                        Commande validée.
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-neutral-500 text-xl font-serif italic"
-                    >
-                        "Le voyage commence."
-                    </motion.p>
-                </div>
+                {/* Success Header is removed/integrated into the card flow or kept minimal? 
+           The prompt assumes the card is the "Element central". 
+           Let's keep a small header or just jump to the card.
+           Based on "Félicitations, l'aventure commence" being BELOW the card in instruction text?
+           Wait, prompt says: "Remplace le texte précédent par celui-ci (...) Affiche le numéro (...) en dessous". 
+           So the header above might be redundant or should be minimal. 
+           Let's keep it simple.
+        */}
 
-                {/* Editorial Access Card */}
+                {/* LUXURY ACCESS CARD */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                    className="w-full max-w-lg bg-[#ffffff] border border-neutral-200 p-10 md:p-14 relative shadow-[0_20px_40px_-10px_rgba(0,0,0,0.05)]"
+                    transition={{ duration: 0.8 }}
+                    className="w-full max-w-xl mx-auto"
                 >
-                    {/* Corner Accents (Editorial Look) */}
-                    <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-neutral-300"></div>
-                    <div className="absolute top-4 right-4 w-4 h-4 border-t border-r border-neutral-300"></div>
-                    <div className="absolute bottom-4 left-4 w-4 h-4 border-b border-l border-neutral-300"></div>
-                    <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-neutral-300"></div>
+                    <div className="bg-stone-50 rounded-xl border border-amber-700/30 p-8 md:p-12 shadow-2xl relative overflow-hidden flex flex-col items-center text-center space-y-10">
 
-                    <div className="relative z-10 text-center space-y-10">
-                        <div className="uppercase tracking-[0.3em] text-[10px] text-neutral-400 font-sans">
-                            Carte d'Accès Officielle
-                        </div>
+                        {/* Texture/Grain overlay if possible (optional styling) */}
 
-                        <div className="space-y-6">
-                            <p className="text-lg leading-relaxed text-black font-serif">
-                                {userName ? (
-                                    <>
-                                        Pour commencer,<br />
-                                        <span className="font-semibold text-xl">{userName}</span> peut appeler dès maintenant.
-                                    </>
-                                ) : "Pour commencer votre livre, appelez simplement notre IA biographe au numéro suivant :"}
-                            </p>
-
-                            <div className="py-6 border-t border-b border-neutral-100">
-                                <a href="tel:+33159169357" className="block text-4xl md:text-5xl font-serif text-black hover:text-[var(--loomina-amber-strong)] transition-colors">
-                                    01 59 16 93 57
-                                </a>
+                        {/* Top: Logo & Title */}
+                        <div className="w-full flex flex-col items-center space-y-4">
+                            <div className="relative w-24 h-6 opacity-80">
+                                <Image
+                                    src="/header-logo-trimmed.png"
+                                    alt="Loomina"
+                                    fill
+                                    className="object-contain"
+                                />
                             </div>
+                            <h2 className="text-xs uppercase tracking-[0.25em] text-amber-900/60 font-sans font-medium">
+                                Carte d'Accès Membre
+                            </h2>
                         </div>
 
-                        <div className="text-xs text-neutral-400 font-sans leading-relaxed">
-                            Service accessible 24h/24 et 7j/7.<br />
-                            Votre numéro est déjà enregistré, l'IA vous reconnaîtra.
+                        {/* Center: Name */}
+                        <div className="py-2">
+                            <h3 className="text-4xl md:text-5xl font-serif text-black tracking-tight">
+                                {userData ? (
+                                    <>
+                                        {userData.firstName} <span className="font-medium">{userData.lastName}</span>
+                                    </>
+                                ) : (
+                                    <span className="opacity-50">Membre Loomina</span>
+                                )}
+                            </h3>
                         </div>
+
+                        {/* Bottom: ID */}
+                        <div className="w-full pt-6 border-t border-amber-900/10">
+                            <p className="text-[10px] uppercase tracking-widest text-neutral-400 font-sans">
+                                ID: 2024-LMN-ACCESS
+                            </p>
+                        </div>
+
                     </div>
+                </motion.div>
+
+                {/* INSTRUCTIONS */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    className="text-center space-y-8 max-w-2xl"
+                >
+                    <p className="text-xl md:text-2xl font-serif text-black leading-relaxed">
+                        Félicitations, l'aventure commence. <br />
+                        Pour commencer votre livre, appelez simplement Loomina au numéro suivant :
+                    </p>
+
+                    <a href="tel:+33159169357" className="block text-4xl md:text-6xl font-serif font-bold text-neutral-900 hover:text-amber-700 transition-colors tracking-tight">
+                        01 59 16 93 57
+                    </a>
                 </motion.div>
 
                 {/* Return Button */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
+                    transition={{ duration: 0.6, delay: 0.8 }}
                 >
-                    <MagicButton href="/" variant="ghost" className="text-black hover:bg-neutral-50">
+                    <MagicButton href="/" variant="ghost" className="text-neutral-500 hover:bg-neutral-50 hover:text-black">
                         Retour à l'accueil
                     </MagicButton>
                 </motion.div>
