@@ -29,6 +29,10 @@ export default function Hero() {
   const xBook = useTransform(scrollYProgress, [0, 0.5], ["0%", isDesktop ? "25%" : "0%"]);
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, 0]);
 
+  // Text Reveal on Scroll (0.15 -> 0.4)
+  const opacityText = useTransform(scrollYProgress, [0.15, 0.4], [0, 1]);
+  const yText = useTransform(scrollYProgress, [0.15, 0.4], [30, 0]);
+
   return (
     <section
       ref={containerRef}
@@ -60,11 +64,8 @@ export default function Hero() {
 
         {/* --- CONTENU COMPLET HERO (Section 1) --- */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="absolute top-[75%] md:top-1/2 md:-translate-y-1/2 z-20 flex flex-col items-center md:items-start text-center md:text-left w-full max-w-none md:grid md:grid-cols-2 px-6 md:px-8 pointer-events-none md:pointer-events-auto gap-12 md:gap-16"
+          style={{ opacity: opacityText, y: yText }}
+          className="absolute top-[75%] md:top-1/2 md:-translate-y-1/2 z-20 flex flex-col items-center md:items-start text-center md:text-left w-full max-w-none md:grid md:grid-cols-2 px-6 md:px-8 pointer-events-none md:pointer-events-auto gap-12 md:gap-40"
         >
           {/* Left Column for Text (Desktop) */}
           <div className="flex flex-col items-center md:items-start space-y-8">
