@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Playfair_Display, Cinzel, Courier_Prime } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,6 +16,19 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  variable: "--font-cinzel",
+  display: "swap",
+});
+
+const courierPrime = Courier_Prime({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-courier",
   display: "swap",
 });
 
@@ -79,7 +92,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="scroll-smooth">
-      <body className={`${plusJakartaSans.variable} ${playfair.variable} antialiased min-h-screen bg-white text-black font-sans selection:bg-[var(--loomina-amber)] selection:text-white relative`}>
+      <body className={`${plusJakartaSans.variable} ${playfair.variable} ${cinzel.variable} ${courierPrime.variable} antialiased min-h-screen bg-white text-black font-sans selection:bg-[var(--loomina-amber)] selection:text-white relative`}>
         <Header />
         {children}
         <Footer />
