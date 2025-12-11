@@ -20,7 +20,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://loomina.eu'),
+  metadataBase: new URL('https://www.loomina.eu'),
   title: {
     default: "Loomina | Écrivez votre autobiographie par téléphone",
     template: "%s | Loomina"
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Loomina - Votre histoire mérite un livre éternel",
     description: "Racontez votre vie par téléphone, nous en faisons un livre. Sans écrire une seule ligne.",
-    url: 'https://loomina.eu',
+    url: 'https://www.loomina.eu',
     siteName: 'Loomina',
     locale: 'fr_FR',
     type: 'website',
@@ -90,7 +90,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Product",
               "name": "Loomina - Livre Autobiographique",
-              "image": "https://loomina.eu/hero-book-v2.png",
+              "image": "https://www.loomina.eu/hero-book-v2.png",
               "description": "Service de création de livre autobiographique par entretiens téléphoniques avec IA.",
               "brand": {
                 "@type": "Brand",
@@ -98,7 +98,7 @@ export default function RootLayout({
               },
               "offers": {
                 "@type": "Offer",
-                "url": "https://loomina.eu",
+                "url": "https://www.loomina.eu",
                 "priceCurrency": "EUR",
                 "price": "219.00",
                 "availability": "https://schema.org/InStock",

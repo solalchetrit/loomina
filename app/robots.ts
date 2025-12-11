@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
             userAgent: '*',
             allow: '/',
         },
-        sitemap: 'https://loomina.eu/sitemap.xml',
+        sitemap: 'https://www.loomina.eu/sitemap.xml',
     };
 }
