@@ -65,20 +65,6 @@ export default function Header() {
           {/* Séparateur visuel optionnel */}
           <div className="h-6 w-px bg-neutral-200 mx-1"></div>
 
-          {/* Bouton Se connecter - Style Secondaire (Outline) */}
-          <Link
-            href="/dashboard"
-            className="
-              hidden md:inline-flex px-5 py-2.5 rounded-full 
-              border border-neutral-200 bg-white
-              text-sm font-medium text-neutral-700 
-              transition-all duration-300 
-              hover:border-neutral-400 hover:text-black hover:shadow-sm
-            "
-          >
-            Se connecter
-          </Link>
-
           {/* Bouton Commencer - Style Primaire (Mise en valeur) */}
           <Link
             href="/order"
@@ -92,6 +78,21 @@ export default function Header() {
             "
           >
             Commencer
+          </Link>
+
+          {/* Bouton Se connecter - Style Gold */}
+          <Link
+            href="/dashboard"
+            className="
+              hidden md:inline-flex px-5 py-2.5 rounded-full 
+              bg-[var(--loomina-amber)] text-white
+              text-sm font-medium 
+              transition-all duration-300 
+              shadow-md shadow-[var(--loomina-amber)]/20
+              hover:bg-[var(--loomina-amber-strong)] hover:scale-105 hover:shadow-lg
+            "
+          >
+            Se connecter
           </Link>
         </nav>
 
@@ -141,19 +142,19 @@ export default function Header() {
                 <div className="w-12 h-px bg-neutral-200 my-4"></div>
 
                 <Link
-                  href="/dashboard"
-                  onClick={() => setIsOpen(false)}
-                  className="px-8 py-3 rounded-full border border-neutral-300 text-lg font-medium text-neutral-700 hover:border-black hover:text-black transition-colors"
-                >
-                  Se connecter
-                </Link>
-
-                <Link
                   href="/order"
                   onClick={() => setIsOpen(false)}
                   className="px-8 py-4 rounded-full bg-[var(--loomina-ink)] text-white text-lg font-medium shadow-lg active:scale-95 transition-transform"
                 >
                   Commencer
+                </Link>
+
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="px-8 py-3 rounded-full bg-[var(--loomina-amber)] text-white text-lg font-medium shadow-lg active:scale-95 transition-transform"
+                >
+                  Se connecter
                 </Link>
               </nav>
             </motion.div>
