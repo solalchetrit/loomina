@@ -24,13 +24,14 @@ export default function Hero() {
 
   // --- ANIMATION TIMELINE ---
 
-  // Scale: Increased by ~10% as requested (Was [2, 1.2])
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [2.2, 1.3]);
+  // Scale: End scale increased to 1.4 as requested (Was 1.3)
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [2.2, 1.4]);
 
-  // Y Movement: 
-  // - Start: Lowered from 150 to 180 to visually center better on load.
-  // - End: Lowered from 0 to 20 to keep it slightly lower relative to text.
-  const yBook = useTransform(scrollYProgress, [0, 0.5], [180, 20]);
+  // Y Movement: Split Logic
+  // Desktop: [150, 0] - Kept as is only for Desktop (user liked it).
+  const yBookDesktop = useTransform(scrollYProgress, [0, 0.5], [150, 0]);
+  // Mobile: [260, 40] - Lowered significantly (Start 180->260) and End (20->40)
+  const yBookMobile = useTransform(scrollYProgress, [0, 0.5], [260, 40]);
 
   // X Movement (Desktop Only) 
   const xBookDesktop = useTransform(scrollYProgress, [0, 0.5], ["-50%", "0%"]);
@@ -62,11 +63,11 @@ export default function Hero() {
         <motion.div
           style={{
             scale: scaleBook,
-            y: yBook,
+            y: isDesktop ? yBookDesktop : yBookMobile,
             x: isDesktop ? xBookDesktop : 0
           }}
-          // Mobile: Width restricted (w-[70%], max-w-[280px]) to prevent huge size/overlap
-          // Desktop: w-full, no max-width constraint handled by grid
+          // Mobile: Width restricted (w-[70%], max-w-[280px])
+          // Desktop: w-full, added md:mt-24 to push it down significantly
           className="relative z-10 w-[70%] max-w-[280px] md:w-full md:max-w-none md:col-start-2 justify-self-center will-change-transform order-1 md:order-2 md:mt-24"
         >
           <motion.div
