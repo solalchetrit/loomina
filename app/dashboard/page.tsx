@@ -73,7 +73,13 @@ export default function DashboardPage() {
                             type="tel"
                             placeholder="Votre numéro (ex: 06 12 34 56 78)"
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, '');
+                                const formatted = val.match(/.{1,2}/g)?.join(' ') || val;
+                                if (val.length <= 15) { // Allow for international length roughly
+                                    setPhone(formatted);
+                                }
+                            }}
                             className="w-full p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-center text-lg focus:ring-black focus:border-black outline-none"
                         />
                         {error && (
