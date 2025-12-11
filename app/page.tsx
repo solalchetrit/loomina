@@ -50,7 +50,7 @@ export default function Home() {
 
       {/* --- SECTION 5: OFFRE (MODIFIÉE) --- */}
       <div id="offres" className="w-full scroll-mt-24">
-        <section className="w-full bg-white px-6 py-20 md:py-28 text-black border-t border-neutral-100">
+        <section className="w-full bg-white px-6 py-10 md:py-16 text-black border-t border-neutral-100">
           <div className="mx-auto max-w-3xl text-center space-y-10">
 
             <div className="space-y-4">

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function ScrollSeparator() {
     return (
-        <div className="w-full flex justify-center py-6 md:py-10 bg-white">
+        <div className="w-full flex justify-center py-2 md:py-4 bg-white">
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 whileInView={{ opacity: 1, y: 0 }}
