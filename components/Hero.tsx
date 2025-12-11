@@ -52,7 +52,7 @@ export default function Hero() {
       ref={containerRef}
       className="relative h-[200vh] bg-white"
     >
-      <div className="sticky top-0 h-[100vh] w-full overflow-hidden px-6 flex flex-col items-center justify-center gap-8 md:grid md:grid-cols-2 md:gap-8 max-w-7xl mx-auto">
+      <div className="sticky top-0 min-h-[100dvh] w-full overflow-hidden px-6 flex flex-col items-center justify-center gap-8 md:grid md:grid-cols-2 md:gap-8 max-w-7xl mx-auto">
 
         {/* --- LE LIVRE (STAR) --- */}
         {/* On Mobile: Centered. On Desktop: Right Column (col-start-2) */}
@@ -64,7 +64,7 @@ export default function Hero() {
           }}
           // Mobile: Width restricted (w-[70%], max-w-[280px]) to prevent huge size/overlap
           // Desktop: w-full, no max-width constraint handled by grid
-          className="relative z-10 w-[70%] max-w-[280px] md:w-full md:max-w-none md:col-start-2 justify-self-center will-change-transform order-1 md:order-2"
+          className="relative z-10 w-[70%] max-w-[280px] md:w-full md:max-w-none md:col-start-2 justify-self-center will-change-transform order-1 md:order-2 md:mt-24"
         >
           <motion.div
             animate={{ y: [0, -20, 0] }}
@@ -93,7 +93,7 @@ export default function Hero() {
           }}
           className={`
             flex flex-col space-y-5 z-20 w-full max-w-lg md:max-w-none
-            items-center text-center mt-8 md:mt-0
+            items-center text-center md:mt-0
             md:items-start md:text-left md:static md:translate-y-0
             order-2 md:order-1
           `}
