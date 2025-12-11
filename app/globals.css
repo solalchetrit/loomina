@@ -62,152 +62,149 @@ h6,
     0 0 0 1px rgba(23, 23, 23, 0.04);
 }
 
-/* --- LOOMINA MEMBER CARD --- */
-/* Variables specific to the card */
+/* --- LOOMINA MEMBER CARD (MIDNIGHT EDITION) --- */
+/* Variables Dark Mode */
 :root {
-  --paper-color: #F9F7F1;
-  /* Ivoire / Crème */
-  --gold-start: #C6A664;
-  --gold-mid: #FFEFBA;
-  --gold-end: #B38728;
-  --text-dark: #2C2C2C;
-  --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+  --dark-bg: #0F0F0F;
+  /* Noir presque pur */
+  --dark-surface: #1A1A1A;
+  /* Gris anthracite */
+  --gold-gradient: linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+  --text-white: #FFFFFF;
+  --text-grey: #888888;
 }
 
-/* --- Container pour centrer et donner la perspective --- */
 .loomina-card-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 40px;
-  background-color: transparent;
-  /* S'adapte au site */
+  padding: 50px 20px;
 }
 
-/* --- La Carte "Physique" --- */
-.loomina-card {
-  background-color: var(--paper-color);
-  /* Simulation texture papier via une image de bruit subtile ou couleur unie chaude */
-  background-image: linear-gradient(to bottom right, #FAF8F5, #F2EFE9);
+/* --- La Carte "Midnight" --- */
+.loomina-card-dark {
   width: 100%;
-  max-width: 600px;
-  padding: 60px 40px;
-  border: 1px solid #E6Dfc8;
-  /* Contour subtil */
-  box-shadow:
-    var(--shadow-soft),
-    inset 0 0 80px rgba(255, 255, 255, 0.5);
-  /* Lumière interne */
-  text-align: center;
+  max-width: 550px;
+  background: var(--dark-surface);
+  /* Dégradé subtil noir vers gris nuit */
+  background: linear-gradient(145deg, #222222, #0d0d0d);
+  border-radius: 16px;
+  padding: 40px;
   position: relative;
-  border-radius: 4px;
-  /* Coins très peu arrondis type carton */
-  /* Le fameux liseré doré autour */
-  outline: 1px solid var(--gold-start);
-  outline-offset: -12px;
+  overflow: hidden;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.6),
+    /* Grosse ombre portée */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  /* Petit liseré blanc subtil */
+  font-family: var(--font-serif);
+  color: var(--text-white);
 }
 
-/* --- Typographie & Dorure --- */
+/* Bordure dorée brillante autour */
+.loomina-card-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  /* Épaisseur de la bordure dorée */
+  background: var(--gold-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.7;
+}
 
-/* Effet Or (Gold Gradient) sur le texte */
-.brand-name,
-.member-title,
-.gold-badge {
-  background: linear-gradient(135deg, var(--gold-start) 0%, var(--gold-mid) 50%, var(--gold-end) 100%);
+/* --- Typographie --- */
+
+.access-label {
+  font-family: var(--font-cinzel);
+  font-size: 0.7rem;
+  letter-spacing: 0.2rem;
+  color: var(--text-grey);
+  text-transform: uppercase;
+}
+
+.card-chip {
+  font-size: 1.5rem;
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.main-title-block {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.brand-text {
+  font-size: 1rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.member-status {
+  font-size: 2.8rem;
+  line-height: 1.1;
+  margin: 0;
+  /* Effet Or sur le gros titre */
+  background: var(--gold-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: #C6A664;
-  /* Fallback */
-}
-
-.brand-name {
-  font-family: var(--font-serif);
-  font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  margin-bottom: 15px;
-  text-transform: uppercase;
-}
-
-.gold-badge {
-  font-family: var(--font-cinzel);
-  /* Look gravure */
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 40px;
-  display: inline-block;
-  border-bottom: 1px solid var(--gold-start);
-  padding-bottom: 5px;
-}
-
-.member-title {
-  font-family: var(--font-serif);
-  font-size: 3.5rem;
-  /* Très gros pour l'impact */
-  font-style: italic;
   font-weight: 400;
-  margin: 0;
-  padding: 0;
-  line-height: 1.2;
-  filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
-  /* Légère ombre portée pour détacher du fond */
+  font-style: italic;
 }
 
-/* --- Éléments graphiques --- */
+/* --- Footer Technique --- */
 
-.separator-line {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold-start), transparent);
-  width: 60%;
-  margin: 30px auto;
-  opacity: 0.5;
-}
-
-.card-footer {
-  margin-top: 40px;
+.footer-row {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+}
+
+.code-block,
+.signature-block {
+  display: flex;
   flex-direction: column;
 }
 
-/* Le numéro ID style "Machine à écrire" */
-.auth-signature span {
-  font-family: var(--font-courier);
-  color: #8A8A8A;
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
+.code-block label {
+  font-size: 0.5rem;
   text-transform: uppercase;
-  border: 1px solid #E0E0E0;
+  letter-spacing: 0.1em;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.code-value {
+  font-family: var(--font-courier);
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: #ddd;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+  /* Petit effet néon */
+}
+
+.start-date {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-grey);
+  align-self: flex-end;
+  border: 1px solid #333;
   padding: 5px 10px;
-  border-radius: 2px;
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* Le filigrane discret */
-.watermark-icon {
-  font-size: 8rem;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.03;
-  /* Très très léger */
-  pointer-events: none;
-  color: var(--text-dark);
-  z-index: 0;
-}
-
-/* --- Responsive --- */
-@media (max-width: 600px) {
-  .loomina-card {
-    padding: 40px 20px;
-    outline-offset: -8px;
-  }
-
-  .member-title {
-    font-size: 2.5rem;
-  }
+  border-radius: 20px;
 }
