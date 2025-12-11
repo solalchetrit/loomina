@@ -13,6 +13,8 @@
   --loomina-haze: #d4d4d4;
   --loomina-amber: #eabf77;
   --loomina-amber-strong: #c58c3c;
+  --loomina-gold: #C6A664;
+  /* Added for compatibility */
   --foreground: #1a1a1a;
   --background: #ffffff;
 }

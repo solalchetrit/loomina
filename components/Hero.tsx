@@ -145,14 +145,14 @@ export default function Hero() {
         {/* --- SCROLL INDICATOR --- */}
         <motion.div
           style={{ opacity: opacityArrow }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 pointer-events-none"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-50 pointer-events-none mix-blend-multiply"
         >
-          <span className="text-[10px] uppercase tracking-widest text-[var(--loomina-ink)]/50 font-sans">Découvrir</span>
+          <span className="text-[10px] uppercase tracking-widest text-black/80 font-sans font-medium">Découvrir</span>
           <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--loomina-ink)] opacity-60">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-black/80">
               <path d="M12 5v14M19 12l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </motion.div>

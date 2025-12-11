@@ -12,9 +12,9 @@ export default function ScrollSeparator() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="flex flex-col items-center gap-2"
             >
-                <div className="w-[1px] h-12 md:h-20 bg-gradient-to-b from-transparent via-[var(--loomina-gold)] to-transparent opacity-50"></div>
-                <span className="text-[var(--loomina-gold)] text-xl opacity-80">✦</span>
-                <div className="w-[1px] h-12 md:h-20 bg-gradient-to-b from-transparent via-[var(--loomina-gold)] to-transparent opacity-50"></div>
+                <div className="w-[1px] h-12 md:h-20 bg-gradient-to-b from-transparent via-[var(--loomina-amber)] to-transparent opacity-80"></div>
+                <span className="text-[var(--loomina-amber)] text-xl">✦</span>
+                <div className="w-[1px] h-12 md:h-20 bg-gradient-to-b from-transparent via-[var(--loomina-amber)] to-transparent opacity-80"></div>
             </motion.div>
         </div>
     );
