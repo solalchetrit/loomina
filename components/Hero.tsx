@@ -63,8 +63,8 @@ export default function Hero() {
             x: isDesktop ? xBookDesktop : 0
           }}
           // Mobile: Width restricted (w-[70%], max-w-[280px])
-          // Desktop: w-full, added md:mt-24 to push it down significantly
-          className="relative z-10 w-[70%] max-w-[280px] md:w-full md:max-w-none md:col-start-2 justify-self-center will-change-transform order-1 md:order-2 md:mt-24"
+          // Desktop: w-full, removed manual margin to allow proper centering
+          className="relative z-10 w-[70%] max-w-[280px] md:w-full md:max-w-none md:col-start-2 justify-self-center will-change-transform order-1 md:order-2"
         >
           <motion.div
             animate={{ y: [0, -20, 0] }}
