@@ -24,13 +24,13 @@ export default function Hero() {
 
   // --- ANIMATION TIMELINE ---
 
-  // Scale: Book starts big.
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [2, 1.2]);
+  // Scale: Increased by ~10% as requested (Was [2, 1.2])
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [2.2, 1.3]);
 
   // Y Movement: 
-  // Mobile Fix: Start MUCH lower (150) to visually center the book (counteracting the invisible text space below).
-  // End at 0 (Natural).
-  const yBook = useTransform(scrollYProgress, [0, 0.5], [150, 0]);
+  // - Start: Lowered from 150 to 180 to visually center better on load.
+  // - End: Lowered from 0 to 20 to keep it slightly lower relative to text.
+  const yBook = useTransform(scrollYProgress, [0, 0.5], [180, 20]);
 
   // X Movement (Desktop Only) 
   const xBookDesktop = useTransform(scrollYProgress, [0, 0.5], ["-50%", "0%"]);
