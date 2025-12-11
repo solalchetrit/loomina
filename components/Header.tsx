@@ -69,7 +69,7 @@ export default function Header() {
           {NAV_LINKS.map((item) => (
             <Link
               key={item.href}
-              href={item.href}
+              href={isHome ? item.href : `/${item.href}`}
               className="
                 px-5 py-2.5 rounded-full
                 text-sm font-medium text-neutral-600 
@@ -150,7 +150,7 @@ export default function Header() {
                 {NAV_LINKS.map((item) => (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={isHome ? item.href : `/${item.href}`}
                     onClick={() => setIsOpen(false)}
                     className="text-3xl font-serif text-[var(--loomina-ink)] hover:text-[var(--loomina-gold)] transition-colors"
                   >
