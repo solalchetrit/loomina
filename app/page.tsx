@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import StarDecoration from "@/components/ui/StarDecoration";
+import ScrollSeparator from "@/components/ui/ScrollSeparator";
 import HowItWorks from "@/components/HowItWorks";
 import MagicButton from "@/components/ui/MagicButton";
 import { STRIPE_CONFIG } from "@/config/stripe";
@@ -41,9 +42,11 @@ export default function Home() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center bg-white text-black">
       <Hero />
+      <ScrollSeparator />
 
       {/* --- SECTION 3: LE PARCOURS --- */}
       <HowItWorks />
+      <ScrollSeparator />
 
       {/* --- SECTION 5: OFFRE (MODIFIÉE) --- */}
       <div id="offres" className="w-full scroll-mt-24">

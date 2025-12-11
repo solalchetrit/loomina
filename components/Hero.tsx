@@ -142,6 +142,22 @@ export default function Hero() {
           </div>
         </motion.div>
 
+        {/* --- SCROLL INDICATOR --- */}
+        <motion.div
+          style={{ opacity: opacityArrow }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 pointer-events-none"
+        >
+          <span className="text-[10px] uppercase tracking-widest text-[var(--loomina-ink)]/50 font-sans">Découvrir</span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--loomina-ink)] opacity-60">
+              <path d="M12 5v14M19 12l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.div>
+        </motion.div>
+
         {/* --- BACKGROUND --- */}
         <div className="absolute inset-x-0 top-0 h-full w-full -z-10 bg-white"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--loomina-gold)] rounded-full blur-[120px] opacity-5 -z-10 pointer-events-none"></div>
