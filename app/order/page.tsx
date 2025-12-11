@@ -94,7 +94,7 @@ export default function OrderPage() {
                         <div className="text-4xl mb-2 opacity-80 group-hover:scale-110 transition-transform duration-300">✒️</div>
                         <h3 className="text-2xl font-serif text-black">C'est pour moi</h3>
                         <p className="text-sm text-neutral-500 font-sans">
-                            Je souhaite raconter mon histoire et laisser une trace éternelle.
+                            Je veux écrire mon histoire !
                         </p>
 
                         {/* Checkmark indicator */}
@@ -120,7 +120,7 @@ export default function OrderPage() {
                         <div className="text-4xl mb-2 opacity-80 group-hover:scale-110 transition-transform duration-300">🎁</div>
                         <h3 className="text-2xl font-serif text-black">C'est pour offrir</h3>
                         <p className="text-sm text-neutral-500 font-sans">
-                            J'offre ce livre à un proche pour qu'il raconte sa vie.
+                            Je veux connaitre son histoire !
                         </p>
 
                         {/* Checkmark indicator */}
