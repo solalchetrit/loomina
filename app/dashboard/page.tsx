@@ -14,26 +14,44 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Clean phone number for database lookup (e.g. remove spaces)
-    const cleanPhone = phone.replace(/\s/g, '');
-
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         setLoading(true);
 
+        // Normalize phone input to test multiple formats
+        const input = phone.replace(/\s/g, '').replace(/\./g, '').replace(/-/g, '');
+        let possibleFormats: string[] = [input];
+
+        // If starts with 0 (e.g. 0612345678), add +33 version (+33612345678)
+        if (input.startsWith("0")) {
+            possibleFormats.push("+33" + input.slice(1));
+        }
+        // If starts with +33 (e.g. +33612345678), add 0 version (0612345678)
+        else if (input.startsWith("+33")) {
+            possibleFormats.push("0" + input.slice(3));
+        }
+        // If starts with 33 (e.g. 33612345678), add +33 and 0 versions
+        else if (input.startsWith("33")) {
+            possibleFormats.push("+" + input);
+            possibleFormats.push("0" + input.slice(2));
+        }
+
         try {
+            // Check if ANY of the possible formats exist in DB
             const { data, error } = await supabase
                 .from('Client')
-                .select('id')
-                .eq('phone_number', cleanPhone)
-                .single();
+                .select('id, phone_number')
+                .in('phone_number', possibleFormats)
+                .maybeSingle();
 
             if (error || !data) {
                 setError("Numéro de téléphone non reconnu ou client introuvable.");
                 return;
             }
 
+            // Success: Use the actual phone number from DB to ensure consistency for next steps
+            setPhone(data.phone_number);
             setIsLoggedIn(true);
         } catch (err) {
             console.error("Login error:", err);
@@ -82,13 +100,13 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="flex-shrink-0">
-                        <StartInterviewButton phone={cleanPhone} userName="Auteur" />
+                        <StartInterviewButton phone={phone} userName="Auteur" />
                     </div>
                 </header>
 
                 {/* Live Book Content */}
                 <main>
-                    <LiveBook userPhone={cleanPhone} />
+                    <LiveBook userPhone={phone} />
                 </main>
 
             </div>
