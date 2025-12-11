@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
@@ -10,18 +10,37 @@ const NAV_LINKS = [
   { href: "#offres", label: "Offre" },
 ];
 
+import { usePathname } from "next/navigation";
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const { scrollY } = useScroll();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
+  // Force visibility on non-home pages or handle scroll on home
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 50) {
-      setIsVisible(true);
+    if (isHome) {
+      if (latest > 50) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
     } else {
-      setIsVisible(false);
+      setIsVisible(true);
     }
   });
+
+  // Ensure correct initial state when navigating
+  useEffect(() => {
+    if (!isHome) {
+      setIsVisible(true);
+    } else {
+      // On home, check if already scrolled (case of refresh) or default to false
+      setIsVisible(window.scrollY > 50);
+    }
+  }, [isHome]);
 
   return (
     <motion.header
