@@ -25,26 +25,22 @@ export default function Hero() {
   // --- ANIMATION TIMELINE ---
 
   // Scale: End scale increased to 1.4 as requested (Was 1.3)
+  // Optimization: ensure values are simple floats
   const scaleBook = useTransform(scrollYProgress, [0, 0.5], [2.2, 1.4]);
 
   // Y Movement: Split Logic
-  // Desktop: [150, 0] - Kept as is only for Desktop (user liked it).
   const yBookDesktop = useTransform(scrollYProgress, [0, 0.5], [150, 0]);
-  // Mobile: [260, 40] - Lowered significantly (Start 180->260) and End (20->40)
   const yBookMobile = useTransform(scrollYProgress, [0, 0.5], [260, 40]);
 
   // X Movement (Desktop Only) 
   const xBookDesktop = useTransform(scrollYProgress, [0, 0.5], ["-50%", "0%"]);
 
-  // Opacity: Book stays visible.
+  // Opacity
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, isDesktop ? 1 : 0]);
 
   // Content Reveal
   const opacityContent = useTransform(scrollYProgress, [0.1, 0.4], [0, 1]);
-  // Y Content
   const yContent = useTransform(scrollYProgress, [0.1, 0.4], [30, 0]);
-
-  // X Content
   const xContentDesktop = useTransform(scrollYProgress, [0.1, 0.4], ["-10%", "0%"]);
 
   // Scroll Indicator Fade
@@ -73,16 +69,21 @@ export default function Hero() {
           <motion.div
             animate={{ y: [0, -20, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            // Optimize: Add will-change-transform here too
+            className="will-change-transform"
           >
             <Image
               src="/hero-book-v2.png"
               alt="Exemple de livre autobiographique Loomina relié et imprimé"
               width={819}
               height={1024}
-              // Removed max-h constraint to allow scaling up, added object-contain to be safe
-              className="w-full h-auto object-contain mix-blend-multiply"
+              // Performance Fix: 
+              // 1. Removed mix-blend-multiply (expensive on mobile GPU)
+              // 2. Removed unoptimized (let Vercel/Next.js serve optimal size)
+              // 3. Added sizes prop
+              className="w-full h-auto object-contain"
+              sizes="(max-width: 768px) 80vw, 50vw"
               priority
-              unoptimized
             />
           </motion.div>
         </motion.div>
