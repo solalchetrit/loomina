@@ -49,7 +49,7 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative h-[200vh] bg-white"
+      className="relative h-[150vh] bg-white"
     >
       {/* Mobile: gap-2 (Tighter). Desktop: gap-8. */}
       <div className="sticky top-0 min-h-[100dvh] w-full overflow-hidden px-6 flex flex-col items-center justify-center gap-2 md:grid md:grid-cols-2 md:gap-8 max-w-7xl mx-auto">
@@ -152,9 +152,7 @@ export default function Hero() {
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-black/80">
-              <path d="M12 5v14M19 12l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="text-2xl text-[var(--loomina-gold)]">✦</span>
           </motion.div>
         </motion.div>
 
