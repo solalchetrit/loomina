@@ -74,9 +74,38 @@ export default function DashboardPage() {
                             placeholder="Votre numéro (ex: 06 12 34 56 78)"
                             value={phone}
                             onChange={(e) => {
-                                const val = e.target.value.replace(/\D/g, '');
-                                const formatted = val.match(/.{1,2}/g)?.join(' ') || val;
-                                if (val.length <= 15) { // Allow for international length roughly
+                                let val = e.target.value;
+                                // Allow + only at the start
+                                const hasPlus = val.startsWith('+');
+                                // Keep only digits
+                                const digits = val.replace(/\D/g, '');
+
+                                let formatted = digits;
+
+                                if (hasPlus) {
+                                    // Handle +33 specific formatting: +33 6 12 34 56 78
+                                    if (digits.startsWith('33')) {
+                                        formatted = "+33";
+                                        const rest = digits.slice(2);
+                                        if (rest.length > 0) {
+                                            // Add 1st digit (usually 6 or 7)
+                                            formatted += " " + rest.substring(0, 1);
+                                            if (rest.length > 1) {
+                                                // Add remaining pairs
+                                                const remaining = rest.substring(1).match(/.{1,2}/g)?.join(' ');
+                                                if (remaining) formatted += " " + remaining;
+                                            }
+                                        }
+                                    } else {
+                                        // Generic + format, just space every 2 digits for now or keep raw
+                                        formatted = "+" + (digits.match(/.{1,2}/g)?.join(' ') || digits);
+                                    }
+                                } else {
+                                    // Standard existing pair formatting
+                                    formatted = digits.match(/.{1,2}/g)?.join(' ') || digits;
+                                }
+
+                                if (formatted.length <= 20) {
                                     setPhone(formatted);
                                 }
                             }}
