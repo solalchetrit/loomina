@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 import StartInterviewButton from "@/components/StartInterviewButton";
 import LiveBook from "@/components/LiveBook";
 import MagicButton from "@/components/ui/MagicButton";
@@ -10,13 +11,35 @@ export default function DashboardPage() {
     const [phone, setPhone] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
     // Clean phone number for database lookup (e.g. remove spaces)
     const cleanPhone = phone.replace(/\s/g, '');
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (cleanPhone.length > 8) {
+        setError(null);
+        setLoading(true);
+
+        try {
+            const { data, error } = await supabase
+                .from('Client')
+                .select('id')
+                .eq('phone_number', cleanPhone)
+                .single();
+
+            if (error || !data) {
+                setError("Numéro de téléphone non reconnu ou client introuvable.");
+                return;
+            }
+
             setIsLoggedIn(true);
+        } catch (err) {
+            console.error("Login error:", err);
+            setError("Une erreur est survenue lors de la connexion.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -35,8 +58,11 @@ export default function DashboardPage() {
                             onChange={(e) => setPhone(e.target.value)}
                             className="w-full p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-center text-lg focus:ring-black focus:border-black outline-none"
                         />
-                        <MagicButton type="submit" className="w-full">
-                            Voir mon livre
+                        {error && (
+                            <p className="text-red-500 text-sm">{error}</p>
+                        )}
+                        <MagicButton type="submit" disabled={loading} className="w-full">
+                            {loading ? "Vérification..." : "Voir mon livre"}
                         </MagicButton>
                     </form>
                 </div>
