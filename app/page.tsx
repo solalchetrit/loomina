@@ -27,7 +27,7 @@ const pillars = [
 const offer = {
   title: "Le Coffret Biographie Complet", // Plus explicite que "L'Héritage Loomina"
   price: "219 €",
-  description: "Un tarif tout compris pour éditer vos mémoires. De la collecte de vos souvenirs jusqu'à la livraison de votre livre imprimé.",
+  description: "Un tarif tout compris pour éditer votre Biographie. De la collecte de vos souvenirs à la mise en mots de votre récit, jusqu'à la livraison de votre livre.",
   highlights: [ // Ces points sont utilisés plus bas dans le JSX, on peut les laisser ici pour référence
     "Entretiens biographiques illimités",
     "Rédaction par IA et correction pro",
@@ -52,7 +52,7 @@ export default function Home() {
 
             <div className="space-y-4">
               {/* H2 Optimisé SEO : "Offre", "Livre de vie" */}
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Votre livre de vie, clé en main.</h2>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Votre Livre de vie, clé en main.</h2>
               <p className="text-xl text-neutral-500">Transmettre son histoire n'a jamais été aussi simple et accessible.</p>
             </div>
 
@@ -73,7 +73,7 @@ export default function Home() {
                     {/* Liste à puces avec mots-clés sémantiques */}
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
-                      <span className="flex-1"><strong>Entretiens illimités</strong> avec votre biographe IA</span>
+                      <span className="flex-1"><strong>Entretiens illimités</strong> avec votre Biographe IA</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
@@ -81,7 +81,7 @@ export default function Home() {
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
-                      <span className="flex-1">Mise en page sur mesure avec vos <strong>photos</strong></span>
+                      <span className="flex-1">Illustrez votre récit avec vos <strong>propres images</strong></span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-[var(--loomina-amber)] text-lg">★</span>
@@ -119,7 +119,7 @@ export default function Home() {
             </div>
 
             <p className="text-xs text-neutral-400 max-w-md mx-auto">
-              Satisfait ou remboursé après le premier entretien. Un cadeau idéal pour vos parents et grands-parents.
+              Un cadeau idéal pour vos parents et grands-parents.
             </p>
 
           </div>

@@ -114,8 +114,8 @@ export default function Hero() {
               Wide (xl): text-6xl 
           */}
           <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
-            Votre biographie, <br />
-            <span className="italic text-[var(--loomina-gold)]">éternelle.</span>
+            Loomina : Vous racontez. <br />
+            <span className="italic text-[var(--loomina-gold)]">Votre livre s'écrit.</span>
           </h1>
 
           {/* Paragraph Sizes:
