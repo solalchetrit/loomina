@@ -27,8 +27,10 @@ export default function Hero() {
   // Scale: Book starts big.
   const scaleBook = useTransform(scrollYProgress, [0, 0.5], [2, 1.2]);
 
-  // Y Movement: Book moves up.
-  const yBook = useTransform(scrollYProgress, [0, 0.5], [50, 0]);
+  // Y Movement: 
+  // Mobile Fix: Start MUCH lower (150) to visually center the book (counteracting the invisible text space below).
+  // End at 0 (Natural).
+  const yBook = useTransform(scrollYProgress, [0, 0.5], [150, 0]);
 
   // X Movement (Desktop Only) 
   const xBookDesktop = useTransform(scrollYProgress, [0, 0.5], ["-50%", "0%"]);
@@ -52,7 +54,8 @@ export default function Hero() {
       ref={containerRef}
       className="relative h-[200vh] bg-white"
     >
-      <div className="sticky top-0 min-h-[100dvh] w-full overflow-hidden px-6 flex flex-col items-center justify-center gap-8 md:grid md:grid-cols-2 md:gap-8 max-w-7xl mx-auto">
+      {/* Mobile: gap-2 (Tighter). Desktop: gap-8. */}
+      <div className="sticky top-0 min-h-[100dvh] w-full overflow-hidden px-6 flex flex-col items-center justify-center gap-2 md:grid md:grid-cols-2 md:gap-8 max-w-7xl mx-auto">
 
         {/* --- LE LIVRE (STAR) --- */}
         {/* On Mobile: Centered. On Desktop: Right Column (col-start-2) */}
