@@ -24,29 +24,25 @@ export default function Hero() {
 
   // --- ANIMATION TIMELINE ---
 
-  // Scale: Book shrinks slightly on scroll
-  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [1.4, 0.9]);
+  // Scale: Book starts MUCH bigger and stays relatively big
+  // Was [1.4, 0.9] -> Now [2, 1.2] to address "book not big enough"
+  const scaleBook = useTransform(scrollYProgress, [0, 0.5], [2, 1.2]);
 
   // Y Movement: Book moves up naturally with sticky, but we adjust it
   const yBook = useTransform(scrollYProgress, [0, 0.5], [50, 0]);
 
   // X Movement (Desktop Only) 
-  // - Book is in Right Col but starts Centered (-50% of container width approx? No, -50% of its own width + gutter).
-  // - Actually, easier to start at Transformed X (Center) -> 0 (Natural Right Pos).
-  // - Let's try: Start at -50% (Left) -> End at 0% (Right Col Center).
   const xBookDesktop = useTransform(scrollYProgress, [0, 0.5], ["-50%", "0%"]);
 
   // Opacity: Book stays visible.
-  const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, isDesktop ? 1 : 0]); // Kept original as it was not part of the change.
+  const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, isDesktop ? 1 : 0]);
 
   // Content Reveal
   const opacityContent = useTransform(scrollYProgress, [0.1, 0.4], [0, 1]);
   // Y Content: Slide up slightly
   const yContent = useTransform(scrollYProgress, [0.1, 0.4], [30, 0]);
 
-  // X Content: Unused if static grid placement works well? 
-  // User asked for "Left alignment". Static grid is Left.
-  // Maybe slight slide in from Left?
+  // X Content
   const xContentDesktop = useTransform(scrollYProgress, [0.1, 0.4], ["-10%", "0%"]);
 
   // Scroll Indicator Fade
@@ -78,7 +74,8 @@ export default function Hero() {
               alt="Exemple de livre autobiographique Loomina relié et imprimé"
               width={819}
               height={1024}
-              className="w-full h-auto object-contain mix-blend-multiply max-h-[60vh]"
+              // Removed max-h constraint to allow scaling up, added object-contain to be safe
+              className="w-full h-auto object-contain mix-blend-multiply"
               priority
               unoptimized
             />
@@ -105,12 +102,14 @@ export default function Hero() {
             La 1ère IA biographe pour écrire vos mémoires par téléphone
           </span>
 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
+          {/* Reduced Text Size: md:text-6xl -> md:text-5xl, lg:text-7xl -> lg:text-6xl */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
             Votre biographie, <br />
             <span className="italic text-[var(--loomina-gold)]">éternelle.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-neutral-600 leading-relaxed md:pr-12">
+          {/* Reduced Text Size: md:text-xl -> md:text-lg */}
+          <p className="text-lg md:text-lg text-neutral-600 leading-relaxed md:pr-12">
             Ne laissez pas vos souvenirs s'effacer. Nous transformons vos entretiens téléphoniques en un <strong>livre autobiographique</strong> d'exception, sans que vous n'ayez rien à écrire.
           </p>
 
