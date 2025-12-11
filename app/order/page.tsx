@@ -63,7 +63,7 @@ export default function OrderPage() {
                         transition={{ duration: 0.6 }}
                         className="text-4xl md:text-5xl font-serif text-black"
                     >
-                        À qui se destine cette autobiographie ?
+                        À qui se destine cette Biographie ?
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 10 }}
