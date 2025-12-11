@@ -5,9 +5,10 @@ import MagicButton from "@/components/ui/MagicButton";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function SuccessPage() {
-    const [userData, setUserData] = useState<{ firstName: string; lastName: string } | null>(null);
+    const [userData, setUserData] = useState<{ firstName: string; lastName: string; phone?: string } | null>(null);
 
     useEffect(() => {
         // Retrieve the user's data from storage
@@ -16,6 +17,38 @@ export default function SuccessPage() {
             try {
                 const parsed = JSON.parse(storedData);
                 setUserData(parsed);
+
+                // Sync new client to Supabase
+                const syncClient = async () => {
+                    if (parsed.phone) {
+                        try {
+                            const cleanPhone = parsed.phone.replace(/\s/g, '');
+                            const fullName = `${parsed.firstName} ${parsed.lastName}`.trim();
+
+                            const { error } = await supabase
+                                .from('Client')
+                                .upsert(
+                                    {
+                                        name: fullName,
+                                        phone_number: cleanPhone,
+                                        // We don't set created_at as it should be auto-generated or handled by DB default
+                                    },
+                                    { onConflict: 'phone_number' }
+                                );
+
+                            if (error) {
+                                console.error("Supabase sync error:", error);
+                            } else {
+                                console.log("Client synced to Supabase successfully.");
+                            }
+                        } catch (err) {
+                            console.error("Error executing Supabase sync:", err);
+                        }
+                    }
+                };
+
+                syncClient();
+
             } catch (e) {
                 console.error("Failed to parse order data", e);
             }

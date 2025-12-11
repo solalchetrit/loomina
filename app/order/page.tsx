@@ -40,7 +40,8 @@ export default function OrderPage() {
         const orderData = {
             firstName: formData.firstName,
             lastName: formData.lastName,
-            isGift: selectedOption === "gift"
+            isGift: selectedOption === "gift",
+            phone: formData.phone
         };
 
         localStorage.setItem("loomina_order_data", JSON.stringify(orderData));
