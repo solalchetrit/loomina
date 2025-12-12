@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
-import PhotoUpload from "@/components/PhotoUpload";
+import PhotoGallery from "@/components/PhotoGallery";
 
 interface Chapter {
     id: number;
@@ -16,7 +16,6 @@ interface Book {
     id: number;
     title: string;
     style: string;
-    cover_image_url?: string;
 }
 
 interface LiveBookProps {
@@ -108,20 +107,12 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="text-center space-y-6 border-b border-neutral-100 pb-8"
+                className="text-center space-y-4 border-b border-neutral-100 pb-8"
             >
                 <div>
                     <span className="text-xs uppercase tracking-widest text-amber-600 font-semibold">Live Book</span>
                     <h2 className="text-3xl md:text-5xl font-serif text-black mt-2">{book?.title || "Titre en cours de rédaction..."}</h2>
                 </div>
-
-                {book && (
-                    <PhotoUpload
-                        bookId={book.id}
-                        currentCoverUrl={book.cover_image_url}
-                        onUploadComplete={(url) => setBook(prev => prev ? { ...prev, cover_image_url: url } : null)}
-                    />
-                )}
 
                 <div className="inline-block px-3 py-1 rounded-full bg-neutral-100 text-neutral-600 text-xs">
                     Style : {book?.style || "Non défini"}
@@ -167,6 +158,17 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
                     </div>
                 )}
             </motion.section>
+
+            {/* Section 2: Photo Gallery */}
+            {book && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                    <PhotoGallery bookId={book.id} />
+                </motion.div>
+            )}
 
         </div>
     );
