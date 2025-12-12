@@ -12,7 +12,7 @@ interface Photo {
 }
 
 interface PhotoGalleryProps {
-    bookId: number;
+    bookId: string;
 }
 
 export default function PhotoGallery({ bookId }: PhotoGalleryProps) {

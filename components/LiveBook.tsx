@@ -6,14 +6,18 @@ import { motion } from "framer-motion";
 import PhotoGallery from "@/components/PhotoGallery";
 
 interface Chapter {
-    id: number;
+    id: number; // Keep as number if chapters use auto-increment int, need to check. Usually best to be safe.
+    // Actually, looking at the error, only "Books" table was mentioned as UUID.
+    // If Books is UUID, it's likely others might be too, or maybe not.
+    // But "BookPhotos" created above uses BIGINT for its own ID.
+    // Let's assume Books.id is UUID (string).
     title: string;
     content: string;
     created_at: string;
 }
 
 interface Book {
-    id: number;
+    id: string; // Changed to string for UUID
     title: string;
     style: string;
 }
