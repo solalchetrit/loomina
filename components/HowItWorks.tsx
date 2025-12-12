@@ -100,7 +100,10 @@ export default function HowItWorks() {
   });
 
   return (
-    <section id="process" className="relative py-24 bg-white text-[var(--loomina-black)] overflow-hidden">
+    <section
+      id="process"
+      className="relative py-24 bg-white text-[var(--loomina-black)] overflow-hidden scroll-mt-24"
+    >
       <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-10 md:mb-20">
