@@ -85,9 +85,10 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
 
     if (loading) return <div className="text-center p-8 text-neutral-500 animate-pulse">Recherche de votre livre...</div>;
     if (error) return <div className="text-center p-8 text-red-500 bg-red-50 rounded-lg">{error}</div>;
-    if (!book) return <div className="text-center p-8 text-neutral-500">Aucun livre en cours pour le moment. L'interview n'a peut-être pas encore commencé.</div>;
 
-    const currentChapter = chapters[chapters.length - 1];
+    // REMOVED EARLY RETURN: if (!book) ...
+
+    const currentChapter = chapters.length > 0 ? chapters[chapters.length - 1] : null;
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -108,13 +109,13 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
                 className="text-center space-y-4 border-b border-neutral-100 pb-8"
             >
                 <span className="text-xs uppercase tracking-widest text-amber-600 font-semibold">Live Book</span>
-                <h2 className="text-3xl md:text-5xl font-serif text-black">{book.title || "Titre en cours de rédaction..."}</h2>
+                <h2 className="text-3xl md:text-5xl font-serif text-black">{book?.title || "Titre en cours de rédaction..."}</h2>
                 <div className="inline-block px-3 py-1 rounded-full bg-neutral-100 text-neutral-600 text-xs">
-                    Style : {book.style || "Non défini"}
+                    Style : {book?.style || "Non défini"}
                 </div>
             </motion.div>
 
-            {/* Section 1: Chapitre en Cours */}
+            {/* Section 1: Chapitre en Cours ONLY */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -154,50 +155,6 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
                 )}
             </motion.section>
 
-            {/* Section 2: Votre Biographie */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="space-y-6"
-            >
-                <div className="space-y-2">
-                    <p className="text-xs uppercase tracking-widest text-neutral-500 font-semibold">Votre Biographie</p>
-                    <h3 className="text-3xl font-serif text-black">Tous vos chapitres</h3>
-                    <p className="text-neutral-500">Retrouvez l'intégralité des chapitres déjà rédigés.</p>
-                </div>
-
-                <div className="space-y-12">
-                    {chapters.length === 0 ? (
-                        <div className="text-center py-16 bg-neutral-50 rounded-2xl border border-dashed border-neutral-200 flex flex-col items-center justify-center gap-4">
-                            <div className="text-4xl opacity-20">📚</div>
-                            <p className="text-neutral-400 italic">Votre livre est encore vide. L'histoire commence bientôt.</p>
-                        </div>
-                    ) : (
-                        chapters.map((chapter, index) => (
-                            <motion.div
-                                key={chapter.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className="prose prose-lg max-w-none group"
-                            >
-                                <div className="flex items-baseline gap-4 mb-6">
-                                    <span className="text-6xl font-serif text-neutral-200 font-bold group-hover:text-amber-100 transition-colors duration-300">{index + 1}</span>
-                                    <h4 className="text-2xl font-serif text-black m-0">
-                                        {chapter.title}
-                                    </h4>
-                                </div>
-                                <div className="text-neutral-600 leading-relaxed font-serif whitespace-pre-wrap pl-4 md:pl-16 border-l-2 border-transparent group-hover:border-amber-200 transition-all duration-300">
-                                    {chapter.content}
-                                </div>
-                                <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-200 to-transparent my-12 mx-auto max-w-sm"></div>
-                            </motion.div>
-                        ))
-                    )}
-                </div>
-            </motion.section>
         </div>
     );
 }
