@@ -14,7 +14,9 @@ export default function OrderPage() {
         firstName: "",
         lastName: "",
         age: "",
+
         phone: "",
+        email: "",
     });
 
     const handleOptionClick = (option: "me" | "gift") => {
@@ -31,7 +33,9 @@ export default function OrderPage() {
         formData.firstName.trim() !== "" &&
         formData.lastName.trim() !== "" &&
         formData.age.trim() !== "" &&
-        formData.phone.trim() !== "";
+
+        formData.phone.trim() !== "" &&
+        formData.email.trim() !== "";
 
     const handleSubmit = () => {
         if (!isFormValid) return;
@@ -41,7 +45,9 @@ export default function OrderPage() {
             firstName: formData.firstName,
             lastName: formData.lastName,
             isGift: selectedOption === "gift",
-            phone: formData.phone
+
+            phone: formData.phone,
+            email: formData.email
         };
 
         localStorage.setItem("loomina_order_data", JSON.stringify(orderData));
@@ -194,6 +200,17 @@ export default function OrderPage() {
                                             value={formData.phone}
                                             onChange={handleInputChange}
                                             placeholder="Ex: 06 12 34 56 78"
+                                            className="w-full p-3 rounded-lg bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-0 outline-none transition-all placeholder:text-neutral-400"
+                                        />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className="text-xs uppercase tracking-wider text-neutral-500 font-medium ml-1">Email</label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                            placeholder="Ex: jean.dupont@email.com"
                                             className="w-full p-3 rounded-lg bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-0 outline-none transition-all placeholder:text-neutral-400"
                                         />
                                     </div>
