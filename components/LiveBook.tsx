@@ -164,15 +164,33 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
             </motion.section>
 
             {/* Section 2: Photo Gallery */}
-            {book && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                >
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+            >
+                {book ? (
                     <PhotoGallery bookId={book.id} />
-                </motion.div>
-            )}
+                ) : (
+                    <section className="bg-neutral-50 border border-neutral-200 rounded-2xl p-8 space-y-6 opacity-60 grayscale cursor-not-allowed">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-lg">
+                                📷
+                            </div>
+                            <div>
+                                <p className="text-xs uppercase tracking-widest text-indigo-700 font-semibold">Galerie Photos</p>
+                                <h3 className="text-2xl font-serif text-black">Vos souvenirs en images</h3>
+                            </div>
+                        </div>
+                        <p className="text-neutral-500 italic">La galerie sera disponible une fois votre livre initialisé.</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="aspect-square rounded-xl bg-neutral-200 animate-pulse"></div>
+                            ))}
+                        </div>
+                    </section>
+                )}
+            </motion.div>
 
         </div>
     );
