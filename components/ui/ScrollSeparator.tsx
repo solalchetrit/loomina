@@ -12,10 +12,6 @@ export default function ScrollSeparator() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="flex flex-col items-center gap-3 text-[var(--loomina-amber)]"
             >
-                <div className="w-[1px] h-14 md:h-24 bg-gradient-to-b from-transparent via-[var(--loomina-amber)] to-transparent opacity-80" />
-                <span className="text-xl" aria-hidden>
-                    ✦
-                </span>
                 <motion.span
                     animate={{ y: [0, 6, 0] }}
                     transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
@@ -24,11 +20,6 @@ export default function ScrollSeparator() {
                 >
                     ↓
                 </motion.span>
-                <div className="w-[1px] h-14 md:h-24 bg-gradient-to-b from-transparent via-[var(--loomina-amber)] to-transparent opacity-80" />
-                <div className="flex items-center gap-2 rounded-full bg-[var(--loomina-amber)]/10 border border-[var(--loomina-amber)]/30 px-4 py-1.5 text-[var(--loomina-black)]">
-                    <span className="text-[10px] uppercase tracking-[0.16em] font-semibold">Section suivante</span>
-                    <span className="text-sm font-medium text-[var(--loomina-amber)]">Faire défiler pour lire</span>
-                </div>
             </motion.div>
         </div>
     );
