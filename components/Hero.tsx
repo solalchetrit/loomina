@@ -152,7 +152,7 @@ export default function Hero() {
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <span className="text-2xl text-[var(--loomina-gold)]">✦</span>
+            <span className="text-2xl text-[var(--loomina-gold)]">↓</span>
           </motion.div>
         </motion.div>
 
