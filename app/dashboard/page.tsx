@@ -52,6 +52,19 @@ export default function DashboardPage() {
                 // We keep 'phone' state for UI display, but could use a ref or separate state for the API value if needed.
                 // For now, let's rely on re-normalizing or just using the one we computed.
 
+                // Check if user exists in Supabase "Client" table
+                const { data: clientData, error: clientError } = await supabase
+                    .from('Client')
+                    .select('id')
+                    .eq('phone_number', formattedForApi)
+                    .single();
+
+                if (clientError || !clientData) {
+                    setError("Ce numéro ne semble pas faire partie de nos auteurs. Avez-vous déjà commandé votre biographie ?");
+                    setLoading(false);
+                    return;
+                }
+
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
