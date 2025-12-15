@@ -71,13 +71,6 @@
                                             "b": "assistant-request",
                                             "o": "text:equal"
                                         }
-                                    ],
-                                    [
-                                        {
-                                            "a": "{{1.action}}",
-                                            "b": "force_call_now",
-                                            "o": "text:equal"
-                                        }
                                     ]
                                 ]
                             },
@@ -8803,6 +8796,69 @@
                                         ]
                                     }
                                 ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 9000,
+                            "module": "http:MakeRequest",
+                            "version": 4,
+                            "parameters": {
+                                "authenticationType": "noAuth"
+                            },
+                            "filter": {
+                                "name": "force_call_now",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{1.action}}",
+                                            "b": "force_call_now",
+                                            "o": "text:equal"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "url": "https://api.vapi.ai/call/phone",
+                                "method": "post",
+                                "headers": [
+                                    {
+                                        "name": "Authorization",
+                                        "value": "Bearer YOUR_VAPI_PRIVATE_API_KEY"
+                                    },
+                                    {
+                                        "name": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": "{\n  \"phoneNumberId\": \"YOUR_VAPI_PHONE_NUMBER_ID\",\n  \"customer\": {\n    \"number\": \"{{1.phone}}\"\n  },\n  \"assistant\": {\n    \"serverUrl\": \"YOUR_MAKE_WEBHOOK_URL\",\n    \"serverMessages\": [\"assistant-request\"]\n  }\n}",
+                                "contentType": "raw",
+                                "parseResponse": true
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 1950
+                                }
+                            }
+                        },
+                        {
+                            "id": 9001,
+                            "module": "gateway:WebhookRespond",
+                            "version": 1,
+                            "parameters": {},
+                            "mapper": {
+                                "status": 200,
+                                "body": "{\n  \"message\": \"Appel initié avec succès.\"\n}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 1950
+                                }
                             }
                         }
                     ]

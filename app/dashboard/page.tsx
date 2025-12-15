@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import StartInterviewButton from "@/components/StartInterviewButton";
 import LiveBook from "@/components/LiveBook";
@@ -12,11 +12,19 @@ export default function DashboardPage() {
     const [otpSent, setOtpSent] = useState(false);
     const [otpCode, setOtpCode] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false); // New state
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-
+    // Check for persistent presence on mount
+    useEffect(() => {
+        const storedPhone = localStorage.getItem("loomina_user_phone");
+        if (storedPhone) {
+            setPhone(storedPhone);
+            setIsLoggedIn(true);
+        }
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,10 +56,6 @@ export default function DashboardPage() {
                     formattedForApi = val;
                 }
 
-                // Store normalized phone for next step
-                // We keep 'phone' state for UI display, but could use a ref or separate state for the API value if needed.
-                // For now, let's rely on re-normalizing or just using the one we computed.
-
                 // Check if user exists in Supabase "Client" table
                 const { data: clientData, error: clientError } = await supabase
                     .from('Client')
@@ -79,8 +83,6 @@ export default function DashboardPage() {
                 }
 
                 setOtpSent(true);
-                // Save the formatted phone if we want to ensure we send the EXACT same string back
-                // But for now, we'll re-derive it or just use the current 'phone' state if it hasn't changed.
             } else {
                 // --- STAGE 2: VERIFY OTP ---
 
@@ -106,11 +108,10 @@ export default function DashboardPage() {
                 const data = await response.json();
 
                 if (data.status === "approved") {
-                    // Success!
-                    // data should ideally contain client info, e.g. data.client.
-                    // For now, assuming we just mark as logged in. 
-                    // If we need client ID later, we should store it.
                     setIsLoggedIn(true);
+                    if (rememberMe) {
+                        localStorage.setItem("loomina_user_phone", phone);
+                    }
                 } else {
                     setError("Code incorrect. Veuillez réessayer.");
                 }
@@ -121,6 +122,14 @@ export default function DashboardPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleLogout = () => {
+        setIsLoggedIn(false);
+        setPhone("");
+        setOtpSent(false);
+        setOtpCode("");
+        localStorage.removeItem("loomina_user_phone");
     };
 
     if (!isLoggedIn) {
@@ -136,48 +145,57 @@ export default function DashboardPage() {
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         {!otpSent ? (
-                            <input
-                                type="tel"
-                                placeholder="Votre numéro (ex: 06 12 34 56 78)"
-                                value={phone}
-                                onChange={(e) => {
-                                    let val = e.target.value;
-                                    // Allow + only at the start
-                                    const hasPlus = val.startsWith('+');
-                                    // Keep only digits
-                                    const digits = val.replace(/\D/g, '');
+                            <>
+                                <input
+                                    type="tel"
+                                    placeholder="Votre numéro (ex: 06 12 34 56 78)"
+                                    value={phone}
+                                    onChange={(e) => {
+                                        let val = e.target.value;
+                                        // Allow + only at the start
+                                        const hasPlus = val.startsWith('+');
+                                        // Keep only digits
+                                        const digits = val.replace(/\D/g, '');
 
-                                    let formatted = digits;
+                                        let formatted = digits;
 
-                                    if (hasPlus) {
-                                        // Handle +33 specific formatting: +33 6 12 34 56 78
-                                        if (digits.startsWith('33')) {
-                                            formatted = "+33";
-                                            const rest = digits.slice(2);
-                                            if (rest.length > 0) {
-                                                // Add 1st digit (usually 6 or 7)
-                                                formatted += " " + rest.substring(0, 1);
-                                                if (rest.length > 1) {
-                                                    // Add remaining pairs
-                                                    const remaining = rest.substring(1).match(/.{1,2}/g)?.join(' ');
-                                                    if (remaining) formatted += " " + remaining;
+                                        if (hasPlus) {
+                                            if (digits.startsWith('33')) {
+                                                formatted = "+33";
+                                                const rest = digits.slice(2);
+                                                if (rest.length > 0) {
+                                                    formatted += " " + rest.substring(0, 1);
+                                                    if (rest.length > 1) {
+                                                        const remaining = rest.substring(1).match(/.{1,2}/g)?.join(' ');
+                                                        if (remaining) formatted += " " + remaining;
+                                                    }
                                                 }
+                                            } else {
+                                                formatted = "+" + (digits.match(/.{1,2}/g)?.join(' ') || digits);
                                             }
                                         } else {
-                                            // Generic + format, just space every 2 digits for now or keep raw
-                                            formatted = "+" + (digits.match(/.{1,2}/g)?.join(' ') || digits);
+                                            formatted = digits.match(/.{1,2}/g)?.join(' ') || digits;
                                         }
-                                    } else {
-                                        // Standard existing pair formatting
-                                        formatted = digits.match(/.{1,2}/g)?.join(' ') || digits;
-                                    }
 
-                                    if (formatted.length <= 20) {
-                                        setPhone(formatted);
-                                    }
-                                }}
-                                className="w-full p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-center text-lg focus:ring-black focus:border-black outline-none"
-                            />
+                                        if (formatted.length <= 20) {
+                                            setPhone(formatted);
+                                        }
+                                    }}
+                                    className="w-full p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-center text-lg focus:ring-black focus:border-black outline-none"
+                                />
+                                <div className="flex items-center justify-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="rememberMe"
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                        className="w-4 h-4 text-black border-neutral-300 rounded focus:ring-black"
+                                    />
+                                    <label htmlFor="rememberMe" className="text-sm text-neutral-600 cursor-pointer select-none">
+                                        Rester connecté
+                                    </label>
+                                </div>
+                            </>
                         ) : (
                             <input
                                 type="text"
@@ -222,8 +240,14 @@ export default function DashboardPage() {
                         <p className="text-neutral-500">Suivez la rédaction de votre autobiographie en temps réel.</p>
                     </div>
 
-                    <div className="flex-shrink-0">
+                    <div className="flex items-center gap-4">
                         <StartInterviewButton phone={phone} userName="Auteur" />
+                        <button
+                            onClick={handleLogout}
+                            className="text-sm text-neutral-400 hover:text-red-500 transition-colors"
+                        >
+                            Se déconnecter
+                        </button>
                     </div>
                 </header>
 
