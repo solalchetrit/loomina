@@ -33,7 +33,7 @@ export default function Hero() {
   const yBookMobile = useTransform(scrollYProgress, [0, 0.5], [260, 40]);
 
   // X Movement (Desktop Only) 
-  const xBookDesktop = useTransform(scrollYProgress, [0, 0.5], ["-50%", "0%"]);
+  const xBookDesktop = useTransform(scrollYProgress, [0, 0.5], ["0%", "5%"]);
 
   // Opacity
   const opacityBook = useTransform(scrollYProgress, [0.8, 1], [1, isDesktop ? 1 : 0]);
