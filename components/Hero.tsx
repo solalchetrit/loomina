@@ -113,7 +113,7 @@ export default function Hero() {
               Desktop (lg): text-5xl (was 6xl)
               Wide (xl): text-6xl 
           */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
             Loomina : Vous racontez. <br />
             <span className="italic text-[var(--loomina-gold)]">Votre livre s'écrit.</span>
           </h1>
