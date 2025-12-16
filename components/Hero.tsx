@@ -49,7 +49,7 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative h-[150vh] bg-[var(--color-background)] bg-noise overflow-hidden"
+      className="relative h-[150vh] bg-white"
     >
       {/* Mobile: gap-2 (Tighter). Desktop: gap-8. */}
       <div className="sticky top-0 min-h-[100dvh] w-full overflow-hidden px-6 flex flex-col items-center justify-center gap-2 md:grid md:grid-cols-2 md:gap-8 max-w-7xl mx-auto">
@@ -113,29 +113,29 @@ export default function Hero() {
               Desktop (lg): text-5xl (was 6xl)
               Wide (xl): text-6xl 
           */}
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif font-medium text-[var(--color-foreground)] leading-[1.1] tracking-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
             Loomina : Vous racontez. <br />
-            <span className="italic text-[var(--color-primary)]">Votre livre s'écrit.</span>
+            <span className="italic text-[var(--loomina-gold)]">Votre livre s'écrit.</span>
           </h1>
 
           {/* Paragraph Sizes:
               Mobile: text-base
               Tablet/Desktop: text-lg
           */}
-          <p className="text-base md:text-lg text-neutral-400 leading-relaxed md:pr-12 max-w-md md:max-w-none">
+          <p className="text-base md:text-lg text-neutral-600 leading-relaxed md:pr-12 max-w-md md:max-w-none">
             Ne laissez pas vos souvenirs s'effacer. Nous transformons vos entretiens téléphoniques en un <strong>livre autobiographique</strong> d'exception, sans que vous n'ayez rien à écrire.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center md:items-start gap-3 md:gap-4 pt-2 md:pt-4 w-full">
             <Link
               href="/order"
-              className="px-6 py-3 md:px-8 md:py-3.5 rounded-full bg-[var(--color-primary)] text-black font-serif font-medium text-sm md:text-base transition-all hover:bg-[#b09b5d] hover:scale-105 shadow-lg shadow-[var(--color-primary)]/20 inline-block w-full sm:w-auto text-center"
+              className="px-6 py-3 md:px-8 md:py-3.5 rounded-full bg-[var(--loomina-ink)] text-white font-sans font-medium text-sm md:text-base transition-all hover:bg-black hover:scale-105 shadow-lg shadow-black/10 inline-block w-full sm:w-auto text-center"
             >
               Commander mon livre
             </Link>
             <a
               href="tel:+33159169357"
-              className="px-6 py-3 md:px-8 md:py-3.5 rounded-full bg-transparent text-[var(--color-foreground)] border border-white/20 font-serif font-medium text-sm md:text-base transition-all hover:bg-white/5 hover:border-white/40 w-full sm:w-auto text-center"
+              className="px-6 py-3 md:px-8 md:py-3.5 rounded-full bg-white text-[var(--loomina-ink)] border border-neutral-200 font-sans font-medium text-sm md:text-base transition-all hover:bg-neutral-50 hover:border-neutral-300 w-full sm:w-auto text-center"
             >
               Essayer gratuitement
             </a>
@@ -157,8 +157,8 @@ export default function Hero() {
         </motion.div>
 
         {/* --- BACKGROUND --- */}
-        {/* <div className="absolute inset-x-0 top-0 h-full w-full -z-10 bg-white"></div> Removed to show global bg + noise */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--color-primary)] rounded-full blur-[120px] opacity-10 -z-10 pointer-events-none mix-blend-screen"></div>
+        <div className="absolute inset-x-0 top-0 h-full w-full -z-10 bg-white"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--loomina-gold)] rounded-full blur-[120px] opacity-5 -z-10 pointer-events-none"></div>
       </div>
     </section>
   );
