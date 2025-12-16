@@ -7,16 +7,35 @@
 }
 
 :root {
-  --loomina-ink: #000000;
-  --loomina-cloud: #f5f5f5;
+  /* Nouvelle Palette Premium "Luxury & Editorial" */
+  --color-background: #050505;
+  /* Noir très profond, presque encre */
+  --color-foreground: #F2F0E9;
+  /* Blanc cassé type "Papier Vélin" */
+
+  --color-primary: #D4AF37;
+  /* Or Antique (Metallic Gold) */
+  --color-primary-foreground: #000000;
+
+  --color-secondary: #1A1A1A;
+  /* Gris anthracite chaud */
+  --color-border: #333333;
+  /* Bordures subtiles */
+
+  --color-ink-blue: #0F172A;
+  /* Bleu nuit profond */
+
+  /* Legacy compatibility (mapped to new values where possible or kept if needed) */
+  --loomina-ink: #050505;
+  --loomina-cloud: #F2F0E9;
   --loomina-sand: #e5e5e5;
   --loomina-haze: #d4d4d4;
-  --loomina-amber: #eabf77;
+  --loomina-amber: #D4AF37;
   --loomina-amber-strong: #c58c3c;
-  --loomina-gold: #C6A664;
-  /* Added for compatibility */
-  --foreground: #1a1a1a;
-  --background: #ffffff;
+  --loomina-gold: #D4AF37;
+
+  --foreground: var(--color-foreground);
+  --background: var(--color-background);
 }
 
 html {
@@ -37,26 +56,43 @@ body {
   line-height: 1.6;
 }
 
+/* Texture de fond "Grain Papier" */
+.bg-noise {
+  position: relative;
+}
+
+.bg-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
 p,
 ul,
 ol,
 li,
 blockquote {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
+  /* Body text kept clean sans-serif as requested "Sans-Serif épuré pour le corps" */
   font-weight: 400;
   letter-spacing: -0.01em;
 }
 
-/* Custom Utilities */
+/* Typographie Élégante */
 h1,
 h2,
 h3,
 h4,
 h5,
-h6,
-.font-serif {
+h6 {
   font-family: var(--font-serif);
-  font-weight: 400;
+  /* Playfair Display */
+  letter-spacing: -0.02em;
+  font-weight: 500;
 }
 
 .glow-ring {

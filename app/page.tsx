@@ -1,5 +1,7 @@
+
 import Hero from "@/components/Hero";
-import StarDecoration from "@/components/ui/StarDecoration";
+import InkDecoration from "@/components/ui/InkDecoration";
+import { ChapterDivider } from "@/components/ui/ChapterDivider";
 import ScrollSeparator from "@/components/ui/ScrollSeparator";
 import HowItWorks from "@/components/HowItWorks";
 import MagicButton from "@/components/ui/MagicButton";
@@ -40,13 +42,14 @@ const offer = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center bg-white text-black">
+    <div className="min-h-screen w-full flex flex-col items-center bg-[var(--color-background)] text-[var(--color-foreground)]">
+      <InkDecoration />
       <Hero />
-      <ScrollSeparator />
+      <ChapterDivider />
 
       {/* --- SECTION 3: LE PARCOURS --- */}
       <HowItWorks />
-      <ScrollSeparator />
+      <ChapterDivider />
 
       {/* --- SECTION 5: OFFRE (MODIFIÉE) --- */}
       <div id="offres" className="w-full scroll-mt-24">

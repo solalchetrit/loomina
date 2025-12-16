@@ -8,16 +8,16 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    // Padding réduit (py-12 au lieu de py-20) pour un footer plus fin
-    <footer className="w-full bg-black text-white border-t border-white/10 py-12 relative overflow-hidden">
+    // Modifié pour l'esthétique "Luxe & Editorial"
+    <footer className="w-full bg-gradient-to-b from-[var(--color-background)] to-[var(--color-ink-blue)] text-white border-t border-white/5 py-16 relative overflow-hidden">
 
       {/* Ligne décorative en bas */}
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[var(--color-primary)]/30 to-transparent" />
 
       <div className="w-full px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center justify-between gap-8">
 
         {/* Partie Gauche : Logo & Bouton alignés */}
-        <div className="flex flex-col sm:flex-row items-center gap-8">
+        <div className="flex flex-col items-start gap-6">
           <div className="relative h-8 w-40">
             <Link href="/" className="relative block w-full h-full">
               {/* Logo Blanc (inversé) */}
@@ -25,9 +25,14 @@ export default function Footer() {
                 src="/header-logo-trimmed.png"
                 alt="Loomina Éditions"
                 fill
-                className="object-contain object-center md:object-left invert brightness-0"
+                className="object-contain object-left invert brightness-0"
               />
             </Link>
+          </div>
+
+          {/* Signature Manuscrite */}
+          <div className="text-[var(--color-primary)] text-2xl rotate-[-5deg] opacity-80" style={{ fontFamily: '"Brush Script MT", cursive' }}>
+            Loomina
           </div>
 
           {/* Bouton : Fond Blanc, Police NOIRE (explicite) */}

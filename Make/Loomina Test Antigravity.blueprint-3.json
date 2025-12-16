@@ -38,6 +38,493 @@
                         "label": "Maximum number of results"
                     }
                 ],
+                "interface": [
+                    {
+                        "name": "message",
+                        "spec": [
+                            {
+                                "name": "timestamp",
+                                "type": "number"
+                            },
+                            {
+                                "name": "type",
+                                "type": "text"
+                            },
+                            {
+                                "name": "conversation",
+                                "spec": {
+                                    "spec": [
+                                        {
+                                            "name": "role",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "name": "content",
+                                            "type": "text"
+                                        }
+                                    ],
+                                    "type": "collection"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "name": "messages",
+                                "spec": {
+                                    "spec": [
+                                        {
+                                            "name": "role",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "name": "message",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "name": "time",
+                                            "type": "number"
+                                        },
+                                        {
+                                            "name": "secondsFromStart",
+                                            "type": "number"
+                                        }
+                                    ],
+                                    "type": "collection"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "name": "messagesOpenAIFormatted",
+                                "type": "array"
+                            },
+                            {
+                                "name": "artifact",
+                                "spec": [
+                                    {
+                                        "name": "messages",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "role",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "name": "message",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "name": "time",
+                                                    "type": "number"
+                                                },
+                                                {
+                                                    "name": "secondsFromStart",
+                                                    "type": "number"
+                                                }
+                                            ],
+                                            "type": "collection"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "name": "messagesOpenAIFormatted",
+                                        "spec": {
+                                            "spec": [
+                                                {
+                                                    "name": "role",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "name": "content",
+                                                    "type": "text"
+                                                }
+                                            ],
+                                            "type": "collection"
+                                        },
+                                        "type": "array"
+                                    }
+                                ],
+                                "type": "collection"
+                            },
+                            {
+                                "name": "transcript",
+                                "type": "text"
+                            },
+                            {
+                                "name": "recordingUrl",
+                                "type": "text"
+                            },
+                            {
+                                "name": "cost",
+                                "type": "number"
+                            },
+                            {
+                                "name": "durationSeconds",
+                                "type": "number"
+                            },
+                            {
+                                "name": "call",
+                                "spec": [
+                                    {
+                                        "name": "transcript",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "recordingUrl",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "durationSeconds",
+                                        "type": "number"
+                                    },
+                                    {
+                                        "name": "id",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "orgId",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "createdAt",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "updatedAt",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "type",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "cost",
+                                        "type": "number"
+                                    },
+                                    {
+                                        "name": "monitor",
+                                        "spec": [
+                                            {
+                                                "name": "listenUrl",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "controlUrl",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    {
+                                        "name": "transport",
+                                        "spec": [
+                                            {
+                                                "name": "conversationType",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "provider",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "callSid",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "accountSid",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "callToken",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    {
+                                        "name": "phoneCallProvider",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "phoneCallProviderId",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "phoneCallTransport",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "status",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "assistant",
+                                        "spec": [
+                                            {
+                                                "name": "name",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "transcriber",
+                                                "spec": [
+                                                    {
+                                                        "name": "provider",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "name": "model",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "name": "language",
+                                                        "type": "text"
+                                                    }
+                                                ],
+                                                "type": "collection"
+                                            },
+                                            {
+                                                "name": "model",
+                                                "spec": [
+                                                    {
+                                                        "name": "model",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "name": "messages",
+                                                        "spec": {
+                                                            "spec": [
+                                                                {
+                                                                    "name": "content",
+                                                                    "type": "text"
+                                                                },
+                                                                {
+                                                                    "name": "role",
+                                                                    "type": "text"
+                                                                }
+                                                            ],
+                                                            "type": "collection"
+                                                        },
+                                                        "type": "array"
+                                                    },
+                                                    {
+                                                        "name": "provider",
+                                                        "type": "text"
+                                                    }
+                                                ],
+                                                "type": "collection"
+                                            },
+                                            {
+                                                "name": "voice",
+                                                "spec": [
+                                                    {
+                                                        "name": "provider",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "name": "voiceId",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "name": "model",
+                                                        "type": "text"
+                                                    }
+                                                ],
+                                                "type": "collection"
+                                            },
+                                            {
+                                                "name": "firstMessage",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "firstMessageMode",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "silenceTimeoutSeconds",
+                                                "type": "number"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    {
+                                        "name": "phoneNumberId",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "customer",
+                                        "spec": [
+                                            {
+                                                "name": "number",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    }
+                                ],
+                                "type": "collection"
+                            },
+                            {
+                                "name": "phoneNumber",
+                                "spec": [
+                                    {
+                                        "name": "id",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "orgId",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "number",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "createdAt",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "updatedAt",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "twilioAccountSid",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "name",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "provider",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "server",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "timeoutSeconds",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "name": "headers",
+                                                "spec": [],
+                                                "type": "collection"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    {
+                                        "name": "status",
+                                        "type": "text"
+                                    }
+                                ],
+                                "type": "collection"
+                            },
+                            {
+                                "name": "customer",
+                                "spec": [
+                                    {
+                                        "name": "number",
+                                        "type": "text"
+                                    }
+                                ],
+                                "type": "collection"
+                            },
+                            {
+                                "name": "assistant",
+                                "spec": [
+                                    {
+                                        "name": "name",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "transcriber",
+                                        "spec": [
+                                            {
+                                                "name": "provider",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "model",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "language",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    {
+                                        "name": "model",
+                                        "spec": [
+                                            {
+                                                "name": "model",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "messages",
+                                                "spec": {
+                                                    "spec": [
+                                                        {
+                                                            "name": "content",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "role",
+                                                            "type": "text"
+                                                        }
+                                                    ],
+                                                    "type": "collection"
+                                                },
+                                                "type": "array"
+                                            },
+                                            {
+                                                "name": "provider",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    {
+                                        "name": "voice",
+                                        "spec": [
+                                            {
+                                                "name": "provider",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "voiceId",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "model",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "type": "collection"
+                                    },
+                                    {
+                                        "name": "firstMessage",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "firstMessageMode",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "silenceTimeoutSeconds",
+                                        "type": "number"
+                                    }
+                                ],
+                                "type": "collection"
+                            }
+                        ],
+                        "type": "collection"
+                    }
+                ],
                 "advanced": true
             }
         },
@@ -69,6 +556,13 @@
                                         {
                                             "a": "{{1.message.type}}",
                                             "b": "assistant-request",
+                                            "o": "text:equal"
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "a": "{{1.action}}",
+                                            "b": "force_call_now",
                                             "o": "text:equal"
                                         }
                                     ]
@@ -469,9 +963,9 @@
                                                 ]
                                             },
                                             "mapper": {
+                                                "phase": "Onboarding",
                                                 "table": "Client",
-                                                "phone_number": "{{ifempty(1.message.call.customer.number; 1.phone)}}",
-                                                "phase": "Onboarding"
+                                                "phone_number": "{{ifempty(1.message.call.customer.number; 1.phone)}}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -479,18 +973,10 @@
                                                     "y": 0
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Supabase connection",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "supabase"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
                                                         "table": {
                                                             "mode": "chose",
+                                                            "label": "Client",
                                                             "nested": [
                                                                 {
                                                                     "help": "Defaults to gen_random_uuid(). Note:\nThis is a Primary Key.<pk/>",
@@ -532,8 +1018,16 @@
                                                                     "options": null,
                                                                     "required": false
                                                                 }
-                                                            ],
-                                                            "label": "Client"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "supabase"
+                                                            },
+                                                            "label": "My Supabase connection"
                                                         }
                                                     }
                                                 },
@@ -648,7 +1142,7 @@
                                             "version": 1,
                                             "parameters": {},
                                             "mapper": {
-                                                "body": "{\n  \"assistant\": {\n    \"transcriber\": {\"provider\": \"deepgram\", \"model\": \"nova-2\", \"language\": \"fr\"}, \"silenceTimeoutSeconds\": 60,\n    \"firstMessageMode\": \"assistant-speaks-first\",\n    \"name\": \"Loomina-Unknown\",\n    \"voice\": {\"provider\": \"11labs\", \"voiceId\": \"Qrl71rx6Yg8RvyPYRGCQ\", \"model\": \"eleven_turbo_v2_5\"},\n    \"firstMessage\": \"Bonjour ! Ici Loomina, votre biographe personnelle. Je ne crois pas avoir déjà ce numéro dans mes carnets. C'est la toute première fois que nous nous parlons, n'est-ce pas ? Quel est votre prénom ?\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es Loomina, une IA biographe.\\n\\n# RÈGLES CRITIQUES\\n- Tes réponses doivent faire 1 à 2 phrases MAX.\\n- Ne répète jamais ce message d'accueil si l'utilisateur a déjà répondu.\\n- Sois directe et chaleureuse.\\n\\n# OBJECTIF\\nAccueille l'inconnu et demande son prénom. Ensuite, explique ton rôle (IA biographe) et demande quel style d'écriture il préfère.\"}\n      ]\n    }\n  }\n}",
+                                                "body": "{\n  \"assistant\": {\n    \"transcriber\": {\"provider\": \"deepgram\", \"model\": \"nova-2\", \"language\": \"fr\"}, \"silenceTimeoutSeconds\": 60,\n    \"firstMessageMode\": \"assistant-speaks-first\",\n    \"name\": \"Loomina-Unknown\",\n    \"voice\": {\"provider\": \"11labs\", \"voiceId\": \"Qrl71rx6Yg8RvyPYRGCQ\", \"model\": \"eleven_turbo_v2_5\"},\n    \"endCallPhrases\": [\"##END_CALL##\"],\n    \"firstMessage\": \"Bonjour ! Ici Loomina, votre biographe personnelle. Je ne crois pas avoir déjà ce numéro dans mes carnets. C'est la toute première fois que nous nous parlons, n'est-ce pas ? Quel est votre prénom ?\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es Loomina, une IA biographe.\\n\\n# RÈGLES CRITIQUES\\n- Tes réponses doivent faire 1 à 2 phrases MAX.\\n- Ne répète jamais ce message d'accueil si l'utilisateur a déjà répondu.\\n- Sois directe et chaleureuse.\\n\\n# GESTION DE FIN D'APPEL\\nSI l'utilisateur dit qu'il doit partir ou raccrocher : Dis 'Au revoir et à très bientôt ! ##END_CALL##'. Le token ##END_CALL## coupera l'appel.\\n\\n# OBJECTIF\\nAccueille l'inconnu et demande son prénom. Ensuite, explique ton rôle (IA biographe) et demande quel style d'écriture il préfère.\"}\n      ]\n    }\n  }\n}",
                                                 "status": "200",
                                                 "headers": []
                                             },
@@ -1191,7 +1685,7 @@
                                                             "version": 1,
                                                             "parameters": {},
                                                             "mapper": {
-                                                                "body": "{\n  \"assistant\": {\n    \"transcriber\": {\"provider\": \"deepgram\", \"model\": \"nova-2\", \"language\": \"fr\"}, \"silenceTimeoutSeconds\": 60,\n    \"firstMessageMode\": \"assistant-speaks-first\",\n    \"name\": \"Loomina-Biographe\",\n    \"voice\": {\"provider\": \"11labs\", \"voiceId\": \"Qrl71rx6Yg8RvyPYRGCQ\", \"model\": \"eleven_turbo_v2_5\"},\n    \"firstMessage\": \"Bonjour {{28.first_name}}. {{ifempty(32.next_question; \\\" \\\" + \\\"Je suis ravie de vous retrouver. Je relisais nos dernières notes... Prêt à replonger dans vos souvenirs ?\\\")}}\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es Loomina, biographe de {{28.first_name}} (Phase: Interview).\\n\\n# RÈGLES ABSOLUES (RÉDIBITOIRE)\\n1. FAIS COURT : 1 à 2 phrases MAXIMUM. C'est impératif.\\n2. UNE SEULE question à la fois.\\n3. ÉCOUTE et RELANCE simplement. Ne fais pas de monologue.\\n\\n# CONTEXTE\\nSujet du jour : **'{{32.current_subject}}'**.\\nStyle : '{{32.style}}'.\\n\\nPose une question simple sur le sujet pour lancer la discussion ou rebondir.\"}\n      ]\n    }\n  }\n}",
+                                                                "body": "{\n  \"assistant\": {\n    \"transcriber\": {\"provider\": \"deepgram\", \"model\": \"nova-2\", \"language\": \"fr\"}, \"silenceTimeoutSeconds\": 60,\n    \"firstMessageMode\": \"assistant-speaks-first\",\n    \"name\": \"Loomina-Biographe\",\n    \"voice\": {\"provider\": \"11labs\", \"voiceId\": \"Qrl71rx6Yg8RvyPYRGCQ\", \"model\": \"eleven_turbo_v2_5\"},\n    \"endCallPhrases\": [\"##END_CALL##\"],\n    \"firstMessage\": \"Bonjour {{ifempty(28.first_name; \"cher utilisateur\")}}. {{if(32.next_question; 32.next_question; \"Je suis ravie de vous retrouver. Je relisais nos dernières notes... Prêt à replonger dans vos souvenirs ?\")}}\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es Loomina, biographe de {{ifempty(28.first_name; \"ce client\")}} (Phase: Interview).\\n\\n# RÈGLES ABSOLUES (RÉDIBITOIRE)\\n1. FAIS COURT : 1 à 2 phrases MAXIMUM. C'est impératif.\\n2. UNE SEULE question à la fois.\\n3. ÉCOUTE et RELANCE simplement. Ne fais pas de monologue.\\n\\n# GESTION DE FIN D'APPEL\\nSI l'utilisateur dit qu'il doit partir ou raccrocher : Dis 'C'était un plaisir. Nous reprendrons plus tard. Au revoir ! ##END_CALL##'. Le token ##END_CALL## coupera automatiquement l'appel.\\n\\n# CONTEXTE\\nSujet du jour : **'{{ifempty(32.current_subject; \"votre histoire\")}}'**.\\nStyle : '{{ifempty(28.writing_style; \"standard\")}}'.\\n\\nPose une question simple sur le sujet pour lancer la discussion ou rebondir.\"}\n      ]\n    }\n  }\n}",
                                                                 "status": "200",
                                                                 "headers": []
                                                             },
@@ -1282,14 +1776,14 @@
                                                                 ]
                                                             },
                                                             "mapper": {
-                                                                "body": "{\n  \"assistant\": {\n    \"transcriber\": {\"provider\": \"deepgram\", \"model\": \"nova-2\", \"language\": \"fr\"}, \"silenceTimeoutSeconds\": 60,\n    \"firstMessageMode\": \"assistant-speaks-first\",\n    \"name\": \"Loomina-Onboarding\",\n    \"voice\": {\"provider\": \"11labs\", \"voiceId\": \"Qrl71rx6Yg8RvyPYRGCQ\", \"model\": \"eleven_turbo_v2_5\"},\n    \"firstMessage\": \"Bonjour {{28.first_name}}, et bienvenue sur Loomina. Je suis ravie de faire votre connaissance. Avant de commencer l'écriture de votre livre, j'aimerais apprendre à mieux vous connaître. Est-ce le bon moment ?\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es Loomina, l'IA biographe empathique, en phase d'Onboarding avec {{28.first_name}}.\\n\\n# OBJECTIF\\nTu dois obtenir 4 informations clés pour configurer le livre. Ne passe jamais à la suivante tant que l'info actuelle n'est pas claire.\\n\\n# LA CHECKLIST (Ordre de priorité)\\n1. POLITESSE : Tutoiement ou Vouvoiement ?\\n2. DESTINATAIRE : Famille, Grand Public ou Thérapie personnelle ?\\n3. STYLE : Naturel/Conversationnel ou Littéraire/Romancé ?\\n4. DÉMARRAGE : Par quel souvenir commencer ?\\n\\n# RÈGLES DE CONVERSATION (CRITIQUE)\\n- CONCISION EXTRÊME : 1 à 2 phrases maximum. Tu es au téléphone.\\n- ANTI-BRUIT : Si l'utilisateur bafouille, qu'il y a un silence ou un bruit non verbal, NE PASSE PAS À LA SUITE. Dis : 'Pardon, je n'ai pas bien entendu.'\\n- ADAPTATION : Dès que l'utilisateur choisit 'Tu' ou 'Vous', adapte ta grammaire IMMÉDIATEMENT pour le reste de la conversation.\\n- ACKNOWLEDGMENT : Valide brièvement la réponse précédente ('C'est noté', 'Entendu', 'Très beau choix') avant de poser la suivante.\\n\\n# SCRIPTS DE QUESTIONS (À adapter naturellement)\\n- Pour la Politesse : 'Pour que vous soyez à l'aise, préférez-vous que je vous vouvoie ou qu'on se tutoie ?'\\n- Pour le Destinataire : 'Pour qui écrivez-vous ce livre ? Vos enfants, le public, ou pour vous-même ?'\\n- Pour le Style : 'Quel ton préférez-vous : votre façon naturelle de parler, ou un style plus littéraire et romancé ?'\\n- Pour Finir (Une fois tout validé) : 'Excellent. Alors, détendez-vous. Pour notre première vraie séance, par quoi aimeriez-vous commencer ? Vos premiers souvenirs ou autre chose ?'\"}\n      ]\n    }\n  }\n}",
+                                                                "body": "{\n  \"assistant\": {\n    \"transcriber\": {\"provider\": \"deepgram\", \"model\": \"nova-2\", \"language\": \"fr\"}, \"silenceTimeoutSeconds\": 60,\n    \"firstMessageMode\": \"assistant-speaks-first\",\n    \"name\": \"Loomina-Onboarding\",\n    \"voice\": {\"provider\": \"11labs\", \"voiceId\": \"Qrl71rx6Yg8RvyPYRGCQ\", \"model\": \"eleven_turbo_v2_5\"},\n    \"endCallPhrases\": [\"##END_CALL##\"],\n    \"firstMessage\": \"Bonjour {{28.first_name}}, et bienvenue sur Loomina. Je suis ravie de faire votre connaissance. Avant de commencer l'écriture de votre livre, j'aimerais apprendre à mieux vous connaître. Êtes-vous prêt à commencer l'aventure ?\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es Loomina, l'IA biographe empathique, en phase d'Onboarding avec {{28.first_name}}.\\n\\n# TON ET EMPATHIE (PRIORITAIRE)\\nPour cette première prise de contact, tu dois être particulièrement CHALEUREUSE, RASSURANTE et ENVELOPPANTE. Les utilisateurs peuvent être intimidés.\\n- N'hésite pas à valider leurs émotions.\\n- Prends le temps d'installer une atmosphère de confiance.\\n\\n# GESTION DE FIN D'APPEL\\nSI l'utilisateur dit qu'il doit partir ou raccrocher : Dis une phrase rassurante comme 'Aucun souci, prenez soin de vous. À très bientôt ! ##END_CALL##'. Le token ##END_CALL## coupera l'appel.\\n\\n# RÈGLES DE LONGUEUR (SPÉCIFIQUE ONBOARDING)\\n- Pas de restriction stricte de longueur ici. Tu peux faire des phrases plus longues si c'est nécessaire pour rassurer ou expliquer, sans pour autant faire des monologues.\\n\\n# ÉTAPE SPÉCIALE : CADRE (Au tout début)\\nSI l'utilisateur répond 'Oui' à 'Êtes-vous prêt à commencer l'aventure ?', ALORS explique les bases avec douceur :\\n'Merveilleux. Deux petites choses pour que vous soyez tout à fait à l'aise : Sachez que je suis là pour vous écouter, vous pouvez m'appeler à votre rythme. Et pour que nos échanges soient aussi fluides que possible, essayons simplement de ne pas nous couper la parole. Cela vous convient ?'\\n\\n# LA CHECKLIST (Ordre de priorité)\\n1. POLITESSE : Tutoiement ou Vouvoiement ?\\n2. DESTINATAIRE : Pour sa Famille/Proches OU pour Soi-même/Thérapie ?\\n3. STYLE : Naturel/Conversationnel ou Littéraire/Romancé ?\\n4. DÉMARRAGE : Par quel souvenir commencer ?\\n\\n# RÈGLES DE CONVERSATION\\n- ANTI-BRUIT : Si l'utilisateur bafouille ou qu'il y a un silence, dis doucement : 'Pardon, je n'ai pas bien entendu.'\\n- ADAPTATION : Adapte le 'Tu' ou 'Vous' dès que le choix est fait.\\n- ACKNOWLEDGMENT : Valide chaque réponse avec bienveillance ('C'est un très beau choix', 'Je comprends tout à fait', 'C'est noté avec soin').\\n\\n# SCRIPTS DE QUESTIONS (Suggestions douces)\\n- Politesse : 'Pour que vous soyez le plus à l'aise possible, préférez-vous que nous utilisions le vouvoiement, ou le tutoiement ?'\\n- Destinataire : 'Dites-moi, à qui souhaitez-vous dédier ce livre ? Est-ce un héritage pour votre famille et vos proches, ou une démarche plus personnelle, pour vous-même ?'\\n- Style : 'Concernant le ton du récit, préférez-vous garder votre spontanéité naturelle, ou souhaitez-vous que je retravaille le texte pour un rendu plus littéraire et romancé ?'\\n- Fin : 'Parfait. Je pense que nous avons de bonnes bases. Détendez-vous, respirez. Pour notre première séance, quel souvenir avez-vous envie d'aborder ?'\"}\n      ]\n    }\n  }\n}",
                                                                 "status": "200",
                                                                 "headers": []
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 1500,
-                                                                    "y": 600
+                                                                    "x": 1891,
+                                                                    "y": 580
                                                                 },
                                                                 "restore": {
                                                                     "expect": {
@@ -1797,7 +2291,7 @@
                                                             "version": 1,
                                                             "parameters": {},
                                                             "mapper": {
-                                                                "body": "{\n  \"assistant\": {\n    \"transcriber\": {\"provider\": \"deepgram\", \"model\": \"nova-2\", \"language\": \"fr\"}, \"silenceTimeoutSeconds\": 60,\n    \"firstMessageMode\": \"assistant-speaks-first\",\n    \"name\": \"Loomina-Final\",\n    \"voice\": {\"provider\": \"11labs\", \"voiceId\": \"Qrl71rx6Yg8RvyPYRGCQ\", \"model\": \"eleven_turbo_v2_5\"},\n    \"firstMessage\": \"Bonjour {{28.first_name}}, c'est Loomina. J'ai une nouvelle émouvante à vous annoncer : nous avons parcouru l'essentiel de votre histoire. Votre biographie est presque prête !\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es Loomina. Le livre de {{28.first_name}} est presque terminé (Phase: Finalisation).\\n\\n# TON CLIENT\\n- Nom : {{28.first_name}}\\n- Style d'écriture : {{40.style}}\\n\\n# OBJECTIFS DE L'APPEL\\n1. Célébration : Félicite-le chaleureusement pour tout ce chemin parcouru. C'est un accomplissement important.\\n2. Le Titre : Demande-lui s'il a choisi le TITRE définitif de son œuvre. S'il n'a pas d'idée, propose-lui de l'aider à en trouver un qui correspond au style '{{40.style}}'.\\n3. La Dédicace : Demande s'il souhaite dicter une dédicace spéciale qui sera imprimée sur la première page (pour ses enfants, son conjoint...).\\n4. Conclusion : Rassure-le sur la suite (mise en page et impression).\\n\\nIMPORTANT : Si le client se souvient soudainement d'une anecdote oubliée, écoute-le. Le livre reste ouvert tant qu'on ne raccroche pas.\"\n        }\n      ]\n    }\n  }\n}",
+                                                                "body": "{\n  \"assistant\": {\n    \"transcriber\": {\"provider\": \"deepgram\", \"model\": \"nova-2\", \"language\": \"fr\"}, \"silenceTimeoutSeconds\": 60,\n    \"firstMessageMode\": \"assistant-speaks-first\",\n    \"name\": \"Loomina-Final\",\n    \"voice\": {\"provider\": \"11labs\", \"voiceId\": \"Qrl71rx6Yg8RvyPYRGCQ\", \"model\": \"eleven_turbo_v2_5\"},\n    \"endCallPhrases\": [\"##END_CALL##\"],\n    \"firstMessage\": \"Bonjour {{28.first_name}}, c'est Loomina. J'ai une nouvelle émouvante à vous annoncer : nous avons parcouru l'essentiel de votre histoire. Votre biographie est presque prête !\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es Loomina. Le livre de {{28.first_name}} est presque terminé (Phase: Finalisation).\\n\\n# TON CLIENT\\n- Nom : {{28.first_name}}\\n- Style d'écriture : {{40.style}}\\n\\n# GESTION DE FIN D'APPEL\\nSI l'utilisateur dit qu'il doit partir ou raccrocher : Dis 'Bravo encore. Au revoir ! ##END_CALL##'. Le token ##END_CALL## coupera l'appel.\\n\\n# OBJECTIFS DE L'APPEL\\n1. Célébration : Félicite-le chaleureusement pour tout ce chemin parcouru. C'est un accomplissement important.\\n2. Le Titre : Demande-lui s'il a choisi le TITRE définitif de son œuvre. S'il n'a pas d'idée, propose-lui de l'aider à en trouver un qui correspond au style '{{40.style}}'.\\n3. La Dédicace : Demande s'il souhaite dicter une dédicace spéciale qui sera imprimée sur la première page (pour ses enfants, son conjoint...).\\n4. Conclusion : Rassure-le sur la suite (mise en page et impression).\\n\\nIMPORTANT : Si le client se souvient soudainement d'une anecdote oubliée, écoute-le. Le livre reste ouvert tant qu'on ne raccroche pas.\"\n        }\n      ]\n    }\n  }\n}",
                                                                 "status": "200",
                                                                 "headers": []
                                                             },
@@ -1892,8 +2386,8 @@
                                     [
                                         {
                                             "a": "{{1.message.call.durationSeconds}}",
-                                            "b": "15",
-                                            "o": "text:equal"
+                                            "b": "0",
+                                            "o": "number:gt"
                                         }
                                     ]
                                 ]
@@ -2257,6 +2751,29 @@
                             }
                         },
                         {
+                            "id": 700,
+                            "module": "supabase:createARow",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 3941672
+                            },
+                            "mapper": {
+                                "cost": "{{ifempty(1.message.cost; ifempty(1.message.artifact.cost; 1.message.call.cost; 0))}}",
+                                "table": "Calls",
+                                "status": "completed",
+                                "duration": "{{round(ifempty(1.message.durationSeconds; ifempty(1.message.artifact.durationSeconds; 1.message.call.durationSeconds; 0)))}}",
+                                "client_id": "{{34.id}}",
+                                "transcript": "{{ifempty(1.message.transcript; ifempty(1.message.artifact.transcript; 1.message.call.transcript))}}",
+                                "recording_url": "{{ifempty(1.message.recordingUrl; ifempty(1.message.artifact.recordingUrl; 1.message.call.recordingUrl))}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 2100
+                                }
+                            }
+                        },
+                        {
                             "id": 300,
                             "module": "builtin:BasicRouter",
                             "version": 1,
@@ -2299,23 +2816,23 @@
                                                 ]
                                             },
                                             "mapper": {
-                                                "select": "chat",
-                                                "temperature": "1",
-                                                "top_p": "1",
-                                                "n_completions": "1",
                                                 "model": "gpt-4o",
-                                                "max_tokens": "500",
+                                                "top_p": "1",
+                                                "select": "chat",
                                                 "messages": [
                                                     {
                                                         "role": "system",
-                                                        "content": "Analyze the transcript. Extract Onboarding Data.\\nOutput JSON ONLY: { \"politeness_preference\": \"tu\" | \"vous\", \"target_audience\": \"family\" | \"public\", \"writing_style\": \"conversational\" | \"literary\", \"narrative_scope\": \"string\", \"onboarding_complete\": boolean }"
+                                                        "content": "Analyze the transcript. Extract Onboarding Data.\\n\\nCRITICAL RULE: Check for these 3 fields: 1) Politeness, 2) Target Audience, 3) Writing Style.\\nIF ALL 3 ARE PRESENT (non-null), YOU MUST SET \"onboarding_complete\": true.\\n\\nTry to extract \"Starting Subject\" into \"narrative_scope\", but it is OPTIONAL. Absence of Subject does NOT stop completion.\\n\\nOutput RAW JSON ONLY. DO NOT uses backticks. DO NOT use markdown code blocks.\\nExample: { \"politeness_preference\": \"tu\" ... }"
                                                     },
                                                     {
                                                         "role": "user",
-                                                        "content": "{{1.message.call.transcript}}",
+                                                        "content": "{{ifempty(1.message.transcript; ifempty(1.message.artifact.transcript; 1.message.call.transcript; \"(Empty Transcript)\"))}}",
                                                         "imageDetail": "auto"
                                                     }
-                                                ]
+                                                ],
+                                                "max_tokens": "500",
+                                                "temperature": "1",
+                                                "n_completions": "1"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -2323,35 +2840,16 @@
                                                     "y": 1200
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My OpenAI connection",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "openai-gpt-3"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
-                                                        "select": {
-                                                            "label": "Create a Chat Completion (GPT and o1 models)"
-                                                        },
-                                                        "logit_bias": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "tool_choice": {
-                                                            "mode": "chose",
-                                                            "label": "Empty"
-                                                        },
                                                         "stop": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "additionalParameters": {
                                                             "mode": "chose"
                                                         },
                                                         "model": {
                                                             "mode": "chose",
                                                             "label": "gpt-4o (system)Fast, intelligent, flexible GPT model"
+                                                        },
+                                                        "select": {
+                                                            "label": "Create a Chat Completion (GPT and o1 models)"
                                                         },
                                                         "messages": {
                                                             "mode": "chose",
@@ -2367,19 +2865,38 @@
                                                                         "mode": "chose",
                                                                         "label": "User"
                                                                     },
-                                                                    "imageInputType": {
-                                                                        "mode": "chose",
-                                                                        "label": "Empty"
-                                                                    },
                                                                     "imageDetail": {
                                                                         "mode": "chose",
                                                                         "label": "Auto"
+                                                                    },
+                                                                    "imageInputType": {
+                                                                        "mode": "chose",
+                                                                        "label": "Empty"
                                                                     }
                                                                 }
                                                             ]
                                                         },
+                                                        "logit_bias": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "tool_choice": {
+                                                            "mode": "chose",
+                                                            "label": "Empty"
+                                                        },
                                                         "response_format": {
                                                             "mode": "chose"
+                                                        },
+                                                        "additionalParameters": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "openai-gpt-3"
+                                                            },
+                                                            "label": "My OpenAI connection"
                                                         }
                                                     }
                                                 },
@@ -2447,9 +2964,8 @@
                                                     },
                                                     {
                                                         "name": "logit_bias",
-                                                        "type": "array",
-                                                        "label": "Token Probability",
                                                         "spec": {
+                                                            "name": "value",
                                                             "spec": [
                                                                 {
                                                                     "name": "token",
@@ -2469,9 +2985,10 @@
                                                                 }
                                                             ],
                                                             "type": "collection",
-                                                            "label": "Token Probability",
-                                                            "name": "value"
-                                                        }
+                                                            "label": "Token Probability"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Token Probability"
                                                     },
                                                     {
                                                         "name": "seed",
@@ -2492,22 +3009,21 @@
                                                     },
                                                     {
                                                         "name": "stop",
+                                                        "spec": {
+                                                            "name": "value",
+                                                            "type": "text",
+                                                            "label": "Stop Sequence"
+                                                        },
                                                         "type": "array",
                                                         "label": "Stop Sequences",
                                                         "validate": {
                                                             "maxItems": 4
-                                                        },
-                                                        "spec": {
-                                                            "type": "text",
-                                                            "label": "Stop Sequence",
-                                                            "name": "value"
                                                         }
                                                     },
                                                     {
                                                         "name": "additionalParameters",
-                                                        "type": "array",
-                                                        "label": "Other Input Parameters",
                                                         "spec": {
+                                                            "name": "value",
                                                             "spec": [
                                                                 {
                                                                     "name": "key",
@@ -2580,9 +3096,10 @@
                                                                 }
                                                             ],
                                                             "type": "collection",
-                                                            "label": "Input Parameter",
-                                                            "name": "value"
-                                                        }
+                                                            "label": "Input Parameter"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Other Input Parameters"
                                                     },
                                                     {
                                                         "name": "model",
@@ -2597,24 +3114,18 @@
                                                     },
                                                     {
                                                         "name": "messages",
-                                                        "type": "array",
-                                                        "label": "Messages",
-                                                        "required": true,
                                                         "spec": {
-                                                            "label": "Message",
-                                                            "type": "collection",
+                                                            "name": "value",
                                                             "spec": [
                                                                 {
                                                                     "name": "role",
                                                                     "type": "select",
                                                                     "label": "Role",
-                                                                    "required": true,
                                                                     "options": {
                                                                         "store": [
                                                                             {
                                                                                 "label": "User",
                                                                                 "value": "user",
-                                                                                "default": true,
                                                                                 "nested": [
                                                                                     {
                                                                                         "help": "Text content of the message on behalf of the selected __Role__.",
@@ -2626,30 +3137,28 @@
                                                                                         "name": "imageInputType",
                                                                                         "type": "select",
                                                                                         "label": "Image Input Type",
-                                                                                        "mappable": false,
                                                                                         "options": [
                                                                                             {
-                                                                                                "value": "url",
                                                                                                 "label": "URL",
+                                                                                                "value": "url",
                                                                                                 "nested": [
                                                                                                     {
+                                                                                                        "help": "Make sure to use a publicly accessible URL.\nYou can test if your image is publicly accessible by opening the link in an incognito tab.",
                                                                                                         "name": "imageUrl",
-                                                                                                        "label": "Image URL",
                                                                                                         "type": "url",
-                                                                                                        "help": "Make sure to use a publicly accessible URL.\nYou can test if your image is publicly accessible by opening the link in an incognito tab."
+                                                                                                        "label": "Image URL"
                                                                                                     }
                                                                                                 ]
                                                                                             },
                                                                                             {
-                                                                                                "value": "file",
                                                                                                 "label": "Image File",
+                                                                                                "value": "file",
                                                                                                 "nested": [
                                                                                                     {
                                                                                                         "name": "imageFile",
-                                                                                                        "label": "Image",
-                                                                                                        "type": "collection",
                                                                                                         "spec": [
                                                                                                             {
+                                                                                                                "help": "Accepted extensions: `.jpg`, `.jpeg`, `.png`, `.webp` and `.gif`.",
                                                                                                                 "name": "imageFilename",
                                                                                                                 "type": "filename",
                                                                                                                 "label": "Image Filename",
@@ -2660,8 +3169,7 @@
                                                                                                                     "png",
                                                                                                                     "webp",
                                                                                                                     "gif"
-                                                                                                                ],
-                                                                                                                "help": "Accepted extensions: `.jpg`, `.jpeg`, `.png`, `.webp` and `.gif`."
+                                                                                                                ]
                                                                                                             },
                                                                                                             {
                                                                                                                 "name": "imageData",
@@ -2669,34 +3177,38 @@
                                                                                                                 "label": "Image Data",
                                                                                                                 "semantic": "file:data"
                                                                                                             }
-                                                                                                        ]
+                                                                                                        ],
+                                                                                                        "type": "collection",
+                                                                                                        "label": "Image"
                                                                                                     }
                                                                                                 ]
                                                                                             }
-                                                                                        ]
+                                                                                        ],
+                                                                                        "mappable": false
                                                                                     },
                                                                                     {
+                                                                                        "help": "Recommended value: `Auto`",
                                                                                         "name": "imageDetail",
                                                                                         "type": "select",
                                                                                         "label": "Image Detail",
-                                                                                        "help": "Recommended value: `Auto`",
                                                                                         "options": [
                                                                                             {
+                                                                                                "label": "Auto",
                                                                                                 "value": "auto",
-                                                                                                "default": true,
-                                                                                                "label": "Auto"
+                                                                                                "default": true
                                                                                             },
                                                                                             {
-                                                                                                "value": "high",
-                                                                                                "label": "High"
+                                                                                                "label": "High",
+                                                                                                "value": "high"
                                                                                             },
                                                                                             {
-                                                                                                "value": "low",
-                                                                                                "label": "Low"
+                                                                                                "label": "Low",
+                                                                                                "value": "low"
                                                                                             }
                                                                                         ]
                                                                                     }
-                                                                                ]
+                                                                                ],
+                                                                                "default": true
                                                                             },
                                                                             {
                                                                                 "label": "Assistant",
@@ -2709,19 +3221,9 @@
                                                                                         "label": "Text Content"
                                                                                     },
                                                                                     {
-                                                                                        "name": "tool_calls",
-                                                                                        "label": "Tool Calls",
-                                                                                        "type": "array",
-                                                                                        "labels": {
-                                                                                            "add": "Add tool call"
-                                                                                        },
                                                                                         "mode": "edit",
-                                                                                        "mappable": {
-                                                                                            "help": "You can map the entire `Choices[]: Message.Tool Calls` array from a previous Create a Completion module here."
-                                                                                        },
+                                                                                        "name": "tool_calls",
                                                                                         "spec": {
-                                                                                            "label": "Tool Call",
-                                                                                            "type": "collection",
                                                                                             "spec": [
                                                                                                 {
                                                                                                     "name": "type",
@@ -2729,39 +3231,50 @@
                                                                                                     "default": "function"
                                                                                                 },
                                                                                                 {
+                                                                                                    "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`.",
                                                                                                     "name": "id",
                                                                                                     "type": "text",
-                                                                                                    "label": "Tool call ID",
-                                                                                                    "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`."
+                                                                                                    "label": "Tool call ID"
                                                                                                 },
                                                                                                 {
                                                                                                     "name": "function",
-                                                                                                    "type": "collection",
-                                                                                                    "label": "Function",
                                                                                                     "spec": [
                                                                                                         {
+                                                                                                            "help": "The name of the function previously called.",
                                                                                                             "name": "name",
-                                                                                                            "label": "Name",
                                                                                                             "type": "text",
-                                                                                                            "required": true,
-                                                                                                            "help": "The name of the function previously called."
+                                                                                                            "label": "Name",
+                                                                                                            "required": true
                                                                                                         },
                                                                                                         {
+                                                                                                            "help": "The arguments previously output by the AI.",
                                                                                                             "name": "arguments",
-                                                                                                            "label": "Arguments",
                                                                                                             "type": "text",
-                                                                                                            "required": true,
-                                                                                                            "help": "The arguments previously output by the AI."
+                                                                                                            "label": "Arguments",
+                                                                                                            "required": true
                                                                                                         }
-                                                                                                    ]
+                                                                                                    ],
+                                                                                                    "type": "collection",
+                                                                                                    "label": "Function"
                                                                                                 }
-                                                                                            ]
+                                                                                            ],
+                                                                                            "type": "collection",
+                                                                                            "label": "Tool Call"
+                                                                                        },
+                                                                                        "type": "array",
+                                                                                        "label": "Tool Calls",
+                                                                                        "labels": {
+                                                                                            "add": "Add tool call"
+                                                                                        },
+                                                                                        "mappable": {
+                                                                                            "help": "You can map the entire `Choices[]: Message.Tool Calls` array from a previous Create a Completion module here."
                                                                                         }
                                                                                     }
                                                                                 ]
                                                                             },
                                                                             {
                                                                                 "label": "Developer / System",
+                                                                                "value": "system",
                                                                                 "nested": [
                                                                                     {
                                                                                         "help": "Text content of the message on behalf of the selected __Role__.",
@@ -2769,8 +3282,7 @@
                                                                                         "type": "text",
                                                                                         "label": "Text Content"
                                                                                     }
-                                                                                ],
-                                                                                "value": "system"
+                                                                                ]
                                                                             },
                                                                             {
                                                                                 "label": "Tool",
@@ -2784,20 +3296,25 @@
                                                                                         "required": true
                                                                                     },
                                                                                     {
-                                                                                        "label": "Tool Call ID.",
+                                                                                        "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`.",
                                                                                         "name": "tool_call_id",
                                                                                         "type": "text",
-                                                                                        "required": true,
-                                                                                        "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`."
+                                                                                        "label": "Tool Call ID.",
+                                                                                        "required": true
                                                                                     }
                                                                                 ]
                                                                             }
                                                                         ]
-                                                                    }
+                                                                    },
+                                                                    "required": true
                                                                 }
                                                             ],
-                                                            "name": "value"
-                                                        }
+                                                            "type": "collection",
+                                                            "label": "Message"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Messages",
+                                                        "required": true
                                                     },
                                                     {
                                                         "name": "response_format",
@@ -3059,6 +3576,23 @@
                                             }
                                         },
                                         {
+                                            "id": 701,
+                                            "module": "json:ParseJSON",
+                                            "version": 1,
+                                            "parameters": {
+                                                "type": ""
+                                            },
+                                            "mapper": {
+                                                "json": "{{replace(replace(replace(200.choices[].message.content; \"```json\"; \"\"); \"```\"; \"\"); \"\\n\"; \"\")}}"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1350,
+                                                    "y": 1200
+                                                }
+                                            }
+                                        },
+                                        {
                                             "id": 201,
                                             "module": "supabase:upsertARecord",
                                             "version": 1,
@@ -3066,19 +3600,37 @@
                                                 "__IMTCONN__": 3941672
                                             },
                                             "mapper": {
-                                                "table": "Client",
                                                 "id": "{{34.id}}",
-                                                "row_id": "{{34.id}}",
-                                                "politeness_preference": "{{200.choices[].message.content.politeness_preference}}",
-                                                "target_audience": "{{200.choices[].message.content.target_audience}}",
-                                                "writing_style": "{{200.choices[].message.content.writing_style}}",
-                                                "narrative_scope": "{{200.choices[].message.content.narrative_scope}}",
-                                                "onboarding_status": "{{200.choices[].message.content.onboarding_complete}}",
-                                                "phase": "{{if(200.choices[].message.content.onboarding_complete = true; \"Interview\"; 34.phase)}}"
+                                                "phase": "{{if(701.onboarding_complete = true; \"Interview\"; ifempty(34.phase; \"Onboarding\"))}}",
+                                                "table": "Client",
+                                                "writing_style": "{{701.writing_style}}",
+                                                "narrative_scope": "{{701.narrative_scope}}",
+                                                "target_audience": "{{701.target_audience}}",
+                                                "onboarding_status": "{{701.onboarding_complete}}",
+                                                "politeness_preference": "{{701.politeness_preference}}"
                                             },
                                             "metadata": {
                                                 "designer": {
                                                     "x": 1500,
+                                                    "y": 1200
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": 8555,
+                                            "module": "supabase:upsertARecord",
+                                            "version": 1,
+                                            "parameters": {
+                                                "__IMTCONN__": 3941672
+                                            },
+                                            "mapper": {
+                                                "table": "Books",
+                                                "client_id": "{{34.id}}",
+                                                "title": "Biographie"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1800,
                                                     "y": 1200
                                                 }
                                             }
@@ -3222,10 +3774,6 @@
                                                                                     {
                                                                                         "label": "Less than",
                                                                                         "value": "number:lt."
-                                                                                    },
-                                                                                    {
-                                                                                        "label": "Greater than or equal to",
-                                                                                        "value": "number:gte."
                                                                                     },
                                                                                     {
                                                                                         "label": "Less than or equal to",
@@ -3597,7 +4145,7 @@
                                                 "messages": [
                                                     {
                                                         "role": "system",
-                                                        "content": "{\n  \"assistant\": {\n    \"name\": \"Loomina-Ghostwriter\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es l'Écrivain Fantôme de Loomina, un maître du récit autobiographique. Ton talent réside dans ta capacité à transformer une conversation orale en une prose élégante, immersive et structurée.\\n\\n# TON CLIENT & SON STYLE\\n- Nom du client : {{34.name}}\\n- Style d'écriture imposé : '{{35.style}}' (Tu dois IMPÉRATIVEMENT adopter le vocabulaire, la syntaxe et le rythme propres à ce style).\\n\\n# TA MISSION : LA TRANSFORMATION NARRATIVE\\nTa tâche est d'extraire la substance émotionnelle et factuelle du transcript pour rédiger un chapitre à la première personne (\\\"Je\\\"), digne d'être imprimé.\\n\\n***\\n\\n# COMPORTEMENT ÉTAPE PAR ÉTAPE (LOGIQUE CRITIQUE)\\n1. **GATEKEEPER (ANALYSE DE PERTINENCE)** : Lis le transcript. S'il ne contient PAS de contenu biographique exploitable (ex: uniquement des tests micro, \\\"allô\\\", \\\"je te rappelle\\\", silence, ou moins de 3 phrases de récit), réponds UNIQUEMENT par le mot : **ABORT**.\\n2. **EXTRACTION DES FAITS** : Identifie mentalement les lieux, les prénoms, les dates et les actions clés.\\n3. **INCARNATION** : Enfile la peau du client. Ce n'est pas toi qui racontes son histoire, c'est LUI qui écrit son livre à travers ta plume.\\n\\n***\\n\\n# RÈGLES D'OR DE RÉDACTION\\n- **NETTOYAGE RADICAL** : Supprime les tics de langage (euh, ben, alors), les hésitations, les répétitions et toutes les interactions techniques avec l'IA.\\n- **ENRICHISSEMENT SENSORIEL** : Ne te contente pas de lister les faits. Si le client dit \\\"je suis allé à la plage\\\", évoque l'odeur du sel ou la sensation du sable. Règle : Ne crée pas de nouveaux faits, mais amplifie la perception de ceux existants.\\n- **RÉSONANCE ÉMOTIONNELLE** : Analyse l'implicite. Derrière un fait, cherche le sentiment (nostalgie, fierté, blessure). Le lecteur doit ressentir ce que le client a vécu.\\n- **FLUIDITÉ ROMANESQUE** : Le texte doit s'enchaîner sans couture. Évite les structures répétitives type \\\"Puis j'ai fait... Après j'ai vu...\\\". Utilise des transitions élégantes.\\n\\n# FORMAT DE SORTIE (STRICT)\\nTITRE : [Un titre court, évocateur et poétique]\\n\\nRÉCIT :\\n[Ton texte rédigé ici, organisé en paragraphes aérés]\"\n        }\n      ]\n    }\n  }\n}"
+                                                        "content": "{\n  \"assistant\": {\n    \"name\": \"Loomina-Ghostwriter\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"Tu es l'Écrivain Fantôme de Loomina, un maître du récit autobiographique. Ton talent réside dans ta capacité à transformer une conversation orale en une prose élégante, immersive et structurée.\\n\\n# TON CLIENT & SON STYLE\\n- Nom du client : {{34.name}}\\n- Style d'écriture imposé : '{{35.style}}' (Tu dois IMPÉRATIVEMENT adopter le vocabulaire, la syntaxe et le rythme propres à ce style).\\n\\n# TA MISSION : LA TRANSFORMATION NARRATIVE\\nTa tâche est d'extraire la substance émotionnelle et factuelle du transcript pour rédiger un chapitre à la première personne (\\\"Je\\\"), digne d'être imprimé.\\n\\n***\\n\\n# COMPORTEMENT ÉTAPE PAR ÉTAPE (LOGIQUE CRITIQUE)\\n1. **GATEKEEPER (ANALYSE DE PERTINENCE)** : Lis le transcript. S'il ne contient PAS de contenu biographique exploitable (ex: uniquement des tests micro, \\\"allô\\\", \\\"je te rappelle\\\", silence, ou moins de 3 phrases de récit), réponds UNIQUEMENT par le mot : **ABORT**.\\n2. **EXTRACTION DES FAITS** : Identifie mentalement les lieux, les prénoms, les dates et les actions clés.\\n3. **INCARNATION** : Enfile la peau du client. Ce n'est pas toi qui racontes son histoire, c'est LUI qui écrit son livre à travers ta plume.\\n\\n***\\n\\n# RÈGLES D'OR DE RÉDACTION\\n- **NETTOYAGE RADICAL** : Supprime les tics de langage (euh, ben, alors), les hésitations, les répétitions et toutes les interactions techniques avec l'IA.\\n- **ENRICHISSEMENT SENSORIEL** : Ne te contente pas de lister les faits. Si le client dit \\\"je suis allé à la plage\\\", évoque l'odeur du sel ou la sensation du sable. Règle : Ne crée pas de nouveaux faits, mais amplifie la perception de ceux existants.\\n- **RÉSONANCE ÉMOTIONNELLE** : Analyse l'implicite. Derrière un fait, cherche le sentiment (nostalgie, fierté, blessure). Le lecteur doit ressentir ce que le client a vécu.\\n- **FLUIDITÉ ROMANESQUE** : Le texte doit s'enchaîner sans couture. Évite les structures répétitives type \\\"Puis j'ai fait... Après j'ai vu...\\\". Utilise des transitions élégantes.\\n\\n# FORMAT DE SORTIE (JSON STRICT)\\nTu dois répondre UNIQUEMENT avec un JSON valide respectant cette structure : { \\\"title\\\": \\\"[Un titre court, évocateur]\\\", \\\"content\\\": \\\"[Ton texte rédigé ici]\\\" }\\n\\nSi le contenu est insuffisant (ABORT), renvoie : { \\\"title\\\": \\\"\\\", \\\"content\\\": \\\"ABORT\\\" }\"\n        }\n      ]\n    }\n  }\n}"
                                                     },
                                                     {
                                                         "role": "user",
@@ -4407,6 +4955,23 @@
                                             ]
                                         },
                                         {
+                                            "id": 702,
+                                            "module": "json:ParseJSON",
+                                            "version": 1,
+                                            "parameters": {
+                                                "type": ""
+                                            },
+                                            "mapper": {
+                                                "json": "{{3.choices[].message.content}}"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1800,
+                                                    "y": 2100
+                                                }
+                                            }
+                                        },
+                                        {
                                             "id": 36,
                                             "module": "supabase:createARow",
                                             "version": 1,
@@ -4427,9 +4992,10 @@
                                             },
                                             "mapper": {
                                                 "table": "Chapters",
+                                                "title": "{{702.title}}",
                                                 "book_id": "{{35.id}}",
-                                                "call_id": "{{34.id}}",
-                                                "content": "{{3.choices[].message.content}}"
+                                                "call_id": "{{700.id}}",
+                                                "content": "{{702.content}}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -6764,12 +7330,9 @@
                                                 ]
                                             },
                                             "mapper": {
-                                                "select": "chat",
-                                                "temperature": "1",
-                                                "top_p": "1",
-                                                "n_completions": "1",
                                                 "model": "gpt-4o",
-                                                "max_tokens": "500",
+                                                "top_p": "1",
+                                                "select": "chat",
                                                 "messages": [
                                                     {
                                                         "role": "system",
@@ -6780,7 +7343,10 @@
                                                         "content": "{{1.message.call.transcript}}",
                                                         "imageDetail": "auto"
                                                     }
-                                                ]
+                                                ],
+                                                "max_tokens": "500",
+                                                "temperature": "1",
+                                                "n_completions": "1"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -6788,35 +7354,16 @@
                                                     "y": 3000
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My OpenAI connection",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "openai-gpt-3"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
-                                                        "select": {
-                                                            "label": "Create a Chat Completion (GPT and o1 models)"
-                                                        },
-                                                        "logit_bias": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "tool_choice": {
-                                                            "mode": "chose",
-                                                            "label": "Empty"
-                                                        },
                                                         "stop": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "additionalParameters": {
                                                             "mode": "chose"
                                                         },
                                                         "model": {
                                                             "mode": "chose",
                                                             "label": "gpt-4o (system)Fast, intelligent, flexible GPT model"
+                                                        },
+                                                        "select": {
+                                                            "label": "Create a Chat Completion (GPT and o1 models)"
                                                         },
                                                         "messages": {
                                                             "mode": "chose",
@@ -6832,19 +7379,38 @@
                                                                         "mode": "chose",
                                                                         "label": "User"
                                                                     },
-                                                                    "imageInputType": {
-                                                                        "mode": "chose",
-                                                                        "label": "Empty"
-                                                                    },
                                                                     "imageDetail": {
                                                                         "mode": "chose",
                                                                         "label": "Auto"
+                                                                    },
+                                                                    "imageInputType": {
+                                                                        "mode": "chose",
+                                                                        "label": "Empty"
                                                                     }
                                                                 }
                                                             ]
                                                         },
+                                                        "logit_bias": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "tool_choice": {
+                                                            "mode": "chose",
+                                                            "label": "Empty"
+                                                        },
                                                         "response_format": {
                                                             "mode": "chose"
+                                                        },
+                                                        "additionalParameters": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "openai-gpt-3"
+                                                            },
+                                                            "label": "My OpenAI connection"
                                                         }
                                                     }
                                                 },
@@ -6912,9 +7478,8 @@
                                                     },
                                                     {
                                                         "name": "logit_bias",
-                                                        "type": "array",
-                                                        "label": "Token Probability",
                                                         "spec": {
+                                                            "name": "value",
                                                             "spec": [
                                                                 {
                                                                     "name": "token",
@@ -6934,9 +7499,10 @@
                                                                 }
                                                             ],
                                                             "type": "collection",
-                                                            "label": "Token Probability",
-                                                            "name": "value"
-                                                        }
+                                                            "label": "Token Probability"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Token Probability"
                                                     },
                                                     {
                                                         "name": "seed",
@@ -6957,22 +7523,21 @@
                                                     },
                                                     {
                                                         "name": "stop",
+                                                        "spec": {
+                                                            "name": "value",
+                                                            "type": "text",
+                                                            "label": "Stop Sequence"
+                                                        },
                                                         "type": "array",
                                                         "label": "Stop Sequences",
                                                         "validate": {
                                                             "maxItems": 4
-                                                        },
-                                                        "spec": {
-                                                            "type": "text",
-                                                            "label": "Stop Sequence",
-                                                            "name": "value"
                                                         }
                                                     },
                                                     {
                                                         "name": "additionalParameters",
-                                                        "type": "array",
-                                                        "label": "Other Input Parameters",
                                                         "spec": {
+                                                            "name": "value",
                                                             "spec": [
                                                                 {
                                                                     "name": "key",
@@ -7045,9 +7610,10 @@
                                                                 }
                                                             ],
                                                             "type": "collection",
-                                                            "label": "Input Parameter",
-                                                            "name": "value"
-                                                        }
+                                                            "label": "Input Parameter"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Other Input Parameters"
                                                     },
                                                     {
                                                         "name": "model",
@@ -7062,24 +7628,18 @@
                                                     },
                                                     {
                                                         "name": "messages",
-                                                        "type": "array",
-                                                        "label": "Messages",
-                                                        "required": true,
                                                         "spec": {
-                                                            "label": "Message",
-                                                            "type": "collection",
+                                                            "name": "value",
                                                             "spec": [
                                                                 {
                                                                     "name": "role",
                                                                     "type": "select",
                                                                     "label": "Role",
-                                                                    "required": true,
                                                                     "options": {
                                                                         "store": [
                                                                             {
                                                                                 "label": "User",
                                                                                 "value": "user",
-                                                                                "default": true,
                                                                                 "nested": [
                                                                                     {
                                                                                         "help": "Text content of the message on behalf of the selected __Role__.",
@@ -7091,30 +7651,28 @@
                                                                                         "name": "imageInputType",
                                                                                         "type": "select",
                                                                                         "label": "Image Input Type",
-                                                                                        "mappable": false,
                                                                                         "options": [
                                                                                             {
-                                                                                                "value": "url",
                                                                                                 "label": "URL",
+                                                                                                "value": "url",
                                                                                                 "nested": [
                                                                                                     {
+                                                                                                        "help": "Make sure to use a publicly accessible URL.\nYou can test if your image is publicly accessible by opening the link in an incognito tab.",
                                                                                                         "name": "imageUrl",
-                                                                                                        "label": "Image URL",
                                                                                                         "type": "url",
-                                                                                                        "help": "Make sure to use a publicly accessible URL.\nYou can test if your image is publicly accessible by opening the link in an incognito tab."
+                                                                                                        "label": "Image URL"
                                                                                                     }
                                                                                                 ]
                                                                                             },
                                                                                             {
-                                                                                                "value": "file",
                                                                                                 "label": "Image File",
+                                                                                                "value": "file",
                                                                                                 "nested": [
                                                                                                     {
                                                                                                         "name": "imageFile",
-                                                                                                        "label": "Image",
-                                                                                                        "type": "collection",
                                                                                                         "spec": [
                                                                                                             {
+                                                                                                                "help": "Accepted extensions: `.jpg`, `.jpeg`, `.png`, `.webp` and `.gif`.",
                                                                                                                 "name": "imageFilename",
                                                                                                                 "type": "filename",
                                                                                                                 "label": "Image Filename",
@@ -7125,8 +7683,7 @@
                                                                                                                     "png",
                                                                                                                     "webp",
                                                                                                                     "gif"
-                                                                                                                ],
-                                                                                                                "help": "Accepted extensions: `.jpg`, `.jpeg`, `.png`, `.webp` and `.gif`."
+                                                                                                                ]
                                                                                                             },
                                                                                                             {
                                                                                                                 "name": "imageData",
@@ -7134,34 +7691,38 @@
                                                                                                                 "label": "Image Data",
                                                                                                                 "semantic": "file:data"
                                                                                                             }
-                                                                                                        ]
+                                                                                                        ],
+                                                                                                        "type": "collection",
+                                                                                                        "label": "Image"
                                                                                                     }
                                                                                                 ]
                                                                                             }
-                                                                                        ]
+                                                                                        ],
+                                                                                        "mappable": false
                                                                                     },
                                                                                     {
+                                                                                        "help": "Recommended value: `Auto`",
                                                                                         "name": "imageDetail",
                                                                                         "type": "select",
                                                                                         "label": "Image Detail",
-                                                                                        "help": "Recommended value: `Auto`",
                                                                                         "options": [
                                                                                             {
+                                                                                                "label": "Auto",
                                                                                                 "value": "auto",
-                                                                                                "default": true,
-                                                                                                "label": "Auto"
+                                                                                                "default": true
                                                                                             },
                                                                                             {
-                                                                                                "value": "high",
-                                                                                                "label": "High"
+                                                                                                "label": "High",
+                                                                                                "value": "high"
                                                                                             },
                                                                                             {
-                                                                                                "value": "low",
-                                                                                                "label": "Low"
+                                                                                                "label": "Low",
+                                                                                                "value": "low"
                                                                                             }
                                                                                         ]
                                                                                     }
-                                                                                ]
+                                                                                ],
+                                                                                "default": true
                                                                             },
                                                                             {
                                                                                 "label": "Assistant",
@@ -7174,19 +7735,9 @@
                                                                                         "label": "Text Content"
                                                                                     },
                                                                                     {
-                                                                                        "name": "tool_calls",
-                                                                                        "label": "Tool Calls",
-                                                                                        "type": "array",
-                                                                                        "labels": {
-                                                                                            "add": "Add tool call"
-                                                                                        },
                                                                                         "mode": "edit",
-                                                                                        "mappable": {
-                                                                                            "help": "You can map the entire `Choices[]: Message.Tool Calls` array from a previous Create a Completion module here."
-                                                                                        },
+                                                                                        "name": "tool_calls",
                                                                                         "spec": {
-                                                                                            "label": "Tool Call",
-                                                                                            "type": "collection",
                                                                                             "spec": [
                                                                                                 {
                                                                                                     "name": "type",
@@ -7194,39 +7745,50 @@
                                                                                                     "default": "function"
                                                                                                 },
                                                                                                 {
+                                                                                                    "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`.",
                                                                                                     "name": "id",
                                                                                                     "type": "text",
-                                                                                                    "label": "Tool call ID",
-                                                                                                    "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`."
+                                                                                                    "label": "Tool call ID"
                                                                                                 },
                                                                                                 {
                                                                                                     "name": "function",
-                                                                                                    "type": "collection",
-                                                                                                    "label": "Function",
                                                                                                     "spec": [
                                                                                                         {
+                                                                                                            "help": "The name of the function previously called.",
                                                                                                             "name": "name",
-                                                                                                            "label": "Name",
                                                                                                             "type": "text",
-                                                                                                            "required": true,
-                                                                                                            "help": "The name of the function previously called."
+                                                                                                            "label": "Name",
+                                                                                                            "required": true
                                                                                                         },
                                                                                                         {
+                                                                                                            "help": "The arguments previously output by the AI.",
                                                                                                             "name": "arguments",
-                                                                                                            "label": "Arguments",
                                                                                                             "type": "text",
-                                                                                                            "required": true,
-                                                                                                            "help": "The arguments previously output by the AI."
+                                                                                                            "label": "Arguments",
+                                                                                                            "required": true
                                                                                                         }
-                                                                                                    ]
+                                                                                                    ],
+                                                                                                    "type": "collection",
+                                                                                                    "label": "Function"
                                                                                                 }
-                                                                                            ]
+                                                                                            ],
+                                                                                            "type": "collection",
+                                                                                            "label": "Tool Call"
+                                                                                        },
+                                                                                        "type": "array",
+                                                                                        "label": "Tool Calls",
+                                                                                        "labels": {
+                                                                                            "add": "Add tool call"
+                                                                                        },
+                                                                                        "mappable": {
+                                                                                            "help": "You can map the entire `Choices[]: Message.Tool Calls` array from a previous Create a Completion module here."
                                                                                         }
                                                                                     }
                                                                                 ]
                                                                             },
                                                                             {
                                                                                 "label": "Developer / System",
+                                                                                "value": "system",
                                                                                 "nested": [
                                                                                     {
                                                                                         "help": "Text content of the message on behalf of the selected __Role__.",
@@ -7234,8 +7796,7 @@
                                                                                         "type": "text",
                                                                                         "label": "Text Content"
                                                                                     }
-                                                                                ],
-                                                                                "value": "system"
+                                                                                ]
                                                                             },
                                                                             {
                                                                                 "label": "Tool",
@@ -7249,20 +7810,25 @@
                                                                                         "required": true
                                                                                     },
                                                                                     {
-                                                                                        "label": "Tool Call ID.",
+                                                                                        "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`.",
                                                                                         "name": "tool_call_id",
                                                                                         "type": "text",
-                                                                                        "required": true,
-                                                                                        "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`."
+                                                                                        "label": "Tool Call ID.",
+                                                                                        "required": true
                                                                                     }
                                                                                 ]
                                                                             }
                                                                         ]
-                                                                    }
+                                                                    },
+                                                                    "required": true
                                                                 }
                                                             ],
-                                                            "name": "value"
-                                                        }
+                                                            "type": "collection",
+                                                            "label": "Message"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Messages",
+                                                        "required": true
                                                     },
                                                     {
                                                         "name": "response_format",
@@ -7532,10 +8098,10 @@
                                             },
                                             "mapper": {
                                                 "table": "Books",
-                                                "status": "completed",
                                                 "title": "{{400.choices[].message.content.title}}",
-                                                "dedication": "{{400.choices[].message.content.dedication}}",
-                                                "client_id": "{{34.id}}"
+                                                "status": "completed",
+                                                "client_id": "{{34.id}}",
+                                                "dedication": "{{400.choices[].message.content.dedication}}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -7557,10 +8123,10 @@
                             "module": "http:MakeRequest",
                             "version": 4,
                             "parameters": {
-                                "authenticationType": "basicAuth",
                                 "tlsType": "",
                                 "proxyKeychain": "",
-                                "basicAuthKeychain": 71390
+                                "basicAuthKeychain": 71390,
+                                "authenticationType": "basicAuth"
                             },
                             "filter": {
                                 "name": "Action = send_otp",
@@ -7578,11 +8144,10 @@
                                 "url": "https://verify.twilio.com/v2/Services/VA85ce7a3d73d72c01e50e6e79896494a2/Verifications",
                                 "method": "post",
                                 "contentType": "urlEncoded",
-                                "parseResponse": true,
-                                "stopOnHttpError": true,
-                                "allowRedirects": true,
                                 "shareCookies": false,
-                                "requestCompressedContent": true,
+                                "parseResponse": true,
+                                "allowRedirects": true,
+                                "stopOnHttpError": true,
                                 "urlEncodedBodyContent": [
                                     {
                                         "name": "To",
@@ -7592,7 +8157,8 @@
                                         "name": "Channel",
                                         "value": "sms"
                                     }
-                                ]
+                                ],
+                                "requestCompressedContent": true
                             },
                             "metadata": {
                                 "designer": {
@@ -7600,20 +8166,6 @@
                                     "y": 3300
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "authenticationType": {
-                                            "label": "Basic authUse when the service requires a username and password."
-                                        },
-                                        "tlsType": {
-                                            "label": "Empty"
-                                        },
-                                        "proxyKeychain": {
-                                            "label": "Choose a key"
-                                        },
-                                        "basicAuthKeychain": {
-                                            "label": "Twilio"
-                                        }
-                                    },
                                     "expect": {
                                         "method": {
                                             "mode": "chose",
@@ -7622,25 +8174,25 @@
                                         "headers": {
                                             "mode": "chose"
                                         },
-                                        "queryParameters": {
-                                            "mode": "chose"
-                                        },
                                         "contentType": {
                                             "label": "application/x-www-form-urlencodedEnter form data as key-value pairs encoded in the URL style."
                                         },
-                                        "parseResponse": {
+                                        "shareCookies": {
                                             "mode": "chose"
                                         },
-                                        "stopOnHttpError": {
+                                        "parseResponse": {
                                             "mode": "chose"
                                         },
                                         "allowRedirects": {
                                             "mode": "chose"
                                         },
-                                        "shareCookies": {
+                                        "paginationType": {
+                                            "label": "Empty"
+                                        },
+                                        "queryParameters": {
                                             "mode": "chose"
                                         },
-                                        "requestCompressedContent": {
+                                        "stopOnHttpError": {
                                             "mode": "chose"
                                         },
                                         "urlEncodedBodyContent": {
@@ -7650,8 +8202,22 @@
                                                 null
                                             ]
                                         },
-                                        "paginationType": {
+                                        "requestCompressedContent": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "tlsType": {
                                             "label": "Empty"
+                                        },
+                                        "proxyKeychain": {
+                                            "label": "Choose a key"
+                                        },
+                                        "basicAuthKeychain": {
+                                            "label": "Twilio"
+                                        },
+                                        "authenticationType": {
+                                            "label": "Basic authUse when the service requires a username and password."
                                         }
                                     }
                                 },
@@ -7688,8 +8254,9 @@
                                     },
                                     {
                                         "name": "basicAuthKeychain",
-                                        "type": "keychain:basicAuth",
-                                        "label": "Basic auth"
+                                        "type": "keychain:basicauth",
+                                        "label": "Credentials",
+                                        "required": true
                                     }
                                 ],
                                 "expect": [
@@ -7718,48 +8285,48 @@
                                     },
                                     {
                                         "name": "headers",
-                                        "type": "array",
-                                        "label": "Headers",
-                                        "validate": {
-                                            "maxItems": 16
-                                        },
                                         "spec": [
                                             {
                                                 "name": "name",
-                                                "label": "Name",
                                                 "type": "text",
+                                                "label": "Name",
                                                 "required": true
                                             },
                                             {
                                                 "name": "value",
-                                                "label": "Value",
                                                 "type": "text",
+                                                "label": "Value",
                                                 "required": true
                                             }
-                                        ]
+                                        ],
+                                        "type": "array",
+                                        "label": "Headers",
+                                        "validate": {
+                                            "maxItems": 16
+                                        }
                                     },
                                     {
                                         "name": "queryParameters",
-                                        "type": "array",
-                                        "label": "Query parameters",
                                         "spec": {
                                             "name": "value",
-                                            "label": "Parameter",
-                                            "type": "collection",
                                             "spec": [
                                                 {
                                                     "name": "name",
-                                                    "label": "Name",
                                                     "type": "text",
+                                                    "label": "Name",
                                                     "required": true
                                                 },
                                                 {
                                                     "name": "value",
-                                                    "label": "Value",
-                                                    "type": "text"
+                                                    "type": "text",
+                                                    "label": "Value"
                                                 }
-                                            ]
-                                        }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Parameter"
+                                        },
+                                        "type": "array",
+                                        "label": "Query parameters"
                                     },
                                     {
                                         "name": "contentType",
@@ -7804,21 +8371,21 @@
                                     },
                                     {
                                         "name": "urlEncodedBodyContent",
-                                        "type": "array",
-                                        "label": "Fields",
                                         "spec": [
                                             {
                                                 "name": "name",
-                                                "label": "Key",
                                                 "type": "text",
+                                                "label": "Key",
                                                 "required": true
                                             },
                                             {
                                                 "name": "value",
-                                                "label": "Value",
-                                                "type": "text"
+                                                "type": "text",
+                                                "label": "Value"
                                             }
-                                        ]
+                                        ],
+                                        "type": "array",
+                                        "label": "Fields"
                                     },
                                     {
                                         "name": "serializeUrl",
@@ -7847,8 +8414,8 @@
                             "version": 1,
                             "parameters": {},
                             "mapper": {
-                                "status": "200",
                                 "body": "{\"status\": \"sent\"}",
+                                "status": "200",
                                 "headers": [
                                     {
                                         "key": "Content-Type",
@@ -7873,10 +8440,10 @@
                                         "name": "status",
                                         "type": "uinteger",
                                         "label": "Status",
+                                        "required": true,
                                         "validate": {
                                             "min": 100
-                                        },
-                                        "required": true
+                                        }
                                     },
                                     {
                                         "name": "body",
@@ -7885,16 +8452,11 @@
                                     },
                                     {
                                         "name": "headers",
-                                        "type": "array",
-                                        "label": "Custom headers",
-                                        "validate": {
-                                            "maxItems": 16
-                                        },
                                         "spec": [
                                             {
                                                 "name": "key",
-                                                "label": "Key",
                                                 "type": "text",
+                                                "label": "Key",
                                                 "required": true,
                                                 "validate": {
                                                     "max": 256
@@ -7902,14 +8464,19 @@
                                             },
                                             {
                                                 "name": "value",
-                                                "label": "Value",
                                                 "type": "text",
+                                                "label": "Value",
                                                 "required": true,
                                                 "validate": {
                                                     "max": 4096
                                                 }
                                             }
-                                        ]
+                                        ],
+                                        "type": "array",
+                                        "label": "Custom headers",
+                                        "validate": {
+                                            "maxItems": 16
+                                        }
                                     }
                                 ]
                             }
@@ -7923,10 +8490,10 @@
                             "module": "http:MakeRequest",
                             "version": 4,
                             "parameters": {
-                                "authenticationType": "basicAuth",
                                 "tlsType": "",
                                 "proxyKeychain": "",
-                                "basicAuthKeychain": 71390
+                                "basicAuthKeychain": 71390,
+                                "authenticationType": "basicAuth"
                             },
                             "filter": {
                                 "name": "Action = verify_otp",
@@ -7944,11 +8511,10 @@
                                 "url": "https://verify.twilio.com/v2/Services/VA85ce7a3d73d72c01e50e6e79896494a2/VerificationCheck",
                                 "method": "post",
                                 "contentType": "urlEncoded",
-                                "parseResponse": true,
-                                "stopOnHttpError": true,
-                                "allowRedirects": true,
                                 "shareCookies": false,
-                                "requestCompressedContent": true,
+                                "parseResponse": true,
+                                "allowRedirects": true,
+                                "stopOnHttpError": true,
                                 "urlEncodedBodyContent": [
                                     {
                                         "name": "To",
@@ -7958,7 +8524,8 @@
                                         "name": "Code",
                                         "value": "{{1.code}}"
                                     }
-                                ]
+                                ],
+                                "requestCompressedContent": true
                             },
                             "metadata": {
                                 "designer": {
@@ -7966,20 +8533,6 @@
                                     "y": 3600
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "authenticationType": {
-                                            "label": "Basic authUse when the service requires a username and password."
-                                        },
-                                        "tlsType": {
-                                            "label": "Empty"
-                                        },
-                                        "proxyKeychain": {
-                                            "label": "Choose a key"
-                                        },
-                                        "basicAuthKeychain": {
-                                            "label": "Twilio"
-                                        }
-                                    },
                                     "expect": {
                                         "method": {
                                             "mode": "chose",
@@ -7988,25 +8541,25 @@
                                         "headers": {
                                             "mode": "chose"
                                         },
-                                        "queryParameters": {
-                                            "mode": "chose"
-                                        },
                                         "contentType": {
                                             "label": "application/x-www-form-urlencodedEnter form data as key-value pairs encoded in the URL style."
                                         },
-                                        "parseResponse": {
+                                        "shareCookies": {
                                             "mode": "chose"
                                         },
-                                        "stopOnHttpError": {
+                                        "parseResponse": {
                                             "mode": "chose"
                                         },
                                         "allowRedirects": {
                                             "mode": "chose"
                                         },
-                                        "shareCookies": {
+                                        "paginationType": {
+                                            "label": "Empty"
+                                        },
+                                        "queryParameters": {
                                             "mode": "chose"
                                         },
-                                        "requestCompressedContent": {
+                                        "stopOnHttpError": {
                                             "mode": "chose"
                                         },
                                         "urlEncodedBodyContent": {
@@ -8016,8 +8569,22 @@
                                                 null
                                             ]
                                         },
-                                        "paginationType": {
+                                        "requestCompressedContent": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "tlsType": {
                                             "label": "Empty"
+                                        },
+                                        "proxyKeychain": {
+                                            "label": "Choose a key"
+                                        },
+                                        "basicAuthKeychain": {
+                                            "label": "Twilio"
+                                        },
+                                        "authenticationType": {
+                                            "label": "Basic authUse when the service requires a username and password."
                                         }
                                     }
                                 },
@@ -8085,17 +8652,13 @@
                                     },
                                     {
                                         "name": "headers",
-                                        "type": "array",
-                                        "label": "Headers",
                                         "spec": {
                                             "name": "value",
-                                            "label": "Header",
-                                            "type": "collection",
                                             "spec": [
                                                 {
                                                     "name": "name",
-                                                    "label": "Name",
                                                     "type": "text",
+                                                    "label": "Name",
                                                     "required": true,
                                                     "validate": {
                                                         "pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
@@ -8103,34 +8666,38 @@
                                                 },
                                                 {
                                                     "name": "value",
-                                                    "label": "Value",
-                                                    "type": "text"
+                                                    "type": "text",
+                                                    "label": "Value"
                                                 }
-                                            ]
-                                        }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Header"
+                                        },
+                                        "type": "array",
+                                        "label": "Headers"
                                     },
                                     {
                                         "name": "queryParameters",
-                                        "type": "array",
-                                        "label": "Query parameters",
                                         "spec": {
                                             "name": "value",
-                                            "label": "Parameter",
-                                            "type": "collection",
                                             "spec": [
                                                 {
                                                     "name": "name",
-                                                    "label": "Name",
                                                     "type": "text",
+                                                    "label": "Name",
                                                     "required": true
                                                 },
                                                 {
                                                     "name": "value",
-                                                    "label": "Value",
-                                                    "type": "text"
+                                                    "type": "text",
+                                                    "label": "Value"
                                                 }
-                                            ]
-                                        }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Parameter"
+                                        },
+                                        "type": "array",
+                                        "label": "Query parameters"
                                     },
                                     {
                                         "name": "contentType",
@@ -8162,8 +8729,8 @@
                                         "type": "uinteger",
                                         "label": "Timeout",
                                         "validate": {
-                                            "min": 1,
-                                            "max": 300
+                                            "max": 300,
+                                            "min": 1
                                         }
                                     },
                                     {
@@ -8186,27 +8753,27 @@
                                     },
                                     {
                                         "name": "urlEncodedBodyContent",
-                                        "type": "array",
-                                        "label": "Body content",
-                                        "required": true,
                                         "spec": {
                                             "name": "value",
-                                            "label": "Field",
-                                            "type": "collection",
                                             "spec": [
                                                 {
                                                     "name": "name",
-                                                    "label": "Name",
                                                     "type": "text",
+                                                    "label": "Name",
                                                     "required": true
                                                 },
                                                 {
                                                     "name": "value",
-                                                    "label": "Value",
-                                                    "type": "text"
+                                                    "type": "text",
+                                                    "label": "Value"
                                                 }
-                                            ]
-                                        }
+                                            ],
+                                            "type": "collection",
+                                            "label": "Field"
+                                        },
+                                        "type": "array",
+                                        "label": "Body content",
+                                        "required": true
                                     },
                                     {
                                         "name": "paginationType",
@@ -8225,53 +8792,53 @@
                                 "interface": [
                                     {
                                         "name": "data",
-                                        "label": "Data",
-                                        "type": "any"
+                                        "type": "any",
+                                        "label": "Data"
                                     },
                                     {
                                         "name": "statusCode",
-                                        "label": "Status Code",
-                                        "type": "number"
+                                        "type": "number",
+                                        "label": "Status Code"
                                     },
                                     {
                                         "name": "headers",
-                                        "label": "Headers",
-                                        "type": "collection",
                                         "spec": [
                                             {
                                                 "name": "content-length",
-                                                "label": "Content-Length",
-                                                "type": "text"
+                                                "type": "text",
+                                                "label": "Content-Length"
                                             },
                                             {
                                                 "name": "content-encoding",
-                                                "label": "Content-Encoding",
-                                                "type": "text"
+                                                "type": "text",
+                                                "label": "Content-Encoding"
                                             },
                                             {
                                                 "name": "content-type",
-                                                "label": "Content-Type",
-                                                "type": "text"
+                                                "type": "text",
+                                                "label": "Content-Type"
                                             },
                                             {
                                                 "name": "server",
-                                                "label": "Server",
-                                                "type": "text"
+                                                "type": "text",
+                                                "label": "Server"
                                             },
                                             {
                                                 "name": "cache-control",
-                                                "label": "Cache-Control",
-                                                "type": "text"
+                                                "type": "text",
+                                                "label": "Cache-Control"
                                             },
                                             {
                                                 "name": "set-cookie",
-                                                "label": "Set-Cookie",
-                                                "type": "array",
                                                 "spec": {
                                                     "type": "text"
-                                                }
+                                                },
+                                                "type": "array",
+                                                "label": "Set-Cookie"
                                             }
-                                        ]
+                                        ],
+                                        "type": "collection",
+                                        "label": "Headers"
                                     }
                                 ]
                             }
@@ -8284,14 +8851,14 @@
                                 "__IMTCONN__": 3941672
                             },
                             "mapper": {
-                                "table": "Client",
                                 "limit": "10",
+                                "table": "Client",
                                 "search": [
                                     [
                                         {
                                             "a": "phone_number",
-                                            "o": "text:eq.",
-                                            "b": "{{1.phone}}"
+                                            "b": "{{1.phone}}",
+                                            "o": "text:eq."
                                         }
                                     ]
                                 ]
@@ -8302,18 +8869,10 @@
                                     "y": 3594
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "label": "My Supabase connection",
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "supabase"
-                                            }
-                                        }
-                                    },
                                     "expect": {
                                         "table": {
                                             "mode": "chose",
+                                            "label": "Client",
                                             "nested": [
                                                 {
                                                     "name": "search",
@@ -8471,8 +9030,16 @@
                                                         ]
                                                     }
                                                 }
-                                            ],
-                                            "label": "Client"
+                                            ]
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "supabase"
+                                            },
+                                            "label": "My Supabase connection"
                                         }
                                     }
                                 },
@@ -8728,8 +9295,8 @@
                             "version": 1,
                             "parameters": {},
                             "mapper": {
-                                "status": "200",
                                 "body": "{\"status\": \"approved\", \"client\": { \"id\": \"{{3007.id}}\", \"first_name\": \"{{3007.first_name}}\", \"last_name\": \"{{3007.last_name}}\" } }",
+                                "status": "200",
                                 "headers": [
                                     {
                                         "key": "Content-Type",
@@ -8757,10 +9324,10 @@
                                         "name": "status",
                                         "type": "uinteger",
                                         "label": "Status",
+                                        "required": true,
                                         "validate": {
                                             "min": 100
-                                        },
-                                        "required": true
+                                        }
                                     },
                                     {
                                         "name": "body",
@@ -8769,16 +9336,11 @@
                                     },
                                     {
                                         "name": "headers",
-                                        "type": "array",
-                                        "label": "Custom headers",
-                                        "validate": {
-                                            "maxItems": 16
-                                        },
                                         "spec": [
                                             {
                                                 "name": "key",
-                                                "label": "Key",
                                                 "type": "text",
+                                                "label": "Key",
                                                 "required": true,
                                                 "validate": {
                                                     "max": 256
@@ -8786,79 +9348,21 @@
                                             },
                                             {
                                                 "name": "value",
-                                                "label": "Value",
                                                 "type": "text",
+                                                "label": "Value",
                                                 "required": true,
                                                 "validate": {
                                                     "max": 4096
                                                 }
                                             }
-                                        ]
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "flow": [
-                        {
-                            "id": 9000,
-                            "module": "http:MakeRequest",
-                            "version": 4,
-                            "parameters": {
-                                "authenticationType": "noAuth"
-                            },
-                            "filter": {
-                                "name": "force_call_now",
-                                "conditions": [
-                                    [
-                                        {
-                                            "a": "{{1.action}}",
-                                            "b": "force_call_now",
-                                            "o": "text:equal"
+                                        ],
+                                        "type": "array",
+                                        "label": "Custom headers",
+                                        "validate": {
+                                            "maxItems": 16
                                         }
-                                    ]
-                                ]
-                            },
-                            "mapper": {
-                                "url": "https://api.vapi.ai/call/phone",
-                                "method": "post",
-                                "headers": [
-                                    {
-                                        "name": "Authorization",
-                                        "value": "Bearer YOUR_VAPI_PRIVATE_API_KEY"
-                                    },
-                                    {
-                                        "name": "Content-Type",
-                                        "value": "application/json"
                                     }
-                                ],
-                                "body": "{\n  \"phoneNumberId\": \"YOUR_VAPI_PHONE_NUMBER_ID\",\n  \"customer\": {\n    \"number\": \"{{1.phone}}\"\n  },\n  \"assistant\": {\n    \"serverUrl\": \"YOUR_MAKE_WEBHOOK_URL\",\n    \"serverMessages\": [\"assistant-request\"]\n  }\n}",
-                                "contentType": "raw",
-                                "parseResponse": true
-                            },
-                            "metadata": {
-                                "designer": {
-                                    "x": 600,
-                                    "y": 1950
-                                }
-                            }
-                        },
-                        {
-                            "id": 9001,
-                            "module": "gateway:WebhookRespond",
-                            "version": 1,
-                            "parameters": {},
-                            "mapper": {
-                                "status": 200,
-                                "body": "{\n  \"message\": \"Appel initié avec succès.\"\n}"
-                            },
-                            "metadata": {
-                                "designer": {
-                                    "x": 900,
-                                    "y": 1950
-                                }
+                                ]
                             }
                         }
                     ]
