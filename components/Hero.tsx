@@ -103,26 +103,26 @@ export default function Hero() {
             order-2 md:order-1
           `}
         >
-          <span className="text-[var(--loomina-gold)] font-sans font-bold text-[10px] md:text-sm tracking-[0.2em] uppercase mb-1 block">
+          <span className="text-[var(--loomina-gold)] font-sans font-bold text-[11px] md:text-[15px] tracking-[0.2em] uppercase mb-1 block">
             La 1ère IA biographe pour écrire vos mémoires par téléphone
           </span>
 
           {/* Refined Sizes: 
-              Mobile: text-4xl 
-              Tablet (md): text-4xl (was 5xl) to fix "clunky" look
-              Desktop (lg): text-5xl (was 6xl)
-              Wide (xl): text-6xl 
+              Mobile: text-[33px] (+10%)
+              Tablet (md): text-[40px] (+10%)
+              Desktop (lg): text-[53px] (+10%)
+              Wide (xl): text-[66px] (+10%)
           */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
+          <h1 className="text-[33px] md:text-[40px] lg:text-[53px] xl:text-[66px] font-serif font-medium text-[var(--loomina-ink)] leading-[1.1] tracking-tight">
             Loomina : Vous racontez. <br />
             <span className="italic text-[var(--loomina-gold)]">Votre livre s'écrit.</span>
           </h1>
 
           {/* Paragraph Sizes:
-              Mobile: text-base
-              Tablet/Desktop: text-lg
+              Mobile: text-lg (+10% from base)
+              Tablet/Desktop: text-xl (+10% from lg)
           */}
-          <p className="text-base md:text-lg text-neutral-600 leading-relaxed md:pr-12 max-w-md md:max-w-none">
+          <p className="text-lg md:text-xl text-neutral-600 leading-relaxed md:pr-12 max-w-md md:max-w-none">
             Ne laissez pas vos souvenirs s'effacer. Nous transformons vos entretiens téléphoniques en un <strong>livre autobiographique</strong> d'exception, sans que vous n'ayez rien à écrire.
           </p>
 
