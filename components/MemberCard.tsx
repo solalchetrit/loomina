@@ -40,15 +40,14 @@ export default function MemberCard({
 
                     {/* HEADER Flex */}
                     <div className="flex justify-between items-start">
-                        {/* Logo Mark */}
+                        {/* Logo Mark: Using the trimmed header logo */}
                         <div className="flex items-center gap-3">
-                            <div className="relative w-8 h-8 opacity-80">
-                                {/* Using the standard logo but tinted via CSS/filter if needed, or just standard */}
+                            <div className="relative h-6 w-24 opacity-80">
                                 <Image
-                                    src="/header_logo.svg"
+                                    src="/header-logo-trimmed.png"
                                     alt="Loomina Logo"
                                     fill
-                                    className="object-contain"
+                                    className="object-contain object-left"
                                 />
                             </div>
                             <div className="h-6 w-[1px] bg-amber-900/10"></div>
@@ -57,14 +56,16 @@ export default function MemberCard({
                             </span>
                         </div>
 
-                        {/* Year / Edition Badge */}
+                        {/* Icon / Seal: Using the favicon pictogram */}
                         <div className="flex flex-col items-end">
-                            <span className="text-[9px] uppercase tracking-wider text-amber-900/30 font-sans">
-                                Édition
-                            </span>
-                            <span className="font-serif text-amber-700/80 text-lg leading-none">
-                                2025
-                            </span>
+                            <div className="relative w-8 h-8 opacity-60 mix-blend-multiply grayscale-[0.2]">
+                                <Image
+                                    src="/loomina-icon.png"
+                                    alt="Loomina Seal"
+                                    fill
+                                    className="object-contain"
+                                />
+                            </div>
                         </div>
                     </div>
 
