@@ -32,6 +32,8 @@ export default function SuccessPage() {
                                     {
                                         name: fullName,
                                         phone_number: cleanPhone,
+                                        email: parsed.email,
+                                        status: 'onboarding',
                                         // We don't set created_at as it should be auto-generated or handled by DB default
                                     },
                                     { onConflict: 'phone_number' }
