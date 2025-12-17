@@ -41,19 +41,13 @@ export default function MemberCard({
                     {/* HEADER Flex */}
                     <div className="flex justify-between items-start">
                         {/* Logo Mark: Using the trimmed header logo */}
-                        <div className="flex items-center gap-3">
-                            <div className="relative h-6 w-24 opacity-80">
-                                <Image
-                                    src="/header-logo-trimmed.png"
-                                    alt="Loomina Logo"
-                                    fill
-                                    className="object-contain object-left"
-                                />
-                            </div>
-                            <div className="h-6 w-[1px] bg-amber-900/10"></div>
-                            <span className="text-[10px] uppercase tracking-[0.25em] text-amber-900/40 font-semibold font-sans pt-0.5">
-                                Ex Libris
-                            </span>
+                        <div className="relative h-8 w-32">
+                            <Image
+                                src="/header-logo-trimmed.png"
+                                alt="Loomina Logo"
+                                fill
+                                className="object-contain object-left"
+                            />
                         </div>
 
                         {/* Icon / Seal: Using the favicon pictogram */}
@@ -90,14 +84,6 @@ export default function MemberCard({
                             <span className="font-mono text-xs text-amber-900/60 tracking-widest">
                                 {memberId}
                             </span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <div className="px-3 py-1 bg-amber-50 rounded-full border border-amber-900/5">
-                                <span className="text-[10px] font-medium text-amber-800/70 uppercase tracking-widest">
-                                    Accès Privé
-                                </span>
-                            </div>
                         </div>
                     </div>
 
