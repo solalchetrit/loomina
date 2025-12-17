@@ -97,28 +97,30 @@ export default function MemberCard({
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none"></div>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 blur-[50px] rounded-full pointer-events-none"></div>
 
-                    <div className="relative h-full p-8 flex flex-col items-center justify-center text-center space-y-6">
+                    <div className="relative h-full p-6 sm:p-8 flex flex-col items-center justify-center text-center space-y-4">
                         <div>
-                            <h3 className="text-xl font-serif text-amber-100 mb-2">Bienvenue chez Loomina</h3>
+                            <h3 className="text-xl sm:text-2xl font-serif text-amber-100 mb-1">L'Expérience Loomina</h3>
                             <div className="w-8 h-[1px] bg-amber-500/50 mx-auto"></div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 flex-1 flex flex-col justify-center">
                             <p className="text-sm text-neutral-300 leading-relaxed max-w-sm mx-auto font-sans">
-                                Pour commencer l'écriture de votre chef-d'œuvre autobiographique, appelez votre biographe IA dès maintenant.
+                                Bienvenue. Votre voyage commence ici. Appelez notre IA pour raconter vos souvenirs : ils deviendront un livre <strong>biographique éternel</strong>.
                             </p>
 
-                            <div className="bg-amber-900/20 border border-amber-500/20 rounded-lg px-4 py-3">
-                                <span className="block text-[10px] uppercase tracking-widest text-amber-500/60 mb-1">Numéro Personnel</span>
-                                <a href="tel:+33159169357" className="text-lg sm:text-2xl font-serif text-white hover:text-amber-400 transition-colors">
+                            <div className="bg-amber-900/20 border border-amber-500/20 rounded-lg px-4 py-3 hover:bg-amber-900/30 transition-colors">
+                                <span className="block text-[10px] uppercase tracking-widest text-amber-500/60 mb-1">Appelez dès maintenant</span>
+                                <a href="tel:+33159169357" className="text-xl sm:text-2xl font-serif text-white hover:text-amber-400 transition-colors block">
                                     01 59 16 93 57
                                 </a>
                             </div>
                         </div>
 
-                        <p className="text-[10px] text-neutral-500 uppercase tracking-widest">
-                            Vous recevrez votre livre imprimé à la fin.
-                        </p>
+                        <div className="pt-2">
+                            <p className="text-[10px] text-neutral-500 uppercase tracking-widest">
+                                Livraison de votre livre imprimé incluse.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </motion.div>
