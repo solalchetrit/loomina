@@ -41,25 +41,13 @@ export default function MemberCard({
                     {/* HEADER Flex */}
                     <div className="flex justify-between items-start">
                         {/* Logo Mark: Using the trimmed header logo */}
-                        <div className="relative h-8 w-32">
+                        <div className="relative h-6 w-28">
                             <Image
                                 src="/header-logo-trimmed.png"
                                 alt="Loomina Logo"
                                 fill
                                 className="object-contain object-left"
                             />
-                        </div>
-
-                        {/* Icon / Seal: Using the favicon pictogram */}
-                        <div className="flex flex-col items-end">
-                            <div className="relative w-8 h-8 opacity-60 mix-blend-multiply grayscale-[0.2]">
-                                <Image
-                                    src="/loomina-icon.png"
-                                    alt="Loomina Seal"
-                                    fill
-                                    className="object-contain"
-                                />
-                            </div>
                         </div>
                     </div>
 
@@ -76,8 +64,8 @@ export default function MemberCard({
                     </div>
 
                     {/* FOOTER: ID & Status */}
-                    <div className="flex justify-between items-end pt-4">
-                        <div className="flex flex-col">
+                    <div className="flex justify-end items-end pt-4">
+                        <div className="flex flex-col items-end">
                             <span className="text-[9px] text-amber-900/30 uppercase tracking-widest font-sans mb-1">
                                 Membre N°
                             </span>
