@@ -64,21 +64,6 @@ h6,
     0 0 0 1px rgba(23, 23, 23, 0.04);
 }
 
-/* --- 3D FLIP UTILITIES --- */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.transform-style-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  /* Safari support */
-}
-
 /* --- LOOMINA MEMBER CARD (MIDNIGHT EDITION) --- */
 /* Variables Dark Mode */
 :root {
