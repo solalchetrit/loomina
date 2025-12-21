@@ -35,14 +35,14 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
             try {
                 setLoading(true);
 
-                const cleandPhone = formatToE164(userPhone);
-                console.log("Cleaned phone:", cleandPhone);
+                const cleanedPhone = formatToE164(userPhone);
+                console.log("Cleaned phone:", cleanedPhone);
 
                 // 1. Find Client by Phone
                 const { data: client, error: clientError } = await supabase
                     .from('Client')
                     .select('id, first_name, last_name')
-                    .eq('phone_number', cleandPhone)
+                    .eq('phone_number', cleanedPhone)
                     .single();
 
                 if (clientError || !client) {

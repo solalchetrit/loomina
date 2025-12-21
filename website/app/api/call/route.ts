@@ -9,8 +9,8 @@ export async function POST(request: NextRequest) {
         console.log("Webhook URL:", webhookUrl);
 
         if (!webhookUrl) {
-            alert("Erreur de configuration : Webhook introuvable.");
-            return;
+            console.error("Erreur de configuration : Webhook introuvable.");
+            return NextResponse.json({ message: "Erreur de configuration : Webhook introuvable." }, { status: 500 });
         }
 
         const formattedPhone = formatToE164(phone_number);

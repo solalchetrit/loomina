@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import MemberCard from "@/components/MemberCard";
+import { formatToE164 } from "@/lib/phone";
 
 export default function SuccessPage() {
     const [userData, setUserData] = useState<{ firstName: string; lastName: string; phone?: string } | null>(null);
@@ -23,7 +24,7 @@ export default function SuccessPage() {
                 const syncClient = async () => {
                     if (parsed.phone) {
                         try {
-                            const cleanPhone = parsed.phone.replace(/\s/g, '');
+                            const cleanPhone = formatToE164(parsed.phone);
                             const fullName = `${parsed.firstName} ${parsed.lastName}`.trim();
 
                             const { error } = await supabase

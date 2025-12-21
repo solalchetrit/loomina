@@ -11,22 +11,15 @@ interface StartInterviewButtonProps {
 export default function StartInterviewButton({ phone, userName }: StartInterviewButtonProps) {
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleStartInterview = async () => {
         setLoading(true);
         console.log("Attempting to trigger interview...");
         try {
-            const webhookUrl = "https://loomina-flow.onrender.com/call-client";
-            console.log("Webhook URL:", webhookUrl);
-
-            if (!webhookUrl) {
-                alert("Erreur de configuration : Webhook introuvable.");
-                return;
-            }
-
+            // We call our internal API route which handles the webhook logic
             const payload = {
                 phone_number: phone,
-
             };
             console.log("Sending payload:", payload);
 
@@ -45,11 +38,12 @@ export default function StartInterviewButton({ phone, userName }: StartInterview
             if (response.ok) {
                 setSent(true);
             } else {
-                alert(`Erreur (${response.status}): ${responseText}`);
+                setError(`Erreur (${response.status}): ${responseText}`);
+                console.error(`Erreur (${response.status}): ${responseText}`);
             }
         } catch (error) {
             console.error("Error triggering interview:", error);
-            alert(`Erreur technique: ${error instanceof Error ? error.message : String(error)}`);
+            setError(`Erreur technique: ${error instanceof Error ? error.message : String(error)}`);
         } finally {
             setLoading(false);
         }
@@ -65,12 +59,17 @@ export default function StartInterviewButton({ phone, userName }: StartInterview
     }
 
     return (
-        <MagicButton
-            onClick={handleStartInterview}
-            disabled={loading}
-            className="w-full md:w-auto"
-        >
-            {loading ? "Déclenchement..." : "📞 Démarrer l'interview maintenant"}
-        </MagicButton>
+        <>
+            <MagicButton
+                onClick={handleStartInterview}
+                disabled={loading}
+                className="w-full md:w-auto"
+            >
+                {loading ? "Déclenchement..." : "📞 Démarrer l'interview maintenant"}
+            </MagicButton>
+            {error && (
+                <p className="text-red-500 text-xs mt-2">{error}</p>
+            )}
+        </>
     );
 }
