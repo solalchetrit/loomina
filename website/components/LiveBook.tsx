@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import PhotoGallery from "@/components/PhotoGallery";
+import { formatToE164 } from "@/lib/phone";
 
 interface Story {
     id: number;
@@ -34,14 +35,19 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
             try {
                 setLoading(true);
 
+                const cleandPhone = formatToE164(userPhone);
+                console.log("Cleaned phone:", cleandPhone);
+
                 // 1. Find Client by Phone
                 const { data: client, error: clientError } = await supabase
                     .from('Client')
-                    .select('id, name')
-                    .eq('phone_number', userPhone)
+                    .select('id, first_name, last_name')
+                    .eq('phone_number', cleandPhone)
                     .single();
 
                 if (clientError || !client) {
+                    console.error("Client introuvable pour ce numéro.", clientError);
+                    setError("Client introuvable pour ce numéro.");
                     throw new Error("Client introuvable pour ce numéro.");
                 }
 
