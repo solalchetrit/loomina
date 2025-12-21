@@ -20,7 +20,7 @@ export default function ContactPage() {
                     {/* Formulaire simple qui ouvre le client mail de l'utilisateur */}
                     <form
                         className="space-y-6 bg-neutral-50 p-8 rounded-2xl border border-black/5"
-                        action="mailto:contact@loomina.fr"
+                        action="mailto:contact@loomina.eu"
                         method="post"
                         encType="text/plain"
                     >

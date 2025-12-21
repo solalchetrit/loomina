@@ -35,7 +35,7 @@ export default function Page() {
                     <section>
                         <h2 className="text-xl font-bold mb-3 text-[var(--loomina-black)]">4. Vos droits</h2>
                         <p>
-                            Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez à tout moment demander la suppression définitive de vos souvenirs numériques de nos serveurs une fois le livre livré, en nous contactant à contact@loomina.fr.
+                            Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez à tout moment demander la suppression définitive de vos souvenirs numériques de nos serveurs une fois le livre livré, en nous contactant à contact@loomina.eu.
                         </p>
                     </section>
                 </div>

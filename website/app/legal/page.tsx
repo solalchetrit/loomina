@@ -19,7 +19,7 @@ export default function Page() {
                     <section>
                         <h2 className="text-xl font-bold mb-3 text-[var(--loomina-black)]">2. Contact</h2>
                         <p>
-                            Email : contact@loomina.fr<br />
+                            Email : contact@loomina.eu<br />
                             Téléphone : +33 1 59 16 93 57
                         </p>
                     </section>
