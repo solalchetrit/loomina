@@ -30,7 +30,7 @@ export default function StartInterviewButton({ phone, userName }: StartInterview
             };
             console.log("Sending payload:", payload);
 
-            const response = await fetch(webhookUrl, {
+            const response = await fetch("/api/call", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
