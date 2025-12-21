@@ -7,6 +7,7 @@ import LiveBook from "@/components/LiveBook";
 import MagicButton from "@/components/ui/MagicButton";
 import { motion } from "framer-motion";
 
+// Trigger deployment for simplified login
 export default function DashboardPage() {
     const [phone, setPhone] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
