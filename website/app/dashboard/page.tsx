@@ -6,6 +6,7 @@ import StartInterviewButton from "@/components/StartInterviewButton";
 import LiveBook from "@/components/LiveBook";
 import MagicButton from "@/components/ui/MagicButton";
 import { motion } from "framer-motion";
+import { formatToE164 } from "@/lib/phone";
 
 // Trigger deployment for simplified login
 export default function DashboardPage() {
@@ -31,29 +32,50 @@ export default function DashboardPage() {
         setLoading(true);
 
         try {
-            // Normalize phone input
-            const val = phone.replace(/\s/g, '').replace(/\./g, '').replace(/-/g, '');
-            let formattedForApi = val;
+            // 1. Normalize input using our utility
+            const e164 = formatToE164(phone);
 
-            // Simple normalization logic to ensure +33 format if possible
-            if (val.startsWith("0") && val.length === 10) {
-                formattedForApi = "+33" + val.slice(1);
-            } else if (val.startsWith("33") && val.length === 11) {
-                formattedForApi = "+" + val;
-            } else if (!val.startsWith("+")) {
-                formattedForApi = val;
+            // 2. Pure digits version
+            const digitsOnly = phone.replace(/\D/g, '');
+
+            // 3. Local version (starting with 0) if it's French
+            let localVersion = digitsOnly;
+            if (digitsOnly.startsWith('33') && digitsOnly.length === 11) {
+                localVersion = '0' + digitsOnly.substring(2);
+            } else if (!digitsOnly.startsWith('0') && digitsOnly.length === 9) {
+                localVersion = '0' + digitsOnly;
             }
 
+            console.log("Attempting login with variations:", { e164, digitsOnly, localVersion, raw: phone });
+
             // Check if user exists in Supabase "Client" table
-            // We check for multiple formats: normalized (+33...), digits only, and raw input
-            const { data: clientData, error: clientError } = await supabase
+            // We check for: E164, pure digits, local version, and the raw input
+            let { data: clientData, error: clientError } = await supabase
                 .from('Client')
-                .select('id')
-                .or(`phone_number.eq.${formattedForApi},phone_number.eq.${val},phone_number.eq.${phone}`)
+                .select('id, phone_number')
+                .or(`phone_number.eq.${e164},phone_number.eq.${digitsOnly},phone_number.eq.${localVersion},phone_number.eq."${phone}"`)
                 .maybeSingle();
 
+            // FALLBACK: If no direct match, try a fuzzy match by removing formatting in the search
+            if (!clientData && !clientError && digitsOnly.length >= 9) {
+                console.log("No direct match, trying fuzzy search...");
+                // Construct a pattern like %0%7%8...
+                const fuzzyPattern = `%${digitsOnly.split('').join('%')}%`;
+
+                const { data: fuzzyData, error: fuzzyError } = await supabase
+                    .from('Client')
+                    .select('id, phone_number')
+                    .ilike('phone_number', fuzzyPattern)
+                    .maybeSingle();
+
+                if (fuzzyData) {
+                    console.log("Fuzzy match found:", fuzzyData.phone_number);
+                    clientData = fuzzyData;
+                }
+            }
+
             if (clientError || !clientData) {
-                console.log("Client not found for:", { formattedForApi, val, phone });
+                console.log("Client not found for variants:", { e164, digitsOnly, localVersion, phone });
                 setError("Ce numéro ne semble pas faire partie de nos auteurs. Avez-vous déjà commandé votre biographie ?");
                 setLoading(false);
                 return;
@@ -61,8 +83,12 @@ export default function DashboardPage() {
 
             // Success: Direct Login
             setIsLoggedIn(true);
+            // Save the EXACT phone number that matched if possible, or the one they typed
+            const matchPhone = clientData.phone_number || phone;
+            setPhone(matchPhone);
+
             if (rememberMe) {
-                localStorage.setItem("loomina_user_phone", phone);
+                localStorage.setItem("loomina_user_phone", matchPhone);
             }
         } catch (err) {
             console.error("Login error:", err);
