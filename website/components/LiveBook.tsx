@@ -39,11 +39,13 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
                 console.log("Cleaned phone:", cleanedPhone);
 
                 // 1. Find Client by Phone
-                const { data: client, error: clientError } = await supabase
+                const { data: clients, error: clientError } = await supabase
                     .from('Client')
                     .select('id, first_name, last_name')
                     .eq('phone_number', cleanedPhone)
-                    .single();
+                    .limit(1);
+
+                const client = clients && clients.length > 0 ? clients[0] : null;
 
                 if (clientError || !client) {
                     console.error("Client introuvable pour ce numéro.", clientError);

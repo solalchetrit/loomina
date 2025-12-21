@@ -50,31 +50,35 @@ export default function DashboardPage() {
 
             // Check if user exists in Supabase "Client" table
             // We check for: E164, pure digits, local version, and the raw input
-            let { data: clientData, error: clientError } = await supabase
+            // We use .limit(1) instead of .maybeSingle() because if a user has multiple 
+            // entries (e.g. one with space, one without), .maybeSingle() would throw an error.
+            let { data: results, error: clientError } = await supabase
                 .from('Client')
                 .select('id, phone_number')
-                .or(`phone_number.eq.${e164},phone_number.eq.${digitsOnly},phone_number.eq.${localVersion},phone_number.eq."${phone}"`)
-                .maybeSingle();
+                .or(`phone_number.eq."${e164}",phone_number.eq."${digitsOnly}",phone_number.eq."${localVersion}",phone_number.eq."${phone}"`)
+                .limit(1);
+
+            let clientData = results && results.length > 0 ? results[0] : null;
 
             // FALLBACK: If no direct match, try a fuzzy match by removing formatting in the search
-            if (!clientData && !clientError && digitsOnly.length >= 9) {
+            if (!clientData && digitsOnly.length >= 9) {
                 console.log("No direct match, trying fuzzy search...");
                 // Construct a pattern like %0%7%8...
                 const fuzzyPattern = `%${digitsOnly.split('').join('%')}%`;
 
-                const { data: fuzzyData, error: fuzzyError } = await supabase
+                const { data: fuzzyResults } = await supabase
                     .from('Client')
                     .select('id, phone_number')
                     .ilike('phone_number', fuzzyPattern)
-                    .maybeSingle();
+                    .limit(1);
 
-                if (fuzzyData) {
-                    console.log("Fuzzy match found:", fuzzyData.phone_number);
-                    clientData = fuzzyData;
+                if (fuzzyResults && fuzzyResults.length > 0) {
+                    console.log("Fuzzy match found:", fuzzyResults[0].phone_number);
+                    clientData = fuzzyResults[0];
                 }
             }
 
-            if (clientError || !clientData) {
+            if (!clientData) {
                 console.log("Client not found for variants:", { e164, digitsOnly, localVersion, phone });
                 setError("Ce numéro ne semble pas faire partie de nos auteurs. Avez-vous déjà commandé votre biographie ?");
                 setLoading(false);
