@@ -45,13 +45,15 @@ export default function DashboardPage() {
             }
 
             // Check if user exists in Supabase "Client" table
+            // We check for multiple formats: normalized (+33...), digits only, and raw input
             const { data: clientData, error: clientError } = await supabase
                 .from('Client')
                 .select('id')
-                .eq('phone_number', formattedForApi)
-                .single();
+                .or(`phone_number.eq.${formattedForApi},phone_number.eq.${val},phone_number.eq.${phone}`)
+                .maybeSingle();
 
             if (clientError || !clientData) {
+                console.log("Client not found for:", { formattedForApi, val, phone });
                 setError("Ce numéro ne semble pas faire partie de nos auteurs. Avez-vous déjà commandé votre biographie ?");
                 setLoading(false);
                 return;
@@ -80,7 +82,7 @@ export default function DashboardPage() {
         return (
             <div className="min-h-screen bg-white text-black flex items-center justify-center px-6 pt-32">
                 <div className="w-full max-w-md space-y-8 text-center">
-                    <h1 className="text-3xl font-serif">Accédez à votre espace</h1>
+                    <h1 className="text-3xl font-serif">Accédez à votre espace<span className="text-[10px] ml-2 text-neutral-300 opacity-50 font-sans">v3.0</span></h1>
                     <p className="text-neutral-500 text-sm">
                         Entrez le numéro de téléphone utilisé lors de votre commande.
                     </p>
