@@ -5,15 +5,12 @@ import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import PhotoGallery from "@/components/PhotoGallery";
 
-interface Chapter {
-    id: number; // Keep as number if chapters use auto-increment int, need to check. Usually best to be safe.
-    // Actually, looking at the error, only "Books" table was mentioned as UUID.
-    // If Books is UUID, it's likely others might be too, or maybe not.
-    // But "BookPhotos" created above uses BIGINT for its own ID.
-    // Let's assume Books.id is UUID (string).
+interface Story {
+    id: number;
     title: string;
     content: string;
     created_at: string;
+    type?: string;
 }
 
 interface Book {
@@ -28,7 +25,7 @@ interface LiveBookProps {
 
 export default function LiveBook({ userPhone }: LiveBookProps) {
     const [book, setBook] = useState<Book | null>(null);
-    const [chapters, setChapters] = useState<Chapter[]>([]);
+    const [stories, setStories] = useState<Story[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -64,16 +61,16 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
 
                 setBook(bookData);
 
-                // 3. Fetch Chapters
-                const { data: chaptersData, error: chaptersError } = await supabase
-                    .from('Chapters')
+                // 3. Fetch Stories
+                const { data: storiesData, error: storiesError } = await supabase
+                    .from('Stories')
                     .select('*')
                     .eq('book_id', bookData.id)
                     .order('created_at', { ascending: true });
 
-                if (chaptersError) throw chaptersError;
+                if (storiesError) throw storiesError;
 
-                setChapters(chaptersData || []);
+                setStories(storiesData || []);
 
             } catch (err: any) {
                 console.error("Error fetching LiveBook:", err);
@@ -93,7 +90,7 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
 
     // REMOVED EARLY RETURN: if (!book) ...
 
-    const currentChapter = chapters.length > 0 ? chapters[chapters.length - 1] : null;
+    const currentStory = stories.length > 0 ? stories[stories.length - 1] : null;
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -135,29 +132,29 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
                         📖
                     </div>
                     <div>
-                        <p className="text-xs uppercase tracking-widest text-amber-700 font-semibold">Chapitre en cours</p>
-                        <h3 className="text-2xl font-serif text-black">{currentChapter ? currentChapter.title : "En attente du premier chapitre"}</h3>
+                        <p className="text-xs uppercase tracking-widest text-amber-700 font-semibold">Dernier Récit</p>
+                        <h3 className="text-2xl font-serif text-black">{currentStory ? currentStory.title : "En attente du premier récit"}</h3>
                     </div>
                 </div>
-                {currentChapter ? (
+                {currentStory ? (
                     <div className="space-y-4 text-neutral-700">
                         <p className="text-sm text-neutral-500 flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            Dernière mise à jour le {formatDate(currentChapter.created_at)}
+                            Dernière mise à jour le {formatDate(currentStory.created_at)}
                         </p>
                         <div className="p-6 bg-white rounded-xl border border-neutral-100 italic text-neutral-600 leading-relaxed font-serif relative">
                             <span className="absolute top-2 left-2 text-4xl text-neutral-200 font-serif leading-none">“</span>
                             <p className="relative z-10 whitespace-pre-wrap">
-                                {currentChapter.content.length > 320
-                                    ? `${currentChapter.content.slice(0, 320)}...`
-                                    : currentChapter.content}
+                                {currentStory.content.length > 320
+                                    ? `${currentStory.content.slice(0, 320)}...`
+                                    : currentStory.content}
                             </p>
                         </div>
-                        <p className="text-sm text-neutral-600">Continuez vos entretiens pour enrichir ce chapitre et avancer dans votre histoire.</p>
+                        <p className="text-sm text-neutral-600">Continuez vos entretiens pour enrichir votre livre, récit après récit.</p>
                     </div>
                 ) : (
                     <div className="p-6 bg-white rounded-xl border border-dashed border-neutral-300 text-center space-y-2">
-                        <p className="text-neutral-500">Vos chapitres apparaîtront ici dès que votre biographe aura commencé la rédaction.</p>
+                        <p className="text-neutral-500">Vos récits apparaîtront ici dès que votre biographe aura commencé la rédaction.</p>
                         <p className="text-xs text-neutral-400">Pensez à planifier votre premier entretien !</p>
                     </div>
                 )}

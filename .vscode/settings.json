@@ -1,0 +1,18 @@
+{
+    "mcpServers": {
+        "context7": {
+            "serverUrl": "https://mcp.context7.com/mcp",
+            "headers": {
+                "CONTEXT7_API_KEY": "ctx7sk-ea759c1e-19e2-4107-bea3-277d1030d7e0"
+            }
+        },
+        "make": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "mcp-remote",
+                "https://eu1.make.com/mcp/u/540db5d9-6a7d-48bf-bba8-547a890392fc/sse"
+            ]
+        }
+    }
+}

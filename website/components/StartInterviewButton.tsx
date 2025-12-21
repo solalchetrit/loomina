@@ -16,7 +16,7 @@ export default function StartInterviewButton({ phone, userName }: StartInterview
         setLoading(true);
         console.log("Attempting to trigger interview...");
         try {
-            const webhookUrl = process.env.NEXT_PUBLIC_MAKE_WEBHOOK_URL;
+            const webhookUrl = "https://loomina-flow.onrender.com/call-client";
             console.log("Webhook URL:", webhookUrl);
 
             if (!webhookUrl) {
@@ -25,9 +25,8 @@ export default function StartInterviewButton({ phone, userName }: StartInterview
             }
 
             const payload = {
-                phone: phone,
-                name: userName,
-                action: "force_call_now"
+                phone_number: phone,
+
             };
             console.log("Sending payload:", payload);
 
