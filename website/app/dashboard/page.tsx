@@ -82,7 +82,7 @@ export default function DashboardPage() {
         return (
             <div className="min-h-screen bg-white text-black flex items-center justify-center px-6 pt-32">
                 <div className="w-full max-w-md space-y-8 text-center">
-                    <h1 className="text-3xl font-serif">Accédez à votre espace<span className="text-[10px] ml-2 text-neutral-300 opacity-50 font-sans">v3.0</span></h1>
+                    <h1 className="text-3xl font-serif">Accédez à votre espace<span className="text-[10px] ml-2 text-neutral-300 opacity-50 font-sans">v3.1</span></h1>
                     <p className="text-neutral-500 text-sm">
                         Entrez le numéro de téléphone utilisé lors de votre commande.
                     </p>

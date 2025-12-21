@@ -1,0 +1,9 @@
+{
+    "name": "loomina-root",
+    "private": true,
+    "scripts": {
+        "dev": "cd website && npm run dev",
+        "build": "cd website && npm run build",
+        "start": "cd website && npm run start"
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "buildCommand": "cd website && npm install && npm run build",
+    "outputDirectory": "website/.next",
+    "devCommand": "cd website && npm run dev",
+    "installCommand": "cd website && npm install"
+}
