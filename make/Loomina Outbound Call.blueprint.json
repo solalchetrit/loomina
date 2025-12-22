@@ -1,13 +1,12 @@
 {
-    "name": "Loomina Outbound Call",
+    "name": "Loomina Outbound Call FIXED",
     "flow": [
         {
             "id": 1,
             "module": "gateway:CustomWebHook",
             "version": 1,
             "parameters": {
-                "hook": 2240549,
-                "maxResults": 1
+                "hook": 2240549
             },
             "mapper": {},
             "metadata": {
@@ -20,25 +19,35 @@
         {
             "id": 4,
             "module": "http:MakeRequest",
-            "version": 1,
+            "version": 4,
             "parameters": {
+                "authenticationType": "noAuth"
+            },
+            "mapper": {
                 "url": "https://api.vapi.ai/call",
-                "method": "POST",
+                "method": "post",
                 "headers": [
                     {
-                        "key": "Authorization",
+                        "name": "Authorization",
                         "value": "Bearer a282c0de-e348-465d-9b76-22ed443c893c"
                     },
                     {
-                        "key": "Content-Type",
+                        "name": "Content-Type",
                         "value": "application/json"
                     }
                 ],
-                "body": "{\n  \"phoneNumberId\": \"9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6\",\n  \"assistant\": {\n    \"serverUrl\": \"https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih\"\n  },\n  \"customer\": {\n    \"number\": \"{{1.phone_number}}\"\n  }\n}",
-                "type": "raw",
-                "contentType": "application/json"
+                "contentType": "json",
+                "fields": {
+                    "phoneNumberId": "9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6",
+                    "assistant": {
+                        "serverUrl": "https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih"
+                    },
+                    "customer": {
+                        "number": "{{1.phone_number}}"
+                    }
+                },
+                "parseResponse": true
             },
-            "mapper": {},
             "metadata": {
                 "designer": {
                     "x": 300,
@@ -52,13 +61,7 @@
             "version": 1,
             "parameters": {
                 "status": 200,
-                "body": "{\n  \"status\": \"success\",\n  \"message\": \"Call triggered via Loomina Main\"\n}",
-                "headers": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                    }
-                ]
+                "body": "{\"status\":\"success\"}"
             },
             "mapper": {},
             "metadata": {
@@ -76,11 +79,7 @@
             "roundtrips": 1,
             "maxErrors": 3,
             "autoCommit": true,
-            "sequential": false,
-            "confidential": false,
-            "dataloss": false,
-            "dlq": false,
-            "freshVariables": false
+            "sequential": false
         },
         "designer": {
             "orphans": []
