@@ -31,11 +31,6 @@
                         "type": "hook:gateway-webhook",
                         "label": "Webhook",
                         "required": true
-                    },
-                    {
-                        "name": "maxResults",
-                        "type": "number",
-                        "label": "Maximum number of results"
                     }
                 ]
             }
@@ -65,6 +60,9 @@
                 "contentType": "json",
                 "fields": {
                     "phoneNumberId": "9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6",
+                    "assistant": {
+                        "serverUrl": "https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih"
+                    },
                     "customer": {
                         "number": "{{1.phone_number}}"
                     }
@@ -79,45 +77,7 @@
                 "designer": {
                     "x": 300,
                     "y": 0
-                },
-                "restore": {
-                    "parameters": {
-                        "authenticationType": {
-                            "label": "No authentication"
-                        }
-                    },
-                    "expect": {
-                        "method": {
-                            "mode": "chose",
-                            "label": "POST"
-                        },
-                        "contentType": {
-                            "label": "JSON (application/json)"
-                        }
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "authenticationType",
-                        "type": "select",
-                        "label": "Authentication type",
-                        "required": true
-                    }
-                ],
-                "expect": [
-                    {
-                        "name": "url",
-                        "type": "url",
-                        "label": "URL",
-                        "required": true
-                    },
-                    {
-                        "name": "method",
-                        "type": "select",
-                        "label": "Method",
-                        "required": true
-                    }
-                ]
+                }
             }
         },
         {
@@ -127,7 +87,7 @@
             "parameters": {},
             "mapper": {
                 "status": "200",
-                "body": "{\n  \"status\": \"success\",\n  \"message\": \"Call triggered\"\n}",
+                "body": "{\n  \"status\": \"success\",\n  \"message\": \"Call triggered via Loomina Main\"\n}",
                 "headers": [
                     {
                         "key": "Content-Type",
@@ -139,44 +99,7 @@
                 "designer": {
                     "x": 600,
                     "y": 0
-                },
-                "restore": {
-                    "expect": {
-                        "headers": {
-                            "mode": "chose"
-                        }
-                    }
-                },
-                "expect": [
-                    {
-                        "name": "status",
-                        "type": "uinteger",
-                        "label": "Status",
-                        "required": true
-                    },
-                    {
-                        "name": "body",
-                        "type": "any",
-                        "label": "Body"
-                    },
-                    {
-                        "name": "headers",
-                        "type": "array",
-                        "label": "Custom headers",
-                        "spec": [
-                            {
-                                "name": "key",
-                                "type": "text",
-                                "label": "Key"
-                            },
-                            {
-                                "name": "value",
-                                "type": "text",
-                                "label": "Value"
-                            }
-                        ]
-                    }
-                ]
+                }
             }
         }
     ],
