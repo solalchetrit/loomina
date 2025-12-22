@@ -1,5 +1,5 @@
 {
-    "name": "Loomina Outbound Call FINAL",
+    "name": "Loomina Outbound Call HTTP",
     "flow": [
         {
             "id": 1,
@@ -39,7 +39,7 @@
                 ],
                 "type": "raw",
                 "contentType": "json",
-                "content": "{\n  \"phoneNumberId\": \"9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6\",\n  \"assistant\": {\n    \"serverUrl\": \"https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih?type=assistant-request\"\n  },\n  \"customer\": {\n    \"number\": \"{{1.phone_number}}\"\n  }\n}",
+                "content": "{\n  \"phoneNumberId\": \"9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6\",\n  \"assistantId\": \"019b46e4-0e33-7993-8c96-df96e7a2feb9\",\n  \"customer\": {\n    \"number\": \"{{1.phone_number}}\"\n  }\n}",
                 "parseResponse": true,
                 "stopOnHttpError": true,
                 "allowRedirects": true,
