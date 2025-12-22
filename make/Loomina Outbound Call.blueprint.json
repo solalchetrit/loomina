@@ -14,65 +14,31 @@
                 "designer": {
                     "x": 0,
                     "y": 0
-                },
-                "restore": {
-                    "parameters": {
-                        "hook": {
-                            "label": "My gateway-webhook webhook",
-                            "data": {
-                                "editable": "true"
-                            }
-                        }
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "hook",
-                        "type": "hook:gateway-webhook",
-                        "label": "Webhook",
-                        "required": true
-                    }
-                ]
+                }
             }
         },
         {
             "id": 4,
             "module": "http:MakeRequest",
-            "version": 4,
+            "version": 1,
             "parameters": {
-                "authenticationType": "noAuth",
-                "tlsType": "",
-                "proxyKeychain": ""
-            },
-            "mapper": {
                 "url": "https://api.vapi.ai/call",
-                "method": "post",
+                "method": "POST",
                 "headers": [
                     {
-                        "name": "Authorization",
+                        "key": "Authorization",
                         "value": "Bearer a282c0de-e348-465d-9b76-22ed443c893c"
                     },
                     {
-                        "name": "Content-Type",
+                        "key": "Content-Type",
                         "value": "application/json"
                     }
                 ],
-                "contentType": "json",
-                "fields": {
-                    "phoneNumberId": "9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6",
-                    "assistant": {
-                        "serverUrl": "https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih"
-                    },
-                    "customer": {
-                        "number": "{{1.phone_number}}"
-                    }
-                },
-                "parseResponse": true,
-                "stopOnHttpError": true,
-                "allowRedirects": true,
-                "shareCookies": false,
-                "requestCompressedContent": true
+                "body": "{\n  \"phoneNumberId\": \"9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6\",\n  \"assistant\": {\n    \"serverUrl\": \"https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih\"\n  },\n  \"customer\": {\n    \"number\": \"{{1.phone_number}}\"\n  }\n}",
+                "type": "raw",
+                "contentType": "application/json"
             },
+            "mapper": {},
             "metadata": {
                 "designer": {
                     "x": 300,
@@ -84,9 +50,8 @@
             "id": 3,
             "module": "gateway:WebhookRespond",
             "version": 1,
-            "parameters": {},
-            "mapper": {
-                "status": "200",
+            "parameters": {
+                "status": 200,
                 "body": "{\n  \"status\": \"success\",\n  \"message\": \"Call triggered via Loomina Main\"\n}",
                 "headers": [
                     {
@@ -95,6 +60,7 @@
                     }
                 ]
             },
+            "mapper": {},
             "metadata": {
                 "designer": {
                     "x": 600,
