@@ -1,12 +1,13 @@
 {
-    "name": "Loomina Outbound Call FIXED",
+    "name": "Loomina Outbound Call FINAL",
     "flow": [
         {
             "id": 1,
             "module": "gateway:CustomWebHook",
             "version": 1,
             "parameters": {
-                "hook": 2240549
+                "hook": 2240549,
+                "maxResults": 1
             },
             "mapper": {},
             "metadata": {
@@ -36,17 +37,15 @@
                         "value": "application/json"
                     }
                 ],
+                "type": "raw",
                 "contentType": "json",
-                "fields": {
-                    "phoneNumberId": "9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6",
-                    "assistant": {
-                        "serverUrl": "https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih"
-                    },
-                    "customer": {
-                        "number": "{{1.phone_number}}"
-                    }
-                },
-                "parseResponse": true
+                "content": "{\n  \"phoneNumberId\": \"9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6\",\n  \"assistant\": {\n    \"serverUrl\": \"https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih\"\n  },\n  \"customer\": {\n    \"number\": \"{{1.phone_number}}\"\n  }\n}",
+                "parseResponse": true,
+                "stopOnHttpError": true,
+                "allowRedirects": true,
+                "shareCookies": false,
+                "requestCompressedContent": false,
+                "serializeUrl": false
             },
             "metadata": {
                 "designer": {
@@ -59,11 +58,17 @@
             "id": 3,
             "module": "gateway:WebhookRespond",
             "version": 1,
-            "parameters": {
+            "parameters": {},
+            "mapper": {
                 "status": 200,
-                "body": "{\"status\":\"success\"}"
+                "body": "{\n  \"status\": \"success\"\n}",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ]
             },
-            "mapper": {},
             "metadata": {
                 "designer": {
                     "x": 600,
@@ -79,7 +84,11 @@
             "roundtrips": 1,
             "maxErrors": 3,
             "autoCommit": true,
-            "sequential": false
+            "sequential": false,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
         },
         "designer": {
             "orphans": []
