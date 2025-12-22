@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { phone_number } = body;
     try {
-        const webhookUrl = "https://loomina-flow.onrender.com/call-client";
+        const webhookUrl = "https://hook.eu1.make.com/6d52cznd3berpbtl1odkr5gvho05bnez";
         console.log("Webhook URL:", webhookUrl);
 
         if (!webhookUrl) {
