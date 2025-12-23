@@ -28,14 +28,8 @@ export default function ExperiencePage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* A. Hero Section - Premium */}
-            <section className="relative pt-24 pb-16 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center bg-white overflow-hidden">
-                {/* Animated background elements */}
-                <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-20 left-10 w-72 h-72 bg-[var(--loomina-gold)] opacity-[0.03] rounded-full blur-3xl animate-pulse"></div>
-                    <div className="absolute bottom-20 right-10 w-96 h-96 bg-[var(--loomina-amber)] opacity-[0.02] rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-                </div>
-
-                <div className="max-w-4xl mx-auto text-center relative z-10">
+            <section className="relative pt-24 pb-16 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center bg-white">
+                <div className="max-w-4xl mx-auto text-center">
                     {/* Decorative top element */}
                     <div className="flex items-center justify-center mb-8">
                         <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>
@@ -50,47 +44,11 @@ export default function ExperiencePage() {
                         <span className="block text-[var(--loomina-gold)] mt-2">votre Vie</span>
                     </h1>
 
-                    <p className="text-lg text-[#666] font-serif max-w-2xl mx-auto leading-relaxed mb-8">
+                    <p className="text-lg text-[#666] font-serif max-w-2xl mx-auto leading-relaxed">
                         De la première conversation à votre livre entre les mains,
                         <br className="hidden md:block" />
                         découvrez comment Loomina transforme vos souvenirs en héritage littéraire.
                     </p>
-
-                    {/* Trust badges - Animated stats */}
-                    <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mt-12">
-                        <div className="text-center group">
-                            <div className="text-3xl md:text-4xl font-serif text-[var(--loomina-gold)] mb-2 transition-transform group-hover:scale-110 duration-300">
-                                500+
-                            </div>
-                            <div className="text-xs md:text-sm text-[#888] font-serif">
-                                Histoires créées
-                            </div>
-                        </div>
-                        <div className="text-center group">
-                            <div className="text-3xl md:text-4xl font-serif text-[var(--loomina-gold)] mb-2 transition-transform group-hover:scale-110 duration-300">
-                                4.9/5
-                            </div>
-                            <div className="text-xs md:text-sm text-[#888] font-serif">
-                                Satisfaction client
-                            </div>
-                        </div>
-                        <div className="text-center group">
-                            <div className="text-3xl md:text-4xl font-serif text-[var(--loomina-gold)] mb-2 transition-transform group-hover:scale-110 duration-300">
-                                14
-                            </div>
-                            <div className="text-xs md:text-sm text-[#888] font-serif">
-                                Thématiques uniques
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Decorative quote */}
-                    <div className="mt-12 pt-8 border-t border-gray-100 max-w-xl mx-auto">
-                        <p className="text-sm italic text-[#999] font-serif leading-relaxed">
-                            "Chaque vie est une histoire qui mérite d'être racontée.<br />
-                            Loomina vous aide à la préserver pour l'éternité."
-                        </p>
-                    </div>
                 </div>
             </section>
 
