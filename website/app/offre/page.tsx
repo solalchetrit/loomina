@@ -92,7 +92,7 @@ export default function OffrePage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* Hero Section */}
-            <section className="relative py-32 px-6 md:px-12 lg:px-24 min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="relative pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center bg-gradient-to-b from-white to-[#fafafa]">
                 <div className="max-w-5xl mx-auto text-center">
                     <div className="flex items-center justify-center mb-12">
                         <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>

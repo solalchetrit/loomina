@@ -28,7 +28,7 @@ export default function ExperiencePage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* A. Hero Section - Premium */}
-            <section className="relative py-32 px-6 md:px-12 lg:px-24 min-h-screen flex items-center justify-center">
+            <section className="relative pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center">
                 <div className="max-w-4xl mx-auto text-center">
                     {/* Decorative top element */}
                     <div className="flex items-center justify-center mb-12">
@@ -55,7 +55,7 @@ export default function ExperiencePage() {
             <ScrollSeparator />
 
             {/* B. Timeline - Compact */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white min-h-screen flex items-center">
+            <section className="pt-20 pb-24 px-6 md:px-12 lg:px-24 bg-white min-h-[85vh] flex items-center">
                 <div className="max-w-6xl mx-auto w-full">
                     {/* Section Title */}
                     <div className="text-center mb-16">
@@ -163,7 +163,7 @@ export default function ExperiencePage() {
             <ScrollSeparator />
 
             {/* C. Carte Narrative - Premium Carousel */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white min-h-screen flex flex-col justify-center">
+            <section className="pt-20 pb-24 px-6 md:px-12 lg:px-24 bg-white min-h-[85vh] flex flex-col justify-center">
                 <div className="max-w-7xl mx-auto w-full">
                     <div className="text-center mb-12">
                         <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">La Carte Narrative</h2>
@@ -239,50 +239,53 @@ export default function ExperiencePage() {
 
             <ScrollSeparator />
 
-            {/* D. Memory Engine - Compact */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white overflow-hidden relative min-h-screen flex items-center">
+            {/* D. Memory Engine + CTA - Unified Section */}
+            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white overflow-hidden relative">
                 {/* Background accent */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--loomina-gold)] opacity-[0.02] blur-[150px] rounded-full pointer-events-none"></div>
 
-                <div className="max-w-5xl mx-auto relative z-10 flex flex-col md:flex-row items-center gap-12">
-                    <div className="flex-1 space-y-8">
-                        <h2 className="text-4xl md:text-5xl font-serif leading-tight tracking-tight">
-                            <span className="block text-[var(--loomina-gold)]">
-                                Memory Engine.
-                            </span>
-                            <span className="text-[#1a1a1a]">L'IA qui n'oublie rien.</span>
-                        </h2>
-                        <p className="text-[#666] text-base leading-relaxed font-serif">
-                            Notre technologie contextuelle analyse et relie vos souvenirs entre eux.
-                            Si vous parlez de votre grand-mère au chapitre 1, Loomina saura faire le lien
-                            quand vous évoquerez sa cuisine au chapitre 7.
-                        </p>
-                        <div className="flex gap-4 pt-4">
-                            <div className="px-4 py-2 rounded border border-[var(--loomina-gold)]/20 bg-[var(--loomina-gold)]/5 font-[family-name:var(--font-courier)] text-xs text-[var(--loomina-gold)]">
-                                PROCESSING_CONTEXT
+                <div className="max-w-5xl mx-auto relative z-10">
+                    {/* Memory Engine Content */}
+                    <div className="flex flex-col md:flex-row items-center gap-12 mb-20">
+                        <div className="flex-1 space-y-8">
+                            <h2 className="text-4xl md:text-5xl font-serif leading-tight tracking-tight">
+                                <span className="block text-[var(--loomina-gold)]">
+                                    Memory Engine.
+                                </span>
+                                <span className="text-[#1a1a1a]">L'IA qui n'oublie rien.</span>
+                            </h2>
+                            <p className="text-[#666] text-base leading-relaxed font-serif">
+                                Notre technologie contextuelle analyse et relie vos souvenirs entre eux.
+                                Si vous parlez de votre grand-mère au chapitre 1, Loomina saura faire le lien
+                                quand vous évoquerez sa cuisine au chapitre 7.
+                            </p>
+                            <div className="flex gap-4 pt-4">
+                                <div className="px-4 py-2 rounded border border-[var(--loomina-gold)]/20 bg-[var(--loomina-gold)]/5 font-[family-name:var(--font-courier)] text-xs text-[var(--loomina-gold)]">
+                                    PROCESSING_CONTEXT
+                                </div>
+                                <div className="px-4 py-2 rounded border border-[var(--loomina-gold)]/20 bg-[var(--loomina-gold)]/5 font-[family-name:var(--font-courier)] text-xs text-[var(--loomina-gold)]">
+                                    LINKING_NODES
+                                </div>
                             </div>
-                            <div className="px-4 py-2 rounded border border-[var(--loomina-gold)]/20 bg-[var(--loomina-gold)]/5 font-[family-name:var(--font-courier)] text-xs text-[var(--loomina-gold)]">
-                                LINKING_NODES
+                        </div>
+
+                        {/* Visual Abstract Representation */}
+                        <div className="flex-1 w-full flex justify-center">
+                            <div className="relative w-56 h-56 border border-[var(--loomina-gold)]/20 rounded-full flex items-center justify-center animate-[spin_60s_linear_infinite]">
+                                <div className="absolute w-40 h-40 border border-[var(--loomina-gold)]/40 rounded-full flex items-center justify-center border-dashed"></div>
+                                <div className="absolute w-28 h-28 bg-[var(--loomina-gold)]/10 rounded-full blur-xl"></div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Visual Abstract Representation */}
-                    <div className="flex-1 w-full flex justify-center">
-                        <div className="relative w-56 h-56 border border-[var(--loomina-gold)]/20 rounded-full flex items-center justify-center animate-[spin_60s_linear_infinite]">
-                            <div className="absolute w-40 h-40 border border-[var(--loomina-gold)]/40 rounded-full flex items-center justify-center border-dashed"></div>
-                            <div className="absolute w-28 h-28 bg-[var(--loomina-gold)]/10 rounded-full blur-xl"></div>
-                        </div>
+                    {/* CTA */}
+                    <div className="text-center pt-12 border-t border-gray-100">
+                        <h2 className="text-4xl md:text-5xl font-serif mb-10 tracking-tight">Votre histoire commence aujourd'hui.</h2>
+                        <Button href="/order" variant="primary" size="lg">
+                            Commencer mon histoire
+                        </Button>
                     </div>
                 </div>
-            </section>
-
-            {/* E. Call to Action (CTA) */}
-            <section className="py-24 px-6 md:px-12 lg:px-24 bg-white text-center">
-                <h2 className="text-4xl md:text-5xl font-serif mb-10 tracking-tight">Votre histoire commence aujourd'hui.</h2>
-                <Button href="/order" variant="primary" size="lg">
-                    Commencer mon histoire
-                </Button>
             </section>
         </main>
     );
