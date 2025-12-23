@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import { STRIPE_CONFIG } from "@/config/stripe";
+import { LOOMINA_CONFIG } from "@/config/loomina";
 
 export default function Hero() {
   const containerRef = useRef(null);
@@ -134,7 +135,7 @@ export default function Hero() {
               Commander mon livre
             </Link>
             <a
-              href="tel:+33159169357"
+              href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`}
               className="px-6 py-3 md:px-8 md:py-3.5 rounded-full bg-white text-[var(--loomina-ink)] border border-neutral-200 font-sans font-medium text-sm md:text-base transition-all hover:bg-neutral-50 hover:border-neutral-300 w-full sm:w-auto text-center"
             >
               Essayer gratuitement

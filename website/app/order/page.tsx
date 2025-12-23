@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagicButton from "@/components/ui/MagicButton";
 import { STRIPE_CONFIG } from "@/config/stripe";
+import { formatToE164 } from "@/lib/phone";
 
 export default function OrderPage() {
     const [step, setStep] = useState<1 | 2>(1);
@@ -40,13 +41,15 @@ export default function OrderPage() {
     const handleSubmit = () => {
         if (!isFormValid) return;
 
+        // Format phone to E164 before saving for consistent storage
+        const formattedPhone = formatToE164(formData.phone);
+
         // Save relevant data to localStorage as a JSON object
         const orderData = {
             firstName: formData.firstName,
             lastName: formData.lastName,
             isGift: selectedOption === "gift",
-
-            phone: formData.phone,
+            phone: formattedPhone, // Store E164 formatted phone
             email: formData.email
         };
 

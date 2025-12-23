@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatToE164 } from "@/lib/phone";
+import { LOOMINA_CONFIG } from "@/config/loomina";
 
 export async function POST(request: NextRequest) {
     const body = await request.json();
     const { phone_number } = body;
     try {
-        const webhookUrl = "https://hook.eu1.make.com/6d52cznd3berpbtl1odkr5gvho05bnez";
+        const webhookUrl = LOOMINA_CONFIG.MAKE_WEBHOOK_URL;
         console.log("Webhook URL:", webhookUrl);
 
         if (!webhookUrl) {

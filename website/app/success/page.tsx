@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import MemberCard from "@/components/MemberCard";
 import { formatToE164 } from "@/lib/phone";
+import { LOOMINA_CONFIG } from "@/config/loomina";
 
 export default function SuccessPage() {
     const [userData, setUserData] = useState<{ firstName: string; lastName: string; phone?: string } | null>(null);
@@ -32,9 +33,11 @@ export default function SuccessPage() {
                                 .upsert(
                                     {
                                         name: fullName,
+                                        first_name: parsed.firstName,
+                                        last_name: parsed.lastName,
                                         phone_number: cleanPhone,
                                         email: parsed.email,
-                                        status: 'onboarding',
+                                        phase: LOOMINA_CONFIG.PHASES.ONBOARDING,
                                         // We don't set created_at as it should be auto-generated or handled by DB default
                                     },
                                     { onConflict: 'phone_number' }
@@ -64,15 +67,6 @@ export default function SuccessPage() {
 
             <div className="max-w-4xl mx-auto w-full flex flex-col flex-1 items-center justify-center space-y-16">
 
-                {/* Success Header is removed/integrated into the card flow or kept minimal? 
-           The prompt assumes the card is the "Element central". 
-           Let's keep a small header or just jump to the card.
-           Based on "Félicitations, l'aventure commence" being BELOW the card in instruction text?
-           Wait, prompt says: "Remplace le texte précédent par celui-ci (...) Affiche le numéro (...) en dessous". 
-           So the header above might be redundant or should be minimal. 
-           Let's keep it simple.
-        */}
-
                 {/* LUXURY ACCESS CARD */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -97,8 +91,8 @@ export default function SuccessPage() {
                         Pour commencer votre livre, appelez simplement Loomina au numéro suivant :
                     </p>
 
-                    <a href="tel:+33159169357" className="block text-4xl md:text-6xl font-serif font-bold text-neutral-900 hover:text-amber-700 transition-colors tracking-tight">
-                        01 59 16 93 57
+                    <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="block text-4xl md:text-6xl font-serif font-bold text-neutral-900 hover:text-amber-700 transition-colors tracking-tight">
+                        {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
                     </a>
                 </motion.div>
 

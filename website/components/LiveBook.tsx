@@ -35,17 +35,45 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
             try {
                 setLoading(true);
 
-                const cleanedPhone = formatToE164(userPhone);
-                console.log("Cleaned phone:", cleanedPhone);
+                // Generate multiple phone format variants for robust lookup
+                const e164 = formatToE164(userPhone);
+                const digitsOnly = userPhone.replace(/\D/g, '');
 
-                // 1. Find Client by Phone
-                const { data: clients, error: clientError } = await supabase
+                // Local version (starting with 0) if it's French
+                let localVersion = digitsOnly;
+                if (digitsOnly.startsWith('33') && digitsOnly.length === 11) {
+                    localVersion = '0' + digitsOnly.substring(2);
+                } else if (!digitsOnly.startsWith('0') && digitsOnly.length === 9) {
+                    localVersion = '0' + digitsOnly;
+                }
+
+                console.log("LiveBook: Searching for client with phone variants:", { e164, digitsOnly, localVersion, raw: userPhone });
+
+                // 1. Find Client by Phone - try multiple formats
+                let { data: clients, error: clientError } = await supabase
                     .from('Client')
                     .select('id, first_name, last_name')
-                    .eq('phone_number', cleanedPhone)
+                    .or(`phone_number.eq."${e164}",phone_number.eq."${digitsOnly}",phone_number.eq."${localVersion}",phone_number.eq."${userPhone}"`)
                     .limit(1);
 
-                const client = clients && clients.length > 0 ? clients[0] : null;
+                let client = clients && clients.length > 0 ? clients[0] : null;
+
+                // Fallback: fuzzy match if no direct match found
+                if (!client && digitsOnly.length >= 9) {
+                    console.log("LiveBook: No direct match, trying fuzzy search...");
+                    const fuzzyPattern = `%${digitsOnly.split('').join('%')}%`;
+
+                    const { data: fuzzyResults } = await supabase
+                        .from('Client')
+                        .select('id, first_name, last_name')
+                        .ilike('phone_number', fuzzyPattern)
+                        .limit(1);
+
+                    if (fuzzyResults && fuzzyResults.length > 0) {
+                        console.log("LiveBook: Fuzzy match found");
+                        client = fuzzyResults[0];
+                    }
+                }
 
                 if (clientError || !client) {
                     console.error("Client introuvable pour ce numéro.", clientError);
@@ -61,7 +89,7 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
                     .single();
 
                 if (bookError || !bookData) {
-                    // It's possible the client exists but no book allows specific error handling
+                    // It's possible the client exists but no book - allows specific error handling
                     console.log("No book found yet for client.");
                     setLoading(false);
                     return;
