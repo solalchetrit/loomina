@@ -32,7 +32,7 @@ export default function AboutPage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* Hero Section */}
-            <section className="relative pt-24 pb-16 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center">
+            <section className="relative pt-24 pb-16 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center bg-white">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="flex items-center justify-center mb-8">
                         <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>
@@ -58,7 +58,7 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* L'Histoire du Fondateur */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
                 <div className="max-w-5xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         {/* Image placeholder - à remplacer par une vraie photo */}
@@ -136,7 +136,7 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* Valeurs */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Nos Valeurs</h2>
@@ -191,7 +191,7 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* L'Équipe */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-8">
                         <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">L'Équipe</h2>

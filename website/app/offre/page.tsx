@@ -92,7 +92,7 @@ export default function OffrePage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* Hero Section */}
-            <section className="relative pt-24 pb-8 px-6 md:px-12 lg:px-24 min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="relative pt-24 pb-8 px-6 md:px-12 lg:px-24 min-h-screen flex items-center justify-center bg-white">
                 <div className="max-w-5xl mx-auto text-center">
                     <div className="flex items-center justify-center mb-6">
                         <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>
@@ -134,7 +134,7 @@ export default function OffrePage() {
             <ScrollSeparator />
 
             {/* Ce qui est inclus */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Tout est Inclus</h2>
@@ -220,7 +220,7 @@ export default function OffrePage() {
             <ScrollSeparator />
 
             {/* Témoignages */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Ils Nous Font Confiance</h2>
