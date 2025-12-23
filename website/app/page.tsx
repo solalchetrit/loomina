@@ -2,7 +2,7 @@ import Hero from "@/components/Hero";
 import StarDecoration from "@/components/ui/StarDecoration";
 import ScrollSeparator from "@/components/ui/ScrollSeparator";
 import HowItWorks from "@/components/HowItWorks";
-import MagicButton from "@/components/ui/MagicButton";
+import Button from "@/components/ui/Button";
 import { STRIPE_CONFIG } from "@/config/stripe";
 
 // --- DATA ---
@@ -106,15 +106,15 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="w-full">
-                    <MagicButton
+                  <div className="w-full max-w-sm mx-auto">
+                    <Button
                       href="/order"
-                      variant="secondary"
-                      size="lg"
-                      className="w-full shadow-lg shadow-amber-500/20"
+                      variant="primary"
+                      size="md"
+                      fullWidth
                     >
                       Commander ma biographie
-                    </MagicButton>
+                    </Button>
                     <p className="text-neutral-500 text-xs mt-4">Paiement 100% sécurisé via Stripe</p>
                   </div>
                 </div>

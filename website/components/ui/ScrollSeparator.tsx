@@ -4,18 +4,18 @@ import { motion } from "framer-motion";
 
 export default function ScrollSeparator() {
     return (
-        <div className="w-full flex justify-center -mt-16 relative z-20 pointer-events-none">
+        <div className="w-full flex justify-center py-12 relative z-20 pointer-events-none">
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="flex flex-col items-center gap-3 text-[var(--loomina-amber)]"
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="flex flex-col items-center gap-2 text-[var(--loomina-gold)]"
             >
                 <motion.span
-                    animate={{ y: [0, 6, 0] }}
-                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-                    className="text-2xl font-semibold"
+                    animate={{ y: [0, 8, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="text-3xl"
                     aria-hidden
                 >
                     ↓

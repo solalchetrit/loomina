@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import { STRIPE_CONFIG } from "@/config/stripe";
 import { LOOMINA_CONFIG } from "@/config/loomina";
+import Button from "@/components/ui/Button";
 
 export default function Hero() {
   const containerRef = useRef(null);
@@ -50,7 +51,7 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative h-[150vh] bg-white"
+      className="relative h-[180vh] bg-white"
     >
       {/* Mobile: gap-2 (Tighter). Desktop: gap-8. */}
       <div className="sticky top-0 min-h-[100dvh] w-full overflow-hidden px-6 flex flex-col items-center justify-center gap-2 md:grid md:grid-cols-2 md:gap-8 max-w-7xl mx-auto">
@@ -128,18 +129,22 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center md:items-start gap-3 md:gap-4 pt-2 md:pt-4 w-full">
-            <Link
+            <Button
               href="/order"
-              className="px-6 py-3 md:px-8 md:py-3.5 rounded-full bg-[var(--loomina-ink)] text-white font-sans font-medium text-sm md:text-base transition-all hover:bg-black hover:scale-105 shadow-lg shadow-black/10 inline-block w-full sm:w-auto text-center"
+              variant="primary"
+              size="lg"
+              className="w-full sm:w-auto"
             >
               Commander mon livre
-            </Link>
-            <a
+            </Button>
+            <Button
               href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`}
-              className="px-6 py-3 md:px-8 md:py-3.5 rounded-full bg-white text-[var(--loomina-ink)] border border-neutral-200 font-sans font-medium text-sm md:text-base transition-all hover:bg-neutral-50 hover:border-neutral-300 w-full sm:w-auto text-center"
+              variant="secondary"
+              size="lg"
+              className="w-full sm:w-auto"
             >
               Essayer gratuitement
-            </a>
+            </Button>
           </div>
         </motion.div>
 
