@@ -141,7 +141,7 @@ export default function FAQPage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* Hero Section */}
-            <section className="relative py-32 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="relative py-32 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="flex items-center justify-center mb-12">
                         <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>

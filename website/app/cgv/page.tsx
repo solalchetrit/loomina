@@ -8,7 +8,7 @@ export default function CGVPage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* Hero Section */}
-            <section className="relative py-24 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa] border-b border-gray-100">
+            <section className="relative py-24 px-6 md:px-12 lg:px-24 bg-white border-b border-gray-100">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex items-center mb-8">
                         <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>
