@@ -58,7 +58,7 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* L'Histoire du Fondateur */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-5xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         {/* Image placeholder - à remplacer par une vraie photo */}
@@ -136,7 +136,7 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* Valeurs */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Nos Valeurs</h2>
@@ -191,7 +191,7 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* L'Équipe */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-8">
                         <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">L'Équipe</h2>

@@ -134,7 +134,7 @@ export default function OffrePage() {
             <ScrollSeparator />
 
             {/* Ce qui est inclus */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Tout est Inclus</h2>
@@ -220,7 +220,7 @@ export default function OffrePage() {
             <ScrollSeparator />
 
             {/* Témoignages */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Ils Nous Font Confiance</h2>

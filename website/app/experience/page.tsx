@@ -55,7 +55,7 @@ export default function ExperiencePage() {
             <ScrollSeparator />
 
             {/* B. Timeline - Compact */}
-            <section className="pt-16 pb-12 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa] min-h-[85vh] flex items-center">
+            <section className="pt-16 pb-12 px-6 md:px-12 lg:px-24 bg-white min-h-[85vh] flex items-center">
                 <div className="max-w-6xl mx-auto w-full">
                     {/* Section Title */}
                     <div className="text-center mb-10">
@@ -240,7 +240,7 @@ export default function ExperiencePage() {
             <ScrollSeparator />
 
             {/* D. Memory Engine + CTA - Unified Section */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#fafafa] overflow-hidden relative">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white overflow-hidden relative">
                 {/* Background accent */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--loomina-gold)] opacity-[0.02] blur-[150px] rounded-full pointer-events-none"></div>
 
