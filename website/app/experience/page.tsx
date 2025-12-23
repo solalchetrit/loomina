@@ -28,10 +28,10 @@ export default function ExperiencePage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* A. Hero Section - Premium */}
-            <section className="relative pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center">
+            <section className="relative pt-24 pb-16 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center">
                 <div className="max-w-4xl mx-auto text-center">
                     {/* Decorative top element */}
-                    <div className="flex items-center justify-center mb-12">
+                    <div className="flex items-center justify-center mb-8">
                         <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>
                         <span className="mx-6 text-xs font-[family-name:var(--font-cinzel)] tracking-[0.4em] text-[var(--loomina-gold)] uppercase">
                             L'Expérience
@@ -39,12 +39,12 @@ export default function ExperiencePage() {
                         <div className="h-px w-16 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]"></div>
                     </div>
 
-                    <h1 className="text-4xl md:text-7xl font-serif mb-10 leading-[1.1] text-center tracking-tight">
+                    <h1 className="text-4xl md:text-6xl font-serif mb-6 leading-[1.1] text-center tracking-tight">
                         Le Voyage de
                         <span className="block text-[var(--loomina-gold)] mt-2">votre Vie</span>
                     </h1>
 
-                    <p className="text-xl text-[#666] font-serif max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-lg text-[#666] font-serif max-w-2xl mx-auto leading-relaxed">
                         De la première conversation à votre livre entre les mains,
                         <br className="hidden md:block" />
                         découvrez comment Loomina transforme vos souvenirs en héritage littéraire.
@@ -55,11 +55,11 @@ export default function ExperiencePage() {
             <ScrollSeparator />
 
             {/* B. Timeline - Compact */}
-            <section className="pt-20 pb-24 px-6 md:px-12 lg:px-24 bg-white min-h-[85vh] flex items-center">
+            <section className="pt-16 pb-12 px-6 md:px-12 lg:px-24 bg-white min-h-[85vh] flex items-center">
                 <div className="max-w-6xl mx-auto w-full">
                     {/* Section Title */}
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">Les 3 Étapes</h2>
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Les 3 Étapes</h2>
                         <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto"></div>
                     </div>
 
@@ -68,15 +68,15 @@ export default function ExperiencePage() {
                         <div className="hidden md:block absolute top-20 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--loomina-gold)]/20 to-transparent z-0"></div>
 
                         {/* Phase 1 - L'Initialisation */}
-                        <div className="relative z-10 bg-white rounded-2xl p-8 border border-gray-200/60 hover:border-[var(--loomina-gold)]/40 hover:shadow-xl transition-all duration-500">
+                        <div className="relative z-10 bg-white rounded-2xl p-6 border border-gray-200/60 hover:border-[var(--loomina-gold)]/40 hover:shadow-xl transition-all duration-500">
                             <div className="flex justify-center mb-6">
                                 <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--loomina-gold)]/10 to-transparent border-2 border-[var(--loomina-gold)]/30 flex items-center justify-center">
                                     <span className="text-3xl font-[family-name:var(--font-cinzel)] text-[var(--loomina-gold)]">I</span>
                                 </div>
                             </div>
 
-                            <h3 className="text-2xl font-serif mb-2 text-center tracking-tight">L'Initialisation</h3>
-                            <p className="text-xs text-[var(--loomina-gold)] font-[family-name:var(--font-cinzel)] tracking-[0.2em] uppercase text-center mb-6 opacity-80">
+                            <h3 className="text-xl font-serif mb-2 text-center tracking-tight">L'Initialisation</h3>
+                            <p className="text-xs text-[var(--loomina-gold)] font-[family-name:var(--font-cinzel)] tracking-[0.2em] uppercase text-center mb-4 opacity-80">
                                 ~Semaine 1
                             </p>
 
@@ -163,10 +163,10 @@ export default function ExperiencePage() {
             <ScrollSeparator />
 
             {/* C. Carte Narrative - Premium Carousel */}
-            <section className="pt-20 pb-24 px-6 md:px-12 lg:px-24 bg-white min-h-[85vh] flex flex-col justify-center">
+            <section className="pt-16 pb-12 px-6 md:px-12 lg:px-24 bg-white min-h-[85vh] flex flex-col justify-center">
                 <div className="max-w-7xl mx-auto w-full">
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">La Carte Narrative</h2>
+                    <div className="text-center mb-8">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">La Carte Narrative</h2>
                         <div className="w-24 h-1 bg-gradient-to-r from-[var(--loomina-amber)] to-[var(--loomina-gold)] mx-auto rounded-full"></div>
                         <p className="mt-8 text-base text-[#888888] font-serif max-w-2xl mx-auto leading-relaxed">
                             14 thématiques pour capturer l'essence de votre vie
@@ -240,7 +240,7 @@ export default function ExperiencePage() {
             <ScrollSeparator />
 
             {/* D. Memory Engine + CTA - Unified Section */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white overflow-hidden relative">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white overflow-hidden relative">
                 {/* Background accent */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--loomina-gold)] opacity-[0.02] blur-[150px] rounded-full pointer-events-none"></div>
 

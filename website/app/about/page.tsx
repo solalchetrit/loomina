@@ -32,9 +32,9 @@ export default function AboutPage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* Hero Section */}
-            <section className="relative pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center">
+            <section className="relative pt-24 pb-16 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="flex items-center justify-center mb-12">
+                    <div className="flex items-center justify-center mb-8">
                         <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>
                         <span className="mx-6 text-xs font-[family-name:var(--font-cinzel)] tracking-[0.4em] text-[var(--loomina-gold)] uppercase">
                             À Propos
@@ -42,12 +42,12 @@ export default function AboutPage() {
                         <div className="h-px w-16 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]"></div>
                     </div>
 
-                    <h1 className="text-4xl md:text-7xl font-serif mb-10 leading-[1.1] tracking-tight">
+                    <h1 className="text-4xl md:text-6xl font-serif mb-6 leading-[1.1] tracking-tight">
                         L'Histoire de
                         <span className="block text-[var(--loomina-gold)] mt-2">Loomina</span>
                     </h1>
 
-                    <p className="text-xl text-[#666] font-serif max-w-3xl mx-auto leading-relaxed">
+                    <p className="text-lg text-[#666] font-serif max-w-3xl mx-auto leading-relaxed">
                         Née d'un besoin personnel, Loomina est devenue une mission :
                         <br className="hidden md:block" />
                         permettre à chacun de transmettre son histoire.
@@ -58,7 +58,7 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* L'Histoire du Fondateur */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-5xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         {/* Image placeholder - à remplacer par une vraie photo */}
@@ -109,10 +109,10 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* Mission */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">Notre Mission</h2>
-                    <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto mb-12"></div>
+                    <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Notre Mission</h2>
+                    <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto mb-8"></div>
 
                     <div className="bg-gradient-to-b from-white to-[#fafafa] border-2 border-[var(--loomina-gold)]/20 rounded-3xl p-12 md:p-16">
                         <p className="text-2xl md:text-3xl font-serif leading-relaxed text-[#666] mb-8">
@@ -136,10 +136,10 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* Valeurs */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">Nos Valeurs</h2>
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Nos Valeurs</h2>
                         <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto mb-6"></div>
                         <p className="text-lg text-[#888] font-serif max-w-2xl mx-auto">
                             Les principes qui guident chaque décision chez Loomina.
@@ -161,10 +161,10 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* Vision */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-4xl mx-auto">
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">Notre Vision</h2>
+                    <div className="text-center mb-8">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Notre Vision</h2>
                         <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto"></div>
                     </div>
 
@@ -191,10 +191,10 @@ export default function AboutPage() {
             <ScrollSeparator />
 
             {/* L'Équipe */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-4xl mx-auto">
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">L'Équipe</h2>
+                    <div className="text-center mb-8">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">L'Équipe</h2>
                         <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto mb-6"></div>
                         <p className="text-lg text-[#888] font-serif">
                             Une petite équipe passionnée, dédiée à votre histoire.

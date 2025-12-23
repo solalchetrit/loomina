@@ -67,7 +67,7 @@ export default function Header() {
 
         {/* --- DESKTOP NAVIGATION (Capsule) --- */}
         {/* --- DESKTOP NAVIGATION (Capsule) --- */}
-        <nav className="hidden md:flex items-center gap-2 p-1.5 bg-white/90 backdrop-blur-md border border-neutral-200/60 rounded-full shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)]">
+        <nav className="hidden md:flex items-center gap-2 p-1.5 bg-white/90 backdrop-blur-md border border-neutral-200/60 rounded-full shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] ml-auto">
           {NAV_LINKS.map((item) => (
             <Link
               key={item.href}

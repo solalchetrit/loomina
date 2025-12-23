@@ -92,9 +92,9 @@ export default function OffrePage() {
     return (
         <main className="min-h-screen bg-white text-[#1a1a1a]">
             {/* Hero Section */}
-            <section className="relative pt-32 pb-24 px-6 md:px-12 lg:px-24 min-h-[85vh] flex items-center justify-center bg-gradient-to-b from-white to-[#fafafa]">
+            <section className="relative pt-24 pb-8 px-6 md:px-12 lg:px-24 min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#fafafa]">
                 <div className="max-w-5xl mx-auto text-center">
-                    <div className="flex items-center justify-center mb-12">
+                    <div className="flex items-center justify-center mb-6">
                         <div className="h-px w-16 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]"></div>
                         <span className="mx-6 text-xs font-[family-name:var(--font-cinzel)] tracking-[0.4em] text-[var(--loomina-gold)] uppercase">
                             L'Offre
@@ -102,22 +102,22 @@ export default function OffrePage() {
                         <div className="h-px w-16 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]"></div>
                     </div>
 
-                    <h1 className="text-4xl md:text-7xl font-serif mb-10 leading-[1.1] tracking-tight">
+                    <h1 className="text-4xl md:text-6xl font-serif mb-6 leading-[1.1] tracking-tight">
                         Votre Livre de Vie,
                         <span className="block text-[var(--loomina-gold)] mt-2">Clé en Main</span>
                     </h1>
 
-                    <p className="text-xl text-[#666] font-serif max-w-3xl mx-auto leading-relaxed mb-12">
+                    <p className="text-lg text-[#666] font-serif max-w-3xl mx-auto leading-relaxed mb-8">
                         Un service tout compris pour transformer vos souvenirs en héritage littéraire.
                         <br className="hidden md:block" />
                         De la première conversation à la livraison de votre livre.
                     </p>
 
                     {/* Prix et CTA */}
-                    <div className="bg-white border-2 border-[var(--loomina-gold)]/20 rounded-3xl p-8 md:p-12 max-w-2xl mx-auto shadow-xl">
-                        <div className="mb-6">
+                    <div className="bg-white border-2 border-[var(--loomina-gold)]/20 rounded-3xl p-6 md:p-8 max-w-2xl mx-auto shadow-xl">
+                        <div className="mb-4">
                             <span className="text-sm text-[#888] uppercase tracking-wider font-[family-name:var(--font-cinzel)]">Prix de lancement</span>
-                            <div className="text-7xl md:text-8xl font-serif text-[var(--loomina-gold)] my-4">
+                            <div className="text-6xl md:text-7xl font-serif text-[var(--loomina-gold)] my-3">
                                 219€
                             </div>
                             <p className="text-sm text-[#888]">Paiement unique • Tout inclus • Sans surprise</p>
@@ -126,7 +126,7 @@ export default function OffrePage() {
                         <Button href="/order" variant="primary" size="lg" fullWidth>
                             Commencer mon livre
                         </Button>
-                        <p className="text-xs text-[#888] mt-4">Garantie satisfait ou remboursé • Paiement sécurisé</p>
+                        <p className="text-xs text-[#888] mt-3">Garantie satisfait ou remboursé • Paiement sécurisé</p>
                     </div>
                 </div>
             </section>
@@ -134,10 +134,10 @@ export default function OffrePage() {
             <ScrollSeparator />
 
             {/* Ce qui est inclus */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">Tout est Inclus</h2>
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Tout est Inclus</h2>
                         <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto mb-6"></div>
                         <p className="text-lg text-[#888] font-serif max-w-2xl mx-auto">
                             Un service complet, sans frais cachés, pour une expérience sereine.
@@ -161,10 +161,10 @@ export default function OffrePage() {
             <ScrollSeparator />
 
             {/* Timeline du processus */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-5xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">Le Processus</h2>
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Le Processus</h2>
                         <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto mb-6"></div>
                         <p className="text-lg text-[#888] font-serif max-w-2xl mx-auto">
                             Un parcours en 3 étapes, simple et accompagné.
@@ -220,10 +220,10 @@ export default function OffrePage() {
             <ScrollSeparator />
 
             {/* Témoignages */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">Ils Nous Font Confiance</h2>
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Ils Nous Font Confiance</h2>
                         <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto"></div>
                     </div>
 
@@ -251,10 +251,10 @@ export default function OffrePage() {
             <ScrollSeparator />
 
             {/* FAQ */}
-            <section className="py-20 px-6 md:px-12 lg:px-24 bg-white">
+            <section className="py-16 px-6 md:px-12 lg:px-24 bg-white">
                 <div className="max-w-4xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 tracking-tight">Questions Fréquentes</h2>
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-4xl font-serif mb-4 tracking-tight">Questions Fréquentes</h2>
                         <div className="w-20 h-px bg-[var(--loomina-gold)] mx-auto"></div>
                     </div>
 
