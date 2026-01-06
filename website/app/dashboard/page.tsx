@@ -57,17 +57,31 @@ export default function DashboardPage() {
             setPhone(matchPhone); // Update UI with the matched variation
             const cleanPhone = formatToE164(matchPhone);
 
-            // 2. Call Internal API (Bypassing Make.com for reliability)
-            console.log("[Login] Sending to Internal API");
+            // 2. Call Make.com Webhook
+            console.log("[Login] Sending to Webhook:", MAKE_CONFIG.VERIFY_WEBHOOK_URL);
 
-            const response = await fetch("/api/verify", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "start",
-                    phone_number: cleanPhone
-                }),
-            });
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+                const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "start",
+                        phone_number: cleanPhone
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    console.warn("Webhook returned error (non-blocking):", response.status);
+                }
+            } catch (err) {
+                console.warn("Webhook request failed or timed out (proceeding anyway):", err);
+            }
 
             // Always move to OTP step to allow user to try entering code
             // (Twilio might have sent it even if Make timed out)
@@ -87,7 +101,7 @@ export default function DashboardPage() {
 
         try {
             const cleanPhone = formatToE164(phone);
-            const response = await fetch("/api/verify", {
+            const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
