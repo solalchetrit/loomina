@@ -7,10 +7,15 @@ import LiveBook from "@/components/LiveBook";
 import MagicButton from "@/components/ui/MagicButton";
 import { motion } from "framer-motion";
 import { formatToE164 } from "@/lib/phone";
+import { MAKE_CONFIG } from "@/config/make";
+
+type LoginStep = "phone" | "otp";
 
 // Trigger deployment for simplified login
 export default function DashboardPage() {
     const [phone, setPhone] = useState("");
+    const [otpCode, setOtpCode] = useState("");
+    const [loginStep, setLoginStep] = useState<LoginStep>("phone");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
 
@@ -26,73 +31,47 @@ export default function DashboardPage() {
         }
     }, []);
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleRequestOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         setLoading(true);
 
         try {
-            // 1. Normalize input using our utility
             const e164 = formatToE164(phone);
-
-            // 2. Pure digits version
             const digitsOnly = phone.replace(/\D/g, '');
 
-            // 3. Local version (starting with 0) if it's French
-            let localVersion = digitsOnly;
-            if (digitsOnly.startsWith('33') && digitsOnly.length === 11) {
-                localVersion = '0' + digitsOnly.substring(2);
-            } else if (!digitsOnly.startsWith('0') && digitsOnly.length === 9) {
-                localVersion = '0' + digitsOnly;
-            }
-
-            console.log("Attempting login with variations:", { e164, digitsOnly, localVersion, raw: phone });
-
-            // Check if user exists in Supabase "Client" table
-            // We check for: E164, pure digits, local version, and the raw input
-            // We use .limit(1) instead of .maybeSingle() because if a user has multiple 
-            // entries (e.g. one with space, one without), .maybeSingle() would throw an error.
-            let { data: results, error: clientError } = await supabase
+            // 1. Check if user exists in Supabase
+            let { data: results } = await supabase
                 .from('Client')
                 .select('id, phone_number')
-                .or(`phone_number.eq."${e164}",phone_number.eq."${digitsOnly}",phone_number.eq."${localVersion}",phone_number.eq."${phone}"`)
+                .or(`phone_number.eq."${e164}",phone_number.eq."${digitsOnly}",phone_number.eq."${phone}"`)
                 .limit(1);
 
-            let clientData = results && results.length > 0 ? results[0] : null;
-
-            // FALLBACK: If no direct match, try a fuzzy match by removing formatting in the search
-            if (!clientData && digitsOnly.length >= 9) {
-                console.log("No direct match, trying fuzzy search...");
-                // Construct a pattern like %0%7%8...
-                const fuzzyPattern = `%${digitsOnly.split('').join('%')}%`;
-
-                const { data: fuzzyResults } = await supabase
-                    .from('Client')
-                    .select('id, phone_number')
-                    .ilike('phone_number', fuzzyPattern)
-                    .limit(1);
-
-                if (fuzzyResults && fuzzyResults.length > 0) {
-                    console.log("Fuzzy match found:", fuzzyResults[0].phone_number);
-                    clientData = fuzzyResults[0];
-                }
-            }
-
-            if (!clientData) {
-                console.log("Client not found for variants:", { e164, digitsOnly, localVersion, phone });
+            if (!results || results.length === 0) {
                 setError("Ce numéro ne semble pas faire partie de nos auteurs. Avez-vous déjà commandé votre biographie ?");
                 setLoading(false);
                 return;
             }
 
-            // Success: Direct Login
-            setIsLoggedIn(true);
-            // Save the EXACT phone number that matched if possible, or the one they typed
-            const matchPhone = clientData.phone_number || phone;
-            setPhone(matchPhone);
+            const matchPhone = results[0].phone_number || e164;
+            setPhone(matchPhone); // Use the formatted one for the next step
 
-            if (rememberMe) {
-                localStorage.setItem("loomina_user_phone", matchPhone);
+            // 2. Call Make.com to start Twilio Verify
+            const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "start",
+                    phone_number: matchPhone
+                }),
+            });
+
+            if (response.ok) {
+                setLoginStep("otp");
+            } else {
+                const text = await response.text();
+                setError(`Erreur lors de l'envoi du code (${response.status}).`);
+                console.error("Make error:", text);
             }
         } catch (err) {
             console.error("Login error:", err);
@@ -102,9 +81,45 @@ export default function DashboardPage() {
         }
     };
 
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setLoading(true);
+
+        try {
+            const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "check",
+                    phone_number: phone,
+                    otp_code: otpCode
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.status === "approved" || result.valid === true) {
+                setIsLoggedIn(true);
+                if (rememberMe) {
+                    localStorage.setItem("loomina_user_phone", phone);
+                }
+            } else {
+                setError("Code incorrect. Veuillez réessayer.");
+            }
+        } catch (err) {
+            console.error("Verification error:", err);
+            setError("Une erreur est survenue lors de la vérification.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleLogout = () => {
         setIsLoggedIn(false);
         setPhone("");
+        setOtpCode("");
+        setLoginStep("phone");
         localStorage.removeItem("loomina_user_phone");
     };
 
@@ -112,49 +127,60 @@ export default function DashboardPage() {
         return (
             <div className="min-h-screen bg-white text-black flex items-center justify-center px-6 pt-32">
                 <div className="w-full max-w-md space-y-8 text-center">
-                    <h1 className="text-3xl font-serif">Accédez à votre espace<span className="text-[10px] ml-2 text-neutral-300 opacity-50 font-sans">v3.1</span></h1>
+                    <h1 className="text-3xl font-serif">
+                        {loginStep === "phone" ? "Accédez à votre espace" : "Vérifiez votre identité"}
+                        <span className="text-[10px] ml-2 text-neutral-300 opacity-50 font-sans">v4.0</span>
+                    </h1>
                     <p className="text-neutral-500 text-sm">
-                        Entrez le numéro de téléphone utilisé lors de votre commande.
+                        {loginStep === "phone"
+                            ? "Entrez le numéro de téléphone utilisé lors de votre commande."
+                            : `Entrez le code à 6 chiffres envoyé au ${phone}`}
                     </p>
 
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <input
-                            type="tel"
-                            placeholder="Votre numéro (ex: 06 12 34 56 78)"
-                            value={phone}
-                            onChange={(e) => {
-                                let val = e.target.value;
-                                // Allow + only at the start
-                                const hasPlus = val.startsWith('+');
-                                // Keep only digits
-                                const digits = val.replace(/\D/g, '');
-
-                                let formatted = digits;
-
-                                if (hasPlus) {
-                                    if (digits.startsWith('33')) {
-                                        formatted = "+33";
-                                        const rest = digits.slice(2);
-                                        if (rest.length > 0) {
-                                            formatted += " " + rest.substring(0, 1);
-                                            if (rest.length > 1) {
-                                                const remaining = rest.substring(1).match(/.{1,2}/g)?.join(' ');
-                                                if (remaining) formatted += " " + remaining;
+                    <form onSubmit={loginStep === "phone" ? handleRequestOtp : handleVerifyOtp} className="space-y-4">
+                        {loginStep === "phone" ? (
+                            <input
+                                type="tel"
+                                placeholder="Votre numéro (ex: 06 12 34 56 78)"
+                                value={phone}
+                                onChange={(e) => {
+                                    let val = e.target.value;
+                                    const hasPlus = val.startsWith('+');
+                                    const digits = val.replace(/\D/g, '');
+                                    let formatted = digits;
+                                    if (hasPlus) {
+                                        if (digits.startsWith('33')) {
+                                            formatted = "+33";
+                                            const rest = digits.slice(2);
+                                            if (rest.length > 0) {
+                                                formatted += " " + rest.substring(0, 1);
+                                                if (rest.length > 1) {
+                                                    const remaining = rest.substring(1).match(/.{1,2}/g)?.join(' ');
+                                                    if (remaining) formatted += " " + remaining;
+                                                }
                                             }
+                                        } else {
+                                            formatted = "+" + (digits.match(/.{1,2}/g)?.join(' ') || digits);
                                         }
                                     } else {
-                                        formatted = "+" + (digits.match(/.{1,2}/g)?.join(' ') || digits);
+                                        formatted = digits.match(/.{1,2}/g)?.join(' ') || digits;
                                     }
-                                } else {
-                                    formatted = digits.match(/.{1,2}/g)?.join(' ') || digits;
-                                }
+                                    if (formatted.length <= 20) setPhone(formatted);
+                                }}
+                                className="w-full p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-center text-lg focus:ring-black focus:border-black outline-none"
+                            />
+                        ) : (
+                            <input
+                                type="text"
+                                maxLength={6}
+                                placeholder="123456"
+                                value={otpCode}
+                                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                                className="w-full p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-center text-3xl tracking-[0.5em] font-mono focus:ring-black focus:border-black outline-none"
+                                autoFocus
+                            />
+                        )}
 
-                                if (formatted.length <= 20) {
-                                    setPhone(formatted);
-                                }
-                            }}
-                            className="w-full p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-center text-lg focus:ring-black focus:border-black outline-none"
-                        />
                         <div className="flex items-center justify-center gap-2">
                             <input
                                 type="checkbox"
@@ -171,9 +197,20 @@ export default function DashboardPage() {
                         {error && (
                             <p className="text-red-500 text-sm">{error}</p>
                         )}
+
                         <MagicButton type="submit" disabled={loading} className="w-full">
-                            {loading ? "Chargement..." : "Accéder à mon espace"}
+                            {loading ? "Chargement..." : (loginStep === "phone" ? "Recevoir mon code" : "Valider le code")}
                         </MagicButton>
+
+                        {loginStep === "otp" && (
+                            <button
+                                type="button"
+                                onClick={() => setLoginStep("phone")}
+                                className="text-sm text-neutral-400 hover:text-black transition-colors underline underline-offset-4"
+                            >
+                                Modifier le numéro
+                            </button>
+                        )}
                     </form>
 
                     <div className="pt-8 border-t border-neutral-100">
