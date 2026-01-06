@@ -10,7 +10,7 @@ export const LOOMINA_CONFIG = {
 
     // Make.com webhook for triggering outbound calls & Verification
     // Consolidated Gateway Webhook
-    MAKE_WEBHOOK_URL: "https://hook.eu1.make.com/t1io85fnb9im0f3isnnf47iyn0n3s0ms",
+    MAKE_WEBHOOK_URL: "https://hook.eu1.make.com/6d52cznd3berpbtl1odkr5gvho05bnez",
 
     // Client phases (must match Make.com blueprint)
     PHASES: {
