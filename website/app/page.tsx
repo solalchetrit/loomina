@@ -3,6 +3,7 @@ import StarDecoration from "@/components/ui/StarDecoration";
 import ScrollSeparator from "@/components/ui/ScrollSeparator";
 import HowItWorks from "@/components/HowItWorks";
 import Button from "@/components/ui/Button";
+import ResumeOrderToast from "@/components/ResumeOrderToast";
 import { STRIPE_CONFIG } from "@/config/stripe";
 
 // --- DATA ---
@@ -42,6 +43,7 @@ export default function Home() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center bg-white text-black">
       <Hero />
+      <ResumeOrderToast />
       <ScrollSeparator />
 
       {/* --- SECTION 3: LE PARCOURS --- */}

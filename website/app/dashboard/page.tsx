@@ -175,6 +175,13 @@ export default function DashboardPage() {
                             {loading ? "Chargement..." : "Accéder à mon espace"}
                         </MagicButton>
                     </form>
+
+                    <div className="pt-8 border-t border-neutral-100">
+                        <p className="text-neutral-400 text-sm mb-4">Vous n'avez pas encore commencé votre histoire ?</p>
+                        <MagicButton href="/order" variant="secondary" size="sm">
+                            Commander ma biographie
+                        </MagicButton>
+                    </div>
                 </div>
             </div>
         );
