@@ -54,25 +54,38 @@ export default function DashboardPage() {
             }
 
             const matchPhone = results[0].phone_number || e164;
-            setPhone(matchPhone); // Use the formatted one for the next step
+            setPhone(matchPhone); // Update UI with the matched variation
+            const cleanPhone = formatToE164(matchPhone);
 
-            // 2. Call Make.com to start Twilio Verify
-            const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "start",
-                    phone_number: matchPhone
-                }),
-            });
+            console.log("[Login] Sending to Webhook:", MAKE_CONFIG.VERIFY_WEBHOOK_URL);
+            console.log("[Login] Payload:", { action: "start", phone_number: cleanPhone });
 
-            if (response.ok) {
-                setLoginStep("otp");
-            } else {
-                const text = await response.text();
-                setError(`Erreur lors de l'envoi du code (${response.status}).`);
-                console.error("Make error:", text);
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+                const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "start",
+                        phone_number: cleanPhone
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    console.warn("Webhook returned error (non-blocking):", response.status);
+                }
+            } catch (err) {
+                console.warn("Webhook request failed or timed out (proceeding anyway):", err);
             }
+
+            // Always move to OTP step to allow user to try entering code
+            // (Twilio might have sent it even if Make timed out)
+            setLoginStep("otp");
         } catch (err) {
             console.error("Login error:", err);
             setError("Une erreur est survenue. Veuillez réessayer.");
@@ -87,12 +100,13 @@ export default function DashboardPage() {
         setLoading(true);
 
         try {
+            const cleanPhone = formatToE164(phone);
             const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     action: "check",
-                    phone_number: phone,
+                    phone_number: cleanPhone,
                     otp_code: otpCode
                 }),
             });
