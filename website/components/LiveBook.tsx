@@ -60,13 +60,15 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
                     style: firstRow.book_style
                 };
 
-                // Map stories
-                const foundStories: Story[] = rpcData.map((row: any) => ({
-                    id: row.story_id,
-                    title: row.story_title,
-                    content: row.story_content,
-                    created_at: row.story_date
-                }));
+                // Map stories (filter out nulls which represent the "no stories" case)
+                const foundStories: Story[] = rpcData
+                    .filter((row: any) => row.story_id !== null)
+                    .map((row: any) => ({
+                        id: row.story_id,
+                        title: row.story_title,
+                        content: row.story_content,
+                        created_at: row.story_date
+                    }));
 
                 setBook(foundBook);
                 setStories(foundStories);
