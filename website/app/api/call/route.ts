@@ -6,8 +6,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { phone_number } = body;
     try {
-        const webhookUrl = LOOMINA_CONFIG.MAKE_WEBHOOK_URL;
-        console.log("Webhook URL:", webhookUrl);
+        const webhookUrl = LOOMINA_CONFIG.MAKE_OUTBOUND_CALL_WEBHOOK_URL;
+        console.log("[Call API] Webhook URL:", webhookUrl);
 
         if (!webhookUrl) {
             console.error("Erreur de configuration : Webhook introuvable.");

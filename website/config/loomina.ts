@@ -8,10 +8,12 @@ export const LOOMINA_CONFIG = {
     PHONE_NUMBER: "+33159169357",
     PHONE_NUMBER_DISPLAY: "01 59 16 93 57",
 
-    // Make.com webhook for triggering outbound calls & Verification
-    // Consolidated Gateway Webhook
-    // NOTE: This webhook is now dedicated to the "Loomina Verify Quick" scenario
-    // Call triggers might need ensuring they use the same hook if they share logic.
+    // Make.com webhook for triggering outbound calls
+    // This is the "Loomina Outbound Call v2" scenario
+    MAKE_OUTBOUND_CALL_WEBHOOK_URL: "https://hook.eu1.make.com/6d52cznd3berpbtl1odkr5gvho05bnez",
+
+    // Legacy: kept for backward compatibility but no longer used
+    // Verification is now handled directly via Twilio API in /api/auth/verify
     MAKE_WEBHOOK_URL: "https://hook.eu1.make.com/t1io85fnb9im0f3isnnf47iyn0n3s0ms",
 
     // Client phases (must match Make.com blueprint)
