@@ -1459,3 +1459,7 @@ website/.venv/lib/python3.9/site-packages/setuptools-58.0.4.dist-info/WHEEL
 .venv/lib/python3.9/site-packages/setuptools-58.0.4.dist-info/REQUESTED
 .venv/lib/python3.9/site-packages/setuptools-58.0.4.dist-info/top_level.txt
 .venv/lib/python3.9/site-packages/setuptools-58.0.4.dist-info/WHEEL
+
+# Local blueprints with secrets
+loomina_main.json
+make/Loomina Outbound Call v2 FIXED.blueprint.json
