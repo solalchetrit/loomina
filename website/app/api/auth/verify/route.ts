@@ -1,14 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { formatToE164 } from "@/lib/phone";
+
+// Twilio credentials from environment variables
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_VERIFY_SERVICE_SID = process.env.TWILIO_VERIFY_SERVICE_SID;
 
 export async function POST(request: NextRequest) {
     console.log("=== [Verify API] Request received ===");
 
     try {
+        // Check for required environment variables
+        if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_VERIFY_SERVICE_SID) {
+            console.error("[Verify API] Missing Twilio environment variables");
+            return NextResponse.json({ message: "Server configuration error" }, { status: 500 });
+        }
+
         const body = await request.json();
         const { action, phone_number, otp_code } = body;
 
-        console.log("[Verify API] Parsed body:", { action, phone_number: phone_number ? "***" + phone_number.slice(-4) : "missing", has_otp: !!otp_code });
+        console.log("[Verify API] Parsed body:", {
+            action,
+            phone_number: phone_number ? "***" + phone_number.slice(-4) : "missing",
+            has_otp: !!otp_code
+        });
 
         // Basic validation
         if (!action || !phone_number) {
@@ -16,70 +31,85 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
         }
 
-        const webhookUrl = LOOMINA_CONFIG.MAKE_WEBHOOK_URL;
+        const formattedPhone = formatToE164(phone_number);
+        const authHeader = "Basic " + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString("base64");
 
-        if (!webhookUrl) {
-            console.error("[Verify API] Configuration Error: Webhook URL missing");
-            return NextResponse.json({ message: "Server configuration error" }, { status: 500 });
-        }
+        if (action === "start") {
+            // Send verification code
+            console.log(`[Verify API] Sending OTP to ${formattedPhone}`);
 
-        console.log("[Verify API] Webhook URL:", webhookUrl);
+            const response = await fetch(
+                `https://verify.twilio.com/v2/Services/${TWILIO_VERIFY_SERVICE_SID}/Verifications`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": authHeader,
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        To: formattedPhone,
+                        Channel: "sms"
+                    })
+                }
+            );
 
-        // Forward request to Make.com
-        const payload: any = {
-            action,
-            phone_number
-        };
-
-        if (otp_code) {
-            payload.otp_code = otp_code;
-        }
-
-        console.log(`[Verify API] Forwarding ${action} for ${phone_number} to Make.com webhook...`);
-        console.log("[Verify API] Payload:", JSON.stringify(payload, null, 2));
-
-        // Pass an AbortController for timeout safety
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-        try {
-            const startTime = Date.now();
-            const response = await fetch(webhookUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
-            const duration = Date.now() - startTime;
-            console.log(`[Verify API] Make.com responded in ${duration}ms with status: ${response.status}`);
-
-            // Handle non-200 responses from Make
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error(`[Verify API] Webhook error ${response.status}:`, errorText);
-                return NextResponse.json(
-                    { message: "Verification service unavailable", details: errorText },
-                    { status: response.status }
-                );
-            }
-
-            // Return the Make.com response
             const data = await response.json();
-            console.log("[Verify API] Make.com response:", JSON.stringify(data, null, 2));
-            return NextResponse.json(data);
+            console.log("[Verify API] Twilio response:", JSON.stringify(data, null, 2));
 
-        } catch (fetchError) {
-            clearTimeout(timeoutId);
-            console.error("[Verify API] Fetch failed:", fetchError);
-
-            // If it's a timeout
-            if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-                console.error("[Verify API] Request timed out after 10s");
-                return NextResponse.json({ message: "Verification timed out" }, { status: 504 });
+            if (!response.ok) {
+                console.error("[Verify API] Twilio error:", data);
+                return NextResponse.json({
+                    message: "Failed to send verification code",
+                    error: data.message || "Unknown error"
+                }, { status: response.status });
             }
-            throw fetchError;
+
+            return NextResponse.json({
+                status: data.status,
+                sid: data.sid
+            });
+
+        } else if (action === "check") {
+            // Verify the code
+            console.log(`[Verify API] Verifying OTP for ${formattedPhone}`);
+
+            if (!otp_code) {
+                return NextResponse.json({ message: "Missing OTP code" }, { status: 400 });
+            }
+
+            const response = await fetch(
+                `https://verify.twilio.com/v2/Services/${TWILIO_VERIFY_SERVICE_SID}/VerificationCheck`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": authHeader,
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        To: formattedPhone,
+                        Code: otp_code
+                    })
+                }
+            );
+
+            const data = await response.json();
+            console.log("[Verify API] Twilio verification response:", JSON.stringify(data, null, 2));
+
+            if (!response.ok) {
+                console.error("[Verify API] Twilio verification error:", data);
+                return NextResponse.json({
+                    message: "Verification failed",
+                    error: data.message || "Unknown error"
+                }, { status: response.status });
+            }
+
+            return NextResponse.json({
+                status: data.status,
+                valid: data.valid
+            });
+
+        } else {
+            return NextResponse.json({ message: "Invalid action" }, { status: 400 });
         }
 
     } catch (error) {
