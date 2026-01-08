@@ -35,78 +35,41 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
             try {
                 setLoading(true);
 
-                // Generate multiple phone format variants for robust lookup
-                const e164 = formatToE164(userPhone);
-                const digitsOnly = userPhone.replace(/\D/g, '');
+                // 1. Fetch Everything via Secure RPC
+                const { data: rpcData, error: rpcError } = await supabase
+                    .rpc('get_client_stories', { phone_input: userPhone });
 
-                // Local version (starting with 0) if it's French
-                let localVersion = digitsOnly;
-                if (digitsOnly.startsWith('33') && digitsOnly.length === 11) {
-                    localVersion = '0' + digitsOnly.substring(2);
-                } else if (!digitsOnly.startsWith('0') && digitsOnly.length === 9) {
-                    localVersion = '0' + digitsOnly;
-                }
+                if (rpcError) throw rpcError;
 
-                console.log("LiveBook: Searching for client with phone variants:", { e164, digitsOnly, localVersion, raw: userPhone });
-
-                // 1. Find Client by Phone - try multiple formats
-                let { data: clients, error: clientError } = await supabase
-                    .from('Client')
-                    .select('id, first_name, last_name')
-                    .or(`phone_number.eq."${e164}",phone_number.eq."${digitsOnly}",phone_number.eq."${localVersion}",phone_number.eq."${userPhone}"`)
-                    .limit(1);
-
-                let client = clients && clients.length > 0 ? clients[0] : null;
-
-                // Fallback: fuzzy match if no direct match found
-                if (!client && digitsOnly.length >= 9) {
-                    console.log("LiveBook: No direct match, trying fuzzy search...");
-                    const fuzzyPattern = `%${digitsOnly.split('').join('%')}%`;
-
-                    const { data: fuzzyResults } = await supabase
-                        .from('Client')
-                        .select('id, first_name, last_name')
-                        .ilike('phone_number', fuzzyPattern)
-                        .limit(1);
-
-                    if (fuzzyResults && fuzzyResults.length > 0) {
-                        console.log("LiveBook: Fuzzy match found");
-                        client = fuzzyResults[0];
-                    }
-                }
-
-                if (clientError || !client) {
-                    console.error("Client introuvable pour ce numéro.", clientError);
-                    setError("Client introuvable pour ce numéro.");
-                    throw new Error("Client introuvable pour ce numéro.");
-                }
-
-                // 2. Find Book by Client ID
-                const { data: bookData, error: bookError } = await supabase
-                    .from('Books')
-                    .select('id, title, style, cover_image_url')
-                    .eq('client_id', client.id)
-                    .single();
-
-                if (bookError || !bookData) {
-                    // It's possible the client exists but no book - allows specific error handling
-                    console.log("No book found yet for client.");
+                if (!rpcData || rpcData.length === 0) {
+                    // Check if client exists at least? (Optional, but RPC returns empty if no client OR no book)
+                    // For now we assume empty means no book/stories found.
+                    console.log("LiveBook: No stories or book found via RPC.");
+                    setBook(null);
+                    setStories([]);
                     setLoading(false);
                     return;
                 }
 
-                setBook(bookData);
+                // Map RPC result to local state
+                // All rows have the same book info
+                const firstRow = rpcData[0];
+                const foundBook: Book = {
+                    id: firstRow.book_id,
+                    title: firstRow.book_title,
+                    style: firstRow.book_style
+                };
 
-                // 3. Fetch Stories
-                const { data: storiesData, error: storiesError } = await supabase
-                    .from('Stories')
-                    .select('*')
-                    .eq('book_id', bookData.id)
-                    .order('created_at', { ascending: true });
+                // Map stories
+                const foundStories: Story[] = rpcData.map((row: any) => ({
+                    id: row.story_id,
+                    title: row.story_title,
+                    content: row.story_content,
+                    created_at: row.story_date
+                }));
 
-                if (storiesError) throw storiesError;
-
-                setStories(storiesData || []);
+                setBook(foundBook);
+                setStories(foundStories);
 
             } catch (err: any) {
                 console.error("Error fetching LiveBook:", err);

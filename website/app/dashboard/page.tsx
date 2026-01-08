@@ -40,21 +40,27 @@ export default function DashboardPage() {
             const e164 = formatToE164(phone);
             const digitsOnly = phone.replace(/\D/g, '');
 
-            // 1. Check if user exists in Supabase
-            let { data: results } = await supabase
-                .from('Client')
-                .select('id, phone_number')
-                .or(`phone_number.eq."${e164}",phone_number.eq."${digitsOnly}",phone_number.eq."${phone}"`)
-                .limit(1);
+            // 1. Check if user exists securely via RPC
+            const { data: rpcData, error: rpcError } = await supabase
+                .rpc('check_client_exists', { phone_input: phone });
 
-            if (!results || results.length === 0) {
-                console.warn("User not found in Supabase. Proceeding with verification for testing/new user flow.");
-                // setError("Ce numéro ne semble pas faire partie de nos auteurs. Avez-vous déjà commandé votre biographie ?");
-                // setLoading(false);
-                // return;
+            if (rpcError) {
+                console.error("RPC Error:", rpcError);
+                throw rpcError;
             }
 
-            const matchPhone = (results && results.length > 0) ? results[0].phone_number : e164;
+            // rpcData will be an array of results or null if singular response not enforced?
+            // RPC returns TABLE, so we get [{ client_found: true, matched_phone: ... }] or [] if no rows returned (IF logic)
+            // Actually our SQL returns rows.
+
+            const resultRow = (rpcData && rpcData.length > 0) ? rpcData[0] : null;
+
+            if (!resultRow || !resultRow.client_found) {
+                console.warn("User not found in Supabase (Secure Check).");
+                // Optional: Handle user not found
+            }
+
+            const matchPhone = (resultRow && resultRow.matched_phone) ? resultRow.matched_phone : e164;
             setPhone(matchPhone); // Update UI with the matched variation
             const cleanPhone = formatToE164(matchPhone);
 
