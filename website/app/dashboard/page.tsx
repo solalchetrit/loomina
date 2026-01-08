@@ -7,7 +7,6 @@ import LiveBook from "@/components/LiveBook";
 import MagicButton from "@/components/ui/MagicButton";
 import { motion } from "framer-motion";
 import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
-import { LOOMINA_CONFIG } from "@/config/loomina";
 
 type LoginStep = "phone" | "otp";
 
@@ -64,8 +63,8 @@ export default function DashboardPage() {
             setPhone(matchPhone); // Update UI with the matched variation
             const cleanPhone = formatToE164(matchPhone);
 
-            // 2. Call Make.com Webhook
-            console.log("[Login] Sending to Webhook:", LOOMINA_CONFIG.MAKE_WEBHOOK_URL);
+            // 2. Call verification API (Twilio)
+            console.log("[Login] Sending verification request for:", cleanPhone);
 
             try {
                 const controller = new AbortController();
