@@ -23,3 +23,33 @@ export function formatToE164(phone: string): string {
 
     return cleaned;
 }
+
+/**
+ * Formats a phone number string for display (as-you-type).
+ * Adds spaces every 2 digits, handles +33 prefix specially.
+ */
+export function formatPhoneNumberForDisplay(value: string): string {
+    const hasPlus = value.startsWith('+');
+    const digits = value.replace(/\D/g, '');
+    let formatted = digits;
+
+    if (hasPlus) {
+        if (digits.startsWith('33')) {
+            formatted = "+33";
+            const rest = digits.slice(2);
+            if (rest.length > 0) {
+                formatted += " " + rest.substring(0, 1);
+                if (rest.length > 1) {
+                    const remaining = rest.substring(1).match(/.{1,2}/g)?.join(' ');
+                    if (remaining) formatted += " " + remaining;
+                }
+            }
+        } else {
+            formatted = "+" + (digits.match(/.{1,2}/g)?.join(' ') || digits);
+        }
+    } else {
+        formatted = digits.match(/.{1,2}/g)?.join(' ') || digits;
+    }
+
+    return formatted;
+}

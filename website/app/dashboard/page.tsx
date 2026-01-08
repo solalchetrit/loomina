@@ -6,8 +6,8 @@ import StartInterviewButton from "@/components/StartInterviewButton";
 import LiveBook from "@/components/LiveBook";
 import MagicButton from "@/components/ui/MagicButton";
 import { motion } from "framer-motion";
-import { formatToE164 } from "@/lib/phone";
-import { MAKE_CONFIG } from "@/config/make";
+import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
+import { LOOMINA_CONFIG } from "@/config/loomina";
 
 type LoginStep = "phone" | "otp";
 
@@ -59,13 +59,13 @@ export default function DashboardPage() {
             const cleanPhone = formatToE164(matchPhone);
 
             // 2. Call Make.com Webhook
-            console.log("[Login] Sending to Webhook:", MAKE_CONFIG.VERIFY_WEBHOOK_URL);
+            console.log("[Login] Sending to Webhook:", LOOMINA_CONFIG.MAKE_WEBHOOK_URL);
 
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
 
-                const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
+                const response = await fetch(LOOMINA_CONFIG.MAKE_WEBHOOK_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -102,7 +102,7 @@ export default function DashboardPage() {
 
         try {
             const cleanPhone = formatToE164(phone);
-            const response = await fetch(MAKE_CONFIG.VERIFY_WEBHOOK_URL, {
+            const response = await fetch(LOOMINA_CONFIG.MAKE_WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -159,27 +159,7 @@ export default function DashboardPage() {
                                 placeholder="Votre numéro (ex: 06 12 34 56 78)"
                                 value={phone}
                                 onChange={(e) => {
-                                    let val = e.target.value;
-                                    const hasPlus = val.startsWith('+');
-                                    const digits = val.replace(/\D/g, '');
-                                    let formatted = digits;
-                                    if (hasPlus) {
-                                        if (digits.startsWith('33')) {
-                                            formatted = "+33";
-                                            const rest = digits.slice(2);
-                                            if (rest.length > 0) {
-                                                formatted += " " + rest.substring(0, 1);
-                                                if (rest.length > 1) {
-                                                    const remaining = rest.substring(1).match(/.{1,2}/g)?.join(' ');
-                                                    if (remaining) formatted += " " + remaining;
-                                                }
-                                            }
-                                        } else {
-                                            formatted = "+" + (digits.match(/.{1,2}/g)?.join(' ') || digits);
-                                        }
-                                    } else {
-                                        formatted = digits.match(/.{1,2}/g)?.join(' ') || digits;
-                                    }
+                                    const formatted = formatPhoneNumberForDisplay(e.target.value);
                                     if (formatted.length <= 20) setPhone(formatted);
                                 }}
                                 className="w-full p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-center text-lg focus:ring-black focus:border-black outline-none"
