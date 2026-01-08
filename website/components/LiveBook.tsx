@@ -7,7 +7,7 @@ import PhotoGallery from "@/components/PhotoGallery";
 import { formatToE164 } from "@/lib/phone";
 
 interface Story {
-    id: number;
+    id: string;
     title: string;
     content: string;
     created_at: string;

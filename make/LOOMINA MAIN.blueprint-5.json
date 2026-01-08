@@ -4878,7 +4878,7 @@
                                                 ]
                                             },
                                             "mapper": {
-                                                "table": "Stories",
+                                                "table": "Chapters",
                                                 "title": "{{702.title}}",
                                                 "status": "draft",
                                                 "book_id": "{{35.id}}",

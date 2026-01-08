@@ -1,14 +1,13 @@
 -- Function to check if a client exists by phone number
 -- Returns the matched phone number if found, avoiding full row exposure
 CREATE OR REPLACE FUNCTION check_client_exists(phone_input text)
-RETURNS TABLE (exists boolean, matched_phone text)
+RETURNS TABLE (client_found boolean, matched_phone text)
 LANGUAGE plpgsql
 SECURITY DEFINER -- Runs with admin privileges to bypass RLS
 AS $$
 DECLARE
   final_phone text;
   digits_only text;
-  e164 text;
 BEGIN
   -- Simple normalization (matches client-side logic roughly)
   digits_only := regexp_replace(phone_input, '[^\d]', '', 'g');
@@ -39,10 +38,11 @@ GRANT EXECUTE ON FUNCTION check_client_exists TO authenticated;
 -- This allows us to hide the Stories/Books tables from public select
 CREATE OR REPLACE FUNCTION get_client_stories(phone_input text)
 RETURNS TABLE (
-  story_id bigint, 
+  story_id uuid, 
   story_title text, 
   story_content text, 
   story_date timestamptz,
+  book_id uuid,
   book_title text,
   book_style text
 )
@@ -62,19 +62,21 @@ BEGIN
     RETURN; -- No results
   END IF;
 
-  -- 2. Return the joined data
+  -- 2. Return the joined data from Chapters, falling back to Client preferences for style
   RETURN QUERY
   SELECT 
-    s.id as story_id,
-    s.title as story_title,
-    s.content as story_content,
-    s.created_at as story_date,
+    c.id as story_id,
+    c.title as story_title,
+    c.content as story_content,
+    c.created_at as story_date,
+    b.id as book_id,
     b.title as book_title,
-    b.style as book_style
-  FROM "Stories" s
-  JOIN "Books" b ON s.book_id = b.id
+    COALESCE(b.style, cl.writing_style) as book_style
+  FROM "Chapters" c
+  JOIN "Books" b ON c.book_id = b.id
+  JOIN "Client" cl ON b.client_id = cl.id
   WHERE b.client_id = client_record_id
-  ORDER BY s.created_at ASC;
+  ORDER BY c.chapter_number ASC, c.created_at ASC;
 END;
 $$;
 
