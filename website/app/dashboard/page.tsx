@@ -65,7 +65,7 @@ export default function DashboardPage() {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
 
-                const response = await fetch(LOOMINA_CONFIG.MAKE_WEBHOOK_URL, {
+                const response = await fetch("/api/auth/verify", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -102,7 +102,7 @@ export default function DashboardPage() {
 
         try {
             const cleanPhone = formatToE164(phone);
-            const response = await fetch(LOOMINA_CONFIG.MAKE_WEBHOOK_URL, {
+            const response = await fetch("/api/auth/verify", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
