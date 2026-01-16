@@ -1460,6 +1460,19 @@ website/.venv/lib/python3.9/site-packages/setuptools-58.0.4.dist-info/WHEEL
 .venv/lib/python3.9/site-packages/setuptools-58.0.4.dist-info/top_level.txt
 .venv/lib/python3.9/site-packages/setuptools-58.0.4.dist-info/WHEEL
 
+# Local secrets
+.env.local
+LOOMINA_API_ACCESS.md
+
+# Backups and temporary files
+download_vercel.py
+backup_git/
+
+# Large archives and binaries
+*.zip
+*.tar.gz
+node-v20.11.0-darwin-arm64/
+
 # Local blueprints with secrets
 loomina_main.json
 make/Loomina Outbound Call v2 FIXED.blueprint.json
