@@ -109,18 +109,14 @@ export default function Header() {
             className="md:hidden relative z-[110] flex items-center justify-center w-10 h-10 -mr-2"
             aria-label="Menu"
           >
-            <div className="flex flex-col gap-1.5 w-6">
+            <div className="flex flex-col gap-1.5 w-8 items-end justify-center">
               <motion.span
-                animate={isOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-                className="w-full h-0.5 bg-[var(--text-primary)] block origin-center transition-transform duration-300 ease-out"
+                animate={isOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
+                className="w-full h-px bg-[var(--text-primary)] block origin-center transition-all duration-500 ease-[0.16,1,0.3,1]"
               />
               <motion.span
-                animate={isOpen ? { opacity: 0, scale: 0.5 } : { opacity: 1, scale: 1 }}
-                className="w-full h-0.5 bg-[var(--text-primary)] block transition-all duration-300 ease-out"
-              />
-              <motion.span
-                animate={isOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-                className="w-full h-0.5 bg-[var(--text-primary)] block origin-center transition-all duration-300 ease-in-out"
+                animate={isOpen ? { rotate: -45, y: -4 } : { rotate: 0, y: 0 }}
+                className="w-2/3 h-px bg-[var(--text-primary)] block origin-center transition-all duration-500 ease-[0.16,1,0.3,1]"
               />
             </div>
           </button>
