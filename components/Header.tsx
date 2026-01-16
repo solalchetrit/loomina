@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
@@ -19,45 +19,94 @@ export default function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
-    requestAnimationFrame(() => setIsScrolled(window.scrollY > 20));
-
+    // Throttled scroll handler
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Body scroll lock
+  // Body scroll lock with padding adjustment to prevent layout shift
   useEffect(() => {
     if (isOpen) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = "hidden";
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     } else {
-      document.body.style.overflow = "unset";
+      // Small timeout to allow exit animation to start before unlocking
+      const timer = setTimeout(() => {
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+      }, 0);
+      return () => clearTimeout(timer);
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
     };
   }, [isOpen]);
+
+  // Animation Variants
+  const menuVariants: Variants = {
+    closed: {
+      opacity: 0,
+      clipPath: "inset(0% 0% 100% 0%)",
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 40,
+        when: "afterChildren",
+        staggerChildren: 0.05,
+        staggerDirection: -1
+      }
+    },
+    open: {
+      opacity: 1,
+      clipPath: "inset(0% 0% 0% 0%)",
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        when: "beforeChildren",
+        staggerChildren: 0.1,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants: Variants = {
+    closed: { opacity: 0, y: 20 },
+    open: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
 
   return (
     <>
       <motion.header
-        initial={{ y: 0, opacity: 1 }}
-        className={`fixed top-0 w-full transition-all duration-500 ${isOpen ? "z-[120]" : "z-50"} ${isScrolled
-          ? "bg-[var(--loomina-void)]/95 backdrop-blur-xl"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 w-full transition-all duration-500 z-[900] ${isScrolled || isOpen
+          ? "bg-[var(--loomina-void)]/80 backdrop-blur-xl border-b border-[var(--loomina-mist)]/20"
           : "bg-transparent"
           }`}
       >
         <div className={`mx-auto flex items-center justify-between px-6 transition-all duration-500 ${isScrolled ? "h-16" : "h-20"} max-w-7xl`}>
           {/* Logo */}
-          <Link href="/" className="relative z-10 flex shrink-0 items-center group">
+          <Link href="/" className="relative z-[920] flex shrink-0 items-center group" onClick={() => setIsOpen(false)}>
             <div className="relative h-8 w-40">
               <Image
                 src="/header-logo-trimmed.png"
                 alt="Logo Loomina"
                 fill
-                className="object-contain object-left transition-all duration-300 group-hover:opacity-70"
+                className="object-contain object-left transition-all duration-300 group-hover:opacity-80"
                 priority
                 sizes="(max-width: 768px) 144px, 192px"
               />
@@ -74,7 +123,7 @@ export default function Header() {
                 px-5 py-2.5 rounded-full
                 text-sm font-medium transition-all duration-300 ease-out
                 ${pathname === item.href
-                    ? "text-[var(--text-primary)] bg-[var(--loomina-mist)]/50"
+                    ? "text-[var(--text-primary)] bg-[var(--loomina-mist)]/50 shadow-sm"
                     : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--loomina-mist)]/30"
                   }
               `}
@@ -94,7 +143,8 @@ export default function Header() {
               bg-gradient-to-r from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]
               text-white font-sans font-semibold text-sm 
               transition-all duration-300 
-              hover:shadow-lg hover:shadow-[var(--loomina-gold)]/20 hover:scale-105
+              shadow-md shadow-[var(--loomina-gold)]/20
+              hover:shadow-lg hover:shadow-[var(--loomina-gold)]/30 hover:-translate-y-0.5
             "
             >
               Commencer
@@ -107,7 +157,7 @@ export default function Header() {
               border border-[var(--loomina-mist)] text-[var(--text-secondary)]
               text-sm font-medium 
               transition-all duration-300 
-              hover:border-[var(--loomina-gold)] hover:text-[var(--loomina-gold)]
+              hover:border-[var(--loomina-gold)] hover:text-[var(--loomina-gold)] hover:bg-[var(--loomina-void)]
             "
             >
               Se connecter
@@ -117,17 +167,22 @@ export default function Header() {
           {/* MOBILE BURGER BUTTON */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden relative z-[120] flex items-center justify-center w-10 h-10 -mr-2"
+            className="md:hidden relative z-[920] flex flex-col items-center justify-center w-12 h-12 rounded-full hover:bg-[var(--loomina-mist)]/20 transition-colors"
             aria-label="Menu"
+            aria-expanded={isOpen}
           >
-            <div className="flex flex-col gap-1.5 w-8 items-end justify-center">
+            <div className="flex flex-col gap-[5px] w-6 items-center justify-center">
               <motion.span
-                animate={isOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
-                className="w-full h-0.5 bg-[var(--text-primary)] block origin-center transition-all duration-500 ease-[0.16,1,0.3,1]"
+                animate={isOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
+                className="w-full h-[2px] bg-[var(--text-primary)] block origin-center transition-all duration-300 ease-out rounded-full"
               />
               <motion.span
-                animate={isOpen ? { rotate: -45, y: -4 } : { rotate: 0, y: 0 }}
-                className="w-2/3 h-0.5 bg-[var(--text-primary)] block origin-center transition-all duration-500 ease-[0.16,1,0.3,1]"
+                animate={isOpen ? { opacity: 0, x: 10 } : { opacity: 1, x: 0 }}
+                className="w-full h-[2px] bg-[var(--text-primary)] block origin-center transition-all duration-300 ease-out rounded-full"
+              />
+              <motion.span
+                animate={isOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
+                className="w-full h-[2px] bg-[var(--text-primary)] block origin-center transition-all duration-300 ease-out rounded-full"
               />
             </div>
           </button>
@@ -135,78 +190,72 @@ export default function Header() {
         </div>
       </motion.header>
 
-      {/* MOBILE FULLSCREEN MENU - Moved outside header to avoid backdrop-filter constraints */}
+      {/* MOBILE FULLSCREEN MENU */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[110] flex flex-col items-center justify-center md:hidden"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={menuVariants}
+            className="fixed inset-0 z-[910] flex flex-col pt-32 pb-10 px-6 md:hidden bg-[var(--loomina-void)]/98 backdrop-blur-2xl"
           >
-            {/* Backdrop Blur */}
-            <div className="absolute inset-0 bg-[#faf8f5]/95 backdrop-blur-xl" />
+            {/* Background Texture/Gradient for Premium Feel */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-b from-[var(--loomina-mist)]/10 to-transparent pointer-events-none" />
 
-            <nav className="relative z-10 flex flex-col items-center gap-8">
-              {NAV_LINKS.map((item, index) => (
-                <motion.div
-                  key={item.href}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{
-                    animate: { delay: index * 0.1, duration: 0.4 },
-                    exit: { delay: 0, duration: 0.2 }
-                  }}
-                >
-                  <Link
-                    href={item.label === "Accueil" ? "/#home" : item.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`
-                    text-3xl font-sans transition-all duration-300
-                    ${pathname === item.href
-                        ? "text-gradient-gold"
-                        : "text-[var(--text-primary)] hover:text-[var(--loomina-gold)]"
-                      }
-                  `}
-                  >
-                    {item.label}
-                  </Link>
-                </motion.div>
-              ))}
+            <nav className="relative z-10 flex flex-col items-center justify-between h-full max-h-[600px] mx-auto w-full max-w-sm">
+              <div className="flex flex-col items-center gap-6 w-full">
+                {NAV_LINKS.map((item) => (
+                  <motion.div key={item.href} variants={itemVariants} className="w-full">
+                    <Link
+                      href={item.label === "Accueil" ? "/#home" : item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`
+                        block w-full text-center text-4xl font-serif tracking-tight transition-all duration-300 py-2
+                        ${pathname === item.href
+                          ? "text-[var(--loomina-gold-dark)] italic scale-105"
+                          : "text-[var(--text-primary)] hover:text-[var(--loomina-gold)] hover:scale-105"
+                        }
+                      `}
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
 
               <motion.div
-                className="w-16 h-px bg-gradient-to-r from-transparent via-[var(--loomina-gold)] to-transparent my-4"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.4 }}
-              />
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{
-                  animate: { delay: 0.4, duration: 0.4 },
-                  exit: { delay: 0, duration: 0.2 }
-                }}
-                className="flex flex-col gap-4"
+                variants={itemVariants}
+                className="w-full flex flex-col gap-4 mt-8"
               >
+                <div className="w-12 h-0.5 bg-[var(--loomina-gold)]/30 mx-auto mb-6 rounded-full" />
+
                 <Link
                   href="/order"
                   onClick={() => setIsOpen(false)}
-                  className="px-10 py-4 rounded-full bg-gradient-to-r from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)] text-white text-lg font-semibold text-center active:scale-95 transition-transform"
+                  className="
+                    w-full py-4 rounded-xl 
+                    bg-gradient-to-r from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)] 
+                    text-white text-lg font-semibold text-center 
+                    shadow-lg shadow-[var(--loomina-gold)]/20
+                    active:scale-95 transition-all
+                  "
                 >
-                  Commencer
+                  Commencer l'expérience
                 </Link>
 
                 <Link
                   href="/dashboard"
                   onClick={() => setIsOpen(false)}
-                  className="px-10 py-4 rounded-full border border-[var(--loomina-mist)] text-[var(--text-primary)] text-lg font-medium text-center active:scale-95 transition-transform"
+                  className="
+                    w-full py-4 rounded-xl 
+                    border border-[var(--loomina-mist)] 
+                    text-[var(--text-secondary)] text-lg font-medium text-center 
+                    hover:bg-[var(--loomina-mist)]/10 hover:border-[var(--loomina-gold)] hover:text-[var(--loomina-gold)]
+                    active:scale-95 transition-all
+                  "
                 >
-                  Se connecter
+                  Espace Client
                 </Link>
               </motion.div>
             </nav>
