@@ -112,11 +112,11 @@ export default function Header() {
             <div className="flex flex-col gap-1.5 w-8 items-end justify-center">
               <motion.span
                 animate={isOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
-                className="w-full h-px bg-[var(--text-primary)] block origin-center transition-all duration-500 ease-[0.16,1,0.3,1]"
+                className="w-full h-0.5 bg-[var(--text-primary)] block origin-center transition-all duration-500 ease-[0.16,1,0.3,1]"
               />
               <motion.span
                 animate={isOpen ? { rotate: -45, y: -4 } : { rotate: 0, y: 0 }}
-                className="w-2/3 h-px bg-[var(--text-primary)] block origin-center transition-all duration-500 ease-[0.16,1,0.3,1]"
+                className="w-2/3 h-0.5 bg-[var(--text-primary)] block origin-center transition-all duration-500 ease-[0.16,1,0.3,1]"
               />
             </div>
           </button>
