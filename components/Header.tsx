@@ -28,12 +28,23 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Body scroll lock
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   return (
     <>
       <motion.header
         initial={{ y: 0, opacity: 1 }}
-        className={`fixed top-0 w-full transition-all duration-500 ${isOpen ? "z-[110]" : "z-50"} ${isScrolled
+        className={`fixed top-0 w-full transition-all duration-500 ${isOpen ? "z-[120]" : "z-50"} ${isScrolled
           ? "bg-[var(--loomina-void)]/95 backdrop-blur-xl"
           : "bg-transparent"
           }`}
@@ -106,7 +117,7 @@ export default function Header() {
           {/* MOBILE BURGER BUTTON */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden relative z-[110] flex items-center justify-center w-10 h-10 -mr-2"
+            className="md:hidden relative z-[120] flex items-center justify-center w-10 h-10 -mr-2"
             aria-label="Menu"
           >
             <div className="flex flex-col gap-1.5 w-8 items-end justify-center">
@@ -128,11 +139,14 @@ export default function Header() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 z-[100] bg-[#faf8f5] flex flex-col items-center justify-center md:hidden"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[110] flex flex-col items-center justify-center md:hidden"
           >
-            <div className="absolute inset-0 bg-[#faf8f5]" />
+            {/* Backdrop Blur */}
+            <div className="absolute inset-0 bg-[#faf8f5]/95 backdrop-blur-xl" />
 
             <nav className="relative z-10 flex flex-col items-center gap-8">
               {NAV_LINKS.map((item, index) => (
