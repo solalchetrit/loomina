@@ -28,18 +28,6 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Body scroll lock
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
-
 
   return (
     <>
@@ -140,86 +128,75 @@ export default function Header() {
         </div>
       </motion.header>
 
-      {/* MOBILE FULLSCREEN MENU - Premium & Simple */}
+      {/* MOBILE FULLSCREEN MENU - Moved outside header to avoid backdrop-filter constraints */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center md:hidden"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100] bg-[#faf8f5] flex flex-col items-center justify-center md:hidden"
           >
-            {/* Backdrop Blur */}
-            <div className="absolute inset-0 bg-[var(--loomina-void)]/95 backdrop-blur-xl" />
+            <div className="absolute inset-0 bg-[#faf8f5]" />
 
-            <nav className="relative z-10 flex flex-col items-center gap-10">
-              <div className="flex flex-col items-center gap-6">
-                {NAV_LINKS.map((item, index) => (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{
-                      delay: index * 0.1,
-                      duration: 0.5,
-                      ease: [0.22, 1, 0.36, 1]
-                    }}
-                  >
-                    <Link
-                      href={item.label === "Accueil" ? "/#home" : item.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`
-                    text-4xl font-serif tracking-tight transition-all duration-300
+            <nav className="relative z-10 flex flex-col items-center gap-8">
+              {NAV_LINKS.map((item, index) => (
+                <motion.div
+                  key={item.href}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{
+                    animate: { delay: index * 0.1, duration: 0.4 },
+                    exit: { delay: 0, duration: 0.2 }
+                  }}
+                >
+                  <Link
+                    href={item.label === "Accueil" ? "/#home" : item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`
+                    text-3xl font-sans transition-all duration-300
                     ${pathname === item.href
-                          ? "text-gradient-gold"
-                          : "text-[var(--text-primary)] hover:text-[var(--loomina-gold)]"
-                        }
+                        ? "text-gradient-gold"
+                        : "text-[var(--text-primary)] hover:text-[var(--loomina-gold)]"
+                      }
                   `}
-                    >
-                      {item.label}
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
+                  >
+                    {item.label}
+                  </Link>
+                </motion.div>
+              ))}
 
               <motion.div
-                initial={{ scaleX: 0, opacity: 0 }}
-                animate={{ scaleX: 1, opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                className="w-12 h-px bg-[var(--loomina-gold)]/30"
+                className="w-16 h-px bg-gradient-to-r from-transparent via-[var(--loomina-gold)] to-transparent my-4"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 0.4 }}
               />
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-                className="flex flex-col gap-4 w-full"
+                exit={{ opacity: 0, y: 10 }}
+                transition={{
+                  animate: { delay: 0.4, duration: 0.4 },
+                  exit: { delay: 0, duration: 0.2 }
+                }}
+                className="flex flex-col gap-4"
               >
                 <Link
                   href="/order"
                   onClick={() => setIsOpen(false)}
-                  className="
-                    px-8 py-3 rounded-full 
-                    bg-[var(--text-primary)] text-[var(--loomina-void)]
-                    text-base font-medium tracking-wide text-center
-                    active:scale-95 transition-transform
-                    shadow-xl shadow-[var(--text-primary)]/10
-                  "
+                  className="px-10 py-4 rounded-full bg-gradient-to-r from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)] text-white text-lg font-semibold text-center active:scale-95 transition-transform"
                 >
                   Commencer
                 </Link>
+
                 <Link
                   href="/dashboard"
                   onClick={() => setIsOpen(false)}
-                  className="
-                    text-sm text-[var(--text-secondary)] text-center
-                    hover:text-[var(--loomina-gold)] transition-colors
-                    uppercase tracking-widest font-sans
-                  "
+                  className="px-10 py-4 rounded-full border border-[var(--loomina-mist)] text-[var(--text-primary)] text-lg font-medium text-center active:scale-95 transition-transform"
                 >
-                  Connexion
+                  Se connecter
                 </Link>
               </motion.div>
             </nav>
