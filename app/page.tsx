@@ -103,10 +103,10 @@ export default function Home() {
             {/* Main Offer Card */}
             <div className="relative max-w-4xl mx-auto">
               {/* Main Offer Card - Enhanced Premium Design */}
-              <div className="relative glass-gold rounded-[2rem] p-6 md:p-10 overflow-hidden border border-[var(--loomina-gold)]/20 shadow-2xl shadow-[var(--loomina-gold)]/5">
+              <div className="relative glass-gold rounded-[2rem] p-8 md:p-10 overflow-hidden border border-[var(--loomina-gold)]/20 shadow-2xl shadow-[var(--loomina-gold)]/5">
 
                 {/* Product Label */}
-                <div className="absolute top-0 right-0 px-6 py-2 md:px-8 md:py-3 bg-[var(--loomina-gold)] text-white text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] rounded-bl-2xl">
+                <div className="absolute top-0 right-0 px-8 py-3 bg-[var(--loomina-gold)] text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-bl-2xl">
                   Forfait Unique
                 </div>
 
@@ -144,7 +144,7 @@ export default function Home() {
                         &quot;Un héritage précieux pour les générations futures. Loomina a transformé l&apos;histoire de mon grand-père en un véritable chef-d&apos;œuvre.&quot;
                       </span>
                       <div className="flex items-baseline justify-center gap-2">
-                        <span className="text-6xl md:text-8xl font-serif text-gradient-gold drop-shadow-sm">
+                        <span className="text-7xl md:text-8xl font-serif text-gradient-gold drop-shadow-sm">
                           {offer.price}
                         </span>
                         <span className="text-3xl text-[var(--loomina-gold)] font-serif mb-3">

@@ -7,8 +7,8 @@ import Button from "@/components/ui/Button";
 
 export default function Hero() {
   return (
-    <section id="home" className="relative min-h-[auto] md:min-h-[600px] lg:min-h-[90vh] flex items-center justify-center pt-28 pb-12 md:pt-0 md:pb-0 overflow-hidden scroll-mt-0">
-      <div className="w-full px-6 flex flex-col items-center justify-center gap-8 md:gap-12 md:grid md:grid-cols-2 max-w-7xl mx-auto relative z-10">
+    <section id="home" className="relative min-h-[auto] md:min-h-[600px] lg:min-h-[90vh] flex items-center justify-center pt-6 pb-10 md:pt-0 md:pb-0 overflow-hidden scroll-mt-0">
+      <div className="w-full px-6 flex flex-col items-center justify-center gap-4 md:gap-12 md:grid md:grid-cols-2 max-w-7xl mx-auto relative z-10">
 
         {/* CONTENU TEXTE - Consistent entry animation */}
         <motion.div
@@ -19,7 +19,7 @@ export default function Hero() {
             flex flex-col space-y-4 md:space-y-8 z-20 w-full max-w-lg md:max-w-none
             items-center text-center 
             md:items-start md:text-left
-            order-1
+            order-2 md:order-1
           `}
         >
           {/* Label with static accent */}
@@ -103,7 +103,7 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.95, x: 20 }}
           animate={{ opacity: 1, scale: 1, x: 0 }}
           transition={{ duration: 1.2, delay: 0.2, ease: [0.21, 0.45, 0.32, 0.9] }}
-          className="relative z-10 w-full max-w-[220px] md:max-w-none md:w-[110%] lg:w-[120%] md:-mr-12 lg:-mr-24 justify-self-center md:justify-self-start order-2"
+          className="relative z-10 w-full max-w-[220px] md:max-w-none md:w-[110%] lg:w-[120%] md:-mr-12 lg:-mr-24 justify-self-center md:justify-self-start order-1 md:order-2"
         >
           <div className="relative group transition-transform duration-700 hover:scale-[1.02]">
 
