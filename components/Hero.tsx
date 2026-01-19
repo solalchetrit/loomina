@@ -26,7 +26,7 @@ export default function Hero() {
           <div className="flex items-center gap-4">
             <div className="h-px w-8 md:w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]" />
             <span className="text-[var(--loomina-gold)] font-sans font-semibold text-[11px] md:text-[13px] tracking-[0.25em] uppercase">
-              La 1ère IA Biographe
+              La 1ère IA biographe
             </span>
             <div className="h-px w-8 md:w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)] md:hidden" />
           </div>
@@ -39,8 +39,8 @@ export default function Hero() {
 
           <p className="text-lg md:text-xl text-[var(--text-secondary)] leading-relaxed md:pr-12 max-w-md md:max-w-none font-serif">
             Racontez votre histoire par téléphone. Notre IA biographe la transforme en un{" "}
-            <span className="text-[var(--text-primary)] font-medium">livre d&apos;exception</span>,
-            sans que vous n&apos;ayez rien à écrire.
+            <span className="text-[var(--text-primary)] font-medium">Livre de Vie d&apos;exception</span>,
+            sans que vous ayez à écrire une seule ligne.
           </p>
 
           {/* Stats - Compact and premium */}

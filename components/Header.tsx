@@ -93,7 +93,7 @@ export default function Header() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 w-full transition-all duration-500 z-[900] ${isScrolled || isOpen
+        className={`fixed top-0 w-full transition-all duration-500 z-[1000] ${isScrolled || isOpen
           ? "bg-[var(--loomina-void)]/80 backdrop-blur-xl border-b border-[var(--loomina-mist)]/20"
           : "bg-transparent"
           }`}

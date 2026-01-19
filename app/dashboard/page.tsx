@@ -39,7 +39,7 @@ export default function DashboardPage() {
 
             // 1. Check if user exists securely via RPC
             const { data: rpcData, error: rpcError } = await supabase
-                .rpc('check_client_exists', { phone_input: phone });
+                .rpc('check_client_exists', { phone_input: e164 });
 
             if (rpcError) {
                 console.error("RPC Error:", rpcError);

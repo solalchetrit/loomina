@@ -18,7 +18,7 @@ const offer = {
         </svg>
       ),
       text: "Entretiens illimités",
-      subtext: "avec votre Biographe IA"
+      subtext: "avec votre biographe IA"
     },
     {
       icon: (
@@ -36,7 +36,7 @@ const offer = {
         </svg>
       ),
       text: "Vos photos intégrées",
-      subtext: "illustrez votre récit"
+      subtext: "pour illustrer votre récit"
     },
     {
       icon: (
@@ -54,7 +54,7 @@ const offer = {
         </svg>
       ),
       text: "Version numérique",
-      subtext: "ebook privé inclus"
+      subtext: "(ebook privé) incluse"
     },
   ],
 };
