@@ -19,6 +19,7 @@ export default function DashboardPage() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [userName, setUserName] = useState<string | null>(null);
 
     // Check for persistent presence on mount
     useEffect(() => {
@@ -28,6 +29,25 @@ export default function DashboardPage() {
             setIsLoggedIn(true);
         }
     }, []);
+
+    // Fetch user profile when logged in
+    useEffect(() => {
+        async function fetchProfile() {
+            if (!isLoggedIn || !phone) return;
+
+            const e164 = formatToE164(phone);
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('phone_number', e164)
+                .maybeSingle();
+
+            if (data && data.full_name) {
+                setUserName(data.full_name);
+            }
+        }
+        fetchProfile();
+    }, [isLoggedIn, phone]);
 
     const handleRequestOtp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,6 +70,9 @@ export default function DashboardPage() {
 
             if (!resultRow || !resultRow.client_found) {
                 console.warn("User not found in Supabase (Secure Check).");
+                setError("Numéro de téléphone inconnu. Avez-vous déjà passé commande ?");
+                setLoading(false);
+                return;
             }
 
             const matchPhone = (resultRow && resultRow.matched_phone) ? resultRow.matched_phone : e164;
@@ -59,10 +82,10 @@ export default function DashboardPage() {
             // 2. Call verification API (Twilio)
             console.log("[Login] Sending verification request for:", cleanPhone);
 
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
 
+            try {
                 const response = await fetch("/api/auth/verify", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -75,17 +98,22 @@ export default function DashboardPage() {
 
                 clearTimeout(timeoutId);
 
-                if (!response.ok) {
-                    console.warn("Webhook returned error (non-blocking):", response.status);
-                }
-            } catch (err) {
-                console.warn("Webhook request failed or timed out (proceeding anyway):", err);
-            }
+                const data = await response.json();
 
-            setLoginStep("otp");
-        } catch (err) {
+                if (!response.ok) {
+                    throw new Error(data.message || "Erreur lors de l'envoi du code");
+                }
+
+                setLoginStep("otp");
+            } catch (err: any) {
+                if (err.name === 'AbortError') {
+                    throw new Error("Le service de vérification ne répond pas. Veuillez réessayer.");
+                }
+                throw err;
+            }
+        } catch (err: any) {
             console.error("Login error:", err);
-            setError("Une erreur est survenue. Veuillez réessayer.");
+            setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
         } finally {
             setLoading(false);
         }
@@ -223,7 +251,7 @@ export default function DashboardPage() {
                     </form>
 
                     <div className="pt-8 border-t border-[var(--loomina-mist)]">
-                        <p className="text-[var(--text-muted)] text-sm mb-4">Vous n&apos;avez pas encore commencé votre histoire ?</p>
+                        <p className="text-[var(--text-muted)] text-sm mb-4">Vous n’avez pas encore commencé votre histoire ?</p>
                         <MagicButton href="/order" variant="secondary" size="sm">
                             Commander ma biographie
                         </MagicButton>
@@ -253,7 +281,9 @@ export default function DashboardPage() {
                             </span>
                             <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
                         </div>
-                        <h1 className="text-4xl font-serif text-[var(--text-primary)] mb-2">Votre Espace Auteur</h1>
+                        <h1 className="text-4xl font-serif text-[var(--text-primary)] mb-2">
+                            {userName ? `Bonjour, ${userName}` : "Votre Espace Auteur"}
+                        </h1>
                         <p className="text-[var(--text-secondary)]">Suivez la rédaction de votre autobiographie en temps réel.</p>
                     </div>
 

@@ -24,7 +24,7 @@ const VALUES = [
             </svg>
         ),
         title: "Bienveillance",
-        desc: "Chaque conversation est un moment d'écoute attentive et respectueuse de votre rythme.",
+        desc: "Chaque conversation est un moment d’écoute attentive et respectueuse de votre rythme.",
         gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]"
     },
     {
@@ -34,7 +34,7 @@ const VALUES = [
             </svg>
         ),
         title: "Transmission",
-        desc: "Nous croyons que chaque vie mérite d'être racontée et transmise aux générations futures.",
+        desc: "Nous croyons que chaque vie mérite d’être racontée et transmise aux générations futures.",
         gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]"
     },
     {
@@ -44,7 +44,7 @@ const VALUES = [
             </svg>
         ),
         title: "Excellence",
-        desc: "De la technologie à l'impression, nous ne faisons aucun compromis sur la qualité.",
+        desc: "De la technologie à l’impression, nous ne faisons aucun compromis sur la qualité.",
         gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]"
     }
 ];
@@ -98,12 +98,12 @@ export default function AboutPage() {
                     </div>
 
                     <h1 className="heading-display font-serif mb-8">
-                        L&apos;Histoire de
+                        L’Histoire de
                         <span className="block text-gradient-gold mt-2">Loomina</span>
                     </h1>
 
                     <p className="text-xl text-[var(--text-secondary)] font-serif max-w-3xl mx-auto leading-relaxed">
-                        Née d&apos;un besoin personnel, Loomina est devenue une mission :
+                        Née d’un besoin personnel, Loomina est devenue une mission :
                         <br className="hidden md:block" />
                         permettre à chacun de transmettre son histoire.
                     </p>
@@ -112,7 +112,7 @@ export default function AboutPage() {
 
             <ScrollSeparator />
 
-            {/* L'Histoire du Fondateur */}
+            {/* L’Histoire du Fondateur */}
             <section className="pt-8 pb-8 px-6 md:px-12 lg:px-24 relative overflow-hidden">
 
                 <div className="max-w-6xl mx-auto relative z-10">
@@ -160,23 +160,23 @@ export default function AboutPage() {
 
                             <div className="space-y-5 text-[var(--text-secondary)] font-serif leading-relaxed text-lg">
                                 <p>
-                                    Je m&apos;appelle <strong className="text-[var(--text-primary)]">Solal Chetrit</strong>, j&apos;ai 22 ans et je suis fraîchement diplômé de l&apos;ESCP Business School.
+                                    Je m’appelle <strong className="text-[var(--text-primary)]">Solal Chetrit</strong>, j’ai 22 ans et je suis fraîchement diplômé de l’ESCP Business School.
                                 </p>
 
                                 <p>
-                                    Il y a deux ans, ma grand-mère a eu des soucis de santé. Face à cette épreuve, j&apos;ai réalisé quelque chose : <strong className="text-[var(--text-primary)]">sa vie était passionnante</strong>, remplie d&apos;histoires que je ne connaissais qu&apos;en partie.
+                                    Il y a deux ans, ma grand-mère a eu des soucis de santé. Face à cette épreuve, j’ai réalisé quelque chose : <strong className="text-[var(--text-primary)]">sa vie était passionnante</strong>, remplie d’histoires que je ne connaissais qu’en partie.
                                 </p>
 
                                 <p>
-                                    Nous voulions qu&apos;elle écrive son livre, mais c&apos;était trop compliqué pour elle. Écrire demande du temps, de l&apos;énergie, et une certaine aisance avec les mots.
+                                    Nous voulions qu’elle écrive son livre, mais c’était trop compliqué pour elle. Écrire demande du temps, de l’énergie, et une certaine aisance avec les mots.
                                 </p>
 
                                 <p>
-                                    C&apos;est là que l&apos;idée de Loomina est née. <strong className="text-[var(--text-primary)]">Et si on pouvait simplement parler ?</strong> Si la technologie pouvait transformer nos conversations en un vrai livre, sans effort ?
+                                    C’est là que l’idée de Loomina est née. <strong className="text-[var(--text-primary)]">Et si on pouvait simplement parler ?</strong> Si la technologie pouvait transformer nos conversations en un vrai livre, sans effort ?
                                 </p>
 
                                 <p className="text-[var(--loomina-gold)]">
-                                    Aujourd&apos;hui, son livre trône dans notre salon, et c&apos;est devenu notre trésor familial.
+                                    Aujourd’hui, son livre trône dans notre salon, et c’est devenu notre trésor familial.
                                 </p>
                             </div>
                         </motion.div>
@@ -193,7 +193,7 @@ export default function AboutPage() {
                         <div className="flex items-center justify-center gap-4 mb-6">
                             <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]" />
                             <span className="text-[var(--loomina-gold)] text-xs font-semibold tracking-[0.3em] uppercase">
-                                Notre Raison d&apos;Être
+                                Notre Raison d’Être
                             </span>
                             <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
                         </div>
@@ -210,16 +210,16 @@ export default function AboutPage() {
                         <div className="relative glass-gold rounded-3xl p-12 md:p-16 border border-[var(--loomina-gold)]/20">
                             <blockquote className="text-2xl md:text-3xl font-serif leading-relaxed text-[var(--text-secondary)] text-center mb-10">
                                 &quot;Permettre à chaque personne de <span className="text-gradient-gold">transmettre son histoire</span>,
-                                sans que l&apos;écriture ne soit un obstacle.&quot;
+                                sans que l’écriture ne soit un obstacle.&quot;
                             </blockquote>
 
                             <div className="space-y-5 text-[var(--text-secondary)] font-serif text-lg max-w-2xl mx-auto">
                                 <p>
-                                    Nous croyons que <strong className="text-[var(--text-primary)]">chaque vie mérite d&apos;être racontée</strong>. Que vous soyez grand-parent, parent, ou simplement quelqu&apos;un qui a une histoire à partager, Loomina est là pour vous.
+                                    Nous croyons que <strong className="text-[var(--text-primary)]">chaque vie mérite d’être racontée</strong>. Que vous soyez grand-parent, parent, ou simplement quelqu’un qui a une histoire à partager, Loomina est là pour vous.
                                 </p>
 
                                 <p>
-                                    Notre technologie n&apos;est qu&un outil au service d&apos;une mission plus grande : <strong className="text-[var(--text-primary)]">préserver la mémoire humaine</strong> et créer des ponts entre les générations.
+                                    Notre technologie n’est qu’un outil au service d’une mission plus grande : <strong className="text-[var(--text-primary)]">préserver la mémoire humaine</strong> et créer des ponts entre les générations.
                                 </p>
                             </div>
                         </div>
@@ -264,7 +264,7 @@ export default function AboutPage() {
                         <div className="flex items-center justify-center gap-4 mb-6">
                             <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]" />
                             <span className="text-[var(--loomina-gold)] text-xs font-semibold tracking-[0.3em] uppercase">
-                                L&apos;Avenir
+                                L’Avenir
                             </span>
                             <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
                         </div>
@@ -283,11 +283,11 @@ export default function AboutPage() {
                         </p>
 
                         <p>
-                            Nous imaginons un futur où chaque famille possède sa bibliothèque d&apos;histoires personnelles. Où les petits-enfants peuvent découvrir la vie de leurs grands-parents non pas à travers des anecdotes éparses, mais à travers un <strong className="text-[var(--text-primary)]">récit complet et structuré</strong>.
+                            Nous imaginons un futur où chaque famille possède sa bibliothèque d’histoires personnelles. Où les petits-enfants peuvent découvrir la vie de leurs grands-parents non pas à travers des anecdotes éparses, mais à travers un <strong className="text-[var(--text-primary)]">récit complet et structuré</strong>.
                         </p>
 
                         <p>
-                            Loomina n&apos;est que le début. Nous travaillons déjà sur de nouvelles fonctionnalités : intégration de photos, d&apos;enregistrements audio, création de livres collaboratifs familiaux...
+                            Loomina n’est que le début. Nous travaillons déjà sur de nouvelles fonctionnalités : intégration de photos, d’enregistrements audio, création de livres collaboratifs familiaux...
                         </p>
 
                         <p className="text-[var(--loomina-gold)] font-semibold text-xl">
@@ -299,7 +299,7 @@ export default function AboutPage() {
 
             <ScrollSeparator />
 
-            {/* L'Équipe */}
+            {/* L’Équipe */}
             <section className="pt-8 pb-8 px-6 md:px-12 lg:px-24">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-10">
@@ -310,7 +310,7 @@ export default function AboutPage() {
                             </span>
                             <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
                         </div>
-                        <h2 className="heading-section font-serif text-[var(--text-primary)] mb-4">L&apos;Équipe</h2>
+                        <h2 className="heading-section font-serif text-[var(--text-primary)] mb-4">L’Équipe</h2>
                         <p className="text-lg text-[var(--text-secondary)] font-serif">
                             Une petite équipe passionnée, dédiée à votre histoire.
                         </p>
@@ -333,7 +333,7 @@ export default function AboutPage() {
                             Fondateur
                         </p>
                         <p className="text-[var(--text-secondary)] font-serif leading-relaxed max-w-2xl mx-auto">
-                            Diplômé de l&apos;ESCP Business School, passionné par l&apos;IA et la transmission.
+                            Diplômé de l’ESCP Business School, passionné par l’IA et la transmission.
                             Solal a créé Loomina pour résoudre un problème personnel qui est devenu une mission universelle.
                         </p>
                     </motion.div>
@@ -356,7 +356,7 @@ export default function AboutPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Button href="/offre" variant="primary" size="lg">
-                            Découvrir l&apos;offre
+                            Découvrir l’offre
                         </Button>
                         <Button href="/contact" variant="secondary" size="lg">
                             Nous contacter

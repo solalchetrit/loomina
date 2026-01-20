@@ -78,15 +78,15 @@ const DETAILED_FEATURES = [
 const FAQ_ITEMS = [
     {
         q: "Combien de temps dure le processus ?",
-        a: "En moyenne 14 semaines, mais nous nous adaptons totalement à votre rythme. Certains clients préfèrent avancer rapidement, d&apos;autres prennent leur temps."
+        a: "En moyenne 14 semaines, mais nous nous adaptons totalement à votre rythme. Certains clients préfèrent avancer rapidement, d’autres prennent leur temps."
     },
     {
         q: "Que se passe-t-il si je veux modifier quelque chose ?",
-        a: "Vous validez chaque chapitre avant de passer au suivant. Les modifications sont illimitées jusqu&apos;à votre satisfaction complète."
+        a: "Vous validez chaque chapitre avant de passer au suivant. Les modifications sont illimitées jusqu’à votre satisfaction complète."
     },
     {
         q: "Puis-je offrir Loomina en cadeau ?",
-        a: "Absolument ! C&apos;est même l&apos;un des cadeaux les plus appréciés. Nous fournissons un bon cadeau élégant à offrir."
+        a: "Absolument ! C’est même l’un des cadeaux les plus appréciés. Nous fournissons un bon cadeau élégant à offrir."
     },
     {
         q: "Mes données sont-elles sécurisées ?",
@@ -94,7 +94,7 @@ const FAQ_ITEMS = [
     },
     {
         q: "Y a-t-il une garantie ?",
-        a: "Oui. Si après le premier appel vous n&apos;êtes pas satisfait, nous vous remboursons intégralement, sans question."
+        a: "Oui. Si après le premier appel vous n’êtes pas satisfait, nous vous remboursons intégralement, sans question."
     }
 ];
 
@@ -102,19 +102,19 @@ const TESTIMONIALS = [
     {
         name: "Marie L.",
         age: "68 ans",
-        text: "J&apos;ai toujours voulu écrire mes mémoires mais je ne savais pas par où commencer. Loomina a rendu cela si simple et naturel.",
+        text: "J’ai toujours voulu écrire mes mémoires mais je ne savais pas par où commencer. Loomina a rendu cela si simple et naturel.",
         rating: 5
     },
     {
         name: "Jean-Pierre D.",
         age: "75 ans",
-        text: "Un cadeau que ma fille m&apos;a offert. Les conversations étaient passionnantes. C&apos;est devenu un moment que j&apos;attendais chaque semaine.",
+        text: "Un cadeau que ma fille m’a offert. Les conversations étaient passionnantes. C’est devenu un moment que j’attendais chaque semaine.",
         rating: 5
     },
     {
         name: "Sophie M.",
         age: "45 ans",
-        text: "Le plus beau cadeau que j&apos;ai pu faire à ma mère. Maintenant nous avons un trésor familial pour toujours.",
+        text: "Le plus beau cadeau que j’ai pu faire à ma mère. Maintenant nous avons un trésor familial pour toujours.",
         rating: 5
     }
 ];

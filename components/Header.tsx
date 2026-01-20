@@ -241,7 +241,7 @@ export default function Header() {
                     active:scale-95 transition-all
                   "
                 >
-                  Commencer l'expérience
+                  Commencer l’expérience
                 </Link>
 
                 <Link

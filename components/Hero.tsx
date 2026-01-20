@@ -34,12 +34,12 @@ export default function Hero() {
           <h1 className="heading-display font-serif text-[var(--text-primary)] leading-[1.1]">
             Vos souvenirs méritent
             <br />
-            <span className="text-gradient-gold italic">l&apos;éternité.</span>
+            <span className="text-gradient-gold italic">l’éternité.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-[var(--text-secondary)] leading-relaxed md:pr-12 max-w-md md:max-w-none font-serif">
             Racontez votre histoire par téléphone. Notre IA biographe la transforme en un{" "}
-            <span className="text-[var(--text-primary)] font-medium">Livre de Vie d&apos;exception</span>,
+            <span className="text-[var(--text-primary)] font-medium">Livre de Vie d’exception</span>,
             sans que vous ayez à écrire une seule ligne.
           </p>
 

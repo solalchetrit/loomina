@@ -84,7 +84,7 @@ export default function SuccessPage() {
                         Paiement Confirmé
                     </h1>
                     <p className="text-[var(--text-secondary)] font-serif text-lg">
-                        Bienvenue dans l&apos;aventure Loomina
+                        Bienvenue dans l’aventure Loomina
                     </p>
                 </motion.div>
 
@@ -139,7 +139,7 @@ export default function SuccessPage() {
                     transition={{ duration: 0.6, delay: 0.8 }}
                 >
                     <MagicButton href="/" variant="ghost">
-                        Retour à l&apos;accueil
+                        Retour à l’accueil
                     </MagicButton>
                 </motion.div>
 

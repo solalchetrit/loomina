@@ -55,7 +55,7 @@ export default function PrivacyPage() {
                         <ul className="list-disc pl-6 mt-4 space-y-2 text-[var(--text-secondary)] font-serif">
                             <li>Enregistrements vocaux des entretiens.</li>
                             <li>Transcriptions textuelles de ces entretiens.</li>
-                            <li>Photographies personnelles fournies pour l&apos;illustration de l&apos;ouvrage.</li>
+                            <li>Photographies personnelles fournies pour l’illustration de l’ouvrage.</li>
                             <li>Coordonnées (nom, adresse, email, téléphone) pour la livraison et la facturation.</li>
                         </ul>
                     </motion.div>
@@ -68,9 +68,9 @@ export default function PrivacyPage() {
                     >
                         <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">2. Utilisation des données et IA</h2>
                         <p className="text-[var(--text-secondary)] leading-relaxed font-serif">
-                            Vos données personnelles et souvenirs ne sont utilisés <strong className="text-[var(--text-primary)]">que dans l&apos;unique but de créer votre livre</strong>.
-                            Loomina garantit que vos enregistrements vocaux ne sont pas utilisés pour entraîner des modèles d&apos;intelligence artificielle publics.
-                            L&apos;IA est utilisée comme un outil d&apos;assistance à la transcription et à la rédaction, sous supervision humaine.
+                            Vos données personnelles et souvenirs ne sont utilisés <strong className="text-[var(--text-primary)]">que dans l’unique but de créer votre livre</strong>.
+                            Loomina garantit que vos enregistrements vocaux ne sont pas utilisés pour entraîner des modèles d’intelligence artificielle publics.
+                            L’IA est utilisée comme un outil d’assistance à la transcription et à la rédaction, sous supervision humaine.
                         </p>
                     </motion.div>
 
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
                         <p className="text-[var(--text-secondary)] leading-relaxed font-serif">
                             Loomina attache une importance capitale à la sécurité de vos mémoires.
                             Toutes les données (audio, texte, images) sont stockées dans un coffre-fort numérique sécurisé et crypté (AES-256).
-                            L&apos;accès est strictement limité au personnel chargé de la production de votre ouvrage.
+                            L’accès est strictement limité au personnel chargé de la production de votre ouvrage.
                         </p>
                         <div className="mt-6 flex items-center gap-3 p-4 bg-[var(--loomina-mist)]/20 rounded-xl border border-[var(--loomina-mist)]">
                             <div className="w-10 h-10 rounded-xl bg-[var(--loomina-gold)]/20 flex items-center justify-center">
@@ -107,7 +107,7 @@ export default function PrivacyPage() {
                     >
                         <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">4. Vos droits</h2>
                         <p className="text-[var(--text-secondary)] leading-relaxed font-serif">
-                            Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification et de suppression de vos données.
+                            Conformément au RGPD, vous disposez d’un droit d’accès, de rectification et de suppression de vos données.
                             Vous pouvez à tout moment demander la suppression définitive de vos souvenirs numériques de nos serveurs une fois le livre livré,
                             en nous contactant à <span className="text-[var(--loomina-gold)]">contact@loomina.eu</span>.
                         </p>

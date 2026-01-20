@@ -24,7 +24,7 @@ export default function CGVPage() {
                     <div className="flex items-center mb-8">
                         <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]" />
                         <span className="mx-4 text-xs font-semibold tracking-[0.3em] text-[var(--loomina-gold)] uppercase">
-                            L&apos;Offre
+                            L’Offre
                         </span>
                         <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
                     </div>
@@ -54,7 +54,7 @@ export default function CGVPage() {
                                 et toute personne physique ou morale souhaitant bénéficier des services proposés par Loomina (ci-après « le Client »).
                             </p>
                             <p className="mt-4">
-                                Les présentes CGV s&apos;appliquent à toute commande passée sur le site internet <strong className="text-[var(--text-primary)]">www.loomina.eu</strong>
+                                Les présentes CGV s’appliquent à toute commande passée sur le site internet <strong className="text-[var(--text-primary)]">www.loomina.eu</strong>
                                 ou par tout autre moyen de communication mis à disposition par Loomina.
                             </p>
                         </div>
@@ -67,12 +67,12 @@ export default function CGVPage() {
                             </p>
                             <ul className="list-disc pl-6 mt-4 space-y-2">
                                 <li>Des entretiens téléphoniques illimités avec le Client pour recueillir son récit de vie</li>
-                                <li>La transformation des enregistrements en texte littéraire via notre technologie d&apos;IA</li>
+                                <li>La transformation des enregistrements en texte littéraire via notre technologie d’IA</li>
                                 <li>La relecture et correction professionnelle de chaque chapitre</li>
-                                <li>L&apos;intégration de photographies fournies par le Client</li>
-                                <li>La mise en page éditoriale et la création d&apos;une couverture personnalisée</li>
-                                <li>L&apos;impression d&apos;un exemplaire physique du livre (format 15x23 cm, couverture rigide)</li>
-                                <li>L&apos;fourniture d&apos;une version numérique (PDF et EPUB)</li>
+                                <li>L’intégration de photographies fournies par le Client</li>
+                                <li>La mise en page éditoriale et la création d’une couverture personnalisée</li>
+                                <li>L’impression d’un exemplaire physique du livre (format 15x23 cm, couverture rigide)</li>
+                                <li>La fourniture d’une version numérique (PDF et EPUB)</li>
                                 <li>La livraison à domicile en France métropolitaine</li>
                             </ul>
                         </div>
@@ -100,7 +100,7 @@ export default function CGVPage() {
                                 Le prix du service est de <strong className="text-[var(--loomina-gold)]">219 euros TTC</strong>, tout compris, sans frais cachés.
                             </p>
                             <p className="mt-4">
-                                Le paiement s&apos;effectue en une fois par carte bancaire via la plateforme sécurisée <strong className="text-[var(--text-primary)]">Stripe</strong>.
+                                Le paiement s’effectue en une fois par carte bancaire via la plateforme sécurisée <strong className="text-[var(--text-primary)]">Stripe</strong>.
                                 Loomina ne conserve aucune donnée bancaire.
                             </p>
                             <p className="mt-4">
@@ -113,12 +113,12 @@ export default function CGVPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">5. Droit de Rétractation</h2>
                             <p className="mt-4">
-                                Conformément à l&apos;article L221-28 du Code de la consommation, le Client dispose d&apos;un délai de <strong className="text-[var(--text-primary)]">14 jours</strong>
+                                Conformément à l’article L221-28 du Code de la consommation, le Client dispose d’un délai de <strong className="text-[var(--text-primary)]">14 jours</strong>
                                 à compter de la conclusion du contrat pour exercer son droit de rétractation, sans avoir à justifier de motifs ni à payer de pénalité.
                             </p>
                             <p className="mt-4">
                                 Toutefois, si le Client demande expressément que la prestation commence avant la fin du délai de rétractation,
-                                il renonce à son droit de rétractation dès le début de l&apos;exécution du service.
+                                il renonce à son droit de rétractation dès le début de l’exécution du service.
                             </p>
                             <p className="mt-4">
                                 Pour exercer son droit de rétractation, le Client doit notifier Loomina par email à <strong className="text-[var(--loomina-gold)]">contact@loomina.eu</strong>.
@@ -129,11 +129,11 @@ export default function CGVPage() {
                         <div className="glass-gold rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">6. Garantie Satisfait ou Remboursé</h2>
                             <p>
-                                Loomina s&apos;engage à rembourser intégralement le Client si, après le premier entretien téléphonique,
+                                Loomina s’engage à rembourser intégralement le Client si, après le premier entretien téléphonique,
                                 le service, sans avoir à se justifier.
                             </p>
                             <p className="mt-4">
-                                Cette garantie s&apos;applique uniquement si la demande de remboursement est formulée dans les <strong className="text-[var(--text-primary)]">7 jours</strong>
+                                Cette garantie s’applique uniquement si la demande de remboursement est formulée dans les <strong className="text-[var(--text-primary)]">7 jours</strong>
                                 suivant le premier appel.
                             </p>
                         </div>
@@ -146,11 +146,11 @@ export default function CGVPage() {
                                 mais peut varier en fonction du rythme du Client et de la complexité du projet.
                             </p>
                             <p className="mt-4">
-                                Une fois le livre finalisé et validé par le Client, l&apos;impression et la livraison prennent entre <strong className="text-[var(--text-primary)]">2 et 3 semaines</strong>.
+                                Une fois le livre finalisé et validé par le Client, l’impression et la livraison prennent entre <strong className="text-[var(--text-primary)]">2 et 3 semaines</strong>.
                             </p>
                             <p className="mt-4">
-                                La livraison est effectuée à l&apos;adresse indiquée par le Client lors de la commande, en France métropolitaine.
-                                Pour les livraisons en Europe ou à l&apos;international, des frais supplémentaires peuvent s&apos;appliquer.
+                                La livraison est effectuée à l’adresse indiquée par le Client lors de la commande, en France métropolitaine.
+                                Pour les livraisons en Europe ou à l’international, des frais supplémentaires peuvent s’appliquer.
                             </p>
                         </div>
 
@@ -158,8 +158,8 @@ export default function CGVPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">8. Propriété Intellectuelle</h2>
                             <p>
-                                Le Client conserve l&apos;intégralité des droits d&apos;auteur sur le contenu de son récit de vie.
-                                Loomina s&apos;engage à ne jamais utiliser, reproduire ou diffuser le contenu du livre sans l&apos;autorisation expresse du Client.
+                                Le Client conserve l’intégralité des droits d’auteur sur le contenu de son récit de vie.
+                                Loomina s’engage à ne jamais utiliser, reproduire ou diffuser le contenu du livre sans l’autorisation expresse du Client.
                             </p>
                             <p className="mt-4">
                                 Le Client accorde à Loomina une licence non exclusive pour utiliser le contenu uniquement dans le cadre de la réalisation du service
@@ -172,7 +172,7 @@ export default function CGVPage() {
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">9. Protection des Données Personnelles</h2>
                             <p>
                                 Les données personnelles collectées par Loomina sont traitées conformément au Règlement Général sur la Protection des Données (RGPD).
-                                Pour plus d&apos;informations sur la gestion de vos données personnelles,
+                                Pour plus d’informations sur la gestion de vos données personnelles,
                                 consultez notre <Link href="/privacy" className="text-[var(--loomina-gold)] hover:underline">Politique de Confidentialité</Link>.
                             </p>
                         </div>
@@ -181,7 +181,7 @@ export default function CGVPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">10. Responsabilité</h2>
                             <p>
-                                Loomina s&apos;engage à fournir un service de qualité conforme aux standards professionnels.
+                                Loomina s’engage à fournir un service de qualité conforme aux standards professionnels.
                                 Toutefois, la responsabilité de Loomina ne saurait être engagée en cas de :
                             </p>
                             <ul className="list-disc pl-6 mt-4 space-y-2">
@@ -195,11 +195,11 @@ export default function CGVPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">11. Résolution des Litiges</h2>
                             <p>
-                                En cas de litige, le Client est invité à contacter Loomina en priorité à l&apos;adresse <strong className="text-[var(--loomina-gold)]">contact@loomina.eu</strong>
+                                En cas de litige, le Client est invité à contacter Loomina en priorité à l’adresse <strong className="text-[var(--loomina-gold)]">contact@loomina.eu</strong>
                                 afin de rechercher une solution amiable.
                             </p>
                             <p className="mt-4">
-                                Conformément à l&apos;article L612-1 du Code de la consommation, le Client peut recourir gratuitement à un médiateur de la consommation
+                                Conformément à l’article L612-1 du Code de la consommation, le Client peut recourir gratuitement à un médiateur de la consommation
                                 en cas de litige non résolu. Les coordonnées du médiateur compétent seront communiquées sur demande.
                             </p>
                             <p className="mt-4">
@@ -211,8 +211,8 @@ export default function CGVPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">12. Modification des CGV</h2>
                             <p>
-                                Nous guidons chaque proche avec un fil rouge simple : un temps d&apos;écoute, un atelier de mise en forme, puis des
-                                supports prêts à offrir. L&apos;accueil de la page reflète cette promesse pour rassurer et donner envie d&apos;avancer.
+                                Nous guidons chaque proche avec un fil rouge simple : un temps d’écoute, un atelier de mise en forme, puis des
+                                supports prêts à offrir. L’accueil de la page reflète cette promesse pour rassurer et donner envie d’avancer.
                             </p>
                         </div>
 
@@ -235,7 +235,7 @@ export default function CGVPage() {
             {/* CTA */}
             <section className="py-16 px-6 md:px-12 lg:px-24 text-center">
                 <Button href="/offre" variant="primary" size="lg">
-                    Découvrir l&apos;offre
+                    Découvrir l’offre
                 </Button>
             </section>
         </main>

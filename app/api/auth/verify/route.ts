@@ -38,6 +38,39 @@ export async function POST(request: NextRequest) {
             // Send verification code
             console.log(`[Verify API] Sending OTP to ${formattedPhone}`);
 
+            // 1. Check if user exists in Supabase
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+            const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+            if (!supabaseUrl || !supabaseKey) {
+                console.error("[Verify API] Missing Supabase environment variables");
+                return NextResponse.json({ message: "Server configuration error" }, { status: 500 });
+            }
+
+            const { createClient } = await import('@supabase/supabase-js');
+            const supabase = createClient(supabaseUrl, supabaseKey);
+
+            const { data: rpcData, error: rpcError } = await supabase
+                .rpc('check_client_exists', { phone_input: formattedPhone });
+
+            if (rpcError) {
+                console.error("[Verify API] RPC Error:", rpcError);
+                // We might want to block or allow if DB fails? safest is block or 500.
+                return NextResponse.json({ message: "Database error during verification check" }, { status: 500 });
+            }
+
+            const resultRow = (rpcData && rpcData.length > 0) ? rpcData[0] : null;
+
+            if (!resultRow || !resultRow.client_found) {
+                console.warn(`[Verify API] User not found for phone ${formattedPhone}. Blocking verification.`);
+                return NextResponse.json({
+                    message: "Numéro de téléphone inconnu. Avez-vous déjà passé commande ?"
+                }, { status: 404 });
+            }
+
+            // Using the matched phone from DB ensures consistency, though check_client_exists logic 
+            // usually handles normalization. logic below uses formattedPhone which should be fine.
+
             const response = await fetch(
                 `https://verify.twilio.com/v2/Services/${TWILIO_VERIFY_SERVICE_SID}/Verifications`,
                 {

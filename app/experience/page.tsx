@@ -7,20 +7,20 @@ import ScrollSeparator from '@/components/ui/ScrollSeparator';
 import Button from '@/components/ui/Button';
 
 const CHAPTERS = [
-    { id: 1, title: "Enfance", subtitle: "0-12 ans", desc: "Vos premiers souvenirs, l'école, les vacances en famille.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
+    { id: 1, title: "Enfance", subtitle: "0-12 ans", desc: "Vos premiers souvenirs, l’école, les vacances en famille.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 2, title: "Adolescence", subtitle: "12-18 ans", desc: "Le lycée, les amitiés intenses, les premières libertés.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 3, title: "Premiers Amours", subtitle: "Rencontres", desc: "Les battements de cœur et les leçons sentimentales.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
-    { id: 4, title: "Études & Formation", subtitle: "L'apprentissage", desc: "Vos années d'étudiant, vos mentors, votre voie.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
+    { id: 4, title: "Études & Formation", subtitle: "L’apprentissage", desc: "Vos années d’étudiant, vos mentors, votre voie.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 5, title: "Premiers Emplois", subtitle: "Vie active", desc: "Les débuts professionnels, les défis, les réussites.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 6, title: "Rencontres Marquantes", subtitle: "Influences", desc: "Ces personnes qui ont changé votre destin.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
-    { id: 7, title: "Fondation de la Famille", subtitle: "Le foyer", desc: "Le mariage, l'arrivée des enfants, la construction.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
-    { id: 8, title: "Carrière Professionnelle", subtitle: "L'œuvre", desc: "Vos évolutions, vos fiertés, vos accomplissements.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
+    { id: 7, title: "Fondation de la Famille", subtitle: "Le foyer", desc: "Le mariage, l’arrivée des enfants, la construction.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
+    { id: 8, title: "Carrière Professionnelle", subtitle: "L’œuvre", desc: "Vos évolutions, vos fiertés, vos accomplissements.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 9, title: "Voyages & Découvertes", subtitle: "Le monde", desc: "Les lieux visités, les aventures et cultures.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 10, title: "Épreuves & Résilience", subtitle: "Les tempêtes", desc: "Les moments difficiles et comment vous les avez surmontés.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 11, title: "Passions & Hobbies", subtitle: "Jardins secrets", desc: "Ce qui vous fait vibrer au quotidien.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 12, title: "Sagesse & Leçons", subtitle: "Le bilan", desc: "Ce que la vie vous a appris de plus précieux.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
     { id: 13, title: "Héritage & Transmission", subtitle: "Valeurs", desc: "Ce que vous souhaitez laisser aux vôtres.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" },
-    { id: 14, title: "Rêves & Projets", subtitle: "Le futur", desc: "Ce qu'il vous reste à accomplir.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" }
+    { id: 14, title: "Rêves & Projets", subtitle: "Le futur", desc: "Ce qu’il vous reste à accomplir.", gradient: "from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]" }
 ];
 
 const PHASES = [

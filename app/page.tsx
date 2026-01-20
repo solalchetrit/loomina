@@ -85,7 +85,7 @@ export default function Home() {
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]" />
                 <span className="text-[var(--loomina-gold)] text-xs font-semibold tracking-[0.3em] uppercase">
-                  L&apos;Offre
+                  L’Offre
                 </span>
                 <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
               </div>
@@ -96,7 +96,7 @@ export default function Home() {
               </h2>
 
               <p className="text-base text-[var(--text-secondary)] max-w-2xl mx-auto font-serif">
-                Nous croyons que chaque vie est un livre d&apos;exception qui mérite d&apos;être transmis. Transmettre son histoire n&apos;a jamais été aussi simple et accessible.
+                Nous croyons que chaque vie est un livre d’exception qui mérite d’être transmis. Transmettre son histoire n’a jamais été aussi simple et accessible.
               </p>
             </div>
 
@@ -141,7 +141,7 @@ export default function Home() {
                   <div className="flex flex-col items-center text-center lg:border-l lg:border-[var(--loomina-mist)]/50 lg:pl-10">
                     <div className="mb-8 bg-[var(--loomina-mist)]/10 p-6 rounded-3xl w-full border border-[var(--loomina-mist)]/20">
                       <span className="text-[var(--text-muted)] text-[10px] uppercase tracking-[0.3em] font-bold block mb-2">
-                        &quot;Un héritage précieux pour les générations futures. Loomina a transformé l&apos;histoire de mon grand-père en un véritable chef-d&apos;œuvre.&quot;
+                        &quot;Un héritage précieux pour les générations futures. Loomina a transformé l’histoire de mon grand-père en un véritable chef-d’œuvre.&quot;
                       </span>
                       <div className="flex items-baseline justify-center gap-2">
                         <span className="text-7xl md:text-8xl font-serif text-gradient-gold drop-shadow-sm">
@@ -203,7 +203,7 @@ export default function Home() {
       <section className="w-full pt-8 pb-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <blockquote className="text-2xl md:text-3xl font-serif text-[var(--text-primary)] italic leading-relaxed mb-6">
-            &quot;Le plus beau cadeau que j&apos;ai pu faire à ma mère. Elle a adoré raconter sa vie,
+            &quot;Le plus beau cadeau que j’ai pu faire à ma mère. Elle a adoré raconter sa vie,
             et maintenant nous avons un trésor familial pour toujours.&quot;
           </blockquote>
           <div className="flex items-center justify-center gap-3">

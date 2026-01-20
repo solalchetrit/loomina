@@ -84,7 +84,7 @@ export default function OrderPage() {
                         transition={{ duration: 0.6, delay: 0.1 }}
                         className="text-[var(--text-secondary)] text-lg max-w-xl mx-auto italic font-serif"
                     >
-                        &quot;Chaque vie mérite d&apos;être racontée.&quot;
+                        &quot;Chaque vie mérite d’être racontée.&quot;
                     </motion.p>
                 </div>
 
@@ -109,7 +109,7 @@ export default function OrderPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                         </div>
-                        <h3 className="text-2xl font-serif text-[var(--text-primary)]">C&apos;est pour moi</h3>
+                        <h3 className="text-2xl font-serif text-[var(--text-primary)]">C’est pour moi</h3>
                         <p className="text-sm text-[var(--text-secondary)] font-sans">
                             Je veux écrire mon histoire !
                         </p>
@@ -146,7 +146,7 @@ export default function OrderPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                             </svg>
                         </div>
-                        <h3 className="text-2xl font-serif text-[var(--text-primary)]">C&apos;est pour offrir</h3>
+                        <h3 className="text-2xl font-serif text-[var(--text-primary)]">C’est pour offrir</h3>
                         <p className="text-sm text-[var(--text-secondary)] font-sans">
                             Je veux connaître son histoire !
                         </p>

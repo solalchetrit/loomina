@@ -83,7 +83,7 @@ export default function LegalPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">3. Propriété Intellectuelle</h2>
                             <p>
-                                L&apos;ensemble des éléments composant le Site (textes, images, graphismes, logo, icônes, sons, logiciels, etc.)
+                                L’ensemble des éléments composant le Site (textes, images, graphismes, logo, icônes, sons, logiciels, etc.)
                                 est la propriété exclusive de Loomina ou de ses partenaires, sauf mention contraire.
                             </p>
                             <p className="mt-4">
@@ -91,8 +91,8 @@ export default function LegalPage() {
                                 quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable de Loomina.
                             </p>
                             <p className="mt-4">
-                                Toute exploitation non autorisée du Site ou de l&apos;un quelconque des éléments qu&apos;il contient sera considérée comme
-                                constitutive d&apos;une contrefaçon et poursuivie conformément aux dispositions des articles L.335-2 et suivants du Code de la Propriété Intellectuelle.
+                                Toute exploitation non autorisée du Site ou de l’un quelconque des éléments qu’il contient sera considérée comme
+                                constitutive d’une contrefaçon et poursuivie conformément aux dispositions des articles L.335-2 et suivants du Code de la Propriété Intellectuelle.
                             </p>
                         </div>
 
@@ -107,7 +107,7 @@ export default function LegalPage() {
                                 et à la loi Informatique et Libertés.
                             </p>
                             <p className="mt-4">
-                                Pour en savoir plus sur la collecte, l&apos;utilisation et la protection de vos données personnelles,
+                                Pour en savoir plus sur la collecte, l’utilisation et la protection de vos données personnelles,
                                 consultez notre <Link href="/privacy" className="text-[var(--loomina-gold)] hover:underline font-semibold">Politique de Confidentialité</Link>.
                             </p>
                             <div className="bg-[var(--loomina-mist)]/20 border border-[var(--loomina-mist)] rounded-xl p-6 mt-6 space-y-2">
@@ -115,8 +115,8 @@ export default function LegalPage() {
                                 <p><strong className="text-[var(--text-primary)]">Délégué à la Protection des Données (DPO) :</strong> <span className="text-[var(--loomina-gold)]">contact@loomina.eu</span></p>
                             </div>
                             <p className="mt-4">
-                                Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression, de limitation,
-                                d&apos;opposition et de portabilité de vos données personnelles. Vous pouvez exercer ces droits en nous contactant à l&apos;adresse :
+                                Conformément au RGPD, vous disposez d’un droit d’accès, de rectification, de suppression, de limitation,
+                                d’opposition et de portabilité de vos données personnelles. Vous pouvez exercer ces droits en nous contactant à l’adresse :
                                 <strong className="text-[var(--loomina-gold)]"> contact@loomina.eu</strong>.
                             </p>
                         </div>
@@ -125,7 +125,7 @@ export default function LegalPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">5. Cookies</h2>
                             <p>
-                                Le Site utilise des cookies pour améliorer l&apos;expérience utilisateur et analyser le trafic.
+                                Le Site utilise des cookies pour améliorer l’expérience utilisateur et analyser le trafic.
                             </p>
                             <p className="mt-4">
                                 Un cookie est un petit fichier texte stocké sur votre appareil lors de votre visite sur le Site.
@@ -133,11 +133,11 @@ export default function LegalPage() {
                             </p>
                             <ul className="list-disc pl-6 mt-4 space-y-2">
                                 <li><strong className="text-[var(--text-primary)]">Cookies techniques :</strong> Nécessaires au fonctionnement du Site (session, panier, etc.)</li>
-                                <li><strong className="text-[var(--text-primary)]">Cookies analytiques :</strong> Pour mesurer l&apos;audience et améliorer le Site (Google Analytics, etc.)</li>
+                                <li><strong className="text-[var(--text-primary)]">Cookies analytiques :</strong> Pour mesurer l’audience et améliorer le Site (Google Analytics, etc.)</li>
                             </ul>
                             <p className="mt-4">
-                                Nous guidons chaque proche avec un fil rouge simple : un temps d&apos;écoute, un atelier de mise en forme, puis des
-                                supports prêts à offrir. L&apos;accueil de la page reflète cette promesse pour rassurer et donner envie d&apos;avancer.
+                                Nous guidons chaque proche avec un fil rouge simple : un temps d’écoute, un atelier de mise en forme, puis des
+                                supports prêts à offrir. L’accueil de la page reflète cette promesse pour rassurer et donner envie d’avancer.
                             </p>
                             <p className="mt-4">
                                 Vous pouvez à tout moment désactiver les cookies dans les paramètres de votre navigateur.
@@ -149,16 +149,16 @@ export default function LegalPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">6. Limitation de Responsabilité</h2>
                             <p>
-                                Loomina s&apos;efforce d&apos;assurer l&apos;exactitude et la mise à jour des informations diffusées sur le Site,
-                                mais ne peut garantir l&apos;exactitude, la précision ou l&apos;exhaustivité des informations mises à disposition.
+                                Loomina s’efforce d’assurer l’exactitude et la mise à jour des informations diffusées sur le Site,
+                                mais ne peut garantir l’exactitude, la précision ou l’exhaustivité des informations mises à disposition.
                             </p>
                             <p className="mt-4">
                                 Loomina ne saurait être tenue responsable :
                             </p>
                             <ul className="list-disc pl-6 mt-4 space-y-2">
                                 <li>Des interruptions ou dysfonctionnements du Site</li>
-                                <li>De l&apos;impossibilité d&apos;accéder au Site</li>
-                                <li>Des dommages directs ou indirects résultant de l&apos;utilisation du Site</li>
+                                <li>De l’impossibilité d’accéder au Site</li>
+                                <li>Des dommages directs ou indirects résultant de l’utilisation du Site</li>
                                 <li>Du contenu des sites tiers vers lesquels le Site pourrait renvoyer</li>
                             </ul>
                         </div>
@@ -167,11 +167,11 @@ export default function LegalPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">7. Liens Hypertextes</h2>
                             <p>
-                                Le Site peut contenir des liens hypertextes vers d&apos;autres sites internet.
-                                Loomina n&apos;exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
+                                Le Site peut contenir des liens hypertextes vers d’autres sites internet.
+                                Loomina n’exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
                             </p>
                             <p className="mt-4">
-                                La création de liens hypertextes vers le Site est soumise à l&apos;autorisation préalable de Loomina.
+                                La création de liens hypertextes vers le Site est soumise à l’autorisation préalable de Loomina.
                                 Pour toute demande, contactez-nous à : <strong className="text-[var(--loomina-gold)]">contact@loomina.eu</strong>.
                             </p>
                         </div>

@@ -17,19 +17,19 @@ const FAQ_CATEGORIES = [
         questions: [
             {
                 q: "Comment fonctionne Loomina ?",
-                a: "Loomina est un service de biographie assistée par IA. Vous racontez votre histoire lors d&apos;appels téléphoniques, notre IA transforme vos paroles en texte littéraire, vous validez chaque chapitre, puis nous imprimons et livrons votre livre."
+                a: "Loomina est un service de biographie assistée par IA. Vous racontez votre histoire lors d’appels téléphoniques, notre IA transforme vos paroles en texte littéraire, vous validez chaque chapitre, puis nous imprimons et livrons votre livre."
             },
             {
                 q: "Combien de temps dure le processus complet ?",
-                a: "En moyenne 14 semaines, mais nous nous adaptons totalement à votre rythme. Certains clients préfèrent avancer rapidement (8-10 semaines), d&apos;autres prennent leur temps (jusqu&apos;à 6 mois). Il n&apos;y a aucune pression."
+                a: "En moyenne 14 semaines, mais nous nous adaptons totalement à votre rythme. Certains clients préfèrent avancer rapidement (8-10 semaines), d’autres prennent leur temps (jusqu’à 6 mois). Il n’y a aucune pression."
             },
             {
-                q: "Combien d'appels sont nécessaires ?",
-                a: "Nous recommandons 14 appels thématiques (un par chapitre), mais c&apos;est flexible. Si vous avez besoin de plus de temps sur un sujet ou de moins sur un autre, nous nous adaptons. Les appels sont illimités."
+                q: "Combien d’appels sont nécessaires ?",
+                a: "Nous recommandons 14 appels thématiques (un par chapitre), mais c’est flexible. Si vous avez besoin de plus de temps sur un sujet ou de moins sur un autre, nous nous adaptons. Les appels sont illimités."
             },
             {
-                q: "Quelle est la durée d'un appel ?",
-                a: "Entre 30 minutes et 1 heure en moyenne. Certains chapitres peuvent être plus courts (20 min), d&apos;autres plus longs (1h30). Vous décidez quand vous avez terminé un sujet."
+                q: "Quelle est la durée d’un appel ?",
+                a: "Entre 30 minutes et 1 heure en moyenne. Certains chapitres peuvent être plus courts (20 min), d’autres plus longs (1h30). Vous décidez quand vous avez terminé un sujet."
             }
         ]
     },
@@ -43,7 +43,7 @@ const FAQ_CATEGORIES = [
         questions: [
             {
                 q: "Combien de pages fait le livre final ?",
-                a: "Cela dépend de votre histoire ! En moyenne, nos livres font entre 150 et 250 pages. Nous nous adaptons à la richesse de votre récit. Il n&apos;y a pas de limite minimum ou maximum."
+                a: "Cela dépend de votre histoire ! En moyenne, nos livres font entre 150 et 250 pages. Nous nous adaptons à la richesse de votre récit. Il n’y a pas de limite minimum ou maximum."
             },
             {
                 q: "Puis-je ajouter des photos ?",
@@ -55,7 +55,7 @@ const FAQ_CATEGORIES = [
             },
             {
                 q: "Puis-je relire et modifier le texte ?",
-                a: "Oui, c&apos;est même obligatoire ! Vous validez chaque chapitre avant de passer au suivant. Les modifications sont illimitées jusqu&apos;à votre satisfaction complète. C&apos;est VOTRE livre."
+                a: "Oui, c’est même obligatoire ! Vous validez chaque chapitre avant de passer au suivant. Les modifications sont illimitées jusqu’à votre satisfaction complète. C’est VOTRE livre."
             },
             {
                 q: "Recevrai-je une version numérique ?",
@@ -73,11 +73,11 @@ const FAQ_CATEGORIES = [
         questions: [
             {
                 q: "Quel est le prix exact ?",
-                a: "219€ tout compris. Ce prix inclut : tous les appels, la rédaction, les corrections, l&apos;intégration de photos, la mise en page, l&apos;impression, la version numérique et la livraison. Aucun frais caché."
+                a: "219€ tout compris. Ce prix inclut : tous les appels, la rédaction, les corrections, l’intégration de photos, la mise en page, l’impression, la version numérique et la livraison. Aucun frais caché."
             },
             {
                 q: "Y a-t-il des frais supplémentaires ?",
-                a: "Non, absolument aucun. Le prix de 219€ couvre l&apos;intégralité du service, du premier appel à la livraison de votre livre."
+                a: "Non, absolument aucun. Le prix de 219€ couvre l’intégralité du service, du premier appel à la livraison de votre livre."
             },
             {
                 q: "Puis-je payer en plusieurs fois ?",
@@ -85,7 +85,7 @@ const FAQ_CATEGORIES = [
             },
             {
                 q: "Y a-t-il une garantie ?",
-                a: "Oui. Si après le premier appel vous n&apos;êtes pas satisfait, nous vous remboursons intégralement, sans question. Votre satisfaction est notre priorité."
+                a: "Oui. Si après le premier appel vous n’êtes pas satisfait, nous vous remboursons intégralement, sans question. Votre satisfaction est notre priorité."
             }
         ]
     },
@@ -121,14 +121,14 @@ const FAQ_CATEGORIES = [
         questions: [
             {
                 q: "Puis-je offrir Loomina en cadeau ?",
-                a: "Absolument ! C&apos;est l&apos;un des cadeaux les plus appréciés. Après commande, nous vous envoyons un bon cadeau élégant (PDF imprimable) à offrir. La personne nous contacte ensuite pour démarrer son livre."
+                a: "Absolument ! C’est l’un des cadeaux les plus appréciés. Après commande, nous vous envoyons un bon cadeau élégant (PDF imprimable) à offrir. La personne nous contacte ensuite pour démarrer son livre."
             },
             {
                 q: "Combien de temps pour la livraison ?",
-                a: "Une fois le livre finalisé et validé, comptez 2-3 semaines pour l'impression et la livraison en France métropolitaine. Nous expédions via Colissimo avec suivi."
+                a: "Une fois le livre finalisé et validé, comptez 2-3 semaines pour l’impression et la livraison en France métropolitaine. Nous expédions via Colissimo avec suivi."
             },
             {
-                q: "Livrez-vous à l'international ?",
+                q: "Livrez-vous à l’international ?",
                 a: "Actuellement, nous livrons uniquement en France métropolitaine et en Europe (frais de port supplémentaires selon pays). Contactez-nous pour les autres destinations."
             },
             {
@@ -147,16 +147,16 @@ const FAQ_CATEGORIES = [
         ),
         questions: [
             {
-                q: "Ai-je besoin d'un ordinateur ou smartphone ?",
+                q: "Ai-je besoin d’un ordinateur ou smartphone ?",
                 a: "Non ! Tout se passe par téléphone. Nous vous appelons aux horaires convenus. Si vous souhaitez envoyer des photos, un email suffit (nous pouvons aussi vous aider par téléphone)."
             },
             {
                 q: "Que se passe-t-il si je rate un appel ?",
-                a: "Aucun problème ! Nous reprogrammons simplement à un autre moment qui vous convient. Il n&apos;y a aucune pénalité ni frais supplémentaire."
+                a: "Aucun problème ! Nous reprogrammons simplement à un autre moment qui vous convient. Il n’y a aucune pénalité ni frais supplémentaire."
             },
             {
-                q: "L'IA remplace-t-elle un vrai biographe ?",
-                a: "Notre IA est un outil au service de votre histoire. Elle transforme vos paroles en texte, mais c&apos;est VOUS qui racontez, et des rédacteurs humains relisent et corrigent chaque chapitre. Le meilleur des deux mondes."
+                q: "L’IA remplace-t-elle un vrai biographe ?",
+                a: "Notre IA est un outil au service de votre histoire. Elle transforme vos paroles en texte, mais c’est VOUS qui racontez, et des rédacteurs humains relisent et corrigent chaque chapitre. Le meilleur des deux mondes."
             }
         ]
     }

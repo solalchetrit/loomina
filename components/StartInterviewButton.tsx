@@ -65,7 +65,7 @@ export default function StartInterviewButton({ phone }: { phone: string; userNam
                 disabled={loading}
                 className="w-full md:w-auto"
             >
-                {loading ? "Déclenchement..." : "📞 Démarrer l&apos;interview maintenant"}
+                {loading ? "Déclenchement..." : "📞 Démarrer l'interview maintenant"}
             </MagicButton>
             {error && (
                 <p className="text-red-500 text-xs mt-2">{error}</p>
