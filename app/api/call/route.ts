@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatToE164 } from "@/lib/phone";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 // Vapi credentials
 const VAPI_API_KEY = process.env.VAPI_API_KEY;
 const VAPI_PHONE_NUMBER_ID = "9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6";
 const VAPI_SERVER_URL = "https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih";
+
+// Init Supabase with Service Role to bypass RLS
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Simple normalization map for phases
 const PHASE_MAP: Record<string, string> = {
