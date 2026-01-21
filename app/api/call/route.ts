@@ -34,11 +34,12 @@ export async function POST(request: NextRequest) {
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
-            .or(`phone_number.eq.${formattedPhone},phone_number.eq.${phone_number}`) // Try both formats to be safe
+            .in('phone_number', [formattedPhone, phone_number])
             .maybeSingle();
 
         if (profileError || !profile) {
-            console.error("[Call API] Profile not found or error:", profileError);
+            console.error(`[Call API] Profile search failed. Criteria: [${formattedPhone}, ${phone_number}]`);
+            console.error("[Call API] Profile error:", profileError);
             return NextResponse.json({ message: "Client profil not found" }, { status: 404 });
         }
 
