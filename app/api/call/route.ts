@@ -3,7 +3,7 @@ import { formatToE164 } from "@/lib/phone";
 import { supabase } from "@/lib/supabase";
 
 // Vapi credentials (from Make.com blueprint)
-const VAPI_API_KEY = process.env.VAPI_API_KEY || "a282c0de-e348-465d-9b76-22ed443c893c";
+const VAPI_API_KEY = process.env.VAPI_API_KEY;
 const VAPI_PHONE_NUMBER_ID = "9c12d63e-ad70-4e8a-bc6e-28b3f17fb5a6";
 const VAPI_SERVER_URL = "https://hook.eu1.make.com/s9yafdfjfsw5koknvrvzqocv64nf72ih";
 
