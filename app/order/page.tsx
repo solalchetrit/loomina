@@ -35,13 +35,13 @@ export default function OrderPage() {
         formData.phone.trim() !== "" &&
         formData.email.trim() !== "";
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!isFormValid) return;
 
         // Format phone to E164 before saving for consistent storage
         const formattedPhone = formatToE164(formData.phone);
 
-        // Save relevant data to localStorage as a JSON object
+        // Save relevant data to localStorage as a JSON object (Backup)
         const orderData = {
             firstName: formData.firstName,
             lastName: formData.lastName,
@@ -52,8 +52,32 @@ export default function OrderPage() {
 
         localStorage.setItem("loomina_order_data", JSON.stringify(orderData));
 
-        // Redirect to Stripe
-        window.location.href = STRIPE_CONFIG.PAYMENT_LINK;
+        try {
+            // Call our custom checkout API to create a session with metadata
+            const response = await fetch("/api/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    phone: formattedPhone,
+                    email: formData.email,
+                    isGift: selectedOption === "gift"
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                console.error("No payment URL returned", data);
+                alert("Une erreur est survenue lors de l'initialisation du paiement.");
+            }
+        } catch (error) {
+            console.error("Checkout error:", error);
+            alert("Erreur de connexion au service de paiement.");
+        }
     };
 
     return (
