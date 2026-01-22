@@ -1,4 +1,5 @@
-import { MetadataRoute } from 'next';
+import { MetadataRoute } from 'next'
+import { SITE_CONFIG } from './config'
 
 export default function robots(): MetadataRoute.Robots {
     return {
@@ -6,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             userAgent: '*',
             allow: '/',
         },
-        sitemap: 'https://www.loomina.eu/sitemap.xml',
-    };
+        sitemap: `${SITE_CONFIG.url}/sitemap.xml`,
+    }
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { SITE_CONFIG } from "./config";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 // Configuration Serif (Titres élégants)
 const playfair = Playfair_Display({
@@ -92,6 +93,9 @@ export default function RootLayout({
       <body
         className={`${plusJakartaSans.variable} ${playfair.variable} ${cinzel.variable} ${courierPrime.variable} antialiased min-h-screen bg-[var(--loomina-void)] text-[var(--text-primary)] font-sans selection:bg-[var(--loomina-gold)] selection:text-[var(--loomina-void)] relative`}
       >
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
         <Header />
         <main className="relative z-0">
           {children}
