@@ -103,6 +103,11 @@ export async function POST(request: NextRequest) {
         // 5. Build Vapi Payload
         const vapiPayload = {
             phoneNumberId: VAPI_PHONE_NUMBER_ID,
+            // Add metadata for robust Make identification
+            metadata: {
+                user_id: profile.id,
+                project_id: project?.id
+            },
             customer: {
                 number: formattedPhone
             },

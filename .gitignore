@@ -1476,3 +1476,4 @@ node-v20.11.0-darwin-arm64/
 # Local blueprints with secrets
 loomina_main.json
 make/Loomina Outbound Call v2 FIXED.blueprint.json
+.env*.local
