@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Playfair_Display, Cinzel, Courier_Prime } from "next
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SITE_CONFIG } from "./config";
 
 // Configuration Serif (Titres élégants)
 const playfair = Playfair_Display({
@@ -33,21 +34,21 @@ const courierPrime = Courier_Prime({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.loomina.eu'),
+  metadataBase: new URL(SITE_CONFIG.url),
   title: {
     default: "Loomina | Écrivez votre autobiographie par téléphone",
     template: "%s | Loomina"
   },
   description: "Transformez vos souvenirs en un livre d'exception. Loomina est l'IA biographe qui recueille votre histoire par téléphone pour en faire une autobiographie éternelle.",
   keywords: ["biographie", "écrire ses mémoires", "livre autobiographique", "cadeau grands-parents", "récit de vie", "IA biographe"],
-  authors: [{ name: "Loomina" }],
-  creator: "Loomina",
-  publisher: "Loomina",
+  authors: [{ name: SITE_CONFIG.name }],
+  creator: SITE_CONFIG.name,
+  publisher: SITE_CONFIG.name,
   openGraph: {
     title: "Loomina - Votre histoire mérite un livre éternel",
     description: "Racontez votre vie par téléphone, nous en faisons un livre. Sans écrire une seule ligne.",
-    url: 'https://www.loomina.eu',
-    siteName: 'Loomina',
+    url: SITE_CONFIG.url,
+    siteName: SITE_CONFIG.name,
     locale: 'fr_FR',
     type: 'website',
     images: [
@@ -89,7 +90,6 @@ export default function RootLayout({
   return (
     <html lang="fr" className="scroll-smooth" suppressHydrationWarning>
       <body
-        suppressHydrationWarning
         className={`${plusJakartaSans.variable} ${playfair.variable} ${cinzel.variable} ${courierPrime.variable} antialiased min-h-screen bg-[var(--loomina-void)] text-[var(--text-primary)] font-sans selection:bg-[var(--loomina-gold)] selection:text-[var(--loomina-void)] relative`}
       >
         <Header />
@@ -103,18 +103,18 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Product",
-              "name": "Loomina - Livre Autobiographique",
-              "image": "https://www.loomina.eu/hero-book-v2.png",
+              "name": SITE_CONFIG.product.name,
+              "image": `${SITE_CONFIG.url}/hero-book-v2.png`,
               "description": "Service de création de livre autobiographique par entretiens téléphoniques avec IA.",
               "brand": {
                 "@type": "Brand",
-                "name": "Loomina"
+                "name": SITE_CONFIG.name
               },
               "offers": {
                 "@type": "Offer",
-                "url": "https://www.loomina.eu",
-                "priceCurrency": "EUR",
-                "price": "219.00",
+                "url": SITE_CONFIG.url,
+                "priceCurrency": SITE_CONFIG.product.currency,
+                "price": SITE_CONFIG.product.price.toFixed(2),
                 "availability": "https://schema.org/InStock",
                 "priceValidUntil": "2026-12-31"
               }
