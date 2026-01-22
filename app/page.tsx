@@ -2,7 +2,7 @@ import Hero from "@/components/Hero";
 import ScrollSeparator from "@/components/ui/ScrollSeparator";
 import HowItWorks from "@/components/HowItWorks";
 import Button from "@/components/ui/Button";
-import ResumeOrderToast from "@/components/ResumeOrderToast";
+
 import { SITE_CONFIG } from "./config";
 
 // --- DATA ---
@@ -66,7 +66,7 @@ export default function Home() {
       <div className="w-full relative z-10">
         <Hero />
       </div>
-      <ResumeOrderToast />
+
       <div className="py-4">
         <ScrollSeparator />
       </div>
