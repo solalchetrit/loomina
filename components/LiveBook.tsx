@@ -20,10 +20,11 @@ interface Book {
 }
 
 interface LiveBookProps {
-    userPhone: string;
+    // userPhone is no longer needed directly
+
 }
 
-export default function LiveBook({ userPhone }: LiveBookProps) {
+export default function LiveBook({ }: LiveBookProps) {
     const [book, setBook] = useState<Book | null>(null);
     const [stories, setStories] = useState<Story[]>([]);
     const [loading, setLoading] = useState(true);
@@ -34,13 +35,17 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
             try {
                 setLoading(true);
 
-                const { data: rpcData, error: rpcError } = await supabase
-                    .rpc('get_client_stories', { phone_input: userPhone });
+                // Secure: Fetch via API Proxy (Cookie Auth)
+                const response = await fetch("/api/user/stories");
+                if (!response.ok) {
+                    if (response.status === 401) throw new Error("Veuillez vous reconnecter.");
+                    throw new Error("Erreur de chargement.");
+                }
 
-                if (rpcError) throw rpcError;
+                const rpcData = await response.json();
 
                 if (!rpcData || rpcData.length === 0) {
-                    console.log("LiveBook: No stories or book found via RPC.");
+                    console.log("LiveBook: No stories or book found via API.");
                     setBook(null);
                     setStories([]);
                     setLoading(false);
@@ -74,10 +79,8 @@ export default function LiveBook({ userPhone }: LiveBookProps) {
             }
         }
 
-        if (userPhone) {
-            fetchData();
-        }
-    }, [userPhone]);
+        fetchData();
+    }, []);
 
     if (loading) {
         return (

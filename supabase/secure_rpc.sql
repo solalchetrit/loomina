@@ -80,5 +80,6 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION get_client_stories TO anon;
+-- Grant execute access to authenticated users only (Service Role will bypass RLS/Auth)
+-- REVOKED: GRANT EXECUTE ON FUNCTION get_client_stories TO anon;
 GRANT EXECUTE ON FUNCTION get_client_stories TO authenticated;

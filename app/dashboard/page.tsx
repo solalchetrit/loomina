@@ -300,7 +300,7 @@ export default function DashboardPage() {
 
                 {/* Live Book Content */}
                 <main>
-                    <LiveBook userPhone={phone} />
+                    <LiveBook />
                 </main>
 
             </div>

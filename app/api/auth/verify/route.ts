@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatToE164 } from "@/lib/phone";
+import { SignJWT } from "jose";
 
 // Twilio credentials from environment variables
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
@@ -136,10 +137,29 @@ export async function POST(request: NextRequest) {
                 }, { status: response.status });
             }
 
-            return NextResponse.json({
+            // Security: Create a session token (JWT)
+            const secret = new TextEncoder().encode(process.env.JWT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || "fallback-secret-change-me");
+            const jwt = await new SignJWT({ phone: formattedPhone, role: 'authenticated' })
+                .setProtectedHeader({ alg: 'HS256' })
+                .setIssuedAt()
+                .setExpirationTime('7d')
+                .sign(secret);
+
+            // Return success with formatted user session cookie
+            const successResponse = NextResponse.json({
                 status: data.status,
                 valid: data.valid
             });
+
+            successResponse.cookies.set('loomina_session', jwt, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 60 * 60 * 24 * 7, // 7 days
+                path: '/',
+            });
+
+            return successResponse;
 
         } else {
             return NextResponse.json({ message: "Invalid action" }, { status: 400 });
