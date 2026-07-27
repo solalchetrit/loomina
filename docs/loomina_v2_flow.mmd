@@ -1,0 +1,80 @@
+%% Loomina v2 — Architecture cible
+%% Un seul point d'entrée, un seul fichier par responsabilité.
+%% À comparer avec MAKE/Loomina_Flow_Schema/loomina_flow.mmd (51 modules).
+
+graph TD
+    classDef ext     fill:#eef2ff,stroke:#4338ca,stroke-width:2px,color:#1e1b4b;
+    classDef entry   fill:#e0f2fe,stroke:#0369a1,stroke-width:3px,color:#0c4a6e;
+    classDef sync    fill:#f3e8ff,stroke:#7e22ce,stroke-width:2px,color:#3b0764;
+    classDef async   fill:#fff7ed,stroke:#c2410c,stroke-width:2px,color:#7c2d12;
+    classDef ai      fill:#fef9c3,stroke:#a16207,stroke-width:2px,color:#713f12;
+    classDef data    fill:#dcfce7,stroke:#15803d,stroke-width:2px,color:#14532d;
+    classDef guard   fill:#fee2e2,stroke:#b91c1c,stroke-width:2px,color:#7f1d1d;
+
+    Phone(["📞 Le client appelle<br/>+33 1 59 16 93 57"]):::ext
+    Twilio["Twilio<br/><i>webhook voix</i>"]:::ext
+    Vapi["Vapi<br/><i>voix, transcription</i>"]:::ext
+
+    Phone --> Twilio --> Vapi
+
+    Vapi -->|"serverMessages =<br/>['end-of-call-report']"| Hook
+
+    Hook["<b>/api/vapi/webhook</b><br/>point d'entrée unique<br/>maxDuration 300 s"]:::entry
+
+    Hook --> Auth{"Secret<br/>valide ?"}:::guard
+    Auth -->|non| Reject["401"]:::guard
+    Auth -->|oui| Type{"type du<br/>message ?"}
+
+    %% ---------- CHEMIN SYNCHRONE ----------
+    Type -->|assistant-request| Sync
+
+    subgraph SYNC ["⚡ Synchrone — réponse sous 1 s (Vapi coupe à 20 s)"]
+        Sync["Chercher le profil<br/>par numéro"]:::sync
+        Sync --> Known{"Client<br/>connu ?"}
+        Known -->|non| Welcome["Assistant d'accueil<br/><i>oriente vers loomina.eu</i>"]:::sync
+        Known -->|oui| Load["Charger projet + phase<br/>+ system_prompts[phase]"]:::sync
+        Load --> Build["buildAssistant()<br/>injecte prénom, style,<br/>sujets sensibles, contexte,<br/>question suivante"]:::sync
+    end
+
+    Build --> Respond(["Config assistant<br/>renvoyée à Vapi"]):::sync
+    Welcome --> Respond
+
+    %% ---------- CHEMIN ASYNCHRONE ----------
+    Type -->|end-of-call-report| Record
+
+    Record["Écrire dans <b>call_events</b>"]:::async
+    Record --> Dedup{"Déjà vu ?<br/><i>unicité sur<br/>vapi_call_id</i>"}:::guard
+    Dedup -->|oui| Ignore["200 · rejeu ignoré"]:::guard
+    Dedup -->|non| Ack(["200 immédiat<br/><i>Vapi est libéré</i>"]):::async
+
+    Ack -.->|"after() — l'instance<br/>reste vivante"| Guard
+
+    subgraph ASYNC ["🔄 Arrière-plan — 30 à 60 s"]
+        Guard{"Transcript ≥ 200 car.<br/>ET durée ≥ 60 s ?"}:::guard
+        Guard -->|non| TooShort["Archivé en 'too_short'<br/><i>aucun token dépensé</i>"]:::guard
+
+        Guard -->|oui| Director["<b>Le Directeur</b><br/>gpt-4o · temp 0.3 · 2048 tk<br/>réécrit tout le contexte"]:::ai
+        Director --> Persist["Écrire projets, interview,<br/>profil, proches<br/><i>AVANT de rédiger</i>"]:::data
+        Persist --> Writer["<b>L'Écrivain</b><br/>gpt-4o · temp 0.6 · 4096 tk<br/>reçoit les 3 chapitres précédents"]:::ai
+        Writer --> Chapter["Insérer dans <b>chapters</b><br/><i>numéroté, versionné</i>"]:::data
+    end
+
+    Chapter --> Done(["call_events → done"]):::data
+
+    %% ---------- RATTRAPAGE ----------
+    Cron["⏱ /api/jobs/process<br/><i>cron — filet de sécurité</i>"]:::async
+    Cron -->|"reprend pending et failed<br/>max 3 tentatives"| Guard
+
+    %% ---------- DONNÉES ----------
+    DB[("<b>Supabase</b><br/>profiles · projects · interviews<br/>chapters · family_members<br/>system_prompts · call_events")]:::data
+
+    Sync -.-> DB
+    Load -.-> DB
+    Persist -.-> DB
+    Chapter -.-> DB
+    Record -.-> DB
+    Cron -.-> DB
+
+    %% ---------- BANC D'ESSAI ----------
+    Dev["🧪 /api/dev/replay<br/><i>rejoue un transcript,<br/>n'écrit rien</i>"]:::ai
+    Dev -.->|itération sur les prompts<br/>en quelques secondes| Director
