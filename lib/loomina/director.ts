@@ -136,7 +136,9 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
   }
 }
 
-Pour \`profile_updates\` : ne renseigne un champ que si l'interlocuteur l'a EXPRIMÉ pendant cet appel. Sinon laisse \`null\` ou un tableau vide. \`sensitive_topics\` ne contient que les sujets nouvellement identifiés comme douloureux ou à éviter.`;
+Pour \`profile_updates\` : ne renseigne un champ que si l'interlocuteur l'a EXPRIMÉ pendant cet appel. Sinon laisse \`null\` ou un tableau vide.
+- \`politeness_preference\` vaut EXACTEMENT "tu" ou "vous" (rien d'autre) : "tu" s'il a demandé le tutoiement, "vous" s'il a demandé le vouvoiement.
+- \`sensitive_topics\` ne contient que les sujets nouvellement identifiés comme douloureux ou à éviter, formulés en quelques mots chacun (ex. "son père", "le divorce de 1998").`;
 }
 
 function userPrompt(params: {
@@ -267,9 +269,24 @@ function profileUpdates(v: unknown): DirectorResult['profile_updates'] {
         : [];
     return {
         writing_style: text(raw.writing_style, 200) ?? null,
-        politeness_preference: text(raw.politeness_preference, 40) ?? null,
+        politeness_preference: politeness(raw.politeness_preference),
         sensitive_topics: topics,
     };
+}
+
+/**
+ * La colonne `profiles.politeness_preference` n'accepte que 'tu' | 'vous'
+ * (contrainte CHECK). Le modèle peut répondre « tutoiement », « Tu »,
+ * « vouvoyer »… : on ramène tout à ces deux valeurs, sinon null — un
+ * update refusé par la base aurait fait perdre la préférence en silence.
+ */
+export function politeness(v: unknown): 'tu' | 'vous' | null {
+    if (typeof v !== 'string') return null;
+    const s = v.trim().toLowerCase();
+    if (!s || s === 'null') return null;
+    if (/^(tu|toi|tutoi|tutoy|tutoiement|informal)/.test(s)) return 'tu';
+    if (/^(vous|vouvoi|vouvoy|vouvoiement|formal)/.test(s)) return 'vous';
+    return null;
 }
 
 /** Exporté pour les tests locaux : rejouer un transcript sans appeler l'API. */

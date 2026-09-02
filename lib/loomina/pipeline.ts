@@ -240,6 +240,7 @@ async function persistDirectorResult(params: {
                 next_phase: director.resolved.next_phase,
                 progress: director.progress_percentage,
                 next_question: director.next_question,
+                profile_updates: director.profile_updates,
                 model: 'gpt-4o',
                 at: new Date().toISOString(),
             },
@@ -263,7 +264,18 @@ async function persistDirectorResult(params: {
         updates.sensitive_topics = merged.join(', ');
     }
     if (Object.keys(updates).length) {
-        await supabase.from('profiles').update(updates).eq('id', profile.id);
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update(updates)
+            .eq('id', profile.id);
+        if (profileError) {
+            // Non bloquant : le chapitre est déjà écrit. Mais on veut le voir dans les logs Vercel.
+            console.error(
+                `[pipeline] Mise à jour profiles refusée (${Object.keys(updates).join(', ')}) : ${profileError.message}`
+            );
+        } else {
+            console.info(`[pipeline] profiles mis à jour : ${Object.keys(updates).join(', ')}`);
+        }
     }
 
     // -- family_members : on n'insère que les personnes inconnues
