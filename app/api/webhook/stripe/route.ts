@@ -1,142 +1,172 @@
-import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
+import { formatToE164 } from '@/lib/phone';
 
-// Init Stripe
+/**
+ * Provisionnement d'un client après paiement.
+ *
+ * Trois règles qui n'étaient pas tenues avant :
+ *
+ *  1. On écrit le schéma v2 — `phase` (entier), pas `current_phase` (texte).
+ *     Les colonnes legacy n'existent plus : les écrire faisait échouer l'insert.
+ *
+ *  2. On est idempotent. Stripe rejoue `checkout.session.completed` en cas de
+ *     doute. `projects.stripe_session_id` est UNIQUE : un rejeu est détecté et
+ *     ignoré au lieu de créer un second projet — ce qui cassait ensuite les
+ *     `.maybeSingle()` du reste du code.
+ *
+ *  3. On répond 500 quand le provisionnement échoue. Avant, toute erreur
+ *     renvoyait `{received:true}` : Stripe croyait à un succès et le client
+ *     repartait sans compte, en silence. Un 500 déclenche le rejeu de Stripe.
+ */
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-// Init Supabase Service Role (Admin) pour pouvoir écrire sans restriction
-// ATTENTION: Il faut la clé SERVICE_ROLE, pas la clé ANON, pour contourner les RLS si besoin
-// ou s'assurer que les policies permettent l'insert.
-// Pour l'instant on utilise SUPABASE_SERVICE_ROLE_KEY si dispo, sinon on tente avec l'ANON key mais ça risque de bloquer si RLS activé.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+/**
+ * Service role obligatoire : `auth.admin.createUser` l'exige, et les tables
+ * sont en RLS sans policy. Avec la clé anon, tout échouerait silencieusement.
+ */
+function db() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+        throw new Error(
+            'SUPABASE_SERVICE_ROLE_KEY ou NEXT_PUBLIC_SUPABASE_URL manquante : ' +
+            'provisionnement impossible.'
+        );
+    }
+    return createClient(url, key, { auth: { persistSession: false } });
+}
 
 export async function POST(request: NextRequest) {
     const payload = await request.text();
-    const sig = request.headers.get("stripe-signature");
+    const sig = request.headers.get('stripe-signature');
 
     let event: Stripe.Event;
-
     try {
         if (!sig || !endpointSecret) {
-            console.error("Webhook Error: Missing signature or secret");
-            return NextResponse.json({ error: "Configuration error" }, { status: 400 });
+            console.error('[stripe] signature ou secret absent');
+            return NextResponse.json({ error: 'configuration' }, { status: 400 });
         }
         event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
     } catch (err) {
-        console.error(`Webhook signature verification failed.`, err);
-        return NextResponse.json({ error: `Webhook Error: ${err instanceof Error ? err.message : String(err)}` }, { status: 400 });
+        console.error('[stripe] signature invalide', err);
+        return NextResponse.json({ error: 'signature' }, { status: 400 });
     }
 
-    // Handle the event
-    if (event.type === "checkout.session.completed") {
-        const session = event.data.object as Stripe.Checkout.Session;
+    if (event.type !== 'checkout.session.completed') {
+        return NextResponse.json({ received: true });
+    }
 
-        console.log("✅ Paiement réussi pour session:", session.id);
+    const session = event.data.object as Stripe.Checkout.Session;
+    const meta = session.metadata ?? {};
+    const email = meta.email?.trim();
 
-        // Récupérer les metadata injectées lors du checkout
-        const metadata = session.metadata;
+    // Sans metadata, c'est le Payment Link concurrent : on ne peut rien créer.
+    // On l'accepte (pas de rejeu utile) mais on le journalise bruyamment.
+    if (!email) {
+        console.error(
+            `[stripe] session ${session.id} sans metadata.email — ` +
+            'probablement le Payment Link. Aucun compte créé.'
+        );
+        return NextResponse.json({ received: true, provisioned: false });
+    }
 
-        if (metadata && metadata.email) {
-            const { firstName, lastName, phone, email, isGift } = metadata;
+    const firstName = meta.firstName?.trim() || '';
+    const lastName = meta.lastName?.trim() || '';
+    const isGift = meta.isGift === 'true' || meta.isGift === '1';
+    const phone = meta.phone ? formatToE164(meta.phone) : null;
 
-            console.log(`Processing activation for ${email} (${firstName} ${lastName})`);
+    try {
+        const supabase = db();
 
-            try {
-                // 1. Check if profile exists (by email) -> Auth ?
-                // Idéalement on provisionne un user Auth, mais pour l'instant on va remplir la table `profiles` publique si utilisée ainsi.
-                // NOTE: Dans Supabase, `profiles` est souvent lié à `auth.users`. Si l'user n'a pas de compte Auth, on ne peut peut-être pas créer de profile si la foreign key est stricte.
-                // On va supposer ici qu'on peut créer une entrée ou qu'on doit inviter l'user.
+        // ── Idempotence : ce paiement a-t-il déjà été provisionné ? ──────────
+        const { data: deja, error: dejaErr } = await supabase
+            .from('projects')
+            .select('id')
+            .eq('stripe_session_id', session.id)
+            .maybeSingle();
 
-                // STRATÉGIE SIMPLIFIÉE PAIEMENT:
-                // On cherche si un profile existe avec cet email (si la colonne email existe dans profiles, ce qui est le cas d'après l'audit)
-
-                // A. Check if user exists in profiles or auth
-                // On ne peut pas facilement créer un `auth.user` via l'API client sans admin API.
-                // Ici on utilise la clé Service Role, donc on a les droits admin.
-
-                // On vachercher l'utilisateur dans auth.users (via admin api) ? 
-                // Pour simplifier, on va insérer dans `profiles` directement.
-                // ATTENTION: `profiles` a besoin d'un `id` qui match `auth.users.id`.
-
-                // ÉTAPE CRITIQUE: Créer le User AUTH d'abord (Invitation)
-                const { data: userData, error: userError } = await supabase.auth.admin.createUser({
-                    email: email,
-                    email_confirm: true, // Auto confirm
-                    user_metadata: { first_name: firstName, last_name: lastName }
-                });
-
-                let userId = userData.user?.id;
-
-                if (userError) {
-                    // Si l'user existe déjà, on essaye de le récupérer
-                    console.log("User creation note:", userError.message);
-                    // On pourrait chercher l'ID via une requête RPC ou admin, mais admin.createUser renvoie une erreur si existe.
-                    // Fallback: Si on ne peut pas créer, on suppose qu'il existe. Mais on n'a pas son ID facilement sans une autre query.
-                    // On va tenter de find dans profiles par email si possible.
-
-                    const { data: existingProfile } = await supabase
-                        .from('profiles')
-                        .select('id')
-                        .eq('email', email)
-                        .single();
-
-                    if (existingProfile) {
-                        userId = existingProfile.id;
-                    }
-                }
-
-                if (userId) {
-                    console.log("User ID resolved:", userId);
-
-                    // 2. Upsert Profile
-                    const { error: profileError } = await supabase
-                        .from('profiles')
-                        .upsert({
-                            id: userId,
-                            full_name: `${firstName} ${lastName}`,
-                            first_name: firstName,
-                            last_name: lastName,
-                            email: email,
-                            phone_number: phone,
-                            // Default preferences
-                            politeness_preference: "vous",
-                            writing_style: "Naturel",
-                            created_at: new Date().toISOString()
-                        });
-
-                    if (profileError) console.error("Profile upsert error:", profileError);
-
-                    // 3. Create Project
-                    const { error: projectError } = await supabase
-                        .from('projects')
-                        .insert({
-                            user_id: userId,
-                            title: `Biographie de ${firstName}`,
-                            status: 'active', // ACTIVÉ !
-                            current_phase: "Vue d'ensemble",
-                            current_topic_id: 1,
-                            global_context: "Nouveau projet démarré après paiement.",
-                            project_metadata: { is_gift: isGift, stripe_session_id: session.id }
-                        });
-
-                    if (projectError) console.error("Project creation error:", projectError);
-                    else console.log("✅ Projet créé et activé avec succès !");
-
-                } else {
-                    console.error("Impossible de résoudre le UserID pour", email);
-                }
-
-            } catch (logicError) {
-                console.error("Logic Error in webhook:", logicError);
-            }
+        if (dejaErr) throw new Error(`lecture projects : ${dejaErr.message}`);
+        if (deja) {
+            console.log(`[stripe] session ${session.id} déjà traitée — rejeu ignoré`);
+            return NextResponse.json({ received: true, duplicate: true });
         }
-    }
 
-    return NextResponse.json({ received: true });
+        // ── Le compte d'authentification ─────────────────────────────────────
+        let userId: string | undefined;
+
+        const { data: created, error: createErr } =
+            await supabase.auth.admin.createUser({
+                email,
+                email_confirm: true,
+                user_metadata: { first_name: firstName, last_name: lastName },
+            });
+
+        if (createErr) {
+            // Le client a déjà commandé : on récupère son profil existant.
+            console.log(`[stripe] compte existant pour ${email} — ${createErr.message}`);
+            const { data: profil, error: profilErr } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('email', email)
+                .maybeSingle();
+            if (profilErr) throw new Error(`lecture profiles : ${profilErr.message}`);
+            userId = profil?.id;
+        } else {
+            userId = created.user?.id;
+        }
+
+        if (!userId) {
+            throw new Error(`impossible de résoudre l'identifiant pour ${email}`);
+        }
+
+        // ── Le profil ────────────────────────────────────────────────────────
+        const { error: profilErr } = await supabase.from('profiles').upsert({
+            id: userId,
+            first_name: firstName || null,
+            last_name: lastName || null,
+            full_name: `${firstName} ${lastName}`.trim() || null,
+            email,
+            phone_number: phone,     // toujours en E.164 : c'est ainsi que Vapi cherche
+            politeness_preference: 'vous',
+            writing_style: 'Naturel',
+        });
+        if (profilErr) throw new Error(`upsert profiles : ${profilErr.message}`);
+
+        // ── Le projet ────────────────────────────────────────────────────────
+        const { error: projetErr } = await supabase.from('projects').insert({
+            user_id: userId,
+            title: firstName ? `Biographie de ${firstName}` : 'Mon Livre de Vie',
+            status: 'active',
+            phase: 1,                // 1 = Vue d'ensemble. Un entier, plus de texte libre.
+            phase_progress: 0,
+            current_topic_id: 1,
+            stripe_session_id: session.id,   // la garantie d'idempotence
+            project_metadata: { is_gift: isGift },
+        });
+
+        if (projetErr) {
+            // Course entre deux livraisons simultanées du même événement.
+            if (projetErr.code === '23505') {
+                console.log(`[stripe] course détectée sur ${session.id} — rejeu ignoré`);
+                return NextResponse.json({ received: true, duplicate: true });
+            }
+            throw new Error(`insert projects : ${projetErr.message}`);
+        }
+
+        console.log(`[stripe] compte et projet créés pour ${email} (phase 1)`);
+        return NextResponse.json({ received: true, provisioned: true });
+
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(`[stripe] ÉCHEC provisionnement session ${session.id} : ${message}`);
+        // 500 → Stripe rejouera. Mieux qu'un faux succès et un client sans compte.
+        return NextResponse.json({ error: 'provisioning_failed' }, { status: 500 });
+    }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatToE164 } from "@/lib/phone";
-import { SignJWT } from "jose";
+import { findProfileByPhone } from "@/lib/loomina/db";
+import { signSession, SESSION_COOKIE } from "@/lib/loomina/session";
 
 // Twilio credentials from environment variables
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
@@ -39,38 +40,22 @@ export async function POST(request: NextRequest) {
             // Send verification code
             console.log(`[Verify API] Sending OTP to ${formattedPhone}`);
 
-            // 1. Check if user exists in Supabase
-            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-            const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-            if (!supabaseUrl || !supabaseKey) {
-                console.error("[Verify API] Missing Supabase environment variables");
-                return NextResponse.json({ message: "Server configuration error" }, { status: 500 });
-            }
-
-            const { createClient } = await import('@supabase/supabase-js');
-            const supabase = createClient(supabaseUrl, supabaseKey);
-
-            const { data: rpcData, error: rpcError } = await supabase
-                .rpc('check_client_exists', { phone_input: formattedPhone });
-
-            if (rpcError) {
-                console.error("[Verify API] RPC Error:", rpcError);
-                // We might want to block or allow if DB fails? safest is block or 500.
+            // 1. Le numéro doit correspondre à un client existant (schéma v2 : table profiles,
+            //    lue avec la clé service role — l'ancienne RPC check_client_exists n'existe plus).
+            let profile;
+            try {
+                profile = await findProfileByPhone(formattedPhone);
+            } catch (dbErr) {
+                console.error("[Verify API] DB Error:", dbErr);
                 return NextResponse.json({ message: "Database error during verification check" }, { status: 500 });
             }
 
-            const resultRow = (rpcData && rpcData.length > 0) ? rpcData[0] : null;
-
-            if (!resultRow || !resultRow.client_found) {
+            if (!profile) {
                 console.warn(`[Verify API] User not found for phone ${formattedPhone}. Blocking verification.`);
                 return NextResponse.json({
                     message: "Numéro de téléphone inconnu. Avez-vous déjà passé commande ?"
                 }, { status: 404 });
             }
-
-            // Using the matched phone from DB ensures consistency, though check_client_exists logic 
-            // usually handles normalization. logic below uses formattedPhone which should be fine.
 
             const response = await fetch(
                 `https://verify.twilio.com/v2/Services/${TWILIO_VERIFY_SERVICE_SID}/Verifications`,
@@ -137,13 +122,8 @@ export async function POST(request: NextRequest) {
                 }, { status: response.status });
             }
 
-            // Security: Create a session token (JWT)
-            const secret = new TextEncoder().encode(process.env.JWT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || "fallback-secret-change-me");
-            const jwt = await new SignJWT({ phone: formattedPhone, role: 'authenticated' })
-                .setProtectedHeader({ alg: 'HS256' })
-                .setIssuedAt()
-                .setExpirationTime('7d')
-                .sign(secret);
+            // Security: Create a session token (JWT) — JWT_SECRET obligatoire, plus de secret de repli.
+            const jwt = await signSession(formattedPhone);
 
             // Return success with formatted user session cookie
             const successResponse = NextResponse.json({
@@ -151,7 +131,7 @@ export async function POST(request: NextRequest) {
                 valid: data.valid
             });
 
-            successResponse.cookies.set('loomina_session', jwt, {
+            successResponse.cookies.set(SESSION_COOKIE, jwt, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',

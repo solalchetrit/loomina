@@ -1,45 +1,56 @@
-import { NextRequest, NextResponse } from "next/server";
-import { jwtVerify } from "jose";
-import { createClient } from "@supabase/supabase-js";
+import { NextRequest, NextResponse } from 'next/server';
+import { db, findProfileByPhone, findActiveProject } from '@/lib/loomina/db';
+import { readSession } from '@/lib/loomina/session';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+/**
+ * Le livre en cours de l'auteur connecté.
+ *
+ * Remplace la RPC `get_client_stories`, qui interrogeait des tables
+ * disparues. Lit directement `profiles` → `projects` → `chapters` avec la
+ * clé service role, et renvoie le même format de lignes qu'avant pour ne
+ * pas toucher au composant LiveBook.
+ */
 export async function GET(request: NextRequest) {
+    const session = await readSession(request);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     try {
-        const cookie = request.cookies.get('loomina_session');
+        const profile = await findProfileByPhone(session.phone);
+        if (!profile) return NextResponse.json([]);
 
-        if (!cookie || !cookie.value) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const project = await findActiveProject(profile.id);
+        if (!project) return NextResponse.json([]);
+
+        const { data: chapters, error } = await db()
+            .from('chapters')
+            .select('id, chapter_number, title, content_markdown, created_at, status')
+            .eq('project_id', project.id)
+            .neq('status', 'archived')
+            .order('chapter_number', { ascending: true });
+
+        if (error) throw new Error(error.message);
+
+        const bookTitle = project.title ?? (profile.first_name ? `L'histoire de ${profile.first_name}` : 'Mon histoire');
+        const base = { book_id: project.id, book_title: bookTitle, book_style: profile.writing_style ?? null };
+
+        if (!chapters || chapters.length === 0) {
+            return NextResponse.json([{ ...base, story_id: null, story_title: null, story_content: null, story_date: null }]);
         }
 
-        // Verify JWT
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || "fallback-secret-change-me");
-
-        // This will throw if invalid
-        const { payload } = await jwtVerify(cookie.value, secret);
-        const { phone } = payload;
-
-        if (!phone) {
-            return NextResponse.json({ error: "Invalid token payload" }, { status: 401 });
-        }
-
-        // Now safe to call RPC or query DB using Service Role
-        // because we validated ownership of the session
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-        const { data, error } = await supabase.rpc('get_client_stories', {
-            phone_input: phone as string
-        });
-
-        if (error) {
-            console.error("RPC Error (Secure Proxy):", error);
-            return NextResponse.json({ error: "Database error" }, { status: 500 });
-        }
-
-        return NextResponse.json(data);
-
+        return NextResponse.json(
+            chapters.map((c) => ({
+                ...base,
+                story_id: c.chapter_number,
+                story_title: c.title ?? `Chapitre ${c.chapter_number}`,
+                story_content: c.content_markdown ?? '',
+                story_date: c.created_at,
+            }))
+        );
     } catch (err) {
-        console.error("Auth Error:", err);
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        console.error('[user/stories]', err);
+        return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 }

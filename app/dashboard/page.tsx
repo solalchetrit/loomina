@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
 import StartInterviewButton from "@/components/StartInterviewButton";
 import LiveBook from "@/components/LiveBook";
 import MagicButton from "@/components/ui/MagicButton";
@@ -35,15 +34,13 @@ export default function DashboardPage() {
         async function fetchProfile() {
             if (!isLoggedIn || !phone) return;
 
-            const e164 = formatToE164(phone);
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('full_name')
-                .eq('phone_number', e164)
-                .maybeSingle();
-
-            if (data && data.full_name) {
-                setUserName(data.full_name);
+            try {
+                const res = await fetch("/api/user/me");
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data && data.full_name) setUserName(data.full_name);
+            } catch {
+                /* silencieux : le prénom est un confort, pas une condition */
             }
         }
         fetchProfile();
@@ -57,27 +54,8 @@ export default function DashboardPage() {
         try {
             const e164 = formatToE164(phone);
 
-            // 1. Check if user exists securely via RPC
-            const { data: rpcData, error: rpcError } = await supabase
-                .rpc('check_client_exists', { phone_input: e164 });
-
-            if (rpcError) {
-                console.error("RPC Error:", rpcError);
-                throw rpcError;
-            }
-
-            const resultRow = (rpcData && rpcData.length > 0) ? rpcData[0] : null;
-
-            if (!resultRow || !resultRow.client_found) {
-                console.warn("User not found in Supabase (Secure Check).");
-                setError("Numéro de téléphone inconnu. Avez-vous déjà passé commande ?");
-                setLoading(false);
-                return;
-            }
-
-            const matchPhone = (resultRow && resultRow.matched_phone) ? resultRow.matched_phone : e164;
-            setPhone(matchPhone);
-            const cleanPhone = formatToE164(matchPhone);
+            // L'existence du client est vérifiée côté serveur par /api/auth/verify.
+            const cleanPhone = e164;
 
             // 2. Call verification API (Twilio)
             console.log("[Login] Sending verification request for:", cleanPhone);
