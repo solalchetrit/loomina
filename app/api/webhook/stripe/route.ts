@@ -127,6 +127,7 @@ export async function POST(request: NextRequest) {
         }
 
         // ── Le profil ────────────────────────────────────────────────────────
+        // Identité : écrasée par la commande (le client vient de la saisir).
         const { error: profilErr } = await supabase.from('profiles').upsert({
             id: userId,
             first_name: firstName || null,
@@ -134,10 +135,24 @@ export async function POST(request: NextRequest) {
             full_name: `${firstName} ${lastName}`.trim() || null,
             email,
             phone_number: phone,     // toujours en E.164 : c'est ainsi que Vapi cherche
-            politeness_preference: 'vous',
-            writing_style: 'Naturel',
         });
         if (profilErr) throw new Error(`upsert profiles : ${profilErr.message}`);
+
+        // Préférences : valeurs par défaut UNIQUEMENT si absentes. Un client
+        // qui recommande (ou rejoue le webhook) ne doit pas perdre le tutoiement
+        // ou le style appris pendant ses appels.
+        const { error: prefErr } = await supabase
+            .from('profiles')
+            .update({ politeness_preference: 'vous' })
+            .eq('id', userId)
+            .is('politeness_preference', null);
+        if (prefErr) throw new Error(`défaut politeness : ${prefErr.message}`);
+        const { error: styleErr } = await supabase
+            .from('profiles')
+            .update({ writing_style: 'Naturel' })
+            .eq('id', userId)
+            .is('writing_style', null);
+        if (styleErr) throw new Error(`défaut writing_style : ${styleErr.message}`);
 
         // ── Le projet ────────────────────────────────────────────────────────
         const { error: projetErr } = await supabase.from('projects').insert({
