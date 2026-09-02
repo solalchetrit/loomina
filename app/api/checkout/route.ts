@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
                         product_data: {
                             name: "Biographie Loomina - Coffret Premium",
                             description: "Accompagnement, Interviews IA, Édition et Impression.",
-                            images: ["https://loomina.fr/images/coffret-metaphor.jpg"], // Remplace par une vraie URL d'image si dispo
+                            images: ["https://www.loomina.eu/hero-book-v2.png"],
                         },
                         unit_amount: 44900, // 449.00 EUR
                     },
@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
                 },
             ],
             mode: "payment",
+            // Permet les codes promo (dont un code 100 % réservé aux tests du parcours complet)
+            allow_promotion_codes: true,
             customer_email: email, // Pré-remplit l'email dans Stripe
             success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${origin}/order`,
