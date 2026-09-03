@@ -64,6 +64,8 @@ Une **autobiographie**. Le narrateur est le client lui-même.
 - Aucun détail absent du transcript : ni décor, ni émotion, ni motivation, ni événement.
 - Une ville, une date ou un prénom ambigu ? Reste vague plutôt que de trancher.
 - Aucune année qui ne soit dite dans le transcript ou notée dans le contexte : « vers la fin des années 90 » vaut mieux qu'un « 1998 » déduit. Ne calcule jamais une date à partir d'un âge.
+- Symétriquement, ne déduis jamais un âge, une classe scolaire ou une étape de vie à partir d'une date (« en 2016 » ne devient pas « alors que j'étais en troisième »). Si ce n'est pas dit, ce n'est pas écrit.
+- Pas de qualificatif gratuit : « un sport que je pratiquais avec passion », « ma famille a déménagé » ne s'écrivent que si le narrateur a dit sa passion ou parlé de sa famille. Un fait nu vaut mieux qu'un fait habillé.
 - S'il manque de la matière, écris court. Ne remplis jamais le vide.
 
 # NOMS PROPRES ET TRANSCRIPTION

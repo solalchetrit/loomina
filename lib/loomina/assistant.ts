@@ -83,9 +83,21 @@ export function buildTemplateVars(
     // par ElevenLabs ; « Solale » passe. Le prénom réel reste `first_name`.
     const firstNameSpoken = profile.first_name_phonetic?.trim() || firstName;
 
+    // Le gabarit de première phrase doit suivre la préférence tu/vous :
+    // « votre biographe, ravi de vous retrouver » à quelqu'un qui a demandé
+    // le tutoiement sonne faux dès la première seconde.
+    const tu = (profile.politeness_preference ?? 'vous') === 'tu';
+
     return {
         first_name: firstName,
         first_name_spoken: firstNameSpoken,
+        vous: tu ? 'te' : 'vous',
+        votre: tu ? 'ton' : 'votre',
+        vos: tu ? 'tes' : 'vos',
+        vous_sujet: tu ? 'tu' : 'vous',
+        // Conjugaisons utilisées par les gabarits de première phrase en base.
+        sens: tu ? 'sens' : 'sentez',
+        souhaite: tu ? 'souhaites' : 'souhaitez',
         full_name: profile.full_name ?? firstName,
         politeness_preference: profile.politeness_preference ?? 'vous',
         writing_style: profile.writing_style ?? 'Naturel et sobre',
