@@ -77,6 +77,7 @@ Objectif : ${PHASE_GOALS[phase]}
 
 # RÈGLE ABSOLUE : ZÉRO INVENTION
 - N'ajoute aucun fait absent du transcript ou du contexte fourni.
+- SEULES les lignes du narrateur (« User: ») sont des faits. Les lignes de l'assistant (« AI: ») sont des questions ou des reformulations : jamais une source, même quand l'assistant résume ou conclut à la place du narrateur.
 - Si une date, un lieu ou un prénom est ambigu, ne tranche pas : mets-le dans \`open_questions\`.
 - Mieux vaut un contexte court et sûr qu'un contexte riche et faux.
 

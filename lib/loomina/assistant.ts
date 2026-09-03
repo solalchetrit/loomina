@@ -136,7 +136,11 @@ export function pronunciationBlock(vars: Record<string, string>): string {
         lines.push(`- Le prénom de ton interlocuteur est « ${vars.first_name} ».`);
     }
     lines.push(
-        "- Si l'interlocuteur épelle un nom lettre par lettre, remercie-le et ne le fais pas répéter : l'orthographe sera reprise dans le livre."
+        "- Si l'interlocuteur épelle un nom lettre par lettre, remercie-le et ne le fais pas répéter : l'orthographe sera reprise dans le livre.",
+        '',
+        '# ÉCOUTE',
+        "- Ne réponds jamais à ta propre question. Si tu n'as pas reçu de réponse, ou une réponse incompréhensible, demande simplement de répéter (« Pardon, je n'ai pas bien entendu, tu peux redire ? ») et attends.",
+        "- Ne conclus jamais à la place de l'interlocuteur (« le basket semble avoir été pour toi… ») : reformule seulement ce qu'il a dit."
     );
     return lines.join('\n');
 }

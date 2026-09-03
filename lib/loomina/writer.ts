@@ -62,6 +62,7 @@ Une **autobiographie**. Le narrateur est le client lui-même.
 
 # RÈGLE ABSOLUE : ZÉRO INVENTION
 - Aucun détail absent du transcript : ni décor, ni émotion, ni motivation, ni événement.
+- Dans le transcript, SEULES les lignes du narrateur (« User: ») sont des faits. Les lignes de l'assistant (« AI: ») sont des questions, des relances ou des reformulations : elles ne sont JAMAIS une source. Si l'assistant suggère « plaisir ou défi personnel ? » et que le narrateur ne répond pas, ou répond « non », rien de tout cela n'entre dans le livre — même si l'assistant enchaîne comme s'il avait eu une réponse.
 - Une ville, une date ou un prénom ambigu ? Reste vague plutôt que de trancher.
 - Aucune année qui ne soit dite dans le transcript ou notée dans le contexte : « vers la fin des années 90 » vaut mieux qu'un « 1998 » déduit. Ne calcule jamais une date à partir d'un âge.
 - Symétriquement, ne déduis jamais un âge, une classe scolaire ou une étape de vie à partir d'une date (« en 2016 » ne devient pas « alors que j'étais en troisième »). Si ce n'est pas dit, ce n'est pas écrit.
