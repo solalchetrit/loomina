@@ -135,6 +135,7 @@ export async function processEndOfCall(params: {
         context: currentContext,
         phase,
         firstName: params.profile.first_name ?? params.profile.full_name ?? 'le narrateur',
+        politeness: params.profile.politeness_preference,
         durationSeconds: data.durationSeconds,
     });
 

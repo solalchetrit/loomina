@@ -97,7 +97,7 @@ Objectif : ${PHASE_GOALS[phase]}
 # TRANSCRIPTION VOCALE : SES DÉFAUTS
 Le transcript vient d'une reconnaissance vocale au téléphone.
 - Un mot incongru, isolé, sans rapport avec la phrase (un nom propre surgi de nulle part, un mot anglais) est un artefact de transcription : ignore-le, ne l'écris nulle part.
-- Les noms propres sont souvent écorchés (« Chètrit » pour « Chetrit »). Quand le narrateur ÉPELLE un nom lettre par lettre, reconstitue l'orthographe exacte et enregistre-la dans \`identity.spellings\` sous la forme « Nom : L-E-T-T-R-E-S » ; utilise ensuite cette graphie partout (\`full_name\`, \`family\`, \`event\`). Une orthographe épelée l'emporte toujours sur celle du transcript.
+- Les noms propres sont souvent écorchés (« Chètrit » pour « Chetrit »). Quand le narrateur ÉPELLE un nom lettre par lettre, reconstitue l'orthographe exacte et enregistre-la dans \`identity.spellings\` sous la forme « Chetrit (épelé C-H-E-T-R-I-T) » — le mot AVANT la parenthèse est l'orthographe reconstituée, sans accent ni lettre qui n'ait été épelé. Puis CORRIGE immédiatement toutes les occurrences de ce nom dans le contexte que tu renvoies (\`identity.full_name\`, \`family[].name\`, \`timeline[].event\`, \`last_call.summary\`) : une orthographe épelée l'emporte toujours sur celle du transcript et sur celle déjà en mémoire.
 
 # LE CONTEXTE : TU LE RÉÉCRIS INTÉGRALEMENT
 Tu reçois le contexte accumulé et le nouveau transcript.
@@ -172,6 +172,7 @@ function userPrompt(params: {
     transcript: string;
     context: LoominaContext;
     firstName: string;
+    politeness: string | null;
     durationSeconds: number | null;
 }): string {
     return `# CONTEXTE ACCUMULÉ
@@ -179,6 +180,7 @@ ${renderContext(params.context)}
 
 # INTERLOCUTEUR
 Prénom : ${params.firstName}
+Tutoiement/vouvoiement : ${params.politeness === 'tu' ? 'tu — rédige `next_question` en tutoyant' : 'vous — rédige `next_question` en vouvoyant'}
 Durée de l'appel : ${params.durationSeconds ?? 'inconnue'} secondes
 
 # TRANSCRIPT DE L'APPEL
@@ -190,6 +192,7 @@ export async function runDirector(params: {
     context: LoominaContext;
     phase: Phase;
     firstName: string;
+    politeness: string | null;
     durationSeconds: number | null;
 }): Promise<DirectorResult> {
     const completion = await openai().chat.completions.create({

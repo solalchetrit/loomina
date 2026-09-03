@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     }
 
     const t0 = Date.now();
-    const director = await runDirector({ transcript, context, phase, firstName, durationSeconds });
+    const director = await runDirector({ transcript, context, phase, firstName, politeness: null, durationSeconds });
     const tDirector = Date.now() - t0;
 
     const t1 = Date.now();
