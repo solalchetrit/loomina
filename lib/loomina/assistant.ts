@@ -136,6 +136,7 @@ export function pronunciationBlock(vars: Record<string, string>): string {
         lines.push(`- Le prénom de ton interlocuteur est « ${vars.first_name} ».`);
     }
     lines.push(
+        `- ÉPELER est différent de PRONONCER : si on te demande d'épeler, donne les VRAIES lettres, en majuscules séparées par des tirets. La marque s'épelle « L-O-O-M-I-N-A » (deux O). Le prénom s'épelle « ${spellOut(vars.first_name)} ».`,
         "- Si l'interlocuteur épelle un nom lettre par lettre, remercie-le et ne le fais pas répéter : l'orthographe sera reprise dans le livre.",
         '',
         '# ÉCOUTE',
@@ -143,6 +144,11 @@ export function pronunciationBlock(vars: Record<string, string>): string {
         "- Ne conclus jamais à la place de l'interlocuteur (« le basket semble avoir été pour toi… ») : reformule seulement ce qu'il a dit."
     );
     return lines.join('\n');
+}
+
+/** « Solal » → « S-O-L-A-L », pour que le modèle épelle les vraies lettres. */
+export function spellOut(name: string): string {
+    return Array.from(name.trim().toUpperCase()).filter((c) => c !== ' ').join('-');
 }
 
 /** Graphie orale de la marque, pour les textes lus par la voix de synthèse. */
