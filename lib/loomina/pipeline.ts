@@ -34,7 +34,7 @@ export const MIN_TRANSCRIPT_CHARS = 200;
 export const MIN_DURATION_SECONDS = 60;
 
 export interface PipelineOutcome {
-    status: 'processed' | 'too_short' | 'no_project';
+    status: 'processed' | 'no_material' | 'too_short' | 'no_project';
     interviewId?: string;
     chapterId?: string;
     chapterNumber?: number;
@@ -146,8 +146,26 @@ export async function processEndOfCall(params: {
     await persistDirectorResult({ project, profile: params.profile, interviewId, director });
 
     // ---------------------------------------------------------
-    // 4. L'Écrivain — avec les chapitres précédents
+    // 4. L'Écrivain — seulement s'il y a quelque chose à raconter
+    //    L'analyse (mémoire, question suivante) est déjà sauvée : un appel
+    //    sans matière n'est pas perdu, il n'a simplement pas de chapitre.
     // ---------------------------------------------------------
+    if (director.chapter_material === 'none') {
+        await supabase
+            .from('interviews')
+            .update({ processing_status: 'processed' })
+            .eq('id', interviewId);
+
+        return {
+            status: 'no_material',
+            interviewId,
+            phase,
+            nextPhase: director.resolved.next_phase,
+            progress: director.progress_percentage,
+            reason: 'Le Directeur n\'a rien trouvé de racontable dans cet appel : mémoire mise à jour, pas de chapitre.',
+        };
+    }
+
     const previousChapters = await getRecentChapters(project.id, 3);
 
     const writer = await runWriter({
@@ -157,6 +175,7 @@ export async function processEndOfCall(params: {
         phase,
         writingStyle: director.profile_updates.writing_style ?? params.profile.writing_style,
         titleHint: director.chapter_title_hint,
+        material: director.chapter_material,
     });
 
     // ---------------------------------------------------------

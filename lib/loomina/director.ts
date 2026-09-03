@@ -46,6 +46,14 @@ export interface DirectorResult {
     covered_topic_ids: number[];
     next_topic_id: number | null;
     chapter_title_hint: string | null;
+    /**
+     * De quoi écrire un chapitre ?
+     * - none : rien de nouveau racontable (bavardage, questions techniques,
+     *   épellations, répétition de ce qui est déjà en mémoire) → pas de chapitre
+     * - thin : un ou deux faits nus, sans anecdote → chapitre très court
+     * - rich : anecdotes, détails, émotions exprimées → chapitre complet
+     */
+    chapter_material: 'none' | 'thin' | 'rich';
     family_members: Array<{
         full_name: string;
         relation: string;
@@ -106,6 +114,13 @@ Reste sous 1 500 tokens. Si tu dois couper, garde ce qui sert à écrire le livr
 - 100    : tous les axes de la phase ont été traités en profondeur
 N'atteins 100 que si la phase est réellement épuisée. Une phase clôturée trop tôt produit un livre creux.
 
+# MATIÈRE POUR UN CHAPITRE (\`chapter_material\`)
+L'Écrivain ne doit écrire que s'il y a quelque chose à raconter. Évalue ce que le narrateur (lignes « User: ») a réellement apporté de NOUVEAU dans cet appel :
+- "none" : rien de racontable — bavardage, questions sur l'assistant, épellations, tests, ou uniquement des choses déjà en mémoire. Aucun chapitre ne sera écrit.
+- "thin" : un ou deux faits nus (« j'ai joué au foot à l'ACBB ») sans anecdote ni détail. Le chapitre fera quelques phrases.
+- "rich" : au moins une anecdote concrète, des détails, des émotions exprimées par le narrateur.
+Sois sévère : un chapitre de remplissage fait plus de mal qu'un appel sans chapitre.
+
 # SENTIMENT (\`sentiment_score\`)
 Nombre décimal entre -1 et 1. -1 = détresse manifeste, 0 = neutre, 1 = joie franche.
 
@@ -137,6 +152,7 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
   "covered_topic_ids": [],
   "next_topic_id": null,
   "chapter_title_hint": "",
+  "chapter_material": "none | thin | rich",
   "family_members": [
     { "full_name": "", "relation": "", "is_deceased": false, "notes": "" }
   ],
@@ -211,6 +227,7 @@ export async function runDirector(params: {
         covered_topic_ids: intArray(parsed.covered_topic_ids),
         next_topic_id: intOrNull(parsed.next_topic_id),
         chapter_title_hint: text(parsed.chapter_title_hint, 160) ?? null,
+        chapter_material: chapterMaterial(parsed.chapter_material),
         family_members: familyMembers(parsed.family_members),
         profile_updates: profileUpdates(parsed.profile_updates),
         resolved: {
@@ -268,6 +285,12 @@ function familyMembers(v: unknown): DirectorResult['family_members'] {
         })
         .filter((e): e is DirectorResult['family_members'][number] => e !== null)
         .slice(0, 40);
+}
+
+function chapterMaterial(v: unknown): DirectorResult['chapter_material'] {
+    // En cas de doute (champ absent, valeur inattendue) on écrit : c'est le
+    // comportement historique, et un chapitre en trop se supprime.
+    return v === 'none' || v === 'thin' ? v : 'rich';
 }
 
 function profileUpdates(v: unknown): DirectorResult['profile_updates'] {

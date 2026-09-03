@@ -83,8 +83,8 @@ Tu peux y faire référence brièvement pour assurer la continuité (« Comme je
 # LONGUEUR, ADAPTÉE À LA DENSITÉ
 - Transcript riche : chapitre complet de 900 à 1 800 mots.
 - Transcript moyen : 500 à 900 mots.
-- Transcript pauvre : 200 à 400 mots, et une clôture qui annonce ce qui sera exploré ensuite.
-Ne délaye jamais pour atteindre une longueur.
+- Transcript pauvre (un ou deux faits nus) : 60 à 150 mots. Un fait = une ou deux phrases. Pas de clôture qui annonce la suite, pas de « cette période a été marquée par… ».
+Ne délaye jamais pour atteindre une longueur. Il n'y a AUCUNE longueur minimale : trois phrases vraies valent mieux que trois paragraphes brodés.
 
 # STYLE
 Respecte le style demandé par le client. À défaut : sobre, chaleureux, sans emphase ni lyrisme forcé.
@@ -135,8 +135,17 @@ export async function runWriter(params: {
     phase: Phase;
     writingStyle: string | null;
     titleHint: string | null;
+    /** Évaluation du Directeur : « thin » impose un chapitre de quelques phrases. */
+    material?: 'thin' | 'rich';
 }): Promise<WriterResult> {
-    const user = `# STYLE DEMANDÉ PAR LE CLIENT
+    const thinNote =
+        params.material === 'thin'
+            ? `# MATIÈRE JUGÉE MINCE PAR LE DIRECTEUR
+Le narrateur n'a livré qu'un ou deux faits nus. Écris 60 à 150 mots maximum : les faits, à la première personne, rien d'autre. Aucune émotion, aucun « moment fort », aucune « camaraderie » qui n'aient été dits.
+
+`
+            : '';
+    const user = `${thinNote}# STYLE DEMANDÉ PAR LE CLIENT
 ${params.writingStyle?.trim() || 'Naturel et sobre'}
 
 # PHASE

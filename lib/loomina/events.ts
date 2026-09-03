@@ -87,7 +87,12 @@ export async function markDone(eventId: string, outcome: PipelineOutcome) {
     await db()
         .from('call_events')
         .update({
-            status: outcome.status === 'processed' ? 'done' : 'skipped',
+            // `no_material` : l'analyse a bien tourné (mémoire à jour), il n'y
+            // a juste pas de chapitre. C'est un traitement réussi, pas un rejet.
+            status:
+                outcome.status === 'processed' || outcome.status === 'no_material'
+                    ? 'done'
+                    : 'skipped',
             error: outcome.reason ?? null,
             processed_at: new Date().toISOString(),
         })
