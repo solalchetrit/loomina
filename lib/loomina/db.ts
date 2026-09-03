@@ -42,6 +42,8 @@ export function db(): SupabaseClient {
 export interface Profile {
     id: string;
     first_name: string | null;
+    /** Graphie du prénom pour la voix de synthèse (null = prénom tel quel). */
+    first_name_phonetic: string | null;
     last_name: string | null;
     full_name: string | null;
     email: string | null;

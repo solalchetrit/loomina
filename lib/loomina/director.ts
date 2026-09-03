@@ -80,6 +80,16 @@ Objectif : ${PHASE_GOALS[phase]}
 - Si une date, un lieu ou un prénom est ambigu, ne tranche pas : mets-le dans \`open_questions\`.
 - Mieux vaut un contexte court et sûr qu'un contexte riche et faux.
 
+# DATES : JAMAIS DEVINÉES
+- Dans \`timeline\`, \`year\` n'est renseigné QUE si l'année a été dite explicitement dans cet appel ou figure déjà dans le contexte. Sinon \`year: null\` et l'approximation va dans \`event\` en toutes lettres (« vers la fin des années 90 », « à l'adolescence »).
+- Ne calcule pas une année à partir d'un âge ou d'une durée (« j'avais 8 ans », « dix ans plus tard ») : garde la formulation entendue et, si c'est utile au livre, ajoute la question dans \`open_questions\`.
+- Un chiffre isolé qui contredit le contexte (2000 contre 2003 déjà noté) est probablement une erreur de transcription : garde le contexte, signale le doute dans \`open_questions\`.
+
+# TRANSCRIPTION VOCALE : SES DÉFAUTS
+Le transcript vient d'une reconnaissance vocale au téléphone.
+- Un mot incongru, isolé, sans rapport avec la phrase (un nom propre surgi de nulle part, un mot anglais) est un artefact de transcription : ignore-le, ne l'écris nulle part.
+- Les noms propres sont souvent écorchés (« Chètrit » pour « Chetrit »). Quand le narrateur ÉPELLE un nom lettre par lettre, reconstitue l'orthographe exacte et enregistre-la dans \`identity.spellings\` sous la forme « Nom : L-E-T-T-R-E-S » ; utilise ensuite cette graphie partout (\`full_name\`, \`family\`, \`event\`). Une orthographe épelée l'emporte toujours sur celle du transcript.
+
 # LE CONTEXTE : TU LE RÉÉCRIS INTÉGRALEMENT
 Tu reçois le contexte accumulé et le nouveau transcript.
 Tu renvoies le contexte **complet, fusionné et mis à jour** — pas un ajout.
@@ -112,8 +122,8 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
 
 {
   "context": {
-    "identity":       { "full_name": "", "birth": "", "places": [] },
-    "timeline":       [ { "year": 1962, "event": "" } ],
+    "identity":       { "full_name": "", "birth": "", "places": [], "spellings": [] },
+    "timeline":       [ { "year": 1962, "event": "" }, { "year": null, "event": "vers la fin des années 90, …" } ],
     "family":         [ { "name": "", "relation": "", "deceased": false, "note": "" } ],
     "key_themes":     [],
     "open_questions": [],

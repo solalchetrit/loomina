@@ -36,6 +36,13 @@ export interface LoominaContext {
         full_name?: string;
         birth?: string;
         places?: string[];
+        /**
+         * Orthographes certifiées : noms que le narrateur a épelés lettre
+         * par lettre au téléphone (« Chetrit : C-H-E-T-R-I-T »). La
+         * transcription vocale les écorche systématiquement ; l'Écrivain
+         * doit reprendre ces graphies telles quelles.
+         */
+        spellings?: string[];
     };
     timeline: TimelineEntry[];
     family: FamilyEntry[];
@@ -63,6 +70,7 @@ const MAX_FAMILY = 40;
 const MAX_THEMES = 25;
 const MAX_QUESTIONS = 15;
 const MAX_PLACES = 20;
+const MAX_SPELLINGS = 20;
 const MAX_TEXT = 600;
 
 function str(v: unknown, max = MAX_TEXT): string | undefined {
@@ -146,6 +154,7 @@ export function normalizeContext(input: unknown): LoominaContext {
             full_name: str(identityRaw.full_name, 160),
             birth: str(identityRaw.birth, 160),
             places: strArray(identityRaw.places, MAX_PLACES),
+            spellings: strArray(identityRaw.spellings, MAX_SPELLINGS),
         },
         timeline,
         family,
@@ -168,12 +177,15 @@ export function normalizeContext(input: unknown): LoominaContext {
 export function renderContext(ctx: LoominaContext): string {
     const parts: string[] = [];
 
-    const { full_name, birth, places } = ctx.identity ?? {};
-    if (full_name || birth || places?.length) {
+    const { full_name, birth, places, spellings } = ctx.identity ?? {};
+    if (full_name || birth || places?.length || spellings?.length) {
         const bits = [
             full_name ? `Nom : ${full_name}` : null,
             birth ? `Naissance : ${birth}` : null,
             places?.length ? `Lieux : ${places.join(', ')}` : null,
+            spellings?.length
+                ? `Orthographes certifiées (épelées par le narrateur, à reprendre telles quelles) : ${spellings.join(' ; ')}`
+                : null,
         ].filter(Boolean);
         parts.push(`## Identité\n${bits.join('\n')}`);
     }
@@ -181,7 +193,9 @@ export function renderContext(ctx: LoominaContext): string {
     if (ctx.timeline?.length) {
         parts.push(
             '## Repères chronologiques\n' +
-                ctx.timeline.map((t) => `- ${t.year ?? '????'} : ${t.event}`).join('\n')
+                ctx.timeline
+                    .map((t) => (t.year ? `- ${t.year} : ${t.event}` : `- (année non précisée) ${t.event}`))
+                    .join('\n')
         );
     }
 

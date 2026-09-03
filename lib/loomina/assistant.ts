@@ -79,8 +79,13 @@ export function buildTemplateVars(
         profile.full_name?.trim().split(/\s+/)[0] ||
         'cher client';
 
+    // Graphie lue par la voix de synthèse. « Solal » est prononcé « Saulal »
+    // par ElevenLabs ; « Solale » passe. Le prénom réel reste `first_name`.
+    const firstNameSpoken = profile.first_name_phonetic?.trim() || firstName;
+
     return {
         first_name: firstName,
+        first_name_spoken: firstNameSpoken,
         full_name: profile.full_name ?? firstName,
         politeness_preference: profile.politeness_preference ?? 'vous',
         writing_style: profile.writing_style ?? 'Naturel et sobre',
@@ -100,6 +105,36 @@ export function buildTemplateVars(
 }
 
 /**
+ * Tout ce que le modèle vocal écrit est lu par la voix de synthèse, jamais
+ * affiché : on lui demande donc d'écrire les noms propres « comme ils se
+ * prononcent », pas comme ils s'orthographient. Le livre, lui, est écrit
+ * par l'Écrivain à partir du transcript et du contexte : il n'est pas
+ * concerné.
+ */
+export function pronunciationBlock(vars: Record<string, string>): string {
+    const lines = [
+        '# PRONONCIATION (ce que tu écris est lu à voix haute, jamais affiché)',
+        '- Écris toujours le nom de la marque « Loumina », jamais « Loomina ».',
+    ];
+    if (vars.first_name_spoken && vars.first_name_spoken !== vars.first_name) {
+        lines.push(
+            `- Le prénom de ton interlocuteur est « ${vars.first_name} ». Pour qu'il soit bien prononcé, écris-le toujours « ${vars.first_name_spoken} ».`
+        );
+    } else if (vars.first_name) {
+        lines.push(`- Le prénom de ton interlocuteur est « ${vars.first_name} ».`);
+    }
+    lines.push(
+        "- Si l'interlocuteur épelle un nom lettre par lettre, remercie-le et ne le fais pas répéter : l'orthographe sera reprise dans le livre."
+    );
+    return lines.join('\n');
+}
+
+/** Graphie orale de la marque, pour les textes lus par la voix de synthèse. */
+export function spokenForm(text: string): string {
+    return text.replace(/Loomina/g, 'Loumina');
+}
+
+/**
  * Construit la charge utile complète attendue par Vapi.
  */
 export function buildAssistant({
@@ -111,12 +146,17 @@ export function buildAssistant({
 }: BuildAssistantInput) {
     const vars = buildTemplateVars(profile, project, phase);
 
-    const systemPrompt = fillTemplate(prompt.prompt_content ?? '', vars);
+    const systemPrompt =
+        fillTemplate(prompt.prompt_content ?? '', vars) + '\n\n' + pronunciationBlock(vars);
 
-    const firstMessage = fillTemplate(
-        prompt.first_message_template?.trim() ||
-            `Bonjour {{first_name}} ! Ici Loomina, votre biographe. Je suis heureux de vous retrouver.`,
-        vars
+    // Dans la première phrase, seule la graphie parlée compte : c'est le TTS
+    // qui la lit, personne ne la voit écrite.
+    const firstMessage = spokenForm(
+        fillTemplate(
+            prompt.first_message_template?.trim() ||
+                `Bonjour {{first_name_spoken}} ! Ici Loumina, votre biographe. Je suis heureux de vous retrouver.`,
+            { ...vars, first_name: vars.first_name_spoken }
+        )
     );
 
     return {
@@ -178,7 +218,7 @@ export function buildUnknownCallerAssistant(serverUrl: string) {
             voice: VOICE,
             firstMessageMode: 'assistant-speaks-first',
             firstMessage:
-                "Bonjour, vous êtes bien chez Loomina, le biographe par téléphone. " +
+                "Bonjour, vous êtes bien chez Loumina, le biographe par téléphone. " +
                 "Je ne reconnais pas ce numéro : il n'est rattaché à aucun projet de livre. " +
                 "Si vous souhaitez commencer votre biographie, rendez-vous sur loomina point e u. " +
                 "Si vous êtes déjà client, appelez depuis le numéro que vous nous avez communiqué.",
@@ -191,7 +231,8 @@ export function buildUnknownCallerAssistant(serverUrl: string) {
                         role: 'system',
                         content:
                             "Tu es l'accueil téléphonique de Loomina. L'appelant n'est pas reconnu. " +
-                            "Sois chaleureux et bref. Explique que Loomina écrit des autobiographies " +
+                            "Ce que tu écris est lu à voix haute : écris la marque « Loumina ». " +
+                            "Sois chaleureux et bref. Explique que Loumina écrit des autobiographies " +
                             "à partir d'entretiens téléphoniques, et oriente vers le site loomina.eu. " +
                             "Ne promets rien, ne collecte aucune donnée personnelle, ne prends pas de commande. " +
                             "Termine l'appel poliment après avoir répondu.",
