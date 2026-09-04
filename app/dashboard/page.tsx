@@ -1,4 +1,5 @@
 "use client";
+import { LOOMINA_CONFIG } from "@/config/loomina";
 
 import { useState, useEffect } from "react";
 import StartInterviewButton from "@/components/StartInterviewButton";
@@ -19,6 +20,9 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
+    // Arrivée depuis Stripe (success_url = /dashboard?session_id=…) : le client
+    // vient de payer et atterrit sur un formulaire de connexion sans un mot.
+    const [justOrdered, setJustOrdered] = useState(false);
 
     // Check for persistent presence on mount
     useEffect(() => {
@@ -26,6 +30,9 @@ export default function DashboardPage() {
         if (storedPhone) {
             setPhone(storedPhone);
             setIsLoggedIn(true);
+        }
+        if (new URLSearchParams(window.location.search).has("session_id")) {
+            setJustOrdered(true);
         }
     }, []);
 
@@ -163,8 +170,21 @@ export default function DashboardPage() {
                         <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
                     </div>
 
+                    {justOrdered && loginStep === "phone" && (
+                        <div className="glass-gold rounded-2xl p-5 text-left space-y-2">
+                            <p className="text-[var(--text-primary)] font-serif text-lg">Merci, votre commande est confirmée.</p>
+                            <p className="text-[var(--text-secondary)] text-sm">
+                                Votre biographe est prêt. Deux façons de commencer : appelez le{" "}
+                                <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="text-[var(--loomina-gold)] whitespace-nowrap">{LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}</a>{" "}
+                                depuis le numéro indiqué à la commande, ou connectez-vous ci-dessous pour que Loomina vous appelle.
+                            </p>
+                        </div>
+                    )}
+
                     <h1 className="text-3xl font-serif text-[var(--text-primary)]">
-                        {loginStep === "phone" ? "Accédez à votre espace" : "Vérifiez votre identité"}
+                        {justOrdered && loginStep === "phone"
+                            ? "Votre espace auteur"
+                            : loginStep === "phone" ? "Accédez à votre espace" : "Vérifiez votre identité"}
                     </h1>
                     <p className="text-[var(--text-secondary)] text-sm">
                         {loginStep === "phone"
