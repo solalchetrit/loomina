@@ -44,6 +44,10 @@ const TRANSCRIBER = {
     language: 'fr',
 } as const;
 
+/** Salutation du tout premier appel, quand la mémoire du projet est vide. */
+export const FIRST_CALL_MESSAGE_TEMPLATE =
+    "Bonjour {{first_name}}, c'est Loumina, {{votre}} biographe. Je suis ravi de faire {{votre}} connaissance ! Comment ça va aujourd'hui ?";
+
 export interface BuildAssistantInput {
     profile: Profile;
     project: Project;
@@ -173,12 +177,18 @@ export function buildAssistant({
 
     // Dans la première phrase, seule la graphie parlée compte : c'est le TTS
     // qui la lit, personne ne la voit écrite.
+    //
+    // Premier appel (mémoire vide) : on ne « retrouve » personne. Le gabarit
+    // en base est écrit pour les appels suivants ; ici on salue une première
+    // fois. Le test « nouveau client » du 04/09 disait « Ravi de vous
+    // retrouver » à quelqu'un qu'on n'avait jamais eu au téléphone.
+    const isFirstCall = isEmptyContext(project.context) && !project.global_context?.trim();
+    const template = isFirstCall
+        ? FIRST_CALL_MESSAGE_TEMPLATE
+        : prompt.first_message_template?.trim() ||
+          `Bonjour {{first_name_spoken}} ! Ici Loumina, {{votre}} biographe. Je suis heureux de {{vous}} retrouver.`;
     const firstMessage = spokenForm(
-        fillTemplate(
-            prompt.first_message_template?.trim() ||
-                `Bonjour {{first_name_spoken}} ! Ici Loumina, votre biographe. Je suis heureux de vous retrouver.`,
-            { ...vars, first_name: vars.first_name_spoken }
-        )
+        fillTemplate(template, { ...vars, first_name: vars.first_name_spoken })
     );
 
     return {

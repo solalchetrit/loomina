@@ -97,7 +97,7 @@ Objectif : ${PHASE_GOALS[phase]}
 # TRANSCRIPTION VOCALE : SES DÉFAUTS
 Le transcript vient d'une reconnaissance vocale au téléphone.
 - Un mot incongru, isolé, sans rapport avec la phrase (un nom propre surgi de nulle part, un mot anglais) est un artefact de transcription : ignore-le, ne l'écris nulle part.
-- Les noms propres sont souvent écorchés (« Chètrit » pour « Chetrit »). Quand le narrateur ÉPELLE un nom lettre par lettre, reconstitue l'orthographe exacte et enregistre-la dans \`identity.spellings\` sous la forme « Chetrit (épelé C-H-E-T-R-I-T) » — le mot AVANT la parenthèse est l'orthographe reconstituée, sans accent ni lettre qui n'ait été épelé. Puis CORRIGE immédiatement toutes les occurrences de ce nom dans le contexte que tu renvoies (\`identity.full_name\`, \`family[].name\`, \`timeline[].event\`, \`last_call.summary\`) : une orthographe épelée l'emporte toujours sur celle du transcript et sur celle déjà en mémoire.
+- Les noms propres sont souvent écorchés (« Chètrit » pour « Chetrit »). Quand le narrateur ÉPELLE un nom lettre par lettre dans CET appel (« ça s'écrit D, U, P, O, N, T »), reconstitue l'orthographe exacte et enregistre-la dans \`identity.spellings\` sous la forme « Nom (épelé N-O-M) » — le mot AVANT la parenthèse est l'orthographe reconstituée, sans accent ni lettre qui n'ait été épelé. Si personne n'a épelé quoi que ce soit dans cet appel, \`spellings\` reste EXACTEMENT ce qu'il était dans le contexte reçu (souvent \`[]\`) : un nom simplement prononcé n'est jamais une épellation. Puis CORRIGE immédiatement toutes les occurrences de ce nom dans le contexte que tu renvoies (\`identity.full_name\`, \`family[].name\`, \`timeline[].event\`, \`last_call.summary\`) : une orthographe épelée l'emporte toujours sur celle du transcript et sur celle déjà en mémoire.
 
 # LE CONTEXTE : TU LE RÉÉCRIS INTÉGRALEMENT
 Tu reçois le contexte accumulé et le nouveau transcript.
@@ -138,7 +138,7 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
 
 {
   "context": {
-    "identity":       { "full_name": "", "birth": "", "places": [], "spellings": [] },
+    "identity":       { "full_name": "", "birth": "", "places": [], "spellings": ["(vide sauf épellation lettre par lettre dans cet appel)"] },
     "timeline":       [ { "year": 1962, "event": "" }, { "year": null, "event": "vers la fin des années 90, …" } ],
     "family":         [ { "name": "", "relation": "", "deceased": false, "note": "" } ],
     "key_themes":     [],
