@@ -3,7 +3,7 @@ export const SITE_CONFIG = {
     url: "https://www.loomina.eu",
     product: {
         name: "Loomina - Livre Autobiographique",
-        price: 219,
+        price: 449,
         currency: "EUR",
         currencySymbol: "€",
     },
