@@ -30,6 +30,7 @@ import { toPhase } from '@/lib/loomina/phases';
 import { buildAssistant, buildUnknownCallerAssistant } from '@/lib/loomina/assistant';
 import { extractCallData } from '@/lib/loomina/pipeline';
 import { recordEvent, processEvent } from '@/lib/loomina/events';
+import { checkSharedSecret } from '@/lib/loomina/secret';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -54,22 +55,16 @@ function serverUrl(request: NextRequest): string {
  * authentification — vérifié en direct : un POST depuis une page web
  * quelconque déclenchait le scénario et écrivait en base.
  *
- * Si VAPI_WEBHOOK_SECRET n'est pas défini, on laisse passer mais on
- * journalise bruyamment : cela évite de bloquer la bascule, sans laisser
- * le trou passer inaperçu.
+ * Si VAPI_WEBHOOK_SECRET n'est pas défini, la requête est refusée en
+ * production (voir lib/loomina/secret.ts).
  */
 function isAuthorized(request: NextRequest): boolean {
-    const expected = process.env.VAPI_WEBHOOK_SECRET?.trim();
-    if (!expected) {
-        console.warn('[vapi] VAPI_WEBHOOK_SECRET non défini — webhook OUVERT. À corriger.');
-        return true;
-    }
     const provided =
         request.headers.get('x-vapi-secret') ??
         request.headers.get('x-webhook-secret') ??
         request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
         '';
-    return provided === expected;
+    return checkSharedSecret(provided, process.env.VAPI_WEBHOOK_SECRET, 'vapi');
 }
 
 export async function POST(request: NextRequest) {
