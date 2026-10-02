@@ -19,6 +19,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { sweepPending } from '@/lib/loomina/events';
+import { checkSharedSecret } from '@/lib/loomina/secret';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,13 +30,9 @@ export const maxDuration = 300;
  * quand la variable est définie sur le projet.
  */
 function isAuthorized(request: NextRequest): boolean {
-    const secret = process.env.CRON_SECRET?.trim();
-    if (!secret) {
-        console.warn('[jobs] CRON_SECRET non défini — endpoint OUVERT. À corriger.');
-        return true;
-    }
     const header = request.headers.get('authorization') ?? '';
-    return header === `Bearer ${secret}`;
+    const provided = header.replace(/^Bearer\s+/i, '');
+    return checkSharedSecret(provided, process.env.CRON_SECRET, 'jobs');
 }
 
 async function handle(request: NextRequest) {

@@ -122,6 +122,13 @@ export async function POST(request: NextRequest) {
                 }, { status: response.status });
             }
 
+            // Twilio répond 200 même quand le code est FAUX (status "pending", valid false).
+            // Seul un code approuvé ouvre une session.
+            if (data.status !== "approved" || data.valid !== true) {
+                console.warn(`[Verify API] Code refusé pour ***${formattedPhone.slice(-4)} (status=${data.status})`);
+                return NextResponse.json({ message: "Code incorrect ou expiré", valid: false }, { status: 401 });
+            }
+
             // Security: Create a session token (JWT) — JWT_SECRET obligatoire, plus de secret de repli.
             const jwt = await signSession(formattedPhone);
 
