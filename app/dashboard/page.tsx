@@ -4,8 +4,7 @@ import { LOOMINA_CONFIG } from "@/config/loomina";
 import { useState, useEffect } from "react";
 import StartInterviewButton from "@/components/StartInterviewButton";
 import LiveBook from "@/components/LiveBook";
-import MagicButton from "@/components/ui/MagicButton";
-import { motion } from "framer-motion";
+import Button from "@/components/ui/Button";
 import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
 
 type LoginStep = "phone" | "otp";
@@ -90,15 +89,15 @@ export default function DashboardPage() {
                 }
 
                 setLoginStep("otp");
-            } catch (err: any) {
-                if (err.name === 'AbortError') {
+            } catch (err: unknown) {
+                if (err instanceof Error && err.name === 'AbortError') {
                     throw new Error("Le service de vérification ne répond pas. Veuillez réessayer.");
                 }
                 throw err;
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Login error:", err);
-            setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
+            setError(err instanceof Error && err.message ? err.message : "Une erreur est survenue. Veuillez réessayer.");
         } finally {
             setLoading(false);
         }
@@ -148,159 +147,142 @@ export default function DashboardPage() {
     };
 
     if (!isLoggedIn) {
+        const showOrdered = justOrdered && loginStep === "phone";
         return (
-            <div className="min-h-screen bg-[var(--loomina-void)] text-[var(--text-primary)] flex items-center justify-center px-6 pt-32 relative overflow-hidden">
-                {/* Background ambient */}
-                <div className="absolute inset-0 pointer-events-none">
-                    <div className="ambient-orb gold w-[500px] h-[500px] top-[-100px] right-[-100px] opacity-15" />
-                    <div className="ambient-orb aurora w-[300px] h-[300px] bottom-[20%] left-[-50px] opacity-10" />
-                </div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="w-full max-w-md space-y-8 text-center relative z-10"
-                >
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                        <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]" />
-                        <span className="text-[var(--loomina-gold)] text-xs font-semibold tracking-[0.3em] uppercase">
-                            Espace Auteur
-                        </span>
-                        <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
-                    </div>
-
-                    {justOrdered && loginStep === "phone" && (
-                        <div className="glass-gold rounded-2xl p-5 text-left space-y-2">
-                            <p className="text-[var(--text-primary)] font-serif text-lg">Merci, votre commande est confirmée.</p>
-                            <p className="text-[var(--text-secondary)] text-sm">
-                                Votre biographe est prêt. Deux façons de commencer : appelez le{" "}
-                                <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="text-[var(--loomina-gold)] whitespace-nowrap">{LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}</a>{" "}
+            <div className="flex min-h-[calc(100svh-0px)] w-full items-center px-5 pt-28 pb-16 sm:px-6 md:pt-32">
+                <div className="mx-auto w-full max-w-md">
+                    {showOrdered && (
+                        <div className="rise card mb-8 rounded-3xl p-5">
+                            <p className="font-serif text-[20px] leading-tight text-[var(--ink)]">Merci, votre commande est confirmée.</p>
+                            <p className="mt-2 font-sans text-[14px] leading-relaxed text-[var(--text-secondary)]">
+                                Votre biographe est prêt. Appelez le{" "}
+                                <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="whitespace-nowrap font-semibold text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4">{LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}</a>{" "}
                                 depuis le numéro indiqué à la commande, ou connectez-vous ci-dessous pour que Loomina vous appelle.
                             </p>
                         </div>
                     )}
 
-                    <h1 className="text-3xl font-serif text-[var(--text-primary)]">
-                        {justOrdered && loginStep === "phone"
-                            ? "Votre espace auteur"
-                            : loginStep === "phone" ? "Accédez à votre espace" : "Vérifiez votre identité"}
-                    </h1>
-                    <p className="text-[var(--text-secondary)] text-sm">
-                        {loginStep === "phone"
-                            ? "Entrez le numéro de téléphone utilisé lors de votre commande."
-                            : `Entrez le code à 6 chiffres envoyé au ${phone}`}
-                    </p>
+                    <div className="rise" style={{ "--i": 1 } as React.CSSProperties}>
+                        <p className="eyebrow">Espace auteur</p>
+                        <h1 className="heading-section mt-3">
+                            {loginStep === "phone" ? (
+                                <>Accédez à <em className="text-[var(--gold-ink)]">votre espace.</em></>
+                            ) : (
+                                <>Vérifiez <em className="text-[var(--gold-ink)]">votre identité.</em></>
+                            )}
+                        </h1>
+                        <p className="mt-4 font-sans text-[15px] leading-relaxed text-[var(--text-secondary)]">
+                            {loginStep === "phone"
+                                ? "Entrez le numéro de téléphone utilisé lors de votre commande. Vous recevrez un code par SMS."
+                                : `Entrez le code à 6 chiffres envoyé au ${phone}.`}
+                        </p>
+                    </div>
 
-                    <form onSubmit={loginStep === "phone" ? handleRequestOtp : handleVerifyOtp} className="space-y-6">
+                    <form onSubmit={loginStep === "phone" ? handleRequestOtp : handleVerifyOtp} className="rise mt-8 space-y-5" style={{ "--i": 2 } as React.CSSProperties}>
                         {loginStep === "phone" ? (
-                            <input
-                                type="tel"
-                                placeholder="Votre numéro (ex: 06 12 34 56 78)"
-                                value={phone}
-                                onChange={(e) => {
-                                    const formatted = formatPhoneNumberForDisplay(e.target.value);
-                                    if (formatted.length <= 20) setPhone(formatted);
-                                }}
-                                className="w-full p-4 rounded-xl bg-[var(--loomina-mist)]/20 border border-[var(--loomina-mist)] text-center text-lg focus:border-[var(--loomina-gold)] outline-none text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors"
-                            />
+                            <div>
+                                <label htmlFor="phone" className="field-label">Numéro de téléphone</label>
+                                <input
+                                    id="phone"
+                                    type="tel"
+                                    inputMode="tel"
+                                    autoComplete="tel"
+                                    placeholder="06 12 34 56 78"
+                                    value={phone}
+                                    onChange={(e) => {
+                                        const formatted = formatPhoneNumberForDisplay(e.target.value);
+                                        if (formatted.length <= 20) setPhone(formatted);
+                                    }}
+                                    className="field text-lg"
+                                    required
+                                />
+                            </div>
                         ) : (
-                            <input
-                                type="text"
-                                maxLength={6}
-                                placeholder="123456"
-                                value={otpCode}
-                                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                                className="w-full p-4 rounded-xl bg-[var(--loomina-mist)]/20 border border-[var(--loomina-mist)] text-center text-3xl tracking-[0.5em] font-mono focus:border-[var(--loomina-gold)] outline-none text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors"
-                                autoFocus
-                            />
+                            <div>
+                                <label htmlFor="otp" className="field-label">Code reçu par SMS</label>
+                                <input
+                                    id="otp"
+                                    type="text"
+                                    inputMode="numeric"
+                                    autoComplete="one-time-code"
+                                    pattern="[0-9]*"
+                                    maxLength={6}
+                                    placeholder="••••••"
+                                    value={otpCode}
+                                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                                    className="field h-16 text-center font-serif text-[32px] tracking-[0.4em]"
+                                    autoFocus
+                                    required
+                                />
+                            </div>
                         )}
 
-                        <div className="flex items-center justify-center gap-2">
+                        <label htmlFor="rememberMe" className="flex cursor-pointer select-none items-center gap-3 font-sans text-[14px] text-[var(--text-secondary)]">
                             <input
                                 type="checkbox"
                                 id="rememberMe"
                                 checked={rememberMe}
                                 onChange={(e) => setRememberMe(e.target.checked)}
-                                className="w-4 h-4 bg-[var(--loomina-mist)]/20 border-[var(--loomina-mist)] rounded focus:ring-[var(--loomina-gold)] checked:bg-[var(--loomina-gold)]"
+                                className="h-4 w-4 accent-[var(--ink)]"
                             />
-                            <label htmlFor="rememberMe" className="text-sm text-[var(--text-secondary)] cursor-pointer select-none">
-                                Rester connecté
-                            </label>
-                        </div>
+                            Rester connecté sur cet appareil
+                        </label>
 
                         {error && (
-                            <p className="text-red-400 text-sm">{error}</p>
+                            <p role="alert" className="rounded-2xl border border-[var(--danger)]/30 bg-[var(--danger)]/5 px-4 py-3 font-sans text-[14px] text-[var(--danger)]">{error}</p>
                         )}
 
-                        <MagicButton type="submit" disabled={loading} className="w-full">
-                            {loading ? "Chargement..." : (loginStep === "phone" ? "Recevoir mon code" : "Valider le code")}
-                        </MagicButton>
+                        <Button type="submit" variant="primary" size="lg" fullWidth loading={loading}>
+                            {loading ? "Un instant…" : (loginStep === "phone" ? "Recevoir mon code" : "Valider le code")}
+                        </Button>
 
                         {loginStep === "otp" && (
                             <button
                                 type="button"
                                 onClick={() => setLoginStep("phone")}
-                                className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-4"
+                                className="block w-full text-center font-sans text-[14px] text-[var(--text-muted)] underline decoration-[var(--hairline-strong)] underline-offset-4 transition-colors duration-200 hover:text-[var(--ink)]"
                             >
                                 Modifier le numéro
                             </button>
                         )}
                     </form>
 
-                    <div className="pt-8 border-t border-[var(--loomina-mist)]">
-                        <p className="text-[var(--text-muted)] text-sm mb-4">Vous n’avez pas encore commencé votre histoire ?</p>
-                        <MagicButton href="/order" variant="secondary" size="sm">
+                    <div className="rise mt-10 border-t border-[var(--hairline)] pt-8" style={{ "--i": 3 } as React.CSSProperties}>
+                        <p className="font-sans text-[14px] text-[var(--text-muted)]">Vous n’avez pas encore commencé votre histoire ?</p>
+                        <Button href="/order" variant="secondary" size="md" className="mt-4">
                             Commander ma biographie
-                        </MagicButton>
+                        </Button>
                     </div>
-                </motion.div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[var(--loomina-void)] text-[var(--text-primary)] pt-32 pb-20 px-6 relative overflow-hidden">
-            {/* Background ambient */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="ambient-orb gold w-[500px] h-[500px] top-[-150px] right-[-100px] opacity-10" />
-            </div>
-
-            <div className="max-w-6xl mx-auto space-y-16 relative z-10">
-
-                {/* Header / Actions */}
-                <header className="flex flex-col md:flex-row items-center justify-between gap-8 pb-12 relative">
-                    <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[var(--loomina-mist)] to-transparent" />
+        <div className="w-full pt-28 pb-20 md:pt-32 md:pb-28">
+            <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
+                <header className="rise flex flex-col gap-6 border-b border-[var(--hairline)] pb-8 md:flex-row md:items-end md:justify-between">
                     <div>
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]" />
-                            <span className="text-[var(--loomina-gold)] text-xs font-semibold tracking-[0.3em] uppercase">
-                                Dashboard
-                            </span>
-                            <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
-                        </div>
-                        <h1 className="text-4xl font-serif text-[var(--text-primary)] mb-2">
-                            {userName ? `Bonjour, ${userName}` : "Votre Espace Auteur"}
+                        <p className="eyebrow">Espace auteur</p>
+                        <h1 className="heading-section mt-3">
+                            {userName ? <>Bonjour, <em className="text-[var(--gold-ink)]">{userName}.</em></> : <>Votre <em className="text-[var(--gold-ink)]">espace.</em></>}
                         </h1>
-                        <p className="text-[var(--text-secondary)]">Suivez la rédaction de votre autobiographie en temps réel.</p>
+                        <p className="mt-3 font-sans text-[15px] text-[var(--text-secondary)]">Suivez la rédaction de votre livre, récit après récit.</p>
                     </div>
-
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                         <StartInterviewButton phone={phone} userName="Auteur" />
                         <button
                             onClick={handleLogout}
-                            className="text-sm text-[var(--text-muted)] hover:text-red-400 transition-colors"
+                            className="press rounded-full px-4 py-2 font-sans text-[14px] text-[var(--text-muted)] hover:bg-[var(--loomina-slate)]/60 hover:text-[var(--ink)]"
                         >
                             Se déconnecter
                         </button>
                     </div>
                 </header>
 
-                {/* Live Book Content */}
-                <main>
+                <main className="rise mt-10" style={{ "--i": 2 } as React.CSSProperties}>
                     <LiveBook />
                 </main>
-
             </div>
         </div>
     );

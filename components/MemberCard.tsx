@@ -1,95 +1,41 @@
-"use client";
-
-import React from "react";
-import { motion } from "framer-motion";
 import Image from "next/image";
 
 interface MemberCardProps {
-    name?: string;
-    memberId?: string;
+  name?: string;
+  memberId?: string;
 }
 
-export default function MemberCard({
-    name = "Membre Loomina",
-    memberId = "2025 • #001",
-}: MemberCardProps) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative w-full max-w-[480px] mx-auto perspective-1000"
-        >
-            {/* Container with Dark Premium feel */}
-            <div className="relative aspect-[1.7/1] rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(184,146,58,0.2)] bg-white border border-[var(--loomina-mist)] group transition-all duration-500 hover:shadow-[0_30px_70px_-15px_rgba(184,146,58,0.3)]">
+/** Carte membre : encre, filet or, nom en serif. Statique (pas de survol animé). */
+export default function MemberCard({ name = "Membre Loomina", memberId = "2025 • #001" }: MemberCardProps) {
+  return (
+    <div className="relative mx-auto w-full max-w-[480px]">
+      <div className="paper-grain relative aspect-[1.7/1] overflow-hidden rounded-2xl bg-[var(--ink)] shadow-[0_40px_60px_-30px_rgba(26,24,21,0.6)]">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(145deg,rgba(255,255,255,0.07)_0%,rgba(255,255,255,0)_55%,rgba(0,0,0,0.25)_100%)]" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_80%_0%,rgba(212,176,106,0.22),transparent_70%)]" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-3 rounded-xl border border-[var(--loomina-gold-light)]/30" />
 
-                {/* BACKGROUND: Gold gradient accent */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[var(--loomina-gold)]/5 via-transparent to-[var(--loomina-aurora)]/5 pointer-events-none" />
-
-                {/* DECORATION: Fine Gold Frame */}
-                <div className="absolute inset-3 border border-[var(--loomina-gold)]/20 rounded-xl pointer-events-none" />
-                <div className="absolute inset-4 border border-[var(--loomina-gold)]/10 rounded-lg pointer-events-none" />
-
-                {/* Corner accents */}
-                <div className="absolute top-4 left-4 w-4 h-4 border-l-2 border-t-2 border-[var(--loomina-gold)]/40 rounded-tl" />
-                <div className="absolute top-4 right-4 w-4 h-4 border-r-2 border-t-2 border-[var(--loomina-gold)]/40 rounded-tr" />
-                <div className="absolute bottom-4 left-4 w-4 h-4 border-l-2 border-b-2 border-[var(--loomina-gold)]/40 rounded-bl" />
-                <div className="absolute bottom-4 right-4 w-4 h-4 border-r-2 border-b-2 border-[var(--loomina-gold)]/40 rounded-br" />
-
-                {/* BACKGROUND ACCENT: Subtle glow */}
-                <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-br from-[var(--loomina-gold)]/10 to-transparent blur-3xl rounded-full mix-blend-screen pointer-events-none" />
-
-                {/* CONTENT LAYER */}
-                <div className="relative h-full p-8 flex flex-col justify-between">
-
-                    {/* HEADER Flex */}
-                    <div className="flex justify-between items-start">
-                        {/* Logo Mark */}
-                        <div className="relative h-6 w-28">
-                            <Image
-                                src="/header-logo-trimmed.png"
-                                alt="Loomina Logo"
-                                fill
-                                className="object-contain object-left"
-                            />
-                        </div>
-                        {/* Status Badge */}
-                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--loomina-gold)]/10 border border-[var(--loomina-gold)]/20">
-                            <span className="w-2 h-2 rounded-full bg-[var(--loomina-gold)] animate-pulse" />
-                            <span className="text-[10px] text-[var(--loomina-gold)] uppercase tracking-wider font-semibold">Actif</span>
-                        </div>
-                    </div>
-
-                    {/* CENTER: Name Typography */}
-                    <div className="flex flex-col items-center text-center space-y-2 mt-2">
-                        <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-[0.3em] font-sans">
-                            Détenteur du compte
-                        </span>
-                        <h2 className="text-3xl sm:text-4xl font-serif text-[var(--text-primary)] tracking-wide">
-                            {name}
-                        </h2>
-                        {/* Decorative underline */}
-                        <div className="w-16 h-px bg-gradient-to-r from-transparent via-[var(--loomina-gold)] to-transparent" />
-                    </div>
-
-                    {/* FOOTER: ID & Status */}
-                    <div className="flex justify-end items-end pt-4">
-                        <div className="flex flex-col items-end">
-                            <span className="text-[9px] text-[var(--text-muted)] uppercase tracking-widest font-sans mb-1">
-                                Membre N°
-                            </span>
-                            <span className="font-mono text-xs text-[var(--loomina-gold)]/60 tracking-widest">
-                                {memberId}
-                            </span>
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* SHIMMER EFFECT (Subtle movement on hover) */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[var(--loomina-gold)]/10 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 w-[200%] translate-x-[-50%] group-hover:translate-x-0" />
-
+        <div className="relative flex h-full flex-col justify-between p-7 sm:p-8">
+          <div className="flex items-start justify-between">
+            <div className="relative h-6 w-28 brightness-0 invert">
+              <Image src="/header-logo-trimmed.png" alt="Loomina" fill className="object-contain object-left" sizes="112px" />
             </div>
-        </motion.div>
-    );
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-sans text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--loomina-gold-light)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--loomina-gold-light)]" />
+              Membre
+            </span>
+          </div>
+
+          <div>
+            <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-[#cfc8bb]">Livre de vie de</p>
+            <p className="mt-1 font-serif text-[28px] leading-tight tracking-[-0.01em] text-[#ecd9ae] sm:text-[34px]">{name}</p>
+          </div>
+
+          <div className="flex items-end justify-between font-sans">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#9d968a]">loomina.eu</span>
+            <span className="text-[11px] tracking-[0.18em] text-[var(--loomina-gold-light)]/80">{memberId}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

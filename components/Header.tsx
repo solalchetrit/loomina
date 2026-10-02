@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
   { href: "/", label: "Accueil" },
-  { href: "/experience", label: "L'Expérience" },
-  { href: "/offre", label: "L'Offre" },
+  { href: "/experience", label: "L’Expérience" },
+  { href: "/offre", label: "L’Offre" },
   { href: "/about", label: "À Propos" },
 ];
 
@@ -17,6 +17,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     // Throttled scroll handler
@@ -30,7 +31,8 @@ export default function Header() {
         ticking = true;
       }
     };
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -54,143 +56,110 @@ export default function Header() {
     };
   }, [isOpen]);
 
-  // Animation Variants
+  // Menu mobile : ouverture occasionnelle → animation courte, ease-out fort.
   const menuVariants: Variants = {
     closed: {
       opacity: 0,
-      clipPath: "inset(0% 0% 100% 0%)",
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 40,
-        when: "afterChildren",
-        staggerChildren: 0.05,
-        staggerDirection: -1
-      }
+      transition: { duration: 0.18, ease: [0.23, 1, 0.32, 1], when: "afterChildren" },
     },
     open: {
       opacity: 1,
-      clipPath: "inset(0% 0% 0% 0%)",
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-        when: "beforeChildren",
-        staggerChildren: 0.1,
-        delayChildren: 0.1
-      }
-    }
+      transition: { duration: 0.22, ease: [0.23, 1, 0.32, 1], staggerChildren: 0.04, delayChildren: 0.03 },
+    },
   };
 
   const itemVariants: Variants = {
-    closed: { opacity: 0, y: 20 },
-    open: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    closed: { opacity: 0, transform: reduceMotion ? "none" : "translateY(8px)", transition: { duration: 0.12 } },
+    open: { opacity: 1, transform: reduceMotion ? "none" : "translateY(0px)", transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
   };
+
+  const isActive = (href: string) => pathname === href;
 
   return (
     <>
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 w-full transition-all duration-500 z-[1000] ${isScrolled || isOpen
-          ? "bg-[var(--loomina-void)]/80 backdrop-blur-xl border-b border-[var(--loomina-mist)]/20"
-          : "bg-transparent"
-          }`}
+      <header
+        className={`fixed top-0 z-[1000] w-full border-b transition-[background-color,border-color,backdrop-filter] duration-300 ease-out ${
+          isScrolled || isOpen
+            ? "border-[var(--hairline)] bg-[var(--loomina-void)]/85 backdrop-blur-xl"
+            : "border-transparent bg-transparent"
+        }`}
       >
-        <div className={`mx-auto flex items-center justify-between px-6 transition-all duration-500 ${isScrolled ? "h-16" : "h-20"} max-w-7xl`}>
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-6 md:h-[72px]">
           {/* Logo */}
-          <Link href="/" className="relative z-[920] flex shrink-0 items-center group" onClick={() => setIsOpen(false)}>
-            <div className="relative h-8 w-40">
+          <Link href="/" className="relative z-[920] flex shrink-0 items-center" onClick={() => setIsOpen(false)}>
+            <div className="relative h-7 w-32 md:h-8 md:w-36">
               <Image
                 src="/header-logo-trimmed.png"
-                alt="Logo Loomina"
+                alt="Loomina — accueil"
                 fill
-                className="object-contain object-left transition-all duration-300 group-hover:opacity-80"
+                className="object-contain object-left"
                 priority
-                sizes="(max-width: 768px) 144px, 192px"
+                sizes="(max-width: 768px) 128px, 144px"
               />
             </div>
           </Link>
 
-          {/* DESKTOP NAVIGATION - Glass Capsule */}
-          <nav className="hidden md:flex items-center gap-1 p-1.5 glass rounded-full">
+          {/* NAVIGATION DESKTOP */}
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
             {NAV_LINKS.map((item) => (
               <Link
                 key={item.href}
                 href={item.label === "Accueil" ? "/#home" : item.href}
-                className={`
-                px-5 py-2.5 rounded-full
-                text-sm font-medium transition-all duration-300 ease-out
-                ${pathname === item.href
-                    ? "text-[var(--text-primary)] bg-[var(--loomina-mist)]/50 shadow-sm"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--loomina-mist)]/30"
-                  }
-              `}
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={`relative rounded-full px-3.5 py-2 font-sans text-[14px] font-medium transition-colors duration-200 lg:px-4 ${
+                  isActive(item.href)
+                    ? "text-[var(--ink)]"
+                    : "text-[var(--text-secondary)] hover:text-[var(--ink)]"
+                }`}
               >
                 {item.label}
+                {isActive(item.href) && (
+                  <span className="absolute inset-x-3.5 -bottom-0.5 h-px bg-[var(--loomina-gold)] lg:inset-x-4" />
+                )}
               </Link>
             ))}
+          </nav>
 
-            {/* Separator */}
-            <div className="h-6 w-px bg-[var(--loomina-mist)] mx-2" />
-
-            {/* CTA Buttons */}
-            <Link
-              href="/order"
-              className="
-              px-6 py-2.5 rounded-full 
-              bg-gradient-to-r from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)]
-              text-white font-sans font-semibold text-sm 
-              transition-all duration-300 
-              shadow-md shadow-[var(--loomina-gold)]/20
-              hover:shadow-lg hover:shadow-[var(--loomina-gold)]/30 hover:-translate-y-0.5
-            "
-            >
-              Commencer
-            </Link>
-
+          <div className="hidden items-center gap-2 md:flex">
             <Link
               href="/dashboard"
-              className="
-              px-5 py-2.5 rounded-full 
-              border border-[var(--loomina-mist)] text-[var(--text-secondary)]
-              text-sm font-medium 
-              transition-all duration-300 
-              hover:border-[var(--loomina-gold)] hover:text-[var(--loomina-gold)] hover:bg-[var(--loomina-void)]
-            "
+              className="rounded-full px-3.5 py-2 font-sans text-[14px] font-medium text-[var(--text-secondary)] transition-colors duration-200 hover:text-[var(--ink)]"
             >
               Se connecter
             </Link>
-          </nav>
+            <Link
+              href="/order"
+              className="press inline-flex h-10 items-center rounded-full bg-[var(--ink)] px-5 font-sans text-[14px] font-semibold text-[var(--loomina-void)] hover:bg-[var(--ink-soft)]"
+            >
+              Commencer
+            </Link>
+          </div>
 
-          {/* MOBILE BURGER BUTTON */}
+          {/* BOUTON MENU MOBILE */}
           <button
+            type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden relative z-[920] flex flex-col items-center justify-center w-12 h-12 rounded-full hover:bg-[var(--loomina-mist)]/20 transition-colors"
-            aria-label="Menu"
+            className="press relative z-[920] -mr-2 flex h-11 w-11 items-center justify-center rounded-full md:hidden"
+            aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={isOpen}
           >
-            <div className="flex flex-col gap-[5px] w-6 items-center justify-center">
-              <motion.span
-                animate={isOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-                className="w-full h-[2px] bg-[var(--text-primary)] block origin-center transition-all duration-300 ease-out rounded-full"
+            <span className="relative block h-3 w-5">
+              <span
+                className={`absolute left-0 top-0 block h-[1.5px] w-full rounded-full bg-[var(--ink)] transition-transform duration-200 ease-out ${
+                  isOpen ? "translate-y-[5px] rotate-45" : "translate-y-0"
+                }`}
               />
-              <motion.span
-                animate={isOpen ? { opacity: 0, x: 10 } : { opacity: 1, x: 0 }}
-                className="w-full h-[2px] bg-[var(--text-primary)] block origin-center transition-all duration-300 ease-out rounded-full"
+              <span
+                className={`absolute left-0 top-0 block h-[1.5px] w-full rounded-full bg-[var(--ink)] transition-transform duration-200 ease-out ${
+                  isOpen ? "translate-y-[5px] -rotate-45" : "translate-y-[10px]"
+                }`}
               />
-              <motion.span
-                animate={isOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-                className="w-full h-[2px] bg-[var(--text-primary)] block origin-center transition-all duration-300 ease-out rounded-full"
-              />
-            </div>
+            </span>
           </button>
-
         </div>
-      </motion.header>
+      </header>
 
-      {/* MOBILE FULLSCREEN MENU */}
+      {/* MENU MOBILE PLEIN ÉCRAN */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -198,64 +167,43 @@ export default function Header() {
             animate="open"
             exit="closed"
             variants={menuVariants}
-            className="fixed inset-0 z-[910] flex flex-col pt-32 pb-10 px-6 md:hidden bg-[var(--loomina-void)]/98 backdrop-blur-2xl"
+            className="fixed inset-0 z-[910] flex flex-col bg-[var(--loomina-void)] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-24 md:hidden"
           >
-            {/* Background Texture/Gradient for Premium Feel */}
-            <div className="absolute inset-0 z-0 bg-gradient-to-b from-[var(--loomina-mist)]/10 to-transparent pointer-events-none" />
-
-            <nav className="relative z-10 flex flex-col items-center justify-between h-full max-h-[600px] mx-auto w-full max-w-sm">
-              <div className="flex flex-col items-center gap-6 w-full">
+            <nav className="flex flex-1 flex-col" aria-label="Navigation mobile">
+              <ul className="flex flex-col">
                 {NAV_LINKS.map((item) => (
-                  <motion.div key={item.href} variants={itemVariants} className="w-full">
+                  <motion.li key={item.href} variants={itemVariants} className="border-b border-[var(--hairline)]">
                     <Link
                       href={item.label === "Accueil" ? "/#home" : item.href}
                       onClick={() => setIsOpen(false)}
-                      className={`
-                        block w-full text-center text-4xl font-serif tracking-tight transition-all duration-300 py-2
-                        ${pathname === item.href
-                          ? "text-[var(--loomina-gold-dark)] italic scale-105"
-                          : "text-[var(--text-primary)] hover:text-[var(--loomina-gold)] hover:scale-105"
-                        }
-                      `}
+                      aria-current={isActive(item.href) ? "page" : undefined}
+                      className={`flex items-center justify-between py-4 font-serif text-[30px] tracking-[-0.02em] ${
+                        isActive(item.href) ? "text-[var(--gold-ink)]" : "text-[var(--ink)]"
+                      }`}
                     >
                       {item.label}
+                      <svg className="h-5 w-5 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+                      </svg>
                     </Link>
-                  </motion.div>
+                  </motion.li>
                 ))}
-              </div>
+              </ul>
 
-              <motion.div
-                variants={itemVariants}
-                className="w-full flex flex-col gap-4 mt-8"
-              >
-                <div className="w-12 h-0.5 bg-[var(--loomina-gold)]/30 mx-auto mb-6 rounded-full" />
-
+              <motion.div variants={itemVariants} className="mt-auto flex flex-col gap-3">
                 <Link
                   href="/order"
                   onClick={() => setIsOpen(false)}
-                  className="
-                    w-full py-4 rounded-xl 
-                    bg-gradient-to-r from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)] 
-                    text-white text-lg font-semibold text-center 
-                    shadow-lg shadow-[var(--loomina-gold)]/20
-                    active:scale-95 transition-all
-                  "
+                  className="press flex h-13 items-center justify-center rounded-full bg-[var(--ink)] font-sans text-base font-semibold text-[var(--loomina-void)]"
                 >
                   Commencer l’expérience
                 </Link>
-
                 <Link
                   href="/dashboard"
                   onClick={() => setIsOpen(false)}
-                  className="
-                    w-full py-4 rounded-xl 
-                    border border-[var(--loomina-mist)] 
-                    text-[var(--text-secondary)] text-lg font-medium text-center 
-                    hover:bg-[var(--loomina-mist)]/10 hover:border-[var(--loomina-gold)] hover:text-[var(--loomina-gold)]
-                    active:scale-95 transition-all
-                  "
+                  className="press flex h-13 items-center justify-center rounded-full border border-[var(--hairline-strong)] font-sans text-base font-medium text-[var(--ink)]"
                 >
-                  Espace Client
+                  Espace client
                 </Link>
               </motion.div>
             </nav>

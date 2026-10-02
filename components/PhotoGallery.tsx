@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { motion } from "framer-motion";
 import MagicButton from "@/components/ui/MagicButton";
 
 interface Photo {
@@ -95,15 +94,17 @@ export default function PhotoGallery({ bookId }: PhotoGalleryProps) {
     if (loading) return null;
 
     return (
-        <section className="bg-neutral-50 border border-neutral-200 rounded-2xl p-8 space-y-6">
+        <section className="card rounded-3xl p-6 sm:p-8 space-y-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-lg">
-                        📷
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--loomina-night)] text-[var(--ink)] shadow-[inset_0_0_0_1px_var(--hairline)]">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+                        </svg>
                     </div>
                     <div>
-                        <p className="text-xs uppercase tracking-widest text-indigo-700 font-semibold">Galerie Photos</p>
-                        <h3 className="text-2xl font-serif text-black">Vos souvenirs en images</h3>
+                        <p className="eyebrow">Galerie photos</p>
+                        <h3 className="text-2xl font-serif text-[var(--ink)]">Vos souvenirs en images</h3>
                     </div>
                 </div>
 
@@ -118,35 +119,33 @@ export default function PhotoGallery({ bookId }: PhotoGalleryProps) {
                     <MagicButton
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="text-sm px-4 py-2"
+                        variant="secondary"
+                        size="sm"
                     >
-                        {uploading ? "Envoi..." : "+ Ajouter une photo"}
+                        {uploading ? "Envoi…" : "Ajouter une photo"}
                     </MagicButton>
                 </div>
             </div>
 
-            <p className="text-neutral-600">Ajoutez des photos pour illustrer vos chapitres et enrichir votre biographie.</p>
+            <p className="font-sans text-[15px] text-[var(--text-secondary)]">Ajoutez des photos pour illustrer vos chapitres et enrichir votre biographie.</p>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {photos.length === 0 ? (
-                    <div className="col-span-full py-12 text-center border-2 border-dashed border-neutral-200 rounded-xl text-neutral-400">
-                        <span className="text-2xl block mb-2">🖼️</span>
+                    <div className="col-span-full rounded-2xl border border-dashed border-[var(--hairline-strong)] py-12 text-center font-sans text-[14px] text-[var(--text-muted)]">
                         Aucune photo pour le moment
                     </div>
                 ) : (
                     photos.map((photo) => (
-                        <motion.div
+                        <div
                             key={photo.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="relative aspect-square rounded-xl overflow-hidden shadow-sm group bg-white"
+                            className="rise relative aspect-square overflow-hidden rounded-2xl bg-[var(--loomina-night)] shadow-[inset_0_0_0_1px_var(--hairline)]"
                         >
                             <img
                                 src={photo.image_url}
                                 alt="Souvenir"
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                className="h-full w-full object-cover"
                             />
-                        </motion.div>
+                        </div>
                     ))
                 )}
             </div>

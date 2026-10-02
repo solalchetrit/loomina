@@ -1,12 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import MagicButton from "./ui/MagicButton";
+import Button from "./ui/Button";
 
-interface StartInterviewButtonProps {
-    phone: string;
-    userName: string;
-}
 
 export default function StartInterviewButton({ phone }: { phone: string; userName: string }) {
     const [loading, setLoading] = useState(false);
@@ -51,24 +47,26 @@ export default function StartInterviewButton({ phone }: { phone: string; userNam
 
     if (sent) {
         return (
-            <div className="text-center p-4 bg-green-50 text-green-800 rounded-xl border border-green-200">
-                <p className="font-medium">Appel déclenché !</p>
-                <p className="text-sm">Votre téléphone devrait sonner d&apos;un instant à l&apos;autre.</p>
+            <div role="status" className="rounded-2xl border border-[var(--success)]/30 bg-[var(--success)]/5 px-4 py-3 font-sans text-[14px] text-[var(--success)]">
+                <p className="font-semibold">Appel déclenché.</p>
+                <p>Votre téléphone devrait sonner d&apos;un instant à l&apos;autre.</p>
             </div>
         );
     }
 
     return (
         <>
-            <MagicButton
+            <Button
                 onClick={handleStartInterview}
-                disabled={loading}
-                className="w-full md:w-auto"
+                loading={loading}
+                variant="primary"
+                size="md"
+                className="w-full sm:w-auto"
             >
-                {loading ? "Déclenchement..." : "📞 Démarrer l'interview maintenant"}
-            </MagicButton>
+                {loading ? "Déclenchement…" : "Me faire appeler maintenant"}
+            </Button>
             {error && (
-                <p className="text-red-500 text-xs mt-2">{error}</p>
+                <p role="alert" className="mt-2 font-sans text-[13px] text-[var(--danger)]">{error}</p>
             )}
         </>
     );
