@@ -51,7 +51,7 @@ export default function Hero() {
             </div>
             <div className="w-px h-8 md:h-10 bg-gradient-to-b from-transparent via-[var(--loomina-mist)] to-transparent" />
             <div className="text-center md:text-left">
-              <div className="text-2xl md:text-3xl font-serif text-gradient-gold">219€</div>
+              <div className="text-2xl md:text-3xl font-serif text-gradient-gold">449€</div>
               <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Tout inclus</div>
             </div>
             <div className="w-px h-8 md:h-10 bg-gradient-to-b from-transparent via-[var(--loomina-mist)] to-transparent" />

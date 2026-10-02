@@ -97,7 +97,7 @@ export default function CGVPage() {
                         <div className="glass rounded-2xl p-8">
                             <h2 className="text-2xl font-serif text-[var(--text-primary)] mb-4">4. Prix et Modalités de Paiement</h2>
                             <p>
-                                Le prix du service est de <strong className="text-[var(--loomina-gold)]">219 euros TTC</strong>, tout compris, sans frais cachés.
+                                Le prix du service est de <strong className="text-[var(--loomina-gold)]">449 euros TTC</strong>, tout compris, sans frais cachés.
                             </p>
                             <p className="mt-4">
                                 Le paiement s’effectue en une fois par carte bancaire via la plateforme sécurisée <strong className="text-[var(--text-primary)]">Stripe</strong>.

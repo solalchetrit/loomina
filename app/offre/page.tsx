@@ -156,7 +156,7 @@ export default function OffrePage() {
                             <div className="mb-6">
                                 <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-[0.3em] font-bold">Investissement unique</span>
                                 <div className="flex items-baseline justify-center gap-1 my-4">
-                                    <span className="text-7xl md:text-8xl font-serif text-gradient-gold drop-shadow-sm">219</span>
+                                    <span className="text-7xl md:text-8xl font-serif text-gradient-gold drop-shadow-sm">449</span>
                                     <span className="text-3xl text-[var(--loomina-gold)] font-serif mb-3">€</span>
                                 </div>
                                 <p className="text-xs text-[var(--text-secondary)] font-serif italic">Collecte • Rédaction • Impression Premium</p>

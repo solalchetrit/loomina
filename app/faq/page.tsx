@@ -73,11 +73,11 @@ const FAQ_CATEGORIES = [
         questions: [
             {
                 q: "Quel est le prix exact ?",
-                a: "219€ tout compris. Ce prix inclut : tous les appels, la rédaction, les corrections, l’intégration de photos, la mise en page, l’impression, la version numérique et la livraison. Aucun frais caché."
+                a: "449 € tout compris. Ce prix inclut : tous les appels, la rédaction, les corrections, l’intégration de photos, la mise en page, l’impression, la version numérique et la livraison. Aucun frais caché."
             },
             {
                 q: "Y a-t-il des frais supplémentaires ?",
-                a: "Non, absolument aucun. Le prix de 219€ couvre l’intégralité du service, du premier appel à la livraison de votre livre."
+                a: "Non, absolument aucun. Le prix de 449 € couvre l’intégralité du service, du premier appel à la livraison de votre livre."
             },
             {
                 q: "Puis-je payer en plusieurs fois ?",
