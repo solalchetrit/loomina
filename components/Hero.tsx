@@ -5,7 +5,7 @@ const FACTS = [
   { value: "14+", label: "chapitres rédigés" },
   { value: "Illimités", label: "entretiens par téléphone" },
   { value: "Relié", label: "livre imprimé et livré" },
-  { value: "219 €", label: "tout compris" },
+  { value: "449 €", label: "tout compris" },
 ];
 
 const CheckIcon = () => (

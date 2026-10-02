@@ -29,7 +29,7 @@ const FAQ_CATEGORIES = [
     id: "tarifs",
     category: "Tarifs & paiement",
     questions: [
-      { q: "Quel est le prix exact ?", a: "219 € tout compris : appels, rédaction, corrections, photos, mise en page, impression, version numérique et livraison. Aucun frais caché." },
+      { q: "Quel est le prix exact ?", a: "449 € tout compris : appels, rédaction, corrections, photos, mise en page, impression, version numérique et livraison. Aucun frais caché." },
       { q: "Y a-t-il des frais supplémentaires ?", a: "Non. Le prix couvre l’intégralité du service, du premier appel à la livraison." },
       { q: "Puis-je payer en plusieurs fois ?", a: "Pour l’instant, le paiement se fait en une fois par carte bancaire via Stripe. Le paiement en plusieurs fois arrive bientôt." },
       { q: "Y a-t-il une garantie ?", a: "Oui. Si après le premier appel vous n’êtes pas satisfait, nous vous remboursons intégralement, sans question." },

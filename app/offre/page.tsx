@@ -13,7 +13,7 @@ const INCLUDED = [
 const COMPARE = {
   cols: ["Loomina", "Biographe traditionnel", "Écrire soi-même"],
   rows: [
-    { label: "Prix", values: ["219 € tout compris", "2 000 à 8 000 €", "Gratuit, mais…"] },
+    { label: "Prix", values: ["449 € tout compris", "2 000 à 8 000 €", "Gratuit, mais…"] },
     { label: "Effort", values: ["Parler au téléphone", "Rendez-vous à planifier", "Des mois d’écriture"] },
     { label: "Délai", values: ["≈ 14 semaines", "6 à 12 mois", "Souvent jamais fini"] },
     { label: "Disponibilité", values: ["Quand vous voulez", "Sur rendez-vous", "Dépend de vous"] },

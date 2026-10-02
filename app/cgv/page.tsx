@@ -81,7 +81,7 @@ export default function CGVPage() {
                         <div className="card rounded-3xl p-6 sm:p-8">
                             <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">4. Prix et Modalités de Paiement</h2>
                             <p>
-                                Le prix du service est de <strong className="text-[var(--gold-ink)]">219 euros TTC</strong>, tout compris, sans frais cachés.
+                                Le prix du service est de <strong className="text-[var(--gold-ink)]">449 euros TTC</strong>, tout compris, sans frais cachés.
                             </p>
                             <p className="mt-4">
                                 Le paiement s’effectue en une fois par carte bancaire via la plateforme sécurisée <strong className="text-[var(--text-primary)]">Stripe</strong>.

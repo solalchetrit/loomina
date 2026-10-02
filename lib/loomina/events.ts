@@ -4,7 +4,7 @@
  * Chaque webhook Vapi exploitable est d'abord ÉCRIT, puis traité.
  * Cette séparation est ce qui manquait le plus à l'architecture Make :
  * un échec OpenAI y faisait perdre définitivement l'appel d'un client
- * à 219 €, sans trace ni possibilité de rejeu.
+ * à 449 €, sans trace ni possibilité de rejeu.
  */
 
 import { db, findProfileByPhone, findActiveProject } from './db';
