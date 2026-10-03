@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
         if (action === "start") {
             // Send verification code
-            console.log(`[Verify API] Sending OTP to ${formattedPhone}`);
+            console.log(`[Verify API] Sending OTP to ***${formattedPhone.slice(-4)}`);
 
             // 1. Le numéro doit correspondre à un client existant (schéma v2 : table profiles,
             //    lue avec la clé service role — l'ancienne RPC check_client_exists n'existe plus).
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
             }
 
             if (!profile) {
-                console.warn(`[Verify API] User not found for phone ${formattedPhone}. Blocking verification.`);
+                console.warn(`[Verify API] User not found for phone ***${formattedPhone.slice(-4)}. Blocking verification.`);
                 return NextResponse.json({
                     message: "Numéro de téléphone inconnu. Avez-vous déjà passé commande ?"
                 }, { status: 404 });
@@ -73,7 +73,8 @@ export async function POST(request: NextRequest) {
             );
 
             const data = await response.json();
-            console.log("[Verify API] Twilio response:", JSON.stringify(data, null, 2));
+            // La réponse Twilio contient le numéro complet : on ne journalise que l'essentiel.
+            console.log(`[Verify API] Twilio response: status=${data.status} sid=${data.sid}`);
 
             if (!response.ok) {
                 console.error("[Verify API] Twilio error:", data);
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
 
         } else if (action === "check") {
             // Verify the code
-            console.log(`[Verify API] Verifying OTP for ${formattedPhone}`);
+            console.log(`[Verify API] Verifying OTP for ***${formattedPhone.slice(-4)}`);
 
             if (!otp_code) {
                 return NextResponse.json({ message: "Missing OTP code" }, { status: 400 });
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
             );
 
             const data = await response.json();
-            console.log("[Verify API] Twilio verification response:", JSON.stringify(data, null, 2));
+            console.log(`[Verify API] Twilio verification response: status=${data.status} valid=${data.valid}`);
 
             if (!response.ok) {
                 console.error("[Verify API] Twilio verification error:", data);
