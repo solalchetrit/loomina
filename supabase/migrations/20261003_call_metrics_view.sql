@@ -62,3 +62,8 @@ left join words w on w.id = b.id;
 
 comment on view public.call_metrics is
     'Métriques par appel (durée, coût, latences, part de parole) extraites du rapport Vapi archivé dans call_events.';
+
+-- La vue ne doit pas contourner le RLS des tables (vue SECURITY DEFINER par
+-- défaut) ni être exposée par l'API publique : lecture réservée au serveur.
+alter view public.call_metrics set (security_invoker = true);
+revoke all on public.call_metrics from anon, authenticated;
