@@ -9,7 +9,7 @@ const FAQ_CATEGORIES = [
     category: "Le service",
     questions: [
       { q: "Comment fonctionne Loomina ?", a: "Vous racontez votre histoire lors d’appels téléphoniques. Notre IA transforme vos paroles en texte littéraire, vous validez chaque chapitre, puis nous imprimons et livrons votre livre." },
-      { q: "Combien de temps dure le processus complet ?", a: "En moyenne 14 semaines, mais nous nous adaptons à votre rythme : certains avancent en 8 à 10 semaines, d’autres prennent jusqu’à 6 mois. Il n’y a aucune pression." },
+      { q: "Combien de temps dure le processus complet ?", a: "En moyenne 6 à 8 semaines, mais nous nous adaptons à votre rythme : certains avancent en un mois, d’autres prennent plusieurs mois. Il n’y a aucune pression." },
       { q: "Combien d’appels sont nécessaires ?", a: "Nous recommandons 14 appels thématiques, un par chapitre, mais c’est flexible. Les appels sont illimités : plus de temps sur un sujet, moins sur un autre." },
       { q: "Quelle est la durée d’un appel ?", a: "Entre 30 minutes et 1 heure en moyenne. Certains chapitres sont plus courts, d’autres plus longs. Vous décidez quand un sujet est terminé." },
     ],
@@ -29,7 +29,7 @@ const FAQ_CATEGORIES = [
     id: "tarifs",
     category: "Tarifs & paiement",
     questions: [
-      { q: "Quel est le prix exact ?", a: "449 € tout compris : appels, rédaction, corrections, photos, mise en page, impression, version numérique et livraison. Aucun frais caché." },
+      { q: "Quel est le prix exact ?", a: "449 € tout compris : appels, rédaction, relecture par notre équipe, mise en page, impression et livraison. Aucun frais caché." },
       { q: "Y a-t-il des frais supplémentaires ?", a: "Non. Le prix couvre l’intégralité du service, du premier appel à la livraison." },
       { q: "Puis-je payer en plusieurs fois ?", a: "Pour l’instant, le paiement se fait en une fois par carte bancaire via Stripe. Le paiement en plusieurs fois arrive bientôt." },
       { q: "Y a-t-il une garantie ?", a: "Oui. Si après le premier appel vous n’êtes pas satisfait, nous vous remboursons intégralement, sans question." },

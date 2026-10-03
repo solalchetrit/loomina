@@ -33,8 +33,8 @@ export default function CGVPage() {
                             <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">1. Objet</h2>
                             <p>
                                 Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre <strong className="text-[var(--text-primary)]">Loomina</strong>,
-                                société par actions simplifiée au capital de [MONTANT] euros, immatriculée au RCS de [VILLE] sous le numéro [NUMÉRO],
-                                dont le siège social est situé [ADRESSE] (ci-après « Loomina » ou « le Prestataire »),
+                                projet en cours de création porté par Solal Chetrit, personne physique,
+                                joignable à contact@loomina.eu (ci-après « Loomina » ou « le Prestataire »),
                                 et toute personne physique ou morale souhaitant bénéficier des services proposés par Loomina (ci-après « le Client »).
                             </p>
                             <p className="mt-4">
@@ -126,7 +126,7 @@ export default function CGVPage() {
                         <div className="card rounded-3xl p-6 sm:p-8">
                             <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">7. Délais de Réalisation et Livraison</h2>
                             <p>
-                                Le délai moyen de réalisation du service est de <strong className="text-[var(--text-primary)]">14 semaines</strong> à compter du premier entretien,
+                                Le délai moyen de réalisation du service est de <strong className="text-[var(--text-primary)]">6 à 8 semaines</strong> à compter du premier entretien,
                                 mais peut varier en fonction du rythme du Client et de la complexité du projet.
                             </p>
                             <p className="mt-4">

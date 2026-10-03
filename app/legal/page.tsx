@@ -35,18 +35,13 @@ export default function LegalPage() {
                                 Le site internet <strong className="text-[var(--text-primary)]">www.loomina.eu</strong> (ci-après « le Site ») est édité par :
                             </p>
                             <div className="rounded-2xl bg-[var(--loomina-night)] p-5 sm:p-6 font-sans text-[15px] space-y-2">
-                                <p><strong className="text-[var(--text-primary)]">Raison sociale :</strong> Loomina</p>
-                                <p><strong className="text-[var(--text-primary)]">Forme juridique :</strong> Société par Actions Simplifiée (SAS)</p>
-                                <p><strong className="text-[var(--text-primary)]">Capital social :</strong> [MONTANT] euros</p>
-                                <p><strong className="text-[var(--text-primary)]">Siège social :</strong> [ADRESSE COMPLÈTE]</p>
-                                <p><strong className="text-[var(--text-primary)]">RCS :</strong> [VILLE] [NUMÉRO]</p>
-                                <p><strong className="text-[var(--text-primary)]">SIRET :</strong> [NUMÉRO]</p>
-                                <p><strong className="text-[var(--text-primary)]">TVA intracommunautaire :</strong> [NUMÉRO]</p>
+                                <p><strong className="text-[var(--text-primary)]">Nom du projet :</strong> Loomina</p>
+                                <p><strong className="text-[var(--text-primary)]">Statut :</strong> projet en cours de création, porté par Solal Chetrit (personne physique). Les informations d’immatriculation seront publiées ici dès la création de la société.</p>
                                 <p><strong className="text-[var(--text-primary)]">Email :</strong> <span className="text-[var(--gold-ink)]">contact@loomina.eu</span></p>
                                 <p><strong className="text-[var(--text-primary)]">Téléphone :</strong> 01 59 16 93 57</p>
                             </div>
                             <p className="mt-4">
-                                <strong className="text-[var(--text-primary)]">Directeur de la publication :</strong> Solal Chetrit, Président
+                                <strong className="text-[var(--text-primary)]">Directeur de la publication :</strong> Solal Chetrit
                             </p>
                         </div>
 

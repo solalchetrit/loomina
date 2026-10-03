@@ -175,7 +175,7 @@ export default function Hero() {
             className="rise mt-4 font-sans text-sm text-[var(--text-muted)]"
             style={{ "--i": 4 } as React.CSSProperties}
           >
-            ou appelez directement le{" "}
+            Démo de 3 minutes, sans engagement : appelez le{" "}
             <a
               href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`}
               className="font-medium text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4 transition-colors duration-200 hover:decoration-[var(--loomina-gold)]"

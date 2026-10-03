@@ -236,44 +236,74 @@ export function buildAssistant({
     };
 }
 
+/** Durée maximale de la démonstration offerte aux appelants inconnus. */
+export const DEMO_MAX_SECONDS = 300;
+
 /**
- * Réponse pour un appelant inconnu.
+ * Réponse pour un appelant inconnu : une vraie démonstration.
  *
- * Auparavant le module Make 15 renvoyait une réponse « Client Inconnu ».
- * Autant en faire quelque chose d'utile commercialement.
+ * C'est là qu'arrive le bouton « Essayer gratuitement » du site. Plutôt
+ * qu'un message d'accueil qui renvoie vers le site, l'appelant vit un
+ * mini-entretien de trois minutes sur un seul souvenir, puis entend
+ * comment commander.
+ *
+ * Rien n'est conservé : pas d'enregistrement audio, pas de rapport de
+ * fin d'appel envoyé au serveur (serverMessages vide), et le webhook
+ * ignore de toute façon tout appel marqué `demo` dans ses métadonnées.
  */
 export function buildUnknownCallerAssistant(serverUrl: string) {
+    const systemPrompt = `Tu es Loomina, un biographe masculin, chaleureux, patient et curieux. Tu fais une DÉMONSTRATION de trois minutes à une personne qui découvre le service. Elle n'est pas cliente : rien de ce qu'elle dit n'est conservé.
+
+# PRONONCIATION (ce que tu écris est lu à voix haute, jamais affiché)
+- Écris toujours la marque « Loumina », jamais « Loomina ».
+- Écris « loomina point e u » pour l'adresse du site.
+
+# DÉROULÉ
+1. Après ta première phrase, attends sa réponse. S'il hésite, rassure-le : c'est un essai, il n'y a rien à préparer.
+2. Demande son prénom, et utilise-le ensuite.
+3. Propose-lui de choisir UN souvenir : « un lieu de votre enfance, une personne qui a compté, ou un moment dont vous êtes fier ». S'il ne sait pas, propose : « Racontez-moi la maison où vous avez grandi. »
+4. Pose au maximum QUATRE questions sur ce souvenir, une à la fois, en creusant les détails sensoriels : les odeurs, les sons, ce que les gens disaient, ce qu'il ressentait. Réagis à ce qu'il dit avant de poser la question suivante.
+5. Après la quatrième réponse, ou si l'appel approche les trois minutes, fais la CLÔTURE :
+   - Reformule en deux phrases ce qu'il vient de raconter, avec ses mots, comme le début d'un chapitre. N'invente aucun détail.
+   - Puis dis : « Voilà comment je travaille. Avec un vrai livre, nous aurions des dizaines d'appels comme celui-ci, à votre rythme, et notre équipe mettrait tout en forme dans un livre relié. Tout est expliqué sur loomina point e u. Merci pour ce moment, [prénom]. »
+   - Termine par ##END_CALL##.
+
+# RÈGLES
+- Une seule question à la fois. Une à deux phrases par intervention. Pas de liste, pas de monologue.
+- Vouvoie toujours.
+- Ne demande ni nom de famille, ni adresse, ni téléphone, ni e-mail. Ne prends pas de commande, ne parle pas de prix : renvoie vers le site.
+- Si la personne dit qu'elle est déjà cliente, explique qu'il faut appeler depuis le numéro communiqué à la commande, et termine par ##END_CALL##.
+- Si elle veut arrêter, remercie-la et termine par ##END_CALL##.`;
+
     return {
         assistant: {
-            name: 'Loomina-Accueil',
+            name: 'Loomina-Demo',
             transcriber: TRANSCRIBER,
             voice: VOICE,
+            backgroundDenoisingEnabled: true,
+            backgroundSound: 'off',
+            startSpeakingPlan: { waitSeconds: 1.5 },
+            stopSpeakingPlan: { numWords: 0, voiceSeconds: 0, backoffSeconds: 3 },
             firstMessageMode: 'assistant-speaks-first',
             firstMessage:
-                "Bonjour, vous êtes bien chez Loumina, le biographe par téléphone. " +
-                "Je ne reconnais pas ce numéro : il n'est rattaché à aucun projet de livre. " +
-                "Si vous souhaitez commencer votre biographie, rendez-vous sur loomina point e u. " +
-                "Si vous êtes déjà client, appelez depuis le numéro que vous nous avez communiqué.",
+                "Bonjour, ici Loumina, le biographe par téléphone. " +
+                "Je ne reconnais pas votre numéro, alors je vous propose une petite démonstration : " +
+                "pendant trois minutes, je vous pose quelques questions sur un souvenir, " +
+                "et vous entendez comment je travaille. Rien n'est enregistré. " +
+                "Ça vous tente ?",
             model: {
                 provider: 'openai',
                 model: 'gpt-4o',
-                temperature: 0.5,
-                messages: [
-                    {
-                        role: 'system',
-                        content:
-                            "Tu es l'accueil téléphonique de Loomina. L'appelant n'est pas reconnu. " +
-                            "Ce que tu écris est lu à voix haute : écris la marque « Loumina ». " +
-                            "Sois chaleureux et bref. Explique que Loumina écrit des autobiographies " +
-                            "à partir d'entretiens téléphoniques, et oriente vers le site loomina.eu. " +
-                            "Ne promets rien, ne collecte aucune donnée personnelle, ne prends pas de commande. " +
-                            "Termine l'appel poliment après avoir répondu.",
-                    },
-                ],
+                temperature: 0.6,
+                messages: [{ role: 'system', content: systemPrompt }],
                 tools: [{ type: 'endCall', messages: [{ type: 'request-start', content: 'Belle journée !' }] }],
             },
+            // Rien n'est conservé : ni audio, ni rapport serveur.
+            artifactPlan: { recordingEnabled: false },
             server: { url: serverUrl, timeoutSeconds: 20 },
-            serverMessages: [...SERVER_MESSAGES],
+            serverMessages: [],
+            metadata: { demo: true },
+            maxDurationSeconds: DEMO_MAX_SECONDS,
             silenceTimeoutSeconds: 30,
             endCallPhrases: ['##END_CALL##'],
         },

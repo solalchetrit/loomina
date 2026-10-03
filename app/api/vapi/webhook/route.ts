@@ -171,6 +171,15 @@ async function handleEndOfCall(
 ) {
     const data = extractCallData(message);
 
+    // Démonstration pour appelant inconnu : promesse « rien n'est
+    // enregistré ». L'assistant n'envoie normalement pas de rapport, mais
+    // si Vapi en envoie un, on ne l'archive pas.
+    const metadata = message?.call?.metadata ?? message?.metadata ?? {};
+    if (metadata?.demo === true) {
+        console.info('[vapi] end-of-call d\'une démo ignoré (rien n\'est conservé)');
+        return NextResponse.json({ received: true, demo: true, stored: false });
+    }
+
     const { id: eventId, alreadySeen } = await recordEvent({
         eventType: 'end-of-call-report',
         payload: body,

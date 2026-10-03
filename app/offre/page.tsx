@@ -15,7 +15,7 @@ const COMPARE = {
   rows: [
     { label: "Prix", values: ["449 € tout compris", "2 000 à 8 000 €", "Gratuit, mais…"] },
     { label: "Effort", values: ["Parler au téléphone", "Rendez-vous à planifier", "Des mois d’écriture"] },
-    { label: "Délai", values: ["≈ 14 semaines", "6 à 12 mois", "Souvent jamais fini"] },
+    { label: "Délai", values: ["6 à 8 semaines", "6 à 12 mois", "Souvent jamais fini"] },
     { label: "Disponibilité", values: ["Quand vous voulez", "Sur rendez-vous", "Dépend de vous"] },
     { label: "Relecture humaine", values: [true, true, false] },
     { label: "Livre relié livré", values: [true, "Selon le devis", false] },
@@ -29,7 +29,7 @@ const TESTIMONIALS = [
 ];
 
 const FAQ = [
-  { q: "Combien de temps dure le processus ?", a: "En moyenne 14 semaines, mais nous nous adaptons totalement à votre rythme. Certains avancent vite, d’autres prennent leur temps." },
+  { q: "Combien de temps dure le processus ?", a: "En moyenne 6 à 8 semaines, mais nous nous adaptons totalement à votre rythme. Certains avancent vite, d’autres prennent leur temps." },
   { q: "Que se passe-t-il si je veux modifier quelque chose ?", a: "Vous validez chaque chapitre avant de passer au suivant. Les modifications sont illimitées jusqu’à votre satisfaction complète." },
   { q: "Puis-je offrir Loomina en cadeau ?", a: "Oui, c’est même l’un des cadeaux les plus appréciés. Nous fournissons un bon cadeau élégant à offrir." },
   { q: "Mes données sont-elles sécurisées ?", a: "Vos enregistrements et textes sont chiffrés, stockés en Europe et jamais partagés. Vous pouvez demander leur suppression à tout moment." },
