@@ -38,3 +38,5 @@ yarn-error.log*
 
 # serveur vocal
 /voice/node_modules
+/voice/.env
+/voice/.public-url

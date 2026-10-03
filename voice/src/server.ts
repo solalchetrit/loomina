@@ -10,6 +10,7 @@
  * changent pas : le rapport de fin d'appel garde la forme Vapi.
  */
 
+import './env.ts';
 import http from 'node:http';
 import { URL } from 'node:url';
 import { WebSocketServer } from 'ws';
