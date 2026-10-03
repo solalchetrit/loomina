@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 const FOOTER_LINKS = [
   { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
   { href: "/cgv", label: "CGV" },
   { href: "/legal", label: "Mentions Légales" },
   { href: "/privacy", label: "Confidentialité" },
@@ -36,9 +36,9 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative w-full bg-[var(--loomina-void)] border-t border-[var(--loomina-mist)] overflow-hidden">
+    <footer className="relative w-full bg-[var(--loomina-void)] border-t border-[var(--hairline)] overflow-hidden">
       {/* Main Footer Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 pt-16 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
         <div className="grid md:grid-cols-12 gap-12 mb-12">
 
           {/* Brand Column */}
@@ -54,7 +54,7 @@ export default function Footer() {
               </div>
             </Link>
 
-            <p className="text-[var(--text-secondary)] text-sm leading-relaxed max-w-sm font-serif">
+            <p className="text-[var(--text-secondary)] text-[15px] leading-relaxed max-w-sm font-sans">
               La première IA biographe qui transforme vos souvenirs en un livre d&apos;exception.
               Racontez votre histoire, nous l&apos;écrivons.
             </p>
@@ -62,43 +62,41 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex items-center gap-4">
               {SOCIAL_LINKS.map((social) => (
-                <motion.a
+                <a
                   key={social.label}
                   href={social.href}
-                  className="w-10 h-10 rounded-full glass flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--loomina-gold)] hover:border-[var(--loomina-gold)]/30 transition-all duration-300"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="press flex h-10 w-10 items-center justify-center rounded-full bg-[var(--paper)] text-[var(--text-muted)] shadow-[inset_0_0_0_1px_var(--hairline)] hover:text-[var(--ink)]"
                   aria-label={social.label}
                 >
                   {social.icon}
-                </motion.a>
+                </a>
               ))}
             </div>
           </div>
 
           {/* Navigation Column */}
           <div className="md:col-span-3">
-            <h4 className="text-[var(--text-primary)] font-semibold text-sm uppercase tracking-wider mb-6">
+            <h4 className="mb-5 font-sans text-[12px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
               Navigation
             </h4>
             <ul className="space-y-3">
               <li>
-                <Link href="/" className="text-[var(--text-secondary)] hover:text-[var(--loomina-gold)] transition-colors text-sm font-sans">
+                <Link href="/" className="text-[var(--text-secondary)] hover:text-[var(--ink)] transition-colors duration-200 text-[15px] font-sans">
                   Accueil
                 </Link>
               </li>
               <li>
-                <Link href="/experience" className="text-[var(--text-secondary)] hover:text-[var(--loomina-gold)] transition-colors text-sm font-sans">
+                <Link href="/experience" className="text-[var(--text-secondary)] hover:text-[var(--ink)] transition-colors duration-200 text-[15px] font-sans">
                   L&apos;Expérience
                 </Link>
               </li>
               <li>
-                <Link href="/offre" className="text-[var(--text-secondary)] hover:text-[var(--loomina-gold)] transition-colors text-sm font-sans">
+                <Link href="/offre" className="text-[var(--text-secondary)] hover:text-[var(--ink)] transition-colors duration-200 text-[15px] font-sans">
                   L&apos;Offre
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-[var(--text-secondary)] hover:text-[var(--loomina-gold)] transition-colors text-sm font-sans">
+                <Link href="/about" className="text-[var(--text-secondary)] hover:text-[var(--ink)] transition-colors duration-200 text-[15px] font-sans">
                   À Propos
                 </Link>
               </li>
@@ -108,15 +106,19 @@ export default function Footer() {
 
           {/* Contact Column */}
           <div className="md:col-span-4">
-            <h4 className="text-[var(--text-primary)] font-semibold text-sm uppercase tracking-wider mb-6">
+            <h4 className="mb-5 font-sans text-[12px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
               Une question ?
             </h4>
-            <p className="text-[var(--text-secondary)] text-sm mb-6 font-serif">
+            <p className="text-[var(--text-secondary)] text-[15px] mb-6 font-sans">
               Notre équipe est à votre écoute pour vous accompagner dans votre projet de biographie.
+            </p>
+            <p className="mb-5 font-sans text-[15px]">
+              <a href="tel:+33159169357" className="font-semibold text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4 transition-colors duration-200 hover:decoration-[var(--loomina-gold)]">01 59 16 93 57</a>
+              <span className="text-[var(--text-muted)]"> · lun.–ven. 9 h–18 h</span>
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[var(--loomina-gold)]/40 text-[var(--loomina-gold)] text-sm font-medium hover:bg-[var(--loomina-gold)]/10 transition-all duration-300"
+              className="press inline-flex h-11 items-center gap-2 rounded-full border border-[var(--hairline-strong)] bg-[var(--paper)] px-5 font-sans text-sm font-semibold text-[var(--ink)] hover:border-[var(--loomina-gold)]"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -127,34 +129,32 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-[var(--loomina-mist)] mb-8 opacity-50" />
+        <div className="h-px bg-[var(--hairline)] mb-8" />
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-6 text-xs text-[var(--text-muted)]">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-sans text-[13px] text-[var(--text-muted)]">
             {FOOTER_LINKS.map((link, index) => (
               <span key={link.href} className="flex items-center gap-6">
                 <Link
                   href={link.href}
-                  className="hover:text-[var(--loomina-gold)] transition-colors"
+                  className="hover:text-[var(--ink)] transition-colors duration-200"
                 >
                   {link.label}
                 </Link>
                 {index < FOOTER_LINKS.length - 1 && (
-                  <span className="w-1 h-1 rounded-full bg-[var(--loomina-mist)]" />
+                  <span className="hidden h-1 w-1 rounded-full bg-[var(--loomina-mist)] sm:inline-block" />
                 )}
               </span>
             ))}
           </div>
 
-          <div className="text-xs text-[var(--text-muted)]">
+          <div className="font-sans text-[13px] text-[var(--text-muted)]">
             © {currentYear} Loomina. Tous droits réservés.
           </div>
         </div>
       </div>
 
-      {/* Decorative bottom line */}
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[var(--loomina-gold)]/30 to-transparent" />
     </footer>
   );
 }

@@ -1,306 +1,240 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { STRIPE_CONFIG } from "@/config/stripe";
 import { formatToE164 } from "@/lib/phone";
+import { Input } from "@/components/ui/Field";
+import Button from "@/components/ui/Button";
+import { SITE_CONFIG } from "@/app/config";
+
+const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
+
+const INCLUDED = ["Entretiens illimités par téléphone", "Rédaction et corrections", "Vos photos intégrées", "Livre relié livré chez vous", "Version numérique incluse"];
+
+const Check = () => (
+  <svg className="mt-0.5 h-4 w-4 shrink-0 text-[var(--gold-ink)]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+    <path fillRule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.5 7.57a1 1 0 0 1-1.42 0l-3.5-3.53a1 1 0 1 1 1.42-1.408l2.79 2.814 6.79-6.853a1 1 0 0 1 1.414-.006Z" clipRule="evenodd" />
+  </svg>
+);
 
 export default function OrderPage() {
-    const [step, setStep] = useState<1 | 2>(1);
-    const [selectedOption, setSelectedOption] = useState<"me" | "gift" | null>(null);
+  const [step, setStep] = useState<1 | 2>(1);
+  const [selectedOption, setSelectedOption] = useState<"me" | "gift" | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-    // Form State
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        age: "",
-        phone: "",
-        email: "",
-    });
+  const [formData, setFormData] = useState({ firstName: "", lastName: "", age: "", phone: "", email: "" });
 
-    const handleOptionClick = (option: "me" | "gift") => {
-        setSelectedOption(option);
-        setStep(2);
+  const handleOptionClick = (option: "me" | "gift") => {
+    setSelectedOption(option);
+    setStep(2);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const isFormValid =
+    formData.firstName.trim() !== "" &&
+    formData.lastName.trim() !== "" &&
+    formData.age.trim() !== "" &&
+    formData.phone.trim() !== "" &&
+    formData.email.trim() !== "";
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!isFormValid || submitting) return;
+    setSubmitting(true);
+    setSubmitError(null);
+
+    // Format phone to E164 before saving for consistent storage
+    const formattedPhone = formatToE164(formData.phone);
+
+    // Save relevant data to localStorage as a JSON object (Backup)
+    const orderData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      isGift: selectedOption === "gift",
+      phone: formattedPhone,
+      email: formData.email,
     };
+    localStorage.setItem("loomina_order_data", JSON.stringify(orderData));
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
+    try {
+      // Call our custom checkout API to create a session with metadata
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formattedPhone,
+          email: formData.email,
+          isGift: selectedOption === "gift",
+        }),
+      });
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("No payment URL returned", data);
+        setSubmitError("Une erreur est survenue lors de l’initialisation du paiement. Réessayez dans un instant.");
+        setSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      setSubmitError("Impossible de joindre le service de paiement. Vérifiez votre connexion et réessayez.");
+      setSubmitting(false);
+    }
+  };
 
-    const isFormValid =
-        formData.firstName.trim() !== "" &&
-        formData.lastName.trim() !== "" &&
-        formData.age.trim() !== "" &&
-        formData.phone.trim() !== "" &&
-        formData.email.trim() !== "";
+  const isGift = selectedOption === "gift";
 
-    const handleSubmit = async () => {
-        if (!isFormValid) return;
+  return (
+    <div className="w-full min-h-[80svh] pt-28 pb-20 md:pt-36 md:pb-28">
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-6">
+        {/* Étapes */}
+        <ol className="rise mx-auto flex max-w-xl items-center justify-center gap-2 font-sans text-[13px]" aria-label="Progression">
+          {STEPS.map((label, i) => {
+            const n = i + 1;
+            const current = n === step;
+            const done = n < step;
+            return (
+              <li key={label} className="flex items-center gap-2">
+                <span
+                  className={`flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-semibold ${
+                    current ? "bg-[var(--ink)] text-[var(--loomina-void)]" : done ? "bg-[var(--gold-ink)] text-white" : "bg-[var(--loomina-slate)] text-[var(--text-muted)]"
+                  }`}
+                  aria-current={current ? "step" : undefined}
+                >
+                  {done ? "✓" : n}
+                </span>
+                <span className={`whitespace-nowrap ${current ? "font-semibold text-[var(--ink)]" : "hidden text-[var(--text-muted)] sm:inline"}`}>{label}</span>
+                {n < STEPS.length && <span aria-hidden="true" className="mx-1 h-px w-4 bg-[var(--hairline-strong)] sm:w-10" />}
+              </li>
+            );
+          })}
+        </ol>
 
-        // Format phone to E164 before saving for consistent storage
-        const formattedPhone = formatToE164(formData.phone);
-
-        // Save relevant data to localStorage as a JSON object (Backup)
-        const orderData = {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            isGift: selectedOption === "gift",
-            phone: formattedPhone,
-            email: formData.email
-        };
-
-        localStorage.setItem("loomina_order_data", JSON.stringify(orderData));
-
-        try {
-            // Call our custom checkout API to create a session with metadata
-            const response = await fetch("/api/checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    phone: formattedPhone,
-                    email: formData.email,
-                    isGift: selectedOption === "gift"
-                }),
-            });
-
-            const data = await response.json();
-
-            if (data.url) {
-                window.location.href = data.url;
-            } else {
-                console.error("No payment URL returned", data);
-                alert("Une erreur est survenue lors de l'initialisation du paiement.");
-            }
-        } catch (error) {
-            console.error("Checkout error:", error);
-            alert("Erreur de connexion au service de paiement.");
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-transparent text-[var(--text-primary)] flex flex-col pt-32 pb-20 px-6 relative">
-            <div className="max-w-3xl mx-auto w-full flex flex-col items-center space-y-12 relative z-10">
-
-                {/* Header Text */}
-                <div className="text-center space-y-4">
-                    <div className="flex items-center justify-center gap-4 mb-6">
-                        <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--loomina-gold)]" />
-                        <span className="text-[var(--loomina-gold)] text-xs font-semibold tracking-[0.3em] uppercase">
-                            Commander
-                        </span>
-                        <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--loomina-gold)]" />
-                    </div>
-
-                    <motion.h1
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="heading-section font-serif text-[var(--text-primary)]"
-                    >
-                        À qui se destine cette Biographie ?
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                        className="text-[var(--text-secondary)] text-lg max-w-xl mx-auto italic font-serif"
-                    >
-                        &quot;Chaque vie mérite d’être racontée.&quot;
-                    </motion.p>
-                </div>
-
-                {/* STEP 1: CHOICE */}
-                <div className="grid md:grid-cols-2 gap-6 w-full">
-                    {/* Option A: Pour moi */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        onClick={() => handleOptionClick("me")}
-                        className={`
-                            group cursor-pointer rounded-2xl p-8 transition-all duration-300
-                            flex flex-col items-center text-center space-y-4
-                            ${selectedOption === "me"
-                                ? "glass-gold border-2 border-[var(--loomina-gold)]/50"
-                                : "glass hover:border-[var(--loomina-gold)]/30"}
-                        `}
-                    >
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <svg className="w-8 h-8 text-[var(--loomina-void)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                        </div>
-                        <h3 className="text-2xl font-serif text-[var(--text-primary)]">C’est pour moi</h3>
-                        <p className="text-sm text-[var(--text-secondary)] font-sans">
-                            Je veux écrire mon histoire !
-                        </p>
-
-                        {/* Checkmark indicator */}
-                        <div className={`mt-4 w-6 h-6 rounded-full border flex items-center justify-center transition-all ${selectedOption === "me"
-                            ? "bg-[var(--loomina-gold)] border-[var(--loomina-gold)]"
-                            : "border-[var(--loomina-mist)]"
-                            }`}>
-                            {selectedOption === "me" && (
-                                <svg className="w-4 h-4 text-[var(--loomina-void)]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                            )}
-                        </div>
-                    </motion.div>
-
-                    {/* Option B: Cadeau */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.3 }}
-                        onClick={() => handleOptionClick("gift")}
-                        className={`
-                            group cursor-pointer rounded-2xl p-8 transition-all duration-300
-                            flex flex-col items-center text-center space-y-4
-                            ${selectedOption === "gift"
-                                ? "glass-gold border-2 border-[var(--loomina-gold)]/50"
-                                : "glass hover:border-[var(--loomina-gold)]/30"}
-                        `}
-                    >
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--loomina-aurora)] to-[var(--loomina-aurora-light)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                            </svg>
-                        </div>
-                        <h3 className="text-2xl font-serif text-[var(--text-primary)]">C’est pour offrir</h3>
-                        <p className="text-sm text-[var(--text-secondary)] font-sans">
-                            Je veux connaître son histoire !
-                        </p>
-
-                        {/* Checkmark indicator */}
-                        <div className={`mt-4 w-6 h-6 rounded-full border flex items-center justify-center transition-all ${selectedOption === "gift"
-                            ? "bg-[var(--loomina-aurora)] border-[var(--loomina-aurora)]"
-                            : "border-[var(--loomina-mist)]"
-                            }`}>
-                            {selectedOption === "gift" && (
-                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                            )}
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* STEP 2: FORM */}
-                <AnimatePresence>
-                    {step === 2 && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="w-full max-w-xl overflow-hidden"
-                        >
-                            <div className="pt-8 border-t border-[var(--loomina-mist)] flex flex-col space-y-8">
-
-                                <div className="text-center space-y-2">
-                                    <h2 className="text-2xl font-serif text-[var(--text-primary)]">
-                                        {selectedOption === 'gift' ? "Coordonnées du bénéficiaire" : "Vos coordonnées"}
-                                    </h2>
-                                    <p className="text-[var(--text-secondary)] text-sm">
-                                        {selectedOption === 'gift'
-                                            ? "La personne qui racontera son histoire."
-                                            : "Informations nécessaires pour créer votre espace."}
-                                    </p>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-medium ml-1">Prénom</label>
-                                        <input
-                                            type="text"
-                                            name="firstName"
-                                            value={formData.firstName}
-                                            onChange={handleInputChange}
-                                            placeholder="Ex: Jean"
-                                            className="w-full p-4 rounded-xl bg-[var(--loomina-mist)]/20 border border-[var(--loomina-mist)] focus:border-[var(--loomina-gold)] focus:ring-0 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--text-primary)]"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-medium ml-1">Nom</label>
-                                        <input
-                                            type="text"
-                                            name="lastName"
-                                            value={formData.lastName}
-                                            onChange={handleInputChange}
-                                            placeholder="Ex: Dupont"
-                                            className="w-full p-4 rounded-xl bg-[var(--loomina-mist)]/20 border border-[var(--loomina-mist)] focus:border-[var(--loomina-gold)] focus:ring-0 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--text-primary)]"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-medium ml-1">Âge</label>
-                                        <input
-                                            type="text"
-                                            name="age"
-                                            value={formData.age}
-                                            onChange={handleInputChange}
-                                            placeholder="Ex: 75"
-                                            className="w-full p-4 rounded-xl bg-[var(--loomina-mist)]/20 border border-[var(--loomina-mist)] focus:border-[var(--loomina-gold)] focus:ring-0 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--text-primary)]"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-medium ml-1">Téléphone</label>
-                                        <input
-                                            type="tel"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleInputChange}
-                                            placeholder="Ex: 06 12 34 56 78"
-                                            className="w-full p-4 rounded-xl bg-[var(--loomina-mist)]/20 border border-[var(--loomina-mist)] focus:border-[var(--loomina-gold)] focus:ring-0 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--text-primary)]"
-                                        />
-                                    </div>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-medium ml-1">Email</label>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            value={formData.email}
-                                            onChange={handleInputChange}
-                                            placeholder="Ex: jean.dupont@email.com"
-                                            className="w-full p-4 rounded-xl bg-[var(--loomina-mist)]/20 border border-[var(--loomina-mist)] focus:border-[var(--loomina-gold)] focus:ring-0 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--text-primary)]"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="pt-4">
-                                    <button
-                                        onClick={handleSubmit}
-                                        disabled={!isFormValid}
-                                        className={`
-                                            w-full py-4 rounded-full text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-3
-                                            ${isFormValid
-                                                ? "bg-gradient-to-r from-[var(--loomina-gold)] to-[var(--loomina-gold-dark)] text-white hover:scale-[1.02] cursor-pointer shadow-lg shadow-[var(--loomina-gold)]/20"
-                                                : "bg-[var(--loomina-mist)]/30 text-[var(--text-muted)] cursor-not-allowed"}
-                                        `}
-                                    >
-                                        Procéder au paiement
-                                        {isFormValid && (
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                            </svg>
-                                        )}
-                                    </button>
-                                    <div className="flex items-center justify-center gap-2 mt-4 text-xs text-[var(--text-muted)]">
-                                        <svg className="w-4 h-4 text-[var(--loomina-gold)]" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                                        </svg>
-                                        <span>Paiement 100% sécurisé via Stripe</span>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
+        <div className="mt-12 grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
+          {/* Colonne principale */}
+          <div>
+            <div className="rise" style={{ "--i": 1 } as React.CSSProperties}>
+              <p className="eyebrow">Commander</p>
+              <h1 className="heading-section mt-3">
+                {step === 1 ? (
+                  <>
+                    À qui se destine <em className="text-[var(--gold-ink)]">ce livre ?</em>
+                  </>
+                ) : isGift ? (
+                  <>
+                    Qui va raconter <em className="text-[var(--gold-ink)]">son histoire ?</em>
+                  </>
+                ) : (
+                  <>
+                    Vos <em className="text-[var(--gold-ink)]">coordonnées.</em>
+                  </>
+                )}
+              </h1>
             </div>
+
+            {/* Étape 1 : choix */}
+            <div className="mt-8 grid gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Destinataire">
+              {(
+                [
+                  { key: "me", title: "C’est pour moi", text: "Je veux raconter mon histoire.", i: 2 },
+                  { key: "gift", title: "C’est pour offrir", text: "Je veux connaître l’histoire d’un proche.", i: 3 },
+                ] as const
+              ).map((o) => {
+                const active = selectedOption === o.key;
+                return (
+                  <button
+                    key={o.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => handleOptionClick(o.key)}
+                    className={`press rise card flex items-start gap-4 rounded-3xl p-5 text-left ${active ? "!border-[var(--ink)] ring-1 ring-[var(--ink)]" : "hover:!border-[var(--loomina-gold)]"}`}
+                    style={{ "--i": o.i } as React.CSSProperties}
+                  >
+                    <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${active ? "border-[var(--ink)] bg-[var(--ink)]" : "border-[var(--hairline-strong)]"}`}>
+                      {active && <span className="h-2 w-2 rounded-full bg-[var(--loomina-gold-light)]" />}
+                    </span>
+                    <span>
+                      <span className="block font-serif text-[22px] leading-tight text-[var(--ink)]">{o.title}</span>
+                      <span className="mt-1 block font-sans text-[14px] text-[var(--text-secondary)]">{o.text}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Étape 2 : formulaire */}
+            {step === 2 && (
+              <form onSubmit={handleSubmit} className="rise mt-10 border-t border-[var(--hairline)] pt-10" noValidate>
+                <p className="font-sans text-[15px] text-[var(--text-secondary)]">
+                  {isGift ? "Les coordonnées de la personne qui racontera son histoire. C’est elle que Loomina appellera." : "Ces informations servent à créer votre espace et à vous appeler."}
+                </p>
+                <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                  <Input label="Prénom" name="firstName" autoComplete={isGift ? "off" : "given-name"} value={formData.firstName} onChange={handleInputChange} placeholder="Jeanne" required />
+                  <Input label="Nom" name="lastName" autoComplete={isGift ? "off" : "family-name"} value={formData.lastName} onChange={handleInputChange} placeholder="Martin" required />
+                  <Input label="Âge" name="age" inputMode="numeric" pattern="[0-9]*" maxLength={3} value={formData.age} onChange={handleInputChange} placeholder="75" required />
+                  <Input label="Téléphone" name="phone" type="tel" inputMode="tel" autoComplete={isGift ? "off" : "tel"} value={formData.phone} onChange={handleInputChange} placeholder="06 12 34 56 78" hint="Le numéro sur lequel Loomina appellera." required />
+                  <div className="sm:col-span-2">
+                    <Input label="E-mail" name="email" type="email" inputMode="email" autoComplete="email" value={formData.email} onChange={handleInputChange} placeholder="jeanne.martin@exemple.fr" hint={isGift ? "Votre e-mail ou le sien : c’est là que le bon cadeau et les chapitres arriveront." : "Pour recevoir la confirmation et vos chapitres à relire."} required />
+                  </div>
+                </div>
+
+                {submitError && (
+                  <p role="alert" className="mt-6 rounded-2xl border border-[var(--danger)]/30 bg-[var(--danger)]/5 px-4 py-3 font-sans text-[14px] text-[var(--danger)]">
+                    {submitError}
+                  </p>
+                )}
+
+                <div className="mt-8">
+                  <Button type="submit" variant="primary" size="lg" fullWidth disabled={!isFormValid} loading={submitting}>
+                    {submitting ? "Redirection vers le paiement…" : `Procéder au paiement · ${SITE_CONFIG.product.price} ${SITE_CONFIG.product.currencySymbol}`}
+                  </Button>
+                  <p className="mt-4 flex items-center justify-center gap-1.5 font-sans text-[13px] text-[var(--text-muted)]">
+                    <svg className="h-4 w-4 text-[var(--gold-ink)]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
+                    </svg>
+                    Paiement sécurisé par Stripe. Vous serez redirigé sur une page de paiement.
+                  </p>
+                </div>
+              </form>
+            )}
+          </div>
+
+          {/* Récapitulatif */}
+          <aside className="rise lg:sticky lg:top-28 lg:self-start" style={{ "--i": 4 } as React.CSSProperties}>
+            <div className="card overflow-hidden rounded-3xl">
+              <div className="paper-grain relative bg-[var(--ink)] p-6">
+                <p className="font-sans text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--loomina-gold-light)]">Votre commande</p>
+                <p className="mt-2 font-serif text-[22px] leading-tight text-[var(--loomina-void)]">Le Coffret Biographie Complet</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="font-serif text-[44px] leading-none tracking-[-0.03em] text-[var(--loomina-void)]">{SITE_CONFIG.product.price}</span>
+                  <span className="font-serif text-xl text-[var(--loomina-gold-light)]">{SITE_CONFIG.product.currencySymbol}</span>
+                  <span className="ml-2 font-sans text-[13px] text-[#cfc8bb]">tout compris</span>
+                </div>
+              </div>
+              <ul className="space-y-2.5 p-6 font-sans text-[14px] text-[var(--text-secondary)]">
+                {INCLUDED.map((it) => (
+                  <li key={it} className="flex items-start gap-2.5">
+                    <Check /> {it}
+                  </li>
+                ))}
+              </ul>
+              <div className="border-t border-[var(--hairline)] px-6 py-4 font-sans text-[13px] text-[var(--text-muted)]">
+                Satisfait ou remboursé après le premier appel.
+              </div>
+            </div>
+            <p className="mt-4 px-2 font-sans text-[13px] text-[var(--text-muted)]">
+              Une question avant de commander ? <a href="/contact" className="text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4">Écrivez-nous</a>.
+            </p>
+          </aside>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

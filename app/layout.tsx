@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Playfair_Display, Cinzel, Courier_Prime } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -20,18 +20,12 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const cinzel = Cinzel({
-  subsets: ["latin"],
-  variable: "--font-cinzel",
-  display: "swap",
-});
-
-const courierPrime = Courier_Prime({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-courier",
-  display: "swap",
-});
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#faf8f5",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.url),
@@ -106,7 +100,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${plusJakartaSans.variable} ${playfair.variable} ${cinzel.variable} ${courierPrime.variable} antialiased min-h-screen bg-[var(--loomina-void)] text-[var(--text-primary)] font-sans selection:bg-[var(--loomina-gold)] selection:text-[var(--loomina-void)] relative`}
+        className={`${plusJakartaSans.variable} ${playfair.variable} antialiased min-h-screen bg-[var(--loomina-void)] text-[var(--text-primary)] font-sans selection:bg-[var(--loomina-gold)] selection:text-[var(--loomina-void)] relative`}
       >
         <Header />
         <main className="relative z-0">

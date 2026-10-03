@@ -12,12 +12,15 @@ interface ButtonProps {
     className?: string;
     fullWidth?: boolean;
     disabled?: boolean;
+    type?: 'button' | 'submit';
+    loading?: boolean;
 }
 
 // Icon for primary button
 const PrimaryIcon = () => (
     <svg
-        className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5"
+        className="w-4 h-4 transition-transform duration-200 ease-[var(--ease-out)] group-hover:translate-x-0.5"
+        aria-hidden="true"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -34,55 +37,54 @@ export default function Button({
     size = 'md',
     className = '',
     fullWidth = false,
-    disabled = false
+    disabled = false,
+    type = 'button',
+    loading = false
 }: ButtonProps) {
 
     // Size classes
     const sizeClasses = {
-        sm: 'px-5 py-2 text-sm gap-2',
-        md: 'px-7 py-3 text-sm gap-2',
-        lg: 'px-8 py-3.5 text-base gap-3'
+        sm: 'h-9 px-4 text-sm gap-2',
+        md: 'h-11 px-6 text-[15px] gap-2',
+        lg: 'h-13 px-7 text-base gap-2.5'
     };
 
-    // Variant classes - Premium Dark Theme
+    // Variants — encre profonde + or en accent (refonte 2026)
     const variantClasses = {
-        // Primary: Gold gradient with dark text
+        // Primary: encre, texte crème
         primary: `
-            bg-gradient-to-r from-[var(--loomina-gold)] via-[var(--loomina-ember)] to-[var(--loomina-gold-dark)]
+            bg-[var(--ink)]
             text-[var(--loomina-void)]
-            shadow-lg shadow-[var(--loomina-gold)]/20
-            hover:shadow-xl hover:shadow-[var(--loomina-gold)]/30
-            hover:scale-[1.02]
-            active:scale-[0.98]
-            disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
+            shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_8px_24px_-12px_rgba(26,24,21,0.45)]
+            hover:bg-[var(--ink-soft)]
+            disabled:opacity-50 disabled:cursor-not-allowed
         `,
-        // Secondary: Glass border with gold accent
+        // Secondary: contour discret
         secondary: `
-            bg-transparent
-            text-[var(--loomina-gold)]
-            border border-[var(--loomina-gold)]/40
+            bg-[var(--paper)]
+            text-[var(--text-primary)]
+            border border-[var(--hairline-strong)]
             hover:border-[var(--loomina-gold)]
-            hover:bg-[var(--loomina-gold)]/10
-            active:scale-[0.98]
+            hover:text-[var(--gold-ink)]
         `,
-        // Ghost: Minimal with hover effect
+        // Ghost: minimal
         ghost: `
             bg-transparent
             text-[var(--text-secondary)]
             hover:text-[var(--text-primary)]
             hover:bg-[var(--loomina-mist)]/30
-            active:scale-[0.98]
         `
     };
 
     const baseClasses = `
+        press
         inline-flex items-center justify-center
         rounded-full
         font-sans font-semibold
-        tracking-wide
+        tracking-[-0.01em]
         cursor-pointer
         select-none
-        transition-all duration-300 ease-out
+        whitespace-nowrap
         ${fullWidth ? 'w-full' : ''}
         ${sizeClasses[size]}
         ${variantClasses[variant]}
@@ -100,12 +102,15 @@ export default function Button({
 
     return (
         <button
+            type={type}
             onClick={onClick}
             className={`group ${baseClasses}`}
-            disabled={disabled}
+            disabled={disabled || loading}
+            aria-busy={loading || undefined}
         >
+            {loading && <span className={`spinner ${variant === 'primary' ? 'spinner-light' : ''}`} aria-hidden="true" />}
             {children}
-            {variant === 'primary' && <PrimaryIcon />}
+            {variant === 'primary' && !loading && <PrimaryIcon />}
         </button>
     );
 }
