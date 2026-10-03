@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Serveur vocal : projet Node séparé (voice/tsconfig.json).
+    "voice/**",
   ]),
 ]);
 
