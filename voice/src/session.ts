@@ -157,8 +157,12 @@ export class CallSession {
             const stream = await this.openai.chat.completions.create(
                 {
                     model: config.openai.model,
-                    temperature: 0.6,
-                    max_tokens: 300,
+                    // Famille gpt-5 : modèles à raisonnement. Au téléphone on
+                    // coupe le raisonnement (latence) et la température n'est
+                    // pas acceptée.
+                    ...(config.openai.model.startsWith('gpt-5')
+                        ? { reasoning_effort: 'none' as const, max_completion_tokens: 300 }
+                        : { temperature: 0.6, max_tokens: 300 }),
                     stream: true,
                     stream_options: { include_usage: true },
                     messages: this.chatMessages(),
