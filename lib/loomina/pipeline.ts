@@ -87,6 +87,7 @@ interface ExistingInterview {
     phase: number | null;
     processing_status: string | null;
     ai_analysis_log: AnalysisLog | null;
+    created_at: string;
 }
 
 /** Ce que `persistDirectorResult` écrit dans `interviews.ai_analysis_log`. */
@@ -98,6 +99,7 @@ interface AnalysisLog {
     chapter_title_hint?: string | null;
     next_topic_id?: number | null;
     project_update?: Record<string, unknown> & { context?: unknown };
+    family_members?: DirectorResult['family_members'];
 }
 
 /** Ce que l'Écrivain a besoin de savoir de l'analyse, rejouable depuis la base. */
@@ -134,7 +136,7 @@ export async function processEndOfCall(params: {
     if (params.eventId) {
         const { data: rows, error } = await supabase
             .from('interviews')
-            .select('id, phase, processing_status, ai_analysis_log')
+            .select('id, phase, processing_status, ai_analysis_log, created_at')
             .eq('call_event_id', params.eventId)
             .limit(1);
         if (error) throw new Error(`Lecture interviews impossible : ${error.message}`);
@@ -198,11 +200,21 @@ export async function processEndOfCall(params: {
     let brief: WriterBrief;
     const log = existing?.ai_analysis_log;
     if (log && log.chapter_material) {
-        // L'essai précédent a pu s'arrêter entre l'analyse et le projet.
-        if (log.project_update) await applyProjectUpdate(project.id, log.project_update);
+        // L'essai précédent a pu s'arrêter entre l'analyse et le projet, ou
+        // avant le profil et la famille : on les réapplique. Sauf si un appel
+        // PLUS RÉCENT a déjà été analysé : sa mémoire et sa phase font foi,
+        // réappliquer l'ancienne analyse les effacerait.
+        const newer = await hasNewerAnalysis(project.id, existing!.created_at);
+        if (!newer && log.project_update) await applyProjectUpdate(project.id, log.project_update);
+        await applyProfileAndFamily({
+            projectId: project.id,
+            profile: params.profile,
+            profileUpdates: newer ? null : (log.profile_updates as DirectorResult['profile_updates'] | undefined) ?? null,
+            familyMembers: log.family_members ?? [],
+        });
         brief = {
             phase,
-            context: normalizeContext(log.project_update?.context ?? project.context),
+            context: normalizeContext(newer ? project.context : log.project_update?.context ?? project.context),
             material: log.chapter_material,
             titleHint: log.chapter_title_hint ?? null,
             writingStyle: log.profile_updates?.writing_style ?? params.profile.writing_style,
@@ -376,6 +388,7 @@ async function persistDirectorResult(params: {
                 chapter_title_hint: director.chapter_title_hint,
                 next_topic_id: director.next_topic_id,
                 project_update: projectUpdate,
+                family_members: director.family_members,
                 model: DIRECTOR_MODEL,
                 at: new Date().toISOString(),
             },
@@ -386,20 +399,48 @@ async function persistDirectorResult(params: {
     // -- projects
     await applyProjectUpdate(project.id, projectUpdate);
 
+    await applyProfileAndFamily({
+        projectId: project.id,
+        profile,
+        profileUpdates: director.profile_updates,
+        familyMembers: director.family_members,
+    });
+}
+
+/** Idempotent : réappliquer la même mise à jour ne change rien. */
+async function applyProjectUpdate(projectId: string, update: Record<string, unknown>) {
+    const { error } = await db().from('projects').update(update).eq('id', projectId);
+    if (error) throw new Error(`Mise à jour projects impossible : ${error.message}`);
+}
+
+/**
+ * Profil (seulement ce que le client a exprimé) et proches (seulement les
+ * inconnus). Rejouable : la fusion des sujets sensibles et la recherche
+ * des proches par nom évitent les doublons.
+ */
+async function applyProfileAndFamily(params: {
+    projectId: string;
+    profile: Profile;
+    profileUpdates: DirectorResult['profile_updates'] | null;
+    familyMembers: DirectorResult['family_members'];
+}) {
+    const supabase = db();
+    const { projectId, profile, profileUpdates, familyMembers } = params;
+
     // -- profiles : uniquement ce que le client a exprimé pendant l'appel
     const updates: Record<string, unknown> = {};
-    if (director.profile_updates.writing_style) {
-        updates.writing_style = director.profile_updates.writing_style;
+    if (profileUpdates?.writing_style) {
+        updates.writing_style = profileUpdates.writing_style;
     }
-    if (director.profile_updates.politeness_preference) {
-        updates.politeness_preference = director.profile_updates.politeness_preference;
+    if (profileUpdates?.politeness_preference) {
+        updates.politeness_preference = profileUpdates.politeness_preference;
     }
-    if (director.profile_updates.sensitive_topics.length) {
+    if (profileUpdates?.sensitive_topics?.length) {
         const existing = (profile.sensitive_topics ?? '')
             .split(',')
             .map((s) => s.trim())
             .filter(Boolean);
-        const merged = [...new Set([...existing, ...director.profile_updates.sensitive_topics])];
+        const merged = [...new Set([...existing, ...profileUpdates.sensitive_topics])];
         updates.sensitive_topics = merged.join(', ');
     }
     if (Object.keys(updates).length) {
@@ -418,11 +459,11 @@ async function persistDirectorResult(params: {
     }
 
     // -- family_members : on n'insère que les personnes inconnues
-    if (director.family_members.length) {
+    if (familyMembers.length) {
         const { data: existing } = await supabase
             .from('family_members')
             .select('full_name')
-            .eq('project_id', project.id);
+            .eq('project_id', projectId);
 
         const known = new Set(
             (existing ?? []).map((f: { full_name: string | null }) =>
@@ -430,10 +471,10 @@ async function persistDirectorResult(params: {
             )
         );
 
-        const fresh = director.family_members
+        const fresh = familyMembers
             .filter((m) => !known.has(m.full_name.trim().toLowerCase()))
             .map((m) => ({
-                project_id: project.id,
+                project_id: projectId,
                 full_name: m.full_name,
                 relation: m.relation,
                 is_deceased: m.is_deceased,
@@ -446,8 +487,15 @@ async function persistDirectorResult(params: {
     }
 }
 
-/** Idempotent : réappliquer la même mise à jour ne change rien. */
-async function applyProjectUpdate(projectId: string, update: Record<string, unknown>) {
-    const { error } = await db().from('projects').update(update).eq('id', projectId);
-    if (error) throw new Error(`Mise à jour projects impossible : ${error.message}`);
+/** Un appel plus récent de ce projet a-t-il déjà été analysé ? */
+async function hasNewerAnalysis(projectId: string, createdAt: string): Promise<boolean> {
+    const { data, error } = await db()
+        .from('interviews')
+        .select('id')
+        .eq('project_id', projectId)
+        .gt('created_at', createdAt)
+        .not('ai_analysis_log', 'is', null)
+        .limit(1);
+    if (error) throw new Error(`Lecture interviews impossible : ${error.message}`);
+    return (data?.length ?? 0) > 0;
 }
