@@ -102,11 +102,22 @@ type Report = ReturnType<typeof buildEndOfCallReport>;
  * le renverra plus tard. Le site déduplique sur l'identifiant d'appel :
  * renvoyer deux fois est sans risque.
  */
+/** Fichiers en cours d'envoi par `deliverReport` : `flushSpool` les laisse. */
+const inFlight = new Set<string>();
+
 export async function deliverReport(callSid: string, report: Report): Promise<boolean> {
     fs.mkdirSync(SPOOL_DIR, { recursive: true });
     const file = path.join(SPOOL_DIR, `${callSid.replace(/[^A-Za-z0-9_-]/g, '')}.json`);
     fs.writeFileSync(file, JSON.stringify(report));
+    inFlight.add(file);
+    try {
+        return await sendWithRetries(callSid, file, report);
+    } finally {
+        inFlight.delete(file);
+    }
+}
 
+async function sendWithRetries(callSid: string, file: string, report: Report): Promise<boolean> {
     for (let attempt = 1; attempt <= 5; attempt++) {
         try {
             await postEndOfCallReport(report);
@@ -125,6 +136,7 @@ export async function flushSpool(): Promise<void> {
     if (!fs.existsSync(SPOOL_DIR)) return;
     for (const name of fs.readdirSync(SPOOL_DIR).filter((n) => n.endsWith('.json'))) {
         const file = path.join(SPOOL_DIR, name);
+        if (inFlight.has(file)) continue;
         try {
             await postEndOfCallReport(JSON.parse(fs.readFileSync(file, 'utf8')));
             fs.rmSync(file, { force: true });

@@ -115,7 +115,10 @@ const server = http.createServer(async (req, res) => {
     try {
         const path = new URL(req.url ?? '/', config.publicUrl).pathname;
         if (req.method === 'GET' && path === '/health') {
-            return reply(res, 200, JSON.stringify({ ok: true, sessions: sessions.size, model: config.openai.model }), 'application/json');
+            // Seules les sessions encore vivantes comptent : keepalive.sh s'y
+            // fie pour ne pas relancer pendant un appel.
+            const live = [...sessions.values()].filter((x) => x.active).length;
+            return reply(res, 200, JSON.stringify({ ok: true, sessions: live, model: config.openai.model }), 'application/json');
         }
         if (req.method === 'POST' && path === '/twilio/voice') return await handleVoice(req, res);
         if (req.method === 'POST' && path === '/twilio/action') return await handleAction(req, res);
@@ -149,6 +152,17 @@ server.on('upgrade', (req, socket, head) => {
 
 wss.on('connection', (ws: WebSocket) => {
     let session: CallSession | null = null;
+
+    // Battement de cœur : un tunnel coupé sans fermeture propre laissait le
+    // WebSocket ouvert pour toujours. Sans réponse en 30 s, on le ferme.
+    let alive = true;
+    ws.on('pong', () => { alive = true; });
+    const heartbeat = setInterval(() => {
+        if (!alive) { ws.terminate(); return; }
+        alive = false;
+        ws.ping();
+    }, 30_000);
+    ws.on('close', () => clearInterval(heartbeat));
 
     ws.on('message', async (raw) => {
         let msg: Record<string, unknown>;
@@ -198,7 +212,11 @@ server.listen(config.port, () => {
     // Rapports restés en attente (site injoignable, redémarrage) : au
     // démarrage puis chaque minute.
     void flushSpool();
-    setInterval(() => void flushSpool(), 60_000);
+    setInterval(() => {
+        void flushSpool();
+        // Ménage des sessions terminées dont le WebSocket n'a jamais fermé.
+        for (const [sid, session] of sessions) if (!session.active) sessions.delete(sid);
+    }, 60_000);
 });
 
 /**
@@ -218,4 +236,6 @@ async function shutdown(signal: string): Promise<void> {
     process.exit(0);
 }
 process.on('SIGTERM', () => void shutdown('SIGTERM'));
+// Une erreur oubliée dans un minuteur ne doit pas couper tous les appels.
+process.on('unhandledRejection', (err) => console.error('[voice] erreur non rattrapée :', err));
 process.on('SIGINT', () => void shutdown('SIGINT'));

@@ -36,7 +36,9 @@ export class CallSession {
     readonly startedAt = new Date();
 
     private ws: WebSocket | null = null;
-    private readonly openai = new OpenAI({ apiKey: config.openai.apiKey });
+    // Au téléphone, mieux vaut « Pardon, pouvez-vous répéter ? » au bout de
+    // 8 s qu'un silence de plusieurs minutes (délai par défaut du SDK : 10 min).
+    private readonly openai = new OpenAI({ apiKey: config.openai.apiKey, timeout: 8000, maxRetries: 0 });
     private readonly turns: TurnRecord[] = [];
     private readonly modelLatenciesMs: number[] = [];
     private promptTokens = 0;
@@ -87,7 +89,9 @@ export class CallSession {
     }
 
     async onPrompt(text: string, last: boolean): Promise<void> {
-        if (!last || this.finished) return;
+        if (this.finished) return;
+        // Le narrateur parle encore : ce n'est pas un silence.
+        if (!last) return this.armSilenceTimer();
         const clean = text.trim();
         if (!clean) return;
 
@@ -120,6 +124,9 @@ export class CallSession {
         if (this.finished) return;
         this.finished = true;
         this.abortGeneration();
+        // Fermer le WebSocket peu après (le temps du dernier « end ») : sans
+        // ça, un tunnel à moitié ouvert laissait la session ouverte.
+        setTimeout(() => this.ws?.terminate(), 3000);
         if (this.silenceTimer) clearTimeout(this.silenceTimer);
         if (this.maxTimer) clearTimeout(this.maxTimer);
 
@@ -151,10 +158,15 @@ export class CallSession {
             interruptions: this.interruptions,
         });
 
-        if (await deliverReport(this.callSid, report)) {
-            console.info(`[${this.callSid}] rapport envoyé au site`);
-        } else {
-            console.error(`[${this.callSid}] rapport gardé sur disque, nouvel envoi plus tard`);
+        try {
+            if (await deliverReport(this.callSid, report)) {
+                console.info(`[${this.callSid}] rapport envoyé au site`);
+            } else {
+                console.error(`[${this.callSid}] rapport gardé sur disque, nouvel envoi plus tard`);
+            }
+        } catch (err) {
+            // Disque plein, droits… : on le dit fort, mais le serveur continue.
+            console.error(`[${this.callSid}] RAPPORT PERDU :`, err instanceof Error ? err.message : err);
         }
     }
 
