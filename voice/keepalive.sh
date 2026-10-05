@@ -38,6 +38,20 @@ point_number() {
         echo "[keepalive] $(date '+%H:%M:%S') numéro → $url"
 }
 
+# Vérifie l'URL publique en résolvant le nom via 1.1.1.1 : le résolveur du
+# Mac garde en cache « nom inconnu » pendant ~1 min pour un tunnel tout neuf,
+# ce qui faisait croire à une panne et relançait le tunnel en boucle.
+public_ok() {
+    local host ip
+    host="${1#https://}"
+    ip=$(dig +short @1.1.1.1 "$host" 2>/dev/null | grep -E '^[0-9.]+$' | head -1)
+    if [ -n "$ip" ]; then
+        curl -s -m 8 --resolve "$host:443:$ip" "$1/health" | grep -q '"ok":true'
+    else
+        curl -s -m 8 "$1/health" | grep -q '"ok":true'
+    fi
+}
+
 SID=$(number_sid) || { echo "[keepalive] numéro Twilio introuvable"; exit 1; }
 
 # Pas de veille du Mac tant que ce script tourne.
@@ -64,13 +78,13 @@ while true; do
     if [ -z "$URL" ]; then echo "[keepalive] pas de tunnel, nouvel essai"; continue; fi
 
     # Le nom du tunnel met quelques secondes à être joignable.
-    for _ in $(seq 1 30); do curl -s -m 5 "$URL/health" | grep -q '"ok":true' && break; sleep 2; done
+    for _ in $(seq 1 30); do public_ok "$URL" && break; sleep 2; done
     point_number "$URL"
 
     fails=0
     while kill -0 "$RUN_PID" 2>/dev/null; do
         sleep 20
-        if curl -s -m 8 "$URL/health" | grep -q '"ok":true'; then
+        if public_ok "$URL"; then
             fails=0
         elif curl -s -m 3 "localhost:${PORT:-8080}/health" | grep -q '"sessions":[1-9]'; then
             # Un appel est en cours : on ne coupe pas, il se termine peut-être
