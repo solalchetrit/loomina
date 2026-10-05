@@ -29,7 +29,9 @@ function openai(): OpenAI {
     if (client) return client;
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('OPENAI_API_KEY manquante');
-    client = new OpenAI({ apiKey });
+    // Le Directeur répond en ~20 s. Sans délai, le SDK attend jusqu'à 10 min et réessaie deux fois :
+    // la fonction Vercel (300 s) était tuée avant, et l'appel restait bloqué.
+    client = new OpenAI({ apiKey, timeout: 90_000, maxRetries: 1 });
     return client;
 }
 

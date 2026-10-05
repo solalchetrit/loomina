@@ -7,7 +7,7 @@
  * à 449 €, sans trace ni possibilité de rejeu.
  */
 
-import { db, findProfileByPhone, findActiveProject } from './db';
+import { db, findProfileByPhone, findActiveProject, maskPhone } from './db';
 import type { Profile, Project } from './db';
 import { processEndOfCall, extractCallData } from './pipeline';
 import type { PipelineOutcome } from './pipeline';
@@ -64,19 +64,36 @@ export async function recordEvent(params: {
 }
 
 /**
+ * Au-delà de ce délai, un événement resté en `processing` est considéré
+ * comme abandonné (fonction tuée à 300 s, déploiement en cours) et peut
+ * être repris. Le pipeline est rejouable : reprendre ne duplique rien.
+ */
+export const STUCK_AFTER_MS = 10 * 60 * 1000;
+
+/** Filtre PostgREST : ce qu'on a le droit de (re)prendre. */
+function claimableFilter(): string {
+    const stuckBefore = new Date(Date.now() - STUCK_AFTER_MS).toISOString();
+    return [
+        'status.in.(pending,failed)',
+        `and(status.eq.processing,claimed_at.lt.${stuckBefore})`,
+        'and(status.eq.processing,claimed_at.is.null)',
+    ].join(',');
+}
+
+/**
  * Verrouille un événement avant traitement.
  *
- * La condition `.eq('status', 'pending')` fait office de verrou optimiste :
- * si le worker cron et le `after()` du webhook tombent sur le même
- * événement, un seul des deux obtient la ligne.
+ * La condition sur le statut fait office de verrou optimiste : si le
+ * worker cron et le `after()` du webhook tombent sur le même événement,
+ * un seul des deux obtient la ligne. Un verrou trop vieux est repris.
  */
 export async function claimEvent(eventId: string): Promise<boolean> {
     const supabase = db();
     const { data, error } = await supabase
         .from('call_events')
-        .update({ status: 'processing' })
+        .update({ status: 'processing', claimed_at: new Date().toISOString() })
         .eq('id', eventId)
-        .in('status', ['pending', 'failed'])
+        .or(claimableFilter())
         .select('id');
 
     if (error) throw new Error(`Verrouillage call_events impossible : ${error.message}`);
@@ -153,13 +170,14 @@ export async function processEvent(eventId: string): Promise<PipelineOutcome | n
         if (!profile) {
             const outcome: PipelineOutcome = {
                 status: 'no_project',
-                reason: `Aucun profil pour le numéro ${data.phone ?? '(inconnu)'}`,
+                // Numéro masqué : la table est lisible depuis le tableau de bord.
+                reason: `Aucun profil pour le numéro ${maskPhone(data.phone)}`,
             };
             await markDone(eventId, outcome);
             return outcome;
         }
 
-        const outcome = await processEndOfCall({ profile, project, message });
+        const outcome = await processEndOfCall({ profile, project, message, eventId });
         await markDone(eventId, outcome);
         return outcome;
     } catch (err) {
@@ -211,14 +229,14 @@ async function resolveCaller(
     return { profile, project };
 }
 
-/** Reprend les événements en attente ou en échec. Appelé par le cron. */
+/** Reprend les événements en attente, en échec ou abandonnés. Appelé par le cron. */
 export async function sweepPending(limit = 10): Promise<{ picked: number; results: string[] }> {
     const supabase = db();
 
     const { data, error } = await supabase
         .from('call_events')
         .select('id, attempts')
-        .in('status', ['pending', 'failed'])
+        .or(claimableFilter())
         .lt('attempts', MAX_ATTEMPTS)
         .order('created_at', { ascending: true })
         .limit(limit);
