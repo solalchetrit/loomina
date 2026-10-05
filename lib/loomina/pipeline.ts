@@ -209,7 +209,9 @@ export async function processEndOfCall(params: {
         await applyProfileAndFamily({
             projectId: project.id,
             profile: params.profile,
-            profileUpdates: newer ? null : (log.profile_updates as DirectorResult['profile_updates'] | undefined) ?? null,
+            // Un appel plus récent fait foi pour le style et le tutoiement ;
+            // les sujets sensibles, eux, ne font que s'ajouter : on les garde.
+            profileUpdates: replayProfileUpdates(log.profile_updates, newer),
             familyMembers: log.family_members ?? [],
         });
         brief = {
@@ -498,4 +500,13 @@ async function hasNewerAnalysis(projectId: string, createdAt: string): Promise<b
         .limit(1);
     if (error) throw new Error(`Lecture interviews impossible : ${error.message}`);
     return (data?.length ?? 0) > 0;
+}
+
+function replayProfileUpdates(
+    updates: AnalysisLog['profile_updates'],
+    newer: boolean
+): DirectorResult['profile_updates'] | null {
+    if (!updates) return null;
+    const u = updates as DirectorResult['profile_updates'];
+    return newer ? { writing_style: null, politeness_preference: null, sensitive_topics: u.sensitive_topics ?? [] } : u;
 }
