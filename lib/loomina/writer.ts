@@ -41,9 +41,10 @@ function openai(): OpenAI {
     if (client) return client;
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('OPENAI_API_KEY manquante');
-    // L'Écrivain gpt-5.5 répond en 30 à 60 s. Sans délai, le SDK attend jusqu'à 10 min et réessaie deux fois :
+    // L'Écrivain gpt-5.5 répond en 30 à 60 s. Sans délai, le SDK attend jusqu'à 10 min et réessaie deux fois. Budget total
+    // sous les 300 s de la fonction : Directeur 2 × 45 s + Écrivain 200 s.
     // la fonction Vercel (300 s) était tuée avant, et l'appel restait bloqué.
-    client = new OpenAI({ apiKey, timeout: 180_000, maxRetries: 1 });
+    client = new OpenAI({ apiKey, timeout: 200_000, maxRetries: 0 });
     return client;
 }
 
