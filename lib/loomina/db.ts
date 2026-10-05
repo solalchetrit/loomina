@@ -131,16 +131,31 @@ export function phoneVariants(phone: string): string[] {
     return [...set];
 }
 
+/**
+ * Le projet en cours du client.
+ *
+ * Un projet non terminé d'abord (le plus récent), sinon le dernier projet
+ * terminé. Auparavant les projets `completed` étaient exclus : un client
+ * dont le livre venait d'être bouclé voyait un espace auteur vide et
+ * tombait sur la démo pour inconnus en appelant.
+ */
 export async function findActiveProject(userId: string): Promise<Project | null> {
     const { data, error } = await db()
         .from('projects')
         .select('*')
         .eq('user_id', userId)
-        .neq('status', 'completed')
-        .limit(1);
+        .order('created_at', { ascending: false })
+        .limit(10);
 
     if (error) throw new Error(`Lecture projects impossible : ${error.message}`);
-    return (data?.[0] as Project) ?? null;
+    const rows = (data ?? []) as Project[];
+    return rows.find((p) => p.status !== 'completed') ?? rows[0] ?? null;
+}
+
+/** « +33781311298 » → « ***1298 », pour les journaux et les tables lisibles. */
+export function maskPhone(phone: string | null | undefined): string {
+    const digits = (phone ?? '').replace(/\D/g, '');
+    return digits ? `***${digits.slice(-4)}` : '(inconnu)';
 }
 
 export async function getSystemPrompt(phase: Phase): Promise<SystemPrompt | null> {
