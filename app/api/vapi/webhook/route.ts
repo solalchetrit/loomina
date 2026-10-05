@@ -25,7 +25,7 @@
 
 import { NextRequest, NextResponse, after } from 'next/server';
 
-import { findProfileByPhone, findActiveProject, getSystemPrompt, db } from '@/lib/loomina/db';
+import { findProfileByPhone, findActiveProject, getSystemPrompt, db, maskPhone } from '@/lib/loomina/db';
 import { toPhase } from '@/lib/loomina/phases';
 import { buildAssistant, buildUnknownCallerAssistant } from '@/lib/loomina/assistant';
 import { extractCallData } from '@/lib/loomina/pipeline';
@@ -132,7 +132,7 @@ async function handleAssistantRequest(
 
     const profile = await findProfileByPhone(phone);
     if (!profile) {
-        console.info(`[vapi] Appelant inconnu : ${phone}`);
+        console.info(`[vapi] Appelant inconnu : ${maskPhone(phone)}`);
         return NextResponse.json(buildUnknownCallerAssistant(url));
     }
 

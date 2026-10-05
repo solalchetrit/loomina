@@ -20,6 +20,13 @@
  *    1.0 est le réglage de la créativité pure. Pour un texte biographique
  *    qui doit rester fidèle aux faits, le modèle inventait des formulations,
  *    des liens de causalité, parfois des détails.
+ *
+ * 4 (04/10/2026). gpt-4o → gpt-5.5, raisonnement « medium ».
+ *    Banc d'essai sur 5 entretiens simulés : gpt-4o ajoutait 5 à 15
+ *    détails non dits par chapitre et réduisait un appel riche à 600 mots ;
+ *    gpt-5.5 en ajoute 1 ou 2 et garde la matière et le ton du narrateur.
+ *    Modèle à raisonnement : pas de `temperature`, et le budget de sortie
+ *    inclut la réflexion, d'où `max_completion_tokens` large.
  */
 
 import OpenAI from 'openai';
@@ -34,13 +41,16 @@ function openai(): OpenAI {
     if (client) return client;
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('OPENAI_API_KEY manquante');
-    client = new OpenAI({ apiKey });
+    // L'Écrivain gpt-5.5 répond en 30 à 60 s. Sans délai, le SDK attend jusqu'à 10 min et réessaie deux fois :
+    // la fonction Vercel (300 s) était tuée avant, et l'appel restait bloqué.
+    client = new OpenAI({ apiKey, timeout: 180_000, maxRetries: 1 });
     return client;
 }
 
-export const WRITER_MODEL = 'gpt-4o';
-export const WRITER_MAX_TOKENS = 4096;
-export const WRITER_TEMPERATURE = 0.6;
+export const WRITER_MODEL = 'gpt-5.5';
+export const WRITER_REASONING_EFFORT = 'medium';
+/** Réflexion + chapitre. Un chapitre riche fait ~4 000 tokens. */
+export const WRITER_MAX_TOKENS = 16000;
 
 export interface WriterResult {
     chapter_title: string;
@@ -163,8 +173,8 @@ ${params.transcript}`;
 
     const completion = await openai().chat.completions.create({
         model: WRITER_MODEL,
-        max_tokens: WRITER_MAX_TOKENS,
-        temperature: WRITER_TEMPERATURE,
+        max_completion_tokens: WRITER_MAX_TOKENS,
+        reasoning_effort: WRITER_REASONING_EFFORT,
         response_format: { type: 'json_object' },
         messages: [
             { role: 'system', content: SYSTEM },

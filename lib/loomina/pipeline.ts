@@ -11,6 +11,13 @@
  *                     l'analyse survive si la rédaction échoue
  *   4. Écrivain     — rédige le chapitre
  *   5. Chapitre     — écrit dans `chapters`, plus jamais en append
+ *
+ * REJOUABLE (05/10/2026)
+ * Un même événement peut être traité plusieurs fois (échec de l'Écrivain,
+ * fonction tuée, rattrapage du cron). Chaque étape vérifie donc ce qui est
+ * déjà fait : un seul entretien par événement (`call_event_id`), le
+ * Directeur ne repasse pas si son analyse est déjà enregistrée (sinon il
+ * ferait avancer la phase une seconde fois), et pas de second chapitre.
  */
 
 import { db, findActiveProject, getRecentChapters, getNextChapterNumber } from './db';
@@ -19,7 +26,7 @@ import { toPhase, isFinalPhase } from './phases';
 import type { Phase } from './phases';
 import { normalizeContext, contextFromLegacy, isEmptyContext } from './context';
 import type { LoominaContext } from './context';
-import { runDirector } from './director';
+import { runDirector, DIRECTOR_MODEL } from './director';
 import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 
@@ -75,10 +82,42 @@ export function extractCallData(message: Record<string, any>) {
     };
 }
 
+interface ExistingInterview {
+    id: string;
+    phase: number | null;
+    processing_status: string | null;
+    ai_analysis_log: AnalysisLog | null;
+}
+
+/** Ce que `persistDirectorResult` écrit dans `interviews.ai_analysis_log`. */
+interface AnalysisLog {
+    next_phase?: Phase;
+    progress?: number;
+    profile_updates?: { writing_style?: string | null };
+    chapter_material?: DirectorResult['chapter_material'];
+    chapter_title_hint?: string | null;
+    next_topic_id?: number | null;
+    project_update?: Record<string, unknown> & { context?: unknown };
+}
+
+/** Ce que l'Écrivain a besoin de savoir de l'analyse, rejouable depuis la base. */
+interface WriterBrief {
+    phase: Phase;
+    context: LoominaContext;
+    material: DirectorResult['chapter_material'];
+    titleHint: string | null;
+    writingStyle: string | null;
+    nextPhase?: Phase;
+    progress?: number;
+    nextTopicId: number | null;
+}
+
 export async function processEndOfCall(params: {
     profile: Profile;
     project?: Project | null;
     message: Record<string, any>;
+    /** L'événement `call_events` d'origine : rend le traitement rejouable. */
+    eventId?: string;
 }): Promise<PipelineOutcome> {
     const supabase = db();
     const data = extractCallData(params.message);
@@ -88,7 +127,29 @@ export async function processEndOfCall(params: {
         return { status: 'no_project', reason: 'Aucun projet actif pour ce profil' };
     }
 
-    const phase = toPhase(project.phase);
+    // ---------------------------------------------------------
+    // 0. Reprise : cet événement a-t-il déjà été (en partie) traité ?
+    // ---------------------------------------------------------
+    let existing: ExistingInterview | null = null;
+    if (params.eventId) {
+        const { data: rows, error } = await supabase
+            .from('interviews')
+            .select('id, phase, processing_status, ai_analysis_log')
+            .eq('call_event_id', params.eventId)
+            .limit(1);
+        if (error) throw new Error(`Lecture interviews impossible : ${error.message}`);
+        existing = (rows?.[0] as ExistingInterview | undefined) ?? null;
+    }
+
+    if (existing && (existing.processing_status === 'processed' || existing.processing_status === 'too_short')) {
+        return {
+            status: existing.processing_status === 'processed' ? 'processed' : 'too_short',
+            interviewId: existing.id,
+            reason: 'Déjà traité lors d\'un essai précédent',
+        };
+    }
+
+    const phase = existing?.phase ? toPhase(existing.phase) : toPhase(project.phase);
 
     // ---------------------------------------------------------
     // 1. Garde-fou — on archive toujours, on ne traite pas toujours
@@ -97,22 +158,28 @@ export async function processEndOfCall(params: {
         data.transcript.length < MIN_TRANSCRIPT_CHARS ||
         (data.durationSeconds !== null && data.durationSeconds < MIN_DURATION_SECONDS);
 
-    const { data: interviewRow, error: interviewError } = await supabase
-        .from('interviews')
-        .insert({
-            project_id: project.id,
-            transcript: data.transcript || null,
-            audio_url: data.recordingUrl,
-            duration_seconds: data.durationSeconds,
-            started_at: new Date().toISOString(),
-            phase,
-            processing_status: tooShort ? 'too_short' : 'pending',
-        })
-        .select('id')
-        .single();
+    let interviewId: string;
+    if (existing) {
+        interviewId = existing.id;
+    } else {
+        const { data: interviewRow, error: interviewError } = await supabase
+            .from('interviews')
+            .insert({
+                project_id: project.id,
+                call_event_id: params.eventId ?? null,
+                transcript: data.transcript || null,
+                audio_url: data.recordingUrl,
+                duration_seconds: data.durationSeconds,
+                started_at: new Date().toISOString(),
+                phase,
+                processing_status: tooShort ? 'too_short' : 'pending',
+            })
+            .select('id')
+            .single();
 
-    if (interviewError) throw new Error(`Écriture interviews impossible : ${interviewError.message}`);
-    const interviewId = interviewRow.id as string;
+        if (interviewError) throw new Error(`Écriture interviews impossible : ${interviewError.message}`);
+        interviewId = interviewRow.id as string;
+    }
 
     if (tooShort) {
         return {
@@ -124,34 +191,59 @@ export async function processEndOfCall(params: {
     }
 
     // ---------------------------------------------------------
-    // 2. Le Directeur
+    // 2-3. Le Directeur, puis la persistance de son analyse — AVANT la
+    //      rédaction. Si l'analyse existe déjà (essai précédent), on la
+    //      réutilise : la relancer ferait avancer la phase deux fois.
     // ---------------------------------------------------------
-    const currentContext: LoominaContext = isEmptyContext(project.context)
-        ? contextFromLegacy(project.global_context)
-        : normalizeContext(project.context);
+    let brief: WriterBrief;
+    const log = existing?.ai_analysis_log;
+    if (log && log.chapter_material) {
+        // L'essai précédent a pu s'arrêter entre l'analyse et le projet.
+        if (log.project_update) await applyProjectUpdate(project.id, log.project_update);
+        brief = {
+            phase,
+            context: normalizeContext(log.project_update?.context ?? project.context),
+            material: log.chapter_material,
+            titleHint: log.chapter_title_hint ?? null,
+            writingStyle: log.profile_updates?.writing_style ?? params.profile.writing_style,
+            nextPhase: log.next_phase,
+            progress: log.progress,
+            nextTopicId: log.next_topic_id ?? null,
+        };
+    } else {
+        const currentContext: LoominaContext = isEmptyContext(project.context)
+            ? contextFromLegacy(project.global_context)
+            : normalizeContext(project.context);
 
-    const director = await runDirector({
-        transcript: data.transcript,
-        context: currentContext,
-        phase,
-        firstName: params.profile.first_name ?? params.profile.full_name ?? 'le narrateur',
-        politeness: params.profile.politeness_preference,
-        durationSeconds: data.durationSeconds,
-    });
+        const director = await runDirector({
+            transcript: data.transcript,
+            context: currentContext,
+            phase,
+            firstName: params.profile.first_name ?? params.profile.full_name ?? 'le narrateur',
+            politeness: params.profile.politeness_preference,
+            durationSeconds: data.durationSeconds,
+        });
 
-    // ---------------------------------------------------------
-    // 3. Persistance de l'analyse — AVANT la rédaction
-    //    Si l'Écrivain échoue, l'analyse et la question suivante
-    //    sont déjà sauvées : le prochain appel reste pertinent.
-    // ---------------------------------------------------------
-    await persistDirectorResult({ project, profile: params.profile, interviewId, director });
+        await persistDirectorResult({ project, profile: params.profile, interviewId, director });
+
+        brief = {
+            phase,
+            context: director.context,
+            material: director.chapter_material,
+            titleHint: director.chapter_title_hint,
+            writingStyle: director.profile_updates.writing_style ?? params.profile.writing_style,
+            nextPhase: director.resolved.next_phase,
+            progress: director.progress_percentage,
+            nextTopicId: director.next_topic_id,
+        };
+    }
 
     // ---------------------------------------------------------
     // 4. L'Écrivain — seulement s'il y a quelque chose à raconter
     //    L'analyse (mémoire, question suivante) est déjà sauvée : un appel
     //    sans matière n'est pas perdu, il n'a simplement pas de chapitre.
     // ---------------------------------------------------------
-    if (director.chapter_material === 'none') {
+    if (brief.material === 'none') {
         await supabase
             .from('interviews')
             .update({ processing_status: 'processed' })
@@ -161,9 +253,29 @@ export async function processEndOfCall(params: {
             status: 'no_material',
             interviewId,
             phase,
-            nextPhase: director.resolved.next_phase,
-            progress: director.progress_percentage,
+            nextPhase: brief.nextPhase,
+            progress: brief.progress,
             reason: 'Le Directeur n\'a rien trouvé de racontable dans cet appel : mémoire mise à jour, pas de chapitre.',
+        };
+    }
+
+    // Un chapitre déjà écrit pour cet entretien (essai coupé juste après) ?
+    const { data: already } = await supabase
+        .from('chapters')
+        .select('id, chapter_number, word_count')
+        .eq('latest_interview_id', interviewId)
+        .limit(1);
+    if (already?.[0]) {
+        await supabase.from('interviews').update({ processing_status: 'processed' }).eq('id', interviewId);
+        return {
+            status: 'processed',
+            interviewId,
+            chapterId: already[0].id as string,
+            chapterNumber: already[0].chapter_number as number,
+            phase,
+            nextPhase: brief.nextPhase,
+            progress: brief.progress,
+            wordCount: (already[0].word_count as number) ?? undefined,
         };
     }
 
@@ -171,12 +283,12 @@ export async function processEndOfCall(params: {
 
     const writer = await runWriter({
         transcript: data.transcript,
-        context: director.context,
+        context: brief.context,
         previousChapters,
         phase,
-        writingStyle: director.profile_updates.writing_style ?? params.profile.writing_style,
-        titleHint: director.chapter_title_hint,
-        material: director.chapter_material,
+        writingStyle: brief.writingStyle,
+        titleHint: brief.titleHint,
+        material: brief.material,
     });
 
     // ---------------------------------------------------------
@@ -196,7 +308,7 @@ export async function processEndOfCall(params: {
             status: 'draft',
             version: 1,
             latest_interview_id: interviewId,
-            topic_id: director.next_topic_id,
+            topic_id: brief.nextTopicId,
             updated_at: new Date().toISOString(),
         })
         .select('id')
@@ -215,8 +327,8 @@ export async function processEndOfCall(params: {
         chapterId: chapterRow.id as string,
         chapterNumber,
         phase,
-        nextPhase: director.resolved.next_phase,
-        progress: director.progress_percentage,
+        nextPhase: brief.nextPhase,
+        progress: brief.progress,
         wordCount: writer.word_count,
     };
 }
@@ -233,23 +345,21 @@ async function persistDirectorResult(params: {
     const projectCompleted =
         isFinalPhase(director.resolved.phase) && director.progress_percentage >= 100;
 
-    // -- projects
-    const { error: projectError } = await supabase
-        .from('projects')
-        .update({
-            phase: director.resolved.next_phase,
-            phase_progress: director.progress_percentage,
-            current_topic_id: director.next_topic_id,
-            context: director.context,
-            next_question_strategy: director.next_question,
-            status: projectCompleted ? 'completed' : 'active',
-        })
-        .eq('id', project.id);
+    const projectUpdate = {
+        phase: director.resolved.next_phase,
+        phase_progress: director.progress_percentage,
+        current_topic_id: director.next_topic_id,
+        context: director.context,
+        next_question_strategy: director.next_question,
+        // Un livre déjà terminé le reste : un appel de plus enrichit le
+        // projet sans le rouvrir.
+        status: projectCompleted || project.status === 'completed' ? 'completed' : 'active',
+    };
 
-    if (projectError) throw new Error(`Mise à jour projects impossible : ${projectError.message}`);
-
-    // -- interviews
-    await supabase
+    // -- interviews D'ABORD : une fois l'analyse écrite ici, un nouvel essai
+    //    ne relance plus le Directeur. Elle contient la mise à jour du
+    //    projet, qu'un essai suivant peut réappliquer telle quelle.
+    const { error: logError } = await supabase
         .from('interviews')
         .update({
             topics_summary: director.call_summary,
@@ -261,11 +371,20 @@ async function persistDirectorResult(params: {
                 progress: director.progress_percentage,
                 next_question: director.next_question,
                 profile_updates: director.profile_updates,
-                model: 'gpt-4o',
+                // De quoi relancer l'Écrivain sans repasser par le Directeur.
+                chapter_material: director.chapter_material,
+                chapter_title_hint: director.chapter_title_hint,
+                next_topic_id: director.next_topic_id,
+                project_update: projectUpdate,
+                model: DIRECTOR_MODEL,
                 at: new Date().toISOString(),
             },
         })
         .eq('id', interviewId);
+    if (logError) throw new Error(`Écriture de l'analyse impossible : ${logError.message}`);
+
+    // -- projects
+    await applyProjectUpdate(project.id, projectUpdate);
 
     // -- profiles : uniquement ce que le client a exprimé pendant l'appel
     const updates: Record<string, unknown> = {};
@@ -325,4 +444,10 @@ async function persistDirectorResult(params: {
             await supabase.from('family_members').insert(fresh);
         }
     }
+}
+
+/** Idempotent : réappliquer la même mise à jour ne change rien. */
+async function applyProjectUpdate(projectId: string, update: Record<string, unknown>) {
+    const { error } = await db().from('projects').update(update).eq('id', projectId);
+    if (error) throw new Error(`Mise à jour projects impossible : ${error.message}`);
 }

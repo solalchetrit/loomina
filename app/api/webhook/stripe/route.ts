@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { formatToE164 } from '@/lib/phone';
+import { findProfileByPhone } from '@/lib/loomina/db';
 
 /**
  * Provisionnement d'un client après paiement.
@@ -99,32 +100,13 @@ export async function POST(request: NextRequest) {
         }
 
         // ── Le compte d'authentification ─────────────────────────────────────
-        let userId: string | undefined;
-
-        const { data: created, error: createErr } =
-            await supabase.auth.admin.createUser({
-                email,
-                email_confirm: true,
-                user_metadata: { first_name: firstName, last_name: lastName },
-            });
-
-        if (createErr) {
-            // Le client a déjà commandé : on récupère son profil existant.
-            console.log(`[stripe] compte existant pour ${email} — ${createErr.message}`);
-            const { data: profil, error: profilErr } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('email', email)
-                .maybeSingle();
-            if (profilErr) throw new Error(`lecture profiles : ${profilErr.message}`);
-            userId = profil?.id;
-        } else {
-            userId = created.user?.id;
-        }
-
-        if (!userId) {
-            throw new Error(`impossible de résoudre l'identifiant pour ${email}`);
-        }
+        // Le narrateur est identifié par son TÉLÉPHONE (c'est ainsi qu'il se
+        // connecte et qu'il est reconnu quand il appelle), pas par l'e-mail
+        // de l'acheteur. Avant : deux livres offerts avec le même e-mail
+        // écrasaient le premier destinataire, qui perdait son accès.
+        const resolved = await resolveNarratorAccount({ email, phone, firstName, lastName });
+        const userId = resolved.userId;
+        const accountEmail = resolved.email;
 
         // ── Le profil ────────────────────────────────────────────────────────
         // Identité : écrasée par la commande (le client vient de la saisir).
@@ -133,7 +115,7 @@ export async function POST(request: NextRequest) {
             first_name: firstName || null,
             last_name: lastName || null,
             full_name: `${firstName} ${lastName}`.trim() || null,
-            email,
+            email: accountEmail,
             phone_number: phone,     // toujours en E.164 : c'est ainsi que Vapi cherche
         });
         if (profilErr) throw new Error(`upsert profiles : ${profilErr.message}`);
@@ -163,7 +145,8 @@ export async function POST(request: NextRequest) {
             phase_progress: 0,
             current_topic_id: 1,
             stripe_session_id: session.id,   // la garantie d'idempotence
-            project_metadata: { is_gift: isGift },
+            // L'acheteur peut être différent du narrateur (cadeau).
+            project_metadata: { is_gift: isGift, buyer_email: email },
         });
 
         if (projetErr) {
@@ -184,4 +167,82 @@ export async function POST(request: NextRequest) {
         // 500 → Stripe rejouera. Mieux qu'un faux succès et un client sans compte.
         return NextResponse.json({ error: 'provisioning_failed' }, { status: 500 });
     }
+}
+
+/**
+ * Trouve ou crée le compte du narrateur.
+ *
+ * 1. Un profil existe déjà pour ce téléphone : c'est lui (nouvelle commande).
+ * 2. Sinon on crée le compte avec l'e-mail de l'acheteur.
+ * 3. Si cet e-mail a déjà un compte :
+ *    - même narrateur (pas de téléphone, ou même téléphone) → ce compte ;
+ *    - autre narrateur (cadeau pour quelqu'un d'autre) → nouveau compte avec
+ *      l'adresse « acheteur+<téléphone>@… », qui arrive dans la même boîte.
+ *
+ * L'identifiant d'un compte existant est cherché côté authentification et
+ * pas seulement dans `profiles` : si un essai précédent a créé le compte
+ * puis échoué avant le profil, Stripe rejouait en boucle sans jamais aboutir.
+ */
+async function resolveNarratorAccount(params: {
+    email: string;
+    phone: string | null;
+    firstName: string;
+    lastName: string;
+}): Promise<{ userId: string; email: string }> {
+    const supabase = db();
+
+    if (params.phone) {
+        const byPhone = await findProfileByPhone(params.phone);
+        if (byPhone) return { userId: byPhone.id, email: byPhone.email ?? params.email };
+    }
+
+    const create = async (email: string) =>
+        supabase.auth.admin.createUser({
+            email,
+            email_confirm: true,
+            user_metadata: { first_name: params.firstName, last_name: params.lastName },
+        });
+
+    const { data: created, error: createErr } = await create(params.email);
+    if (!createErr && created.user) return { userId: created.user.id, email: params.email };
+
+    const existingId = await findAuthUserIdByEmail(params.email);
+    if (!existingId) {
+        throw new Error(`création du compte impossible : ${createErr?.message ?? 'raison inconnue'}`);
+    }
+
+    const { data: profil } = await supabase
+        .from('profiles')
+        .select('phone_number')
+        .eq('id', existingId)
+        .maybeSingle();
+    const existingPhone = (profil?.phone_number as string | null) ?? null;
+
+    // Même narrateur, ou compte créé lors d'un essai précédent sans profil.
+    if (!params.phone || !existingPhone || existingPhone === params.phone) {
+        return { userId: existingId, email: params.email };
+    }
+
+    // Un autre narrateur avec le même e-mail d'acheteur : compte distinct.
+    const [local, domain] = params.email.split('@');
+    const alias = `${local}+${params.phone.replace(/\D/g, '')}@${domain}`;
+    const { data: aliasUser, error: aliasErr } = await create(alias);
+    if (!aliasErr && aliasUser.user) return { userId: aliasUser.user.id, email: alias };
+
+    const aliasId = await findAuthUserIdByEmail(alias);
+    if (aliasId) return { userId: aliasId, email: alias };
+    throw new Error(`création du compte cadeau impossible : ${aliasErr?.message ?? 'raison inconnue'}`);
+}
+
+/** Recherche d'un compte d'authentification par e-mail (quelques centaines de comptes au plus). */
+async function findAuthUserIdByEmail(email: string): Promise<string | null> {
+    const target = email.trim().toLowerCase();
+    for (let page = 1; page <= 20; page++) {
+        const { data, error } = await db().auth.admin.listUsers({ page, perPage: 1000 });
+        if (error) throw new Error(`lecture des comptes : ${error.message}`);
+        const hit = data.users.find((u) => (u.email ?? '').toLowerCase() === target);
+        if (hit) return hit.id;
+        if (data.users.length < 1000) return null;
+    }
+    return null;
 }
