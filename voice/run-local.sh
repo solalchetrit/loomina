@@ -26,7 +26,9 @@ trap 'kill $TUNNEL_PID 2>/dev/null; exit' INT TERM EXIT
 
 PUBLIC_URL=""
 for _ in $(seq 1 40); do
-  PUBLIC_URL=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$LOG_DIR/tunnel.log" | head -1)
+  # « api.trycloudflare.com » apparaît dans les messages d'erreur de
+  # cloudflared : ce n'est pas l'adresse du tunnel (panne du 05/10 à 17h48).
+  PUBLIC_URL=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$LOG_DIR/tunnel.log" | grep -v '^https://api\.' | head -1)
   [ -n "$PUBLIC_URL" ] && break
   sleep 0.5
 done

@@ -46,7 +46,9 @@ export const config = {
         /** Durée maximale d'un entretien (secondes). */
         maxCallSeconds: Number(optional('VOICE_MAX_CALL_SECONDS', '2700')),
         /** Silence toléré avant de relancer puis de raccrocher (secondes). */
-        silenceSeconds: Number(optional('VOICE_SILENCE_SECONDS', '45')),
+        // 60 s : un narrateur âgé peut parler longtemps d'une traite, et Twilio
+        // ne signale la parole qu'à la fin de chaque phrase.
+        silenceSeconds: Number(optional('VOICE_SILENCE_SECONDS', '60')),
     },
 } as const;
 

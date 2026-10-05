@@ -182,6 +182,16 @@ export class CallSession {
         let spoken = '';
         let pending = '';
         this.spokenSoFar = '';
+        // Le délai du client OpenAI ne couvre que l'arrivée de la réponse :
+        // un flux qui s'arrête en route n'était jamais coupé. Sans nouveau
+        // morceau pendant 8 s, on abandonne et on s'excuse.
+        let stalled = false;
+        let idle: NodeJS.Timeout | null = null;
+        const watch = () => {
+            if (idle) clearTimeout(idle);
+            idle = setTimeout(() => { stalled = true; controller.abort(); }, 8000);
+        };
+        watch();
 
         try {
             const stream = await this.openai.chat.completions.create(
@@ -201,6 +211,7 @@ export class CallSession {
             );
 
             for await (const chunk of stream) {
+                watch();
                 if (controller.signal.aborted) break;
                 if (chunk.usage) {
                     this.promptTokens += chunk.usage.prompt_tokens ?? 0;
@@ -231,16 +242,18 @@ export class CallSession {
                 pending = pending.slice(pending.length - keep);
             }
 
-            if (controller.signal.aborted) return;
+            if (controller.signal.aborted && !stalled) return;
+            if (stalled) throw new Error('flux OpenAI muet depuis 8 s');
             if (pending && !pending.includes('#')) { this.sendText(pending, false); spoken += pending; }
             this.sendText('', true);
         } catch (err) {
-            if (controller.signal.aborted) return;
+            if (controller.signal.aborted && !stalled) return;
             console.error(`[${this.callSid}] erreur modèle :`, err instanceof Error ? err.message : err);
             const fallback = "Pardon, je n'ai pas bien entendu. Pouvez-vous répéter ?";
-            this.sendText(fallback, true);
-            spoken = fallback;
+            this.sendText(spoken ? ` ${fallback}` : fallback, true);
+            spoken = spoken ? `${spoken} ${fallback}` : fallback;
         } finally {
+            if (idle) clearTimeout(idle);
             if (this.generation === controller) {
                 this.generation = null;
                 this.spokenSoFar = '';

@@ -44,7 +44,7 @@ point_number() {
 public_ok() {
     local host ip
     host="${1#https://}"
-    ip=$(dig +short @1.1.1.1 "$host" 2>/dev/null | grep -E '^[0-9.]+$' | head -1)
+    ip=$(dig +short +time=2 +tries=1 @1.1.1.1 "$host" 2>/dev/null | grep -E '^[0-9.]+$' | head -1)
     if [ -n "$ip" ]; then
         curl -s -m 8 --resolve "$host:443:$ip" "$1/health" | grep -q '"ok":true'
     else
