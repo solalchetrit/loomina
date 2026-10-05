@@ -97,7 +97,17 @@ export async function claimEvent(eventId: string): Promise<boolean> {
         .select('id');
 
     if (error) throw new Error(`Verrouillage call_events impossible : ${error.message}`);
-    return (data?.length ?? 0) > 0;
+    if ((data?.length ?? 0) === 0) return false;
+
+    // L'essai est compté dès la prise en charge : une fonction tuée à 300 s
+    // n'atteint jamais `markFailed`, et l'événement était repris toutes les
+    // nuits sans jamais atteindre MAX_ATTEMPTS.
+    const { data: row } = await supabase.from('call_events').select('attempts').eq('id', eventId).single();
+    await supabase
+        .from('call_events')
+        .update({ attempts: ((row?.attempts as number) ?? 0) + 1 })
+        .eq('id', eventId);
+    return true;
 }
 
 export async function markDone(eventId: string, outcome: PipelineOutcome) {
@@ -119,13 +129,14 @@ export async function markDone(eventId: string, outcome: PipelineOutcome) {
 export async function markFailed(eventId: string, message: string) {
     const supabase = db();
 
+    // `attempts` a déjà été incrémenté par `claimEvent`.
     const { data } = await supabase
         .from('call_events')
         .select('attempts')
         .eq('id', eventId)
         .single();
 
-    const attempts = ((data?.attempts as number) ?? 0) + 1;
+    const attempts = (data?.attempts as number) ?? 0;
 
     await supabase
         .from('call_events')
@@ -133,7 +144,6 @@ export async function markFailed(eventId: string, message: string) {
             // Au-delà de MAX_ATTEMPTS on laisse en `failed` sans le remettre
             // en file : inutile de boucler sur une erreur permanente.
             status: attempts >= MAX_ATTEMPTS ? 'failed' : 'pending',
-            attempts,
             error: message.slice(0, 2000),
             processed_at: new Date().toISOString(),
         })
