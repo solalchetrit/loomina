@@ -48,7 +48,8 @@ stop_run() {
     [ -n "$RUN_PID" ] && kill "$RUN_PID" 2>/dev/null
     pkill -f "cloudflared tunnel --url http://localhost:${PORT:-8080}" 2>/dev/null
     pkill -f "loomina/voice/node_modules/tsx" 2>/dev/null
-    sleep 2
+    # Le serveur clôt les appels et met les rapports sur disque (5 s max).
+    sleep 6
 }
 trap 'stop_run; exit' INT TERM
 
@@ -71,6 +72,10 @@ while true; do
         sleep 20
         if curl -s -m 8 "$URL/health" | grep -q '"ok":true'; then
             fails=0
+        elif curl -s -m 3 "localhost:${PORT:-8080}/health" | grep -q '"sessions":[1-9]'; then
+            # Un appel est en cours : on ne coupe pas, il se termine peut-être
+            # normalement (coupure brève du tunnel). On relancera après.
+            echo "[keepalive] $(date '+%H:%M:%S') URL publique muette, appel en cours : pas de relance"
         else
             fails=$((fails + 1))
             echo "[keepalive] $(date '+%H:%M:%S') URL publique muette ($fails/3)"

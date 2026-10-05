@@ -17,6 +17,7 @@ import { WebSocketServer } from 'ws';
 import type { WebSocket } from 'ws';
 import twilio from 'twilio';
 import { config, wsUrl } from './config.ts';
+import { flushSpool } from './report.ts';
 import { conversationRelayTwiml, sayAndHangupTwiml } from './twiml.ts';
 import { planForCaller } from './plan.ts';
 import { CallSession } from './session.ts';
@@ -74,6 +75,14 @@ async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse):
         const session = new CallSession({ callSid, from, to, direction, plan });
         sessions.set(callSid, session);
         console.info(`[voice] ${direction} ${callSid} → ${plan.label}`);
+        // Raccroché avant que Twilio n'ouvre le WebSocket : sans ce ménage,
+        // la session restait en mémoire pour toujours.
+        setTimeout(() => {
+            if (sessions.get(callSid) === session && !session.attached) {
+                sessions.delete(callSid);
+                console.info(`[voice] ${callSid} jamais connecté, session retirée`);
+            }
+        }, 60_000);
         reply(res, 200, conversationRelayTwiml({ welcomeGreeting: plan.firstMessage, callSid }), 'text/xml');
     } catch (err) {
         console.error('[voice] préparation impossible :', err instanceof Error ? err.message : err);
@@ -186,4 +195,27 @@ wss.on('connection', (ws: WebSocket) => {
 
 server.listen(config.port, () => {
     console.info(`[voice] prêt sur :${config.port} — WebSocket ${wsUrl()} — modèle ${config.openai.model}`);
+    // Rapports restés en attente (site injoignable, redémarrage) : au
+    // démarrage puis chaque minute.
+    void flushSpool();
+    setInterval(() => void flushSpool(), 60_000);
 });
+
+/**
+ * Arrêt propre : chaque appel en cours est clos et son rapport écrit sur
+ * disque avant de quitter. Avant, un redémarrage perdait l'entretien.
+ */
+let stopping = false;
+async function shutdown(signal: string): Promise<void> {
+    if (stopping) return;
+    stopping = true;
+    console.info(`[voice] ${signal} — ${sessions.size} appel(s) en cours, arrêt propre`);
+    server.close();
+    const pending = [...sessions.values()].map((s) => s.finish('server-shutdown'));
+    // Le rapport est déjà sur disque dès le début de finish() ; on laisse
+    // quelques secondes à l'envoi, le reste partira au prochain démarrage.
+    await Promise.race([Promise.allSettled(pending), new Promise((r) => setTimeout(r, 5000))]);
+    process.exit(0);
+}
+process.on('SIGTERM', () => void shutdown('SIGTERM'));
+process.on('SIGINT', () => void shutdown('SIGINT'));

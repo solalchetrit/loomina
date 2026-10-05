@@ -40,3 +40,4 @@ yarn-error.log*
 /voice/node_modules
 /voice/.env
 /voice/.public-url
+/voice/spool/

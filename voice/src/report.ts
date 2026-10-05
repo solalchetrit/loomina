@@ -7,7 +7,17 @@
  * rien changer à la fabrication des chapitres.
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { config } from './config.ts';
+
+/**
+ * Dossier d'attente des rapports. Un rapport y est écrit AVANT tout envoi
+ * et n'en sort qu'une fois accepté par le site : une coupure réseau, un
+ * site en erreur ou un redémarrage du serveur ne perdent plus l'entretien.
+ */
+export const SPOOL_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'spool');
 
 export interface TurnRecord {
     role: 'bot' | 'user';
@@ -84,10 +94,52 @@ export function buildEndOfCallReport(input: CallReportInput) {
     };
 }
 
+type Report = ReturnType<typeof buildEndOfCallReport>;
+
+/**
+ * Livre un rapport : copie sur disque, puis jusqu'à 5 essais espacés
+ * (2, 4, 8, 16 s). En cas d'échec il reste sur disque et `flushSpool`
+ * le renverra plus tard. Le site déduplique sur l'identifiant d'appel :
+ * renvoyer deux fois est sans risque.
+ */
+export async function deliverReport(callSid: string, report: Report): Promise<boolean> {
+    fs.mkdirSync(SPOOL_DIR, { recursive: true });
+    const file = path.join(SPOOL_DIR, `${callSid.replace(/[^A-Za-z0-9_-]/g, '')}.json`);
+    fs.writeFileSync(file, JSON.stringify(report));
+
+    for (let attempt = 1; attempt <= 5; attempt++) {
+        try {
+            await postEndOfCallReport(report);
+            fs.rmSync(file, { force: true });
+            return true;
+        } catch (err) {
+            console.warn(`[${callSid}] envoi du rapport, essai ${attempt}/5 :`, err instanceof Error ? err.message : err);
+            if (attempt < 5) await new Promise((r) => setTimeout(r, 2000 * 2 ** (attempt - 1)));
+        }
+    }
+    return false;
+}
+
+/** Renvoie les rapports restés en attente. Appelé au démarrage puis chaque minute. */
+export async function flushSpool(): Promise<void> {
+    if (!fs.existsSync(SPOOL_DIR)) return;
+    for (const name of fs.readdirSync(SPOOL_DIR).filter((n) => n.endsWith('.json'))) {
+        const file = path.join(SPOOL_DIR, name);
+        try {
+            await postEndOfCallReport(JSON.parse(fs.readFileSync(file, 'utf8')));
+            fs.rmSync(file, { force: true });
+            console.info(`[spool] rapport ${name} livré`);
+        } catch (err) {
+            console.warn(`[spool] ${name} toujours en attente :`, err instanceof Error ? err.message : err);
+        }
+    }
+}
+
 /** Envoie le rapport au site, exactement comme Vapi le faisait. */
-export async function postEndOfCallReport(report: ReturnType<typeof buildEndOfCallReport>): Promise<void> {
+export async function postEndOfCallReport(report: Report): Promise<void> {
     const url = `${config.nextBaseUrl}/api/vapi/webhook`;
     const response = await fetch(url, {
+        signal: AbortSignal.timeout(20_000),
         method: 'POST',
         headers: {
             'content-type': 'application/json',

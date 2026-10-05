@@ -12,7 +12,7 @@ import type { WebSocket } from 'ws';
 import OpenAI from 'openai';
 import { config } from './config.ts';
 import type { CallPlan } from './plan.ts';
-import { buildEndOfCallReport, postEndOfCallReport } from './report.ts';
+import { buildEndOfCallReport, deliverReport } from './report.ts';
 import type { TurnRecord } from './report.ts';
 
 const END_MARKER = '##END_CALL##';
@@ -49,6 +49,8 @@ export class CallSession {
     private silenceNudged = false;
     private finished = false;
     private endRequested = false;
+    /** Texte déjà envoyé à la voix pour la réponse en cours. */
+    private spokenSoFar = '';
 
     constructor(init: SessionInit) {
         this.callSid = init.callSid;
@@ -61,6 +63,14 @@ export class CallSession {
     // ------------------------------------------------------------
     // Cycle de vie
     // ------------------------------------------------------------
+
+    get attached(): boolean {
+        return this.ws !== null;
+    }
+
+    get active(): boolean {
+        return !this.finished;
+    }
 
     attach(ws: WebSocket): void {
         this.ws = ws;
@@ -82,20 +92,28 @@ export class CallSession {
         if (!clean) return;
 
         this.armSilenceTimer();
-        this.turns.push({ role: 'user', message: clean, time: Date.now() });
+        // D'abord clore la réponse en cours (gardée telle que dite), puis
+        // la phrase du narrateur : l'historique reste dans l'ordre.
         this.abortGeneration();
+        this.turns.push({ role: 'user', message: clean, time: Date.now() });
         await this.generate();
     }
 
     onInterrupt(utteranceUntilInterrupt: string): void {
         this.interruptions += 1;
-        this.abortGeneration();
-        // Ne garder que ce que le narrateur a réellement entendu.
-        const lastBot = [...this.turns].reverse().find((t) => t.role === 'bot');
-        if (lastBot && utteranceUntilInterrupt) {
-            lastBot.message = utteranceUntilInterrupt.trim();
+        const heard = utteranceUntilInterrupt.trim();
+        if (this.generation) {
+            // Réponse encore en cours : elle n'est pas dans l'historique.
+            // On l'y ajoute, réduite à ce qui a été entendu.
+            this.abortGeneration(heard);
+            return;
         }
+        // Réponse déjà complète mais en train d'être lue : on la tronque.
+        const lastBot = [...this.turns].reverse().find((t) => t.role === 'bot');
+        if (lastBot && heard) lastBot.message = heard;
     }
+
+
 
     /** Fin de session, quelle qu'en soit la cause. Idempotent. */
     async finish(reason: string): Promise<void> {
@@ -133,11 +151,10 @@ export class CallSession {
             interruptions: this.interruptions,
         });
 
-        try {
-            await postEndOfCallReport(report);
+        if (await deliverReport(this.callSid, report)) {
             console.info(`[${this.callSid}] rapport envoyé au site`);
-        } catch (err) {
-            console.error(`[${this.callSid}] rapport NON envoyé :`, err instanceof Error ? err.message : err);
+        } else {
+            console.error(`[${this.callSid}] rapport gardé sur disque, nouvel envoi plus tard`);
         }
     }
 
@@ -152,6 +169,7 @@ export class CallSession {
         let firstTokenAt: number | null = null;
         let spoken = '';
         let pending = '';
+        this.spokenSoFar = '';
 
         try {
             const stream = await this.openai.chat.completions.create(
@@ -190,14 +208,14 @@ export class CallSession {
                 if (idx >= 0) {
                     this.endRequested = true;
                     const before = pending.slice(0, idx);
-                    if (before) { this.sendText(before, false); spoken += before; }
+                    if (before) { this.sendText(before, false); spoken += before; this.spokenSoFar = spoken; }
                     pending = '';
                     break;
                 }
                 // Garder un éventuel début de marqueur ("##END") en attente.
                 const keep = partialMarkerLength(pending);
                 const emit = pending.slice(0, pending.length - keep);
-                if (emit) { this.sendText(emit, false); spoken += emit; }
+                if (emit) { this.sendText(emit, false); spoken += emit; this.spokenSoFar = spoken; }
                 pending = pending.slice(pending.length - keep);
             }
 
@@ -211,11 +229,17 @@ export class CallSession {
             this.sendText(fallback, true);
             spoken = fallback;
         } finally {
-            if (this.generation === controller) this.generation = null;
+            if (this.generation === controller) {
+                this.generation = null;
+                this.spokenSoFar = '';
+            }
         }
 
         if (spoken.trim()) {
             this.turns.push({ role: 'bot', message: spoken.trim(), time: Date.now() });
+            // Le silence se compte à partir de la fin de la voix de Loomina,
+            // pas de la dernière phrase du narrateur (~60 ms par caractère).
+            if (!this.endRequested) this.armSilenceTimer(spoken.length * 60);
         }
 
         if (this.endRequested) {
@@ -233,21 +257,29 @@ export class CallSession {
         return [{ role: 'system', content: this.plan.systemPrompt }, ...history];
     }
 
-    private abortGeneration(): void {
-        if (this.generation) {
-            this.generation.abort();
-            this.generation = null;
-        }
+    /**
+     * Coupe la réponse en cours et l'inscrit dans l'historique telle que le
+     * narrateur l'a entendue (ou telle qu'envoyée à la voix). Avant, une
+     * réponse coupée disparaissait et l'interruption écrasait la réponse
+     * précédente.
+     */
+    private abortGeneration(heard?: string): void {
+        if (!this.generation) return;
+        this.generation.abort();
+        this.generation = null;
+        const said = (heard || this.spokenSoFar).trim();
+        this.spokenSoFar = '';
+        if (said) this.turns.push({ role: 'bot', message: said, time: Date.now() });
     }
 
     // ------------------------------------------------------------
     // Silence et fin
     // ------------------------------------------------------------
 
-    private armSilenceTimer(): void {
+    private armSilenceTimer(extraMs = 0): void {
         if (this.silenceTimer) clearTimeout(this.silenceTimer);
         this.silenceNudged = false;
-        this.silenceTimer = setTimeout(() => void this.onSilence(), config.limits.silenceSeconds * 1000);
+        this.silenceTimer = setTimeout(() => void this.onSilence(), config.limits.silenceSeconds * 1000 + extraMs);
     }
 
     private async onSilence(): Promise<void> {
