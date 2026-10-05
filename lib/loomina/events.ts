@@ -102,11 +102,13 @@ export async function claimEvent(eventId: string): Promise<boolean> {
     // L'essai est compté dès la prise en charge : une fonction tuée à 300 s
     // n'atteint jamais `markFailed`, et l'événement était repris toutes les
     // nuits sans jamais atteindre MAX_ATTEMPTS.
-    const { data: row } = await supabase.from('call_events').select('attempts').eq('id', eventId).single();
-    await supabase
+    const { data: row, error: readErr } = await supabase.from('call_events').select('attempts').eq('id', eventId).single();
+    if (readErr) throw new Error(`Lecture des essais impossible : ${readErr.message}`);
+    const { error: countErr } = await supabase
         .from('call_events')
         .update({ attempts: ((row?.attempts as number) ?? 0) + 1 })
         .eq('id', eventId);
+    if (countErr) throw new Error(`Comptage des essais impossible : ${countErr.message}`);
     return true;
 }
 
@@ -252,6 +254,16 @@ export async function sweepPending(limit = 10): Promise<{ picked: number; result
         .limit(limit);
 
     if (error) throw new Error(`Lecture de la file impossible : ${error.message}`);
+
+    // Tué pendant son dernier essai : `markFailed` n'a jamais tourné et la
+    // ligne serait restée « processing » pour toujours. On la clôt.
+    const stuckBefore = new Date(Date.now() - STUCK_AFTER_MS).toISOString();
+    await supabase
+        .from('call_events')
+        .update({ status: 'failed', error: 'Abandonné : traitement interrompu à chaque essai (délai dépassé)' })
+        .eq('status', 'processing')
+        .gte('attempts', MAX_ATTEMPTS)
+        .lt('claimed_at', stuckBefore);
 
     const results: string[] = [];
     for (const row of data ?? []) {
