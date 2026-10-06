@@ -3,11 +3,12 @@ import Accordion from "@/components/ui/Accordion";
 import Button from "@/components/ui/Button";
 import CtaBand from "@/components/CtaBand";
 import { SITE_CONFIG } from "@/app/config";
+import { OFFER, INCLUDED as INCLUDED_LIST, GUARANTEE } from "@/config/offer";
 
 const INCLUDED = [
-  { title: "La collecte", items: ["14 appels thématiques guidés", "Durée adaptée à votre rythme", "Enregistrements chiffrés, hébergés en Europe", "Modifications illimitées à chaque étape"] },
-  { title: "La rédaction", items: ["Transformation en prose littéraire", "Relecture par des professionnels", "Respect de votre voix", "Validation chapitre par chapitre"] },
-  { title: "Le livre", items: ["Couverture rigide, reliure cousue", "150 à 250 pages personnalisées", "Vos photos intégrées", "Version numérique (ebook) incluse"] },
+  { title: "Les appels", items: ["Autant d’appels qu’il vous faut", "14 thèmes pour vous guider", "Vous appelez quand vous voulez", "Vos données stockées en Europe, jamais revendues"] },
+  { title: "L’écriture", items: ["Un chapitre écrit après chaque appel", "Dans vos mots, sans rien inventer", "Vos corrections, autant que nécessaire", "Chaque page relue par notre équipe"] },
+  { title: "Le livre", items: ["Couverture rigide, format 15 × 23 cm", "Vos photos placées dans le texte", "Livraison incluse en France métropolitaine", "Version numérique (PDF et EPUB) pour la famille"] },
 ];
 
 const COMPARE = {
@@ -22,18 +23,12 @@ const COMPARE = {
   ],
 };
 
-const TESTIMONIALS = [
-  { name: "Marie L.", meta: "68 ans, pour elle-même", text: "J’ai toujours voulu écrire mes mémoires mais je ne savais pas par où commencer. Loomina a rendu cela si simple et naturel." },
-  { name: "Jean-Pierre D.", meta: "75 ans, cadeau de sa fille", text: "Les conversations étaient passionnantes. C’est devenu un moment que j’attendais chaque semaine." },
-  { name: "Sophie M.", meta: "Pour sa mère, 72 ans", text: "Le plus beau cadeau que j’ai pu faire à ma mère. Maintenant nous avons un trésor familial pour toujours." },
-];
-
 const FAQ = [
   { q: "Combien de temps dure le processus ?", a: "En moyenne 6 à 8 semaines, mais nous nous adaptons totalement à votre rythme. Certains avancent vite, d’autres prennent leur temps." },
   { q: "Que se passe-t-il si je veux modifier quelque chose ?", a: "Vous validez chaque chapitre avant de passer au suivant. Les modifications sont illimitées jusqu’à votre satisfaction complète." },
-  { q: "Puis-je offrir Loomina en cadeau ?", a: "Oui, c’est même l’un des cadeaux les plus appréciés. Nous fournissons un bon cadeau élégant à offrir." },
-  { q: "Mes données sont-elles sécurisées ?", a: "Vos enregistrements et textes sont chiffrés, stockés en Europe et jamais partagés. Vous pouvez demander leur suppression à tout moment." },
-  { q: "Y a-t-il une garantie ?", a: "Oui. Si après le premier appel vous n’êtes pas satisfait, nous vous remboursons intégralement, sans question." },
+  { q: "Puis-je offrir Loomina ?", a: "Oui. À la commande, choisissez « C’est pour offrir » et indiquez le prénom et le numéro de la personne qui racontera. C’est elle qui appellera Loomina, depuis ce numéro." },
+  { q: "Mes données sont-elles protégées ?", a: "Vos textes sont stockés en Europe, ne sont jamais revendus et servent uniquement à écrire votre livre. Vous pouvez demander leur suppression à tout moment." },
+  { q: "Y a-t-il une garantie ?", a: `Oui. ${GUARANTEE}` },
 ];
 
 const Check = ({ dark = false }: { dark?: boolean }) => (
@@ -52,45 +47,35 @@ export default function OffrePage() {
   const price = SITE_CONFIG.product.price;
   return (
     <main className="w-full">
-      <PageHeader eyebrow="L’offre" title="Votre Livre de vie," accent="clé en main." text="Un seul forfait, tout compris : de la première conversation au livre relié posé sur votre table.">
+      <PageHeader title="Un prix, tout compris" text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus.">
         {/* Carte prix */}
         <div className="rise mx-auto mt-14 grid max-w-5xl overflow-hidden rounded-[28px] bg-[var(--paper)] shadow-[0_0_0_1px_var(--hairline),0_30px_60px_-40px_rgba(26,24,21,0.35)] lg:grid-cols-[1fr_1.1fr]" style={{ "--i": 2 } as React.CSSProperties}>
           <div className="paper-grain relative flex flex-col justify-between gap-10 bg-[var(--ink)] p-7 text-left sm:p-10 md:p-12">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_0%,rgba(212,176,106,0.22),transparent_70%)]" />
             <div className="relative">
-              <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--loomina-gold-light)]">
-                Forfait unique
-              </span>
-              <h2 className="mt-5 font-serif text-[28px] leading-tight tracking-[-0.02em] text-[var(--loomina-void)] md:text-[32px]">Le Coffret Biographie Complet</h2>
+              <h2 className="font-serif text-[28px] leading-tight tracking-[-0.01em] text-[var(--loomina-void)] md:text-[32px]">{OFFER.name}</h2>
               <div className="mt-6 flex items-start gap-1.5">
                 <span className="font-serif text-[96px] leading-[0.85] tracking-[-0.04em] text-[var(--loomina-void)] md:text-[112px]">{price}</span>
                 <span className="mt-1 font-serif text-3xl text-[var(--loomina-gold-light)]">{SITE_CONFIG.product.currencySymbol}</span>
               </div>
-              <p className="mt-5 font-sans text-[15px] text-[#cfc8bb]">Paiement unique. Aucun frais caché, aucun abonnement.</p>
+              <p className="mt-5 font-sans text-[15px] text-[#d6cfc2]">Paiement unique par carte, sécurisé par Stripe.</p>
             </div>
             <div className="relative">
               <Button href="/order" variant="primary" size="lg" fullWidth className="!bg-[var(--loomina-void)] !text-[var(--ink)] hover:!bg-white">
-                Commander ma biographie
+                Commander
               </Button>
-              <p className="mt-4 text-center font-sans text-[13px] text-[#cfc8bb]">Satisfait ou remboursé après le premier appel · Paiement sécurisé Stripe</p>
+              <p className="mt-4 text-center font-sans text-[13px] leading-relaxed text-[#d6cfc2]">{GUARANTEE}</p>
             </div>
           </div>
           <div className="p-7 text-left sm:p-10 md:p-12">
-            <p className="eyebrow">Ce qui est inclus</p>
-            <ul className="mt-5 divide-y divide-[var(--hairline)]">
-              {[
-                ["Entretiens illimités", "avec votre biographe IA, à votre rythme"],
-                ["Rédaction & corrections", "prose littéraire, relue par des humains"],
-                ["Vos photos intégrées", "pour illustrer votre récit"],
-                ["Livre relié", "couverture rigide, livré chez vous"],
-                ["Version numérique", "ebook privé à partager en famille"],
-                ["Bon cadeau", "si vous l’offrez à un proche"],
-              ].map(([t, s]) => (
-                <li key={t} className="flex items-start gap-3 py-3.5">
+            <p className="font-sans text-[14px] font-semibold text-[var(--ink)]">Ce qui est inclus</p>
+            <ul className="mt-4 divide-y divide-[var(--hairline)]">
+              {INCLUDED_LIST.map((it) => (
+                <li key={it.title} className="flex items-start gap-3 py-4">
                   <Check />
-                  <span className="font-sans text-[15px] leading-snug text-[var(--ink)]">
-                    <span className="font-semibold">{t}</span>
-                    <span className="text-[var(--text-muted)]"> — {s}</span>
+                  <span className="font-sans text-[16px] leading-snug text-[var(--ink)]">
+                    <span className="block font-semibold">{it.title}</span>
+                    <span className="mt-0.5 block text-[var(--text-secondary)]">{it.detail}</span>
                   </span>
                 </li>
               ))}
@@ -101,7 +86,7 @@ export default function OffrePage() {
 
       {/* Détail */}
       <Section>
-        <SectionHeading eyebrow="En détail" title="Tout est" accent="compris." text="Trois étapes, un seul prix. Voici précisément ce que couvre le forfait." />
+        <SectionHeading title="Ce que couvre le prix, en détail" />
         <div className="mt-14 grid gap-px overflow-hidden rounded-3xl bg-[var(--hairline)] shadow-[0_0_0_1px_var(--hairline)] md:grid-cols-3">
           {INCLUDED.map((g, i) => (
             <div key={g.title} className="reveal bg-[var(--paper)] p-7 md:p-8">
@@ -121,7 +106,7 @@ export default function OffrePage() {
 
       {/* Comparatif */}
       <Section tone="alt">
-        <SectionHeading eyebrow="Comparer" title="Pourquoi Loomina," accent="plutôt qu’autre chose ?" text="Un biographe coûte plusieurs milliers d’euros. Écrire seul demande des mois. Loomina prend le meilleur des deux." />
+        <SectionHeading title="Pourquoi pas un biographe, ou écrire soi-même ?" text="Un biographe coûte plusieurs milliers d’euros. Écrire seul demande des mois. Loomina se situe entre les deux." />
         <div className="reveal mx-auto mt-14 max-w-5xl overflow-x-auto rounded-3xl bg-[var(--paper)] shadow-[0_0_0_1px_var(--hairline)]">
           <table className="w-full min-w-[640px] border-collapse font-sans text-[15px]">
             <thead>
@@ -151,35 +136,16 @@ export default function OffrePage() {
         <p className="mt-4 text-center font-sans text-[13px] text-[var(--text-muted)]">Fourchettes indicatives constatées sur le marché français.</p>
       </Section>
 
-      {/* Témoignages */}
-      <Section>
-        <SectionHeading eyebrow="Ils nous font confiance" title="Ce qu’en disent" accent="les familles." />
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <figure key={t.name} className="reveal card flex flex-col justify-between rounded-3xl p-7">
-              <blockquote className="font-serif text-[20px] leading-[1.4] tracking-[-0.01em] text-[var(--ink)]">« {t.text} »</blockquote>
-              <figcaption className="mt-8 flex items-center gap-3 border-t border-[var(--hairline)] pt-5 font-sans">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--ink)] font-serif text-base text-[var(--loomina-gold-light)]">{t.name[0]}</span>
-                <span>
-                  <span className="block text-[15px] font-semibold text-[var(--ink)]">{t.name}</span>
-                  <span className="block text-[13px] text-[var(--text-muted)]">{t.meta}</span>
-                </span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </Section>
-
       {/* FAQ */}
       <Section tone="alt" size="md">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
-          <SectionHeading align="left" eyebrow="Questions" title="Avant de" accent="commander." text={<>Toutes les réponses détaillées sont dans la <a href="/faq" className="text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4">FAQ complète</a>.</>} />
+          <SectionHeading align="left" title="Avant de commander" text={<>Toutes les réponses détaillées sont dans la <a href="/faq" className="text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4">FAQ complète</a>.</>} />
           <Accordion items={FAQ} className="reveal" />
         </div>
       </Section>
 
       <div className="pt-8">
-        <CtaBand title="Prêt à" accent="commencer ?" text="Rejoignez les familles qui ont choisi Loomina pour préserver leurs histoires." secondary={{ href: "/contact", label: "Poser une question" }} />
+        <CtaBand title="Pas encore sûr ?" accent="Essayez trois minutes." text="Appelez le 01 59 16 93 57 et racontez un souvenir à Loomina. C’est gratuit et rien n’est enregistré." primary={{ href: "tel:+33159169357", label: "Appeler le 01 59 16 93 57" }} secondary={{ href: "/order", label: "Commander" }} />
       </div>
     </main>
   );

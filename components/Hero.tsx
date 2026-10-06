@@ -1,22 +1,13 @@
 import { LOOMINA_CONFIG } from "@/config/loomina";
 import Button from "@/components/ui/Button";
+import { OFFER } from "@/config/offer";
 
 const FACTS = [
-  { value: "14+", label: "chapitres rédigés" },
-  { value: "Illimités", label: "entretiens par téléphone" },
-  { value: "Relié", label: "livre imprimé et livré" },
-  { value: "449 €", label: "tout compris" },
+  { value: `${OFFER.demoMinutes} min`, label: "pour essayer, gratuitement" },
+  { value: `${OFFER.chapters} chapitres`, label: "un thème de vie par appel" },
+  { value: OFFER.delay, label: "du premier appel au livre" },
+  { value: `${OFFER.price} €`, label: "tout compris, livraison incluse" },
 ];
-
-const CheckIcon = () => (
-  <svg className="h-4 w-4 shrink-0 text-[var(--gold-ink)]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-    <path
-      fillRule="evenodd"
-      d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.5 7.57a1 1 0 0 1-1.42 0l-3.5-3.53a1 1 0 1 1 1.42-1.408l2.79 2.814 6.79-6.853a1 1 0 0 1 1.414-.006Z"
-      clipRule="evenodd"
-    />
-  </svg>
-);
 
 const PhoneIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden="true">
@@ -32,9 +23,6 @@ const PhoneIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
 function BookVisual() {
   return (
     <div aria-hidden="true" className="relative mx-auto aspect-[5/6] w-full max-w-[340px] select-none sm:max-w-[420px] lg:max-w-[480px]">
-      {/* Halo doré */}
-      <div className="absolute inset-[8%] rounded-full bg-[radial-gradient(closest-side,rgba(212,176,106,0.35),rgba(212,176,106,0)_70%)]" />
-
       {/* Page d'extrait, derrière le livre */}
       <div
         className="settle absolute right-[-3%] top-[5%] w-[50%] rotate-[5deg] rounded-[6px] bg-[var(--paper)] py-[5%] pl-[8%] pr-[5%] shadow-[0_24px_48px_-24px_rgba(26,24,21,0.35),0_0_0_1px_var(--hairline)]"
@@ -123,81 +111,65 @@ function BookVisual() {
 export default function Hero() {
   return (
     <section id="home" className="relative w-full scroll-mt-0 overflow-hidden">
-      {/* Fond : lumière chaude très douce */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[720px] bg-[radial-gradient(60%_50%_at_75%_30%,rgba(212,176,106,0.14),transparent_70%)]"
-      />
-
-      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-5 pb-16 pt-28 sm:px-6 md:pt-36 lg:min-h-[min(92svh,860px)] lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:pb-20 lg:pt-32">
+      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-5 pb-16 pt-28 sm:px-6 md:pt-36 lg:min-h-[min(92svh,860px)] lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:pb-20 lg:pt-32">
         {/* Texte */}
         <div className="flex flex-col items-start">
-          <span
-            className="rise inline-flex items-center gap-2 rounded-full border border-[var(--hairline)] bg-[var(--paper)]/70 py-1 pl-1.5 pr-3 font-sans text-[12px] font-medium text-[var(--text-secondary)]"
+          <p
+            className="rise font-sans text-[14px] font-medium text-[var(--text-secondary)]"
             style={{ "--i": 0 } as React.CSSProperties}
           >
-            <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-[var(--ink)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--loomina-gold-light)]" />
-            </span>
-            La 1ʳᵉ IA biographe, par téléphone
-          </span>
+            Biographie par téléphone · livre relié
+          </p>
 
           <h1
-            className="rise mt-6 font-serif text-[clamp(2.75rem,7vw,5.25rem)] leading-[1.02] tracking-[-0.035em] text-[var(--ink)]"
+            className="rise mt-5 font-serif text-[clamp(2.6rem,6.2vw,4.75rem)] leading-[1.04] tracking-[-0.025em] text-[var(--ink)]"
             style={{ "--i": 1 } as React.CSSProperties}
           >
-            Vos souvenirs méritent <em className="whitespace-nowrap text-[var(--gold-ink)]">l’éternité.</em>
+            Racontez votre vie au téléphone. <span className="italic text-[var(--gold-ink)]">Nous en faisons un livre.</span>
           </h1>
 
           <p
-            className="rise mt-6 max-w-[34rem] font-sans text-[17px] leading-[1.65] text-[var(--text-secondary)] sm:text-lg"
+            className="rise mt-6 max-w-[36rem] font-sans text-[18px] leading-[1.65] text-[var(--text-secondary)]"
             style={{ "--i": 2 } as React.CSSProperties}
           >
-            Racontez votre histoire au téléphone, simplement. Notre IA biographe en fait un{" "}
-            <span className="font-medium text-[var(--ink)]">Livre de Vie d’exception</span>, sans que vous ayez à écrire
-            une seule ligne.
+            Vous parlez, comme à quelqu’un qui vous écoute vraiment. Après chaque appel, Loomina écrit un chapitre
+            dans vos mots. Notre équipe relit chaque page, et vous recevez le livre relié chez vous.
           </p>
 
+          {/* Démo : l'action la plus simple, mise en avant */}
           <div
-            className="rise mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
+            className="rise mt-9 w-full max-w-[36rem] rounded-2xl border border-[var(--hairline-strong)] bg-[var(--paper)] p-5 sm:p-6"
             style={{ "--i": 3 } as React.CSSProperties}
           >
-            <Button href="/order" variant="primary" size="lg" className="w-full sm:w-auto">
-              Commander mon livre
-            </Button>
-            <Button href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} variant="secondary" size="lg" className="w-full sm:w-auto">
-              <PhoneIcon />
-              Essayer gratuitement
-            </Button>
-          </div>
-
-          <p
-            className="rise mt-4 font-sans text-sm text-[var(--text-muted)]"
-            style={{ "--i": 4 } as React.CSSProperties}
-          >
-            Démo de 3 minutes, sans engagement : appelez le{" "}
+            <p className="font-sans text-[14px] font-semibold text-[var(--ink)]">Essayez maintenant, c’est gratuit</p>
             <a
               href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`}
-              className="font-medium text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4 transition-colors duration-200 hover:decoration-[var(--loomina-gold)]"
+              className="group mt-2 inline-flex items-center gap-3 font-serif text-[clamp(2rem,4.4vw,2.6rem)] leading-none tracking-[-0.01em] text-[var(--ink)]"
             >
-              {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--ink)] text-[var(--loomina-gold-light)] transition-transform duration-200 group-active:scale-95">
+                <PhoneIcon className="h-5 w-5" />
+              </span>
+              <span className="underline decoration-[var(--loomina-gold)]/40 decoration-1 underline-offset-[6px] group-hover:decoration-[var(--loomina-gold)]">
+                {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+              </span>
             </a>
-          </p>
+            <p className="mt-3 font-sans text-[15px] leading-relaxed text-[var(--text-secondary)]">
+              Trois minutes avec Loomina : vous racontez un souvenir, elle vous pose quelques questions. Rien n’est
+              enregistré. Prix d’un appel normal.
+            </p>
+          </div>
 
-          <ul
-            className="rise mt-8 flex flex-wrap gap-x-5 gap-y-2 font-sans text-[13px] text-[var(--text-secondary)]"
-            style={{ "--i": 5 } as React.CSSProperties}
+          <div
+            className="rise mt-6 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
+            style={{ "--i": 4 } as React.CSSProperties}
           >
-            <li className="flex items-center gap-1.5 font-sans">
-              <CheckIcon /> Paiement sécurisé
-            </li>
-            <li className="flex items-center gap-1.5 font-sans">
-              <CheckIcon /> Satisfait ou remboursé
-            </li>
-            <li className="flex items-center gap-1.5 font-sans">
-              <CheckIcon /> Sans rien écrire
-            </li>
-          </ul>
+            <Button href="/order" variant="primary" size="lg" className="w-full sm:w-auto">
+              Commander · {OFFER.price} €
+            </Button>
+            <Button href="#parcours" variant="ghost" size="lg" className="w-full sm:w-auto">
+              Comment ça se passe
+            </Button>
+          </div>
         </div>
 
         {/* Visuel */}
@@ -211,18 +183,17 @@ export default function Hero() {
             <div
               key={fact.label}
               className={[
-                "py-6 md:py-8",
+                "flex flex-col-reverse justify-end py-6 md:py-8",
                 i === 0 ? "" : "md:border-l md:border-[var(--hairline)] md:pl-8",
                 i % 2 === 1 ? "border-l border-[var(--hairline)] pl-5" : "",
                 i === 2 ? "md:pl-8" : "",
                 i > 1 ? "border-t border-[var(--hairline)] md:border-t-0" : "",
               ].join(" ")}
             >
-              <dt className="sr-only">{fact.label}</dt>
-              <dd className="font-serif text-[28px] leading-none tracking-[-0.02em] text-[var(--ink)] md:text-[34px]">
+              <dt className="mt-2 font-sans text-[14px] text-[var(--text-muted)]">{fact.label}</dt>
+              <dd className="font-serif text-[26px] leading-none tracking-[-0.01em] text-[var(--ink)] md:text-[32px]">
                 {fact.value}
               </dd>
-              <dd className="mt-2 font-sans text-[13px] text-[var(--text-muted)]">{fact.label}</dd>
             </div>
           ))}
         </dl>

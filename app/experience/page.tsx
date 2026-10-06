@@ -22,31 +22,30 @@ const CHAPTERS = [
 
 const PHASES = [
   {
-    number: "I",
-    title: "L’initialisation",
-    duration: "Semaine 1",
+    number: "1",
+    title: "Le premier appel",
+    duration: "Le jour de votre choix",
     items: [
-      { title: "Premier appel", desc: "Nous faisons connaissance et définissons ensemble le ton de votre récit." },
-      { title: "Calibrage", desc: "Loomina apprend votre style, vos préférences narratives et vos priorités." },
+      { title: "Faire connaissance", desc: "Loomina se présente, vous explique comment ça marche et vous demande par où vous aimeriez commencer." },
+      { title: "Un premier souvenir", desc: "Souvent l’enfance. Vous parlez, elle relance, et le premier chapitre est écrit dans la foulée." },
     ],
   },
   {
-    number: "II",
+    number: "2",
     title: "Les conversations",
-    duration: "Semaines 2 à 13",
+    duration: "Au fil des semaines",
     items: [
-      { title: "14 appels thématiques", desc: "Une thématique par semaine, à votre rythme." },
-      { title: "Rédaction en continu", desc: "Loomina transforme vos paroles en prose littéraire." },
-      { title: "Validation", desc: "Vous recevez chaque chapitre pour relecture et ajustements." },
+      { title: "Un thème par appel", desc: "Quatorze thèmes proposés, de l’enfance à aujourd’hui. Vous en sautez, vous en ajoutez." },
+      { title: "Un chapitre après chaque appel", desc: "Vous le relisez dans votre espace et dites au prochain appel ce qu’il faut changer." },
     ],
   },
   {
-    number: "III",
-    title: "L’héritage",
-    duration: "Semaine 14",
+    number: "3",
+    title: "Le livre",
+    duration: "6 à 8 semaines en général",
     items: [
-      { title: "Mise en page", desc: "Typographie soignée, couverture personnalisée." },
-      { title: "Livraison", desc: "Votre livre arrive chez vous, prêt à être transmis." },
+      { title: "Relecture et mise en page", desc: "Notre équipe relit chaque page, place vos photos et compose le livre." },
+      { title: "Livraison", desc: "Le livre relié arrive chez vous, avec sa version numérique pour la famille." },
     ],
   },
 ];
@@ -62,10 +61,8 @@ export default function ExperiencePage() {
   return (
     <main className="w-full">
       <PageHeader
-        eyebrow="L’expérience"
-        title="Le voyage de votre vie,"
-        accent="en trois étapes."
-        text="Un parcours simple et accompagné, de la première écoute à la livraison du livre. Vous parlez, Loomina écrit."
+        title="Comment ça marche"
+        text="Vous parlez au téléphone, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, sans jargon."
       />
 
       {/* Phases : frise */}
@@ -97,10 +94,8 @@ export default function ExperiencePage() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <SectionHeading
             align="left"
-            eyebrow="Un appel, concrètement"
-            title="Une conversation,"
-            accent="pas un interrogatoire."
-            text="Loomina reprend là où vous vous étiez arrêté, pose une question à la fois et laisse le silence faire son travail. Vous n’avez rien à préparer."
+            title="Une conversation, pas un interrogatoire"
+            text="Loomina reprend là où vous vous étiez arrêté, pose une question à la fois et vous laisse le temps de chercher vos souvenirs. Vous n’avez rien à préparer."
           />
           <div className="reveal card mx-auto w-full max-w-md rounded-3xl p-2">
             <div className="flex items-center gap-3 border-b border-[var(--hairline)] px-4 py-3">
@@ -110,7 +105,7 @@ export default function ExperiencePage() {
                 </svg>
               </span>
               <div className="flex-1">
-                <p className="font-sans text-[14px] font-semibold text-[var(--ink)]">Entretien n°7 · Le foyer</p>
+                <p className="font-sans text-[14px] font-semibold text-[var(--ink)]">Appel n°7 · La maison de famille</p>
                 <p className="font-sans text-[12px] text-[var(--text-muted)]">En cours · 12 min</p>
               </div>
               <span className="flex h-5 items-center gap-[3px]">
@@ -145,10 +140,8 @@ export default function ExperiencePage() {
       <Section id="chapitres">
         <SectionHeading
           align="left"
-          eyebrow="La carte narrative"
-          title="Quatorze chapitres"
-          accent="pour une vie."
-          text="Chaque appel explore une thématique. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
+          title="Quatorze thèmes pour vous guider"
+          text="Ce sont des points de départ, pas un questionnaire. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
         />
         <div className="mt-12">
           <ChapterCarousel chapters={CHAPTERS} />
@@ -164,16 +157,14 @@ export default function ExperiencePage() {
           <SectionHeading
             className="order-1 lg:order-2"
             align="left"
-            eyebrow="Technologie"
-            title="Memory Engine :"
-            accent="l’IA qui n’oublie rien."
-            text="Loomina relie vos souvenirs entre eux. Si vous parlez de votre grand-mère au chapitre 1, elle saura faire le lien quand vous évoquerez sa cuisine au chapitre 7, et vous posera la bonne question."
+            title="Elle se souvient de ce que vous lui avez dit"
+            text="Si vous parlez de votre grand-mère au premier appel, Loomina s’en souviendra quand vous évoquerez sa cuisine des semaines plus tard, et vous posera la bonne question. Vous n’avez jamais à tout répéter."
           />
         </div>
       </Section>
 
       <div className="pt-8">
-        <CtaBand title="Votre histoire" accent="commence aujourd’hui." text="Essayez gratuitement par téléphone, puis commandez quand vous êtes prêt. Aucun engagement, juste une conversation." secondary={{ href: "/offre", label: "Voir l’offre" }} />
+        <CtaBand title="Essayez d’abord," accent="commandez ensuite." text="Appelez le 01 59 16 93 57 : trois minutes avec Loomina, gratuitement, sans rien enregistrer." primary={{ href: "tel:+33159169357", label: "Appeler le 01 59 16 93 57" }} secondary={{ href: "/order", label: "Commander" }} />
       </div>
     </main>
   );

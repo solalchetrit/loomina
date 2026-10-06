@@ -113,8 +113,8 @@ export default function CGVPage() {
                         <div className="card rounded-3xl p-6 sm:p-8">
                             <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">6. Garantie Satisfait ou Remboursé</h2>
                             <p>
-                                Loomina s’engage à rembourser intégralement le Client si, après le premier entretien téléphonique,
-                                le service, sans avoir à se justifier.
+                                Loomina s’engage à rembourser intégralement le Client qui, après le premier entretien téléphonique,
+                                ne souhaite pas poursuivre le service, sans avoir à se justifier.
                             </p>
                             <p className="mt-4">
                                 Cette garantie s’applique uniquement si la demande de remboursement est formulée dans les <strong className="text-[var(--text-primary)]">7 jours</strong>

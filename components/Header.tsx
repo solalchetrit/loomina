@@ -7,10 +7,10 @@ import { motion, AnimatePresence, Variants, useReducedMotion } from "framer-moti
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { href: "/", label: "Accueil" },
-  { href: "/experience", label: "L’Expérience" },
-  { href: "/offre", label: "L’Offre" },
-  { href: "/about", label: "À Propos" },
+  { href: "/experience", label: "Comment ça marche" },
+  { href: "/offre", label: "Prix" },
+  { href: "/about", label: "Notre histoire" },
+  { href: "/faq", label: "Questions" },
 ];
 
 export default function Header() {
@@ -104,7 +104,7 @@ export default function Header() {
             {NAV_LINKS.map((item) => (
               <Link
                 key={item.href}
-                href={item.label === "Accueil" ? "/#home" : item.href}
+                href={item.href}
                 aria-current={isActive(item.href) ? "page" : undefined}
                 className={`relative rounded-full px-3.5 py-2 font-sans text-[14px] font-medium transition-colors duration-200 lg:px-4 ${
                   isActive(item.href)
@@ -125,13 +125,13 @@ export default function Header() {
               href="/dashboard"
               className="rounded-full px-3.5 py-2 font-sans text-[14px] font-medium text-[var(--text-secondary)] transition-colors duration-200 hover:text-[var(--ink)]"
             >
-              Se connecter
+              Espace auteur
             </Link>
             <Link
               href="/order"
               className="press inline-flex h-10 items-center rounded-full bg-[var(--ink)] px-5 font-sans text-[14px] font-semibold text-[var(--loomina-void)] hover:bg-[var(--ink-soft)]"
             >
-              Commencer
+              Commander
             </Link>
           </div>
 
@@ -174,7 +174,7 @@ export default function Header() {
                 {NAV_LINKS.map((item) => (
                   <motion.li key={item.href} variants={itemVariants} className="border-b border-[var(--hairline)]">
                     <Link
-                      href={item.label === "Accueil" ? "/#home" : item.href}
+                      href={item.href}
                       onClick={() => setIsOpen(false)}
                       aria-current={isActive(item.href) ? "page" : undefined}
                       className={`flex items-center justify-between py-4 font-serif text-[30px] tracking-[-0.02em] ${
@@ -196,14 +196,14 @@ export default function Header() {
                   onClick={() => setIsOpen(false)}
                   className="press flex h-13 items-center justify-center rounded-full bg-[var(--ink)] font-sans text-base font-semibold text-[var(--loomina-void)]"
                 >
-                  Commencer l’expérience
+                  Commander
                 </Link>
                 <Link
                   href="/dashboard"
                   onClick={() => setIsOpen(false)}
                   className="press flex h-13 items-center justify-center rounded-full border border-[var(--hairline-strong)] font-sans text-base font-medium text-[var(--ink)]"
                 >
-                  Espace client
+                  Espace auteur
                 </Link>
               </motion.div>
             </nav>

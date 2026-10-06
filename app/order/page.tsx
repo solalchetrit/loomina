@@ -5,10 +5,11 @@ import { formatToE164 } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
 import { SITE_CONFIG } from "@/app/config";
+import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
 
-const INCLUDED = ["Entretiens illimités par téléphone", "Rédaction et corrections", "Vos photos intégrées", "Livre relié livré chez vous", "Version numérique incluse"];
+
 
 const Check = () => (
   <svg className="mt-0.5 h-4 w-4 shrink-0 text-[var(--gold-ink)]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -22,7 +23,7 @@ export default function OrderPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({ firstName: "", lastName: "", age: "", phone: "", email: "" });
+  const [formData, setFormData] = useState({ firstName: "", lastName: "", phone: "", email: "" });
 
   const handleOptionClick = (option: "me" | "gift") => {
     setSelectedOption(option);
@@ -37,7 +38,6 @@ export default function OrderPage() {
   const isFormValid =
     formData.firstName.trim() !== "" &&
     formData.lastName.trim() !== "" &&
-    formData.age.trim() !== "" &&
     formData.phone.trim() !== "" &&
     formData.email.trim() !== "";
 
@@ -173,13 +173,12 @@ export default function OrderPage() {
             {step === 2 && (
               <form onSubmit={handleSubmit} className="rise mt-10 border-t border-[var(--hairline)] pt-10" noValidate>
                 <p className="font-sans text-[15px] text-[var(--text-secondary)]">
-                  {isGift ? "Les coordonnées de la personne qui racontera son histoire. C’est elle que Loomina appellera." : "Ces informations servent à créer votre espace et à vous appeler."}
+                  {isGift ? "Les coordonnées de la personne qui racontera son histoire. C’est elle qui parlera avec Loomina." : "Ces informations servent à créer votre espace auteur."}
                 </p>
                 <div className="mt-6 grid gap-5 sm:grid-cols-2">
                   <Input label="Prénom" name="firstName" autoComplete={isGift ? "off" : "given-name"} value={formData.firstName} onChange={handleInputChange} placeholder="Jeanne" required />
                   <Input label="Nom" name="lastName" autoComplete={isGift ? "off" : "family-name"} value={formData.lastName} onChange={handleInputChange} placeholder="Martin" required />
-                  <Input label="Âge" name="age" inputMode="numeric" pattern="[0-9]*" maxLength={3} value={formData.age} onChange={handleInputChange} placeholder="75" required />
-                  <Input label="Téléphone" name="phone" type="tel" inputMode="tel" autoComplete={isGift ? "off" : "tel"} value={formData.phone} onChange={handleInputChange} placeholder="06 12 34 56 78" hint="Le numéro sur lequel Loomina appellera." required />
+                  <div className="sm:col-span-2"><Input label="Téléphone" name="phone" type="tel" inputMode="tel" autoComplete={isGift ? "off" : "tel"} value={formData.phone} onChange={handleInputChange} placeholder="06 12 34 56 78" hint={isGift ? "Le numéro depuis lequel cette personne appellera Loomina : c’est ainsi qu’elle sera reconnue." : "Le numéro depuis lequel vous appellerez Loomina : c’est ainsi qu’elle vous reconnaîtra."} required /></div>
                   <div className="sm:col-span-2">
                     <Input label="E-mail" name="email" type="email" inputMode="email" autoComplete="email" value={formData.email} onChange={handleInputChange} placeholder="jeanne.martin@exemple.fr" hint={isGift ? "Votre e-mail ou le sien : c’est là que le bon cadeau et les chapitres arriveront." : "Pour recevoir la confirmation et vos chapitres à relire."} required />
                   </div>
@@ -211,26 +210,26 @@ export default function OrderPage() {
             <div className="card overflow-hidden rounded-3xl">
               <div className="paper-grain relative bg-[var(--ink)] p-6">
                 <p className="font-sans text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--loomina-gold-light)]">Votre commande</p>
-                <p className="mt-2 font-serif text-[22px] leading-tight text-[var(--loomina-void)]">Le Coffret Biographie Complet</p>
+                <p className="mt-2 font-serif text-[22px] leading-tight text-[var(--loomina-void)]">{OFFER.name}</p>
                 <div className="mt-4 flex items-baseline gap-1">
                   <span className="font-serif text-[44px] leading-none tracking-[-0.03em] text-[var(--loomina-void)]">{SITE_CONFIG.product.price}</span>
                   <span className="font-serif text-xl text-[var(--loomina-gold-light)]">{SITE_CONFIG.product.currencySymbol}</span>
-                  <span className="ml-2 font-sans text-[13px] text-[#cfc8bb]">tout compris</span>
+                  <span className="ml-2 font-sans text-[13px] text-[#d6cfc2]">tout compris, livraison incluse</span>
                 </div>
               </div>
               <ul className="space-y-2.5 p-6 font-sans text-[14px] text-[var(--text-secondary)]">
                 {INCLUDED.map((it) => (
-                  <li key={it} className="flex items-start gap-2.5">
-                    <Check /> {it}
+                  <li key={it.title} className="flex items-start gap-2.5">
+                    <Check /> {it.title}
                   </li>
                 ))}
               </ul>
               <div className="border-t border-[var(--hairline)] px-6 py-4 font-sans text-[13px] text-[var(--text-muted)]">
-                Satisfait ou remboursé après le premier appel.
+                {GUARANTEE}
               </div>
             </div>
             <p className="mt-4 px-2 font-sans text-[13px] text-[var(--text-muted)]">
-              Une question avant de commander ? <a href="/contact" className="text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4">Écrivez-nous</a>.
+              Une question avant de commander ? <a href="mailto:contact@loomina.eu" className="text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4">Écrivez-nous</a>.
             </p>
           </aside>
         </div>

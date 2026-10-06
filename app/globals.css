@@ -197,17 +197,17 @@
 
 /* Typographie */
 .heading-display {
-  font-size: clamp(2.75rem, 7vw, 5.25rem);
-  line-height: 1.02;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.6rem, 6.2vw, 4.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   font-weight: 400;
   color: var(--ink);
 }
 
 .heading-section {
-  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  font-size: clamp(2.1rem, 4vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   font-weight: 400;
   color: var(--ink);
 }

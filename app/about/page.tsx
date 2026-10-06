@@ -2,10 +2,10 @@ import { Section, SectionHeading, PageHeader } from "@/components/ui/Section";
 import CtaBand from "@/components/CtaBand";
 
 const VALUES = [
-  { title: "Authenticité", desc: "Nous capturons votre voix, sans filtre ni artifice. Votre histoire, telle que vous la racontez." },
-  { title: "Bienveillance", desc: "Chaque conversation est un moment d’écoute attentive, respectueuse de votre rythme." },
-  { title: "Transmission", desc: "Chaque vie mérite d’être racontée et transmise aux générations suivantes." },
-  { title: "Exigence", desc: "De la technologie à l’impression, aucun compromis sur la qualité." },
+  { title: "Rien n’est inventé", desc: "Le livre ne contient que ce que vous avez raconté. Quand un détail manque, Loomina vous le demande au lieu de l’imaginer." },
+  { title: "Chaque page est relue", desc: "Par une personne de l’équipe, avant l’impression. Vous relisez aussi, et vous avez le dernier mot." },
+  { title: "Votre histoire reste à vous", desc: "Vos paroles et vos textes servent uniquement à écrire votre livre. Ils ne sont ni revendus, ni utilisés pour autre chose." },
+  { title: "Vous allez à votre rythme", desc: "Un appel par semaine ou trois dans la journée : personne ne vous presse, et vous pouvez faire une pause quand vous voulez." },
 ];
 
 const MILESTONES = [
@@ -17,19 +17,15 @@ const MILESTONES = [
 export default function AboutPage() {
   return (
     <main className="w-full">
-      <PageHeader eyebrow="À propos" title="Tout a commencé" accent="avec ma grand-mère." text="Loomina est née d’un besoin personnel, devenu une mission : permettre à chacun de transmettre son histoire, sans que l’écriture soit un obstacle." />
+      <PageHeader title="Tout a commencé avec ma grand-mère" text="Loomina est née d’une histoire de famille : une vie qui méritait un livre, et une personne pour qui écrire était devenu trop difficile." />
 
       {/* Récit fondateur */}
       <Section size="sm">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
           <div className="reveal">
-            {/* Emplacement portrait : remplacer par une vraie photo (public/solal.jpg) */}
-            <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-[28px] bg-[var(--loomina-night)] shadow-[inset_0_0_0_1px_var(--hairline)]">
-              <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_30%,rgba(212,176,106,0.25),transparent_70%)]" />
-              <div className="absolute inset-x-0 bottom-0 p-6">
-                <p className="font-serif text-[22px] leading-tight text-[var(--ink)]">Solal Chetrit</p>
-                <p className="mt-1 font-sans text-[13px] font-semibold uppercase tracking-[0.14em] text-[var(--gold-ink)]">Fondateur</p>
-              </div>
+            <div className="border-t border-[var(--ink)]/80 pt-6">
+              <p className="font-serif text-[26px] leading-tight text-[var(--ink)]">Solal Chetrit</p>
+              <p className="mt-1 font-sans text-[15px] text-[var(--text-secondary)]">Fondateur de Loomina</p>
             </div>
             <ol className="mt-8 space-y-4 border-l border-[var(--hairline)] pl-6">
               {MILESTONES.map((m) => (
@@ -62,73 +58,41 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      {/* Mission */}
-      <Section tone="alt">
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="eyebrow reveal">Notre mission</p>
-          <blockquote className="reveal mt-6 font-serif text-[clamp(1.75rem,4vw,3rem)] leading-[1.2] tracking-[-0.025em] text-[var(--ink)]">
-            Permettre à chaque personne de <em className="text-[var(--gold-ink)]">transmettre son histoire</em>, sans que l’écriture ne soit un obstacle.
-          </blockquote>
-          <div className="reveal prose-loomina mx-auto mt-10 max-w-2xl text-left sm:text-center">
-            <p>
-              Que vous soyez grand-parent, parent, ou simplement quelqu’un qui a une histoire à partager, Loomina est là pour vous. Notre technologie n’est qu’un outil au service d’une mission plus grande : <strong>préserver la mémoire humaine</strong> et créer des ponts entre les générations.
-            </p>
-          </div>
-        </div>
-      </Section>
-
       {/* Valeurs */}
       <Section>
-        <SectionHeading align="left" eyebrow="Ce qui nous guide" title="Quatre" accent="principes." />
+        <SectionHeading align="left" title="Nos engagements" />
         <dl className="mt-12 grid gap-px overflow-hidden rounded-3xl bg-[var(--hairline)] shadow-[0_0_0_1px_var(--hairline)] sm:grid-cols-2 lg:grid-cols-4">
           {VALUES.map((v, i) => (
             <div key={v.title} className="reveal bg-[var(--paper)] p-7 md:p-8">
               <span className="font-serif text-[15px] italic text-[var(--gold-ink)]">0{i + 1}</span>
-              <dt className="mt-6 font-serif text-[26px] leading-tight tracking-[-0.02em] text-[var(--ink)]">{v.title}</dt>
-              <dd className="mt-3 font-sans text-[15px] leading-relaxed text-[var(--text-secondary)]">{v.desc}</dd>
+              <dt className="mt-6 font-serif text-[24px] leading-tight tracking-[-0.01em] text-[var(--ink)]">{v.title}</dt>
+              <dd className="mt-3 font-sans text-[16px] leading-relaxed text-[var(--text-secondary)]">{v.desc}</dd>
             </div>
           ))}
         </dl>
       </Section>
 
-      {/* Vision + équipe */}
+      {/* Qui vous répond */}
       <Section tone="alt">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="reveal">
-            <p className="eyebrow">L’avenir</p>
-            <h2 className="heading-section mt-4">
-              Une bibliothèque d’histoires <em className="text-[var(--gold-ink)]">dans chaque famille.</em>
-            </h2>
-            <div className="prose-loomina mt-6">
-              <p>
-                Dans un monde où les souvenirs se perdent dans le flux numérique, nous voulons créer quelque chose de <strong>tangible et durable</strong>. Un futur où les petits-enfants découvrent la vie de leurs grands-parents non pas à travers des anecdotes éparses, mais dans un récit complet.
-              </p>
-              <p>
-                Loomina n’est que le début : intégration de photos, d’enregistrements audio, livres collaboratifs familiaux… Notre ambition est de devenir la référence de la transmission des histoires de vie.
-              </p>
-            </div>
-          </div>
-          <div className="reveal card rounded-3xl p-7 md:p-8">
-            <p className="eyebrow">L’équipe</p>
-            <p className="mt-4 font-serif text-[26px] leading-tight tracking-[-0.02em] text-[var(--ink)]">Une petite équipe, dédiée à votre histoire.</p>
-            <ul className="mt-6 divide-y divide-[var(--hairline)] font-sans">
-              <li className="flex items-center gap-4 py-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--ink)] font-serif text-lg text-[var(--loomina-gold-light)]">S</span>
-                <span>
-                  <span className="block text-[16px] font-semibold text-[var(--ink)]">Solal Chetrit</span>
-                  <span className="block text-[14px] text-[var(--text-muted)]">Fondateur · produit, IA et relation clients</span>
-                </span>
-              </li>
-              <li className="py-4 text-[15px] leading-relaxed text-[var(--text-secondary)]">
-                Nous collaborons avec des rédacteurs professionnels, des designers et des imprimeurs de confiance pour garantir la qualité de chaque livre.
-              </li>
-            </ul>
+        <div className="reveal mx-auto max-w-3xl">
+          <h2 className="heading-section">Qui vous répond</h2>
+          <div className="prose-loomina mt-6">
+            <p>
+              Loomina est une toute petite équipe. Quand vous écrivez à{" "}
+              <a href="mailto:contact@loomina.eu">contact@loomina.eu</a>, c’est moi qui vous lis et qui vous réponds. Les
+              entretiens, eux, sont menés par Loomina, une intelligence artificielle que nous avons conçue pour écouter
+              patiemment, une question à la fois.
+            </p>
+            <p>
+              Si vous hésitez, le mieux est encore de l’essayer : appelez le{" "}
+              <a href="tel:+33159169357">01 59 16 93 57</a> et racontez-lui un souvenir. Trois minutes, gratuitement.
+            </p>
           </div>
         </div>
       </Section>
 
       <div className="pt-8">
-        <CtaBand title="Prêt à écrire" accent="votre histoire ?" text="Rejoignez les familles qui ont choisi Loomina pour préserver leurs souvenirs." primary={{ href: "/offre", label: "Découvrir l’offre" }} secondary={{ href: "/contact", label: "Nous contacter" }} />
+        <CtaBand title="Votre histoire" accent="mérite son livre." text="Commandez quand vous êtes prêt, et commencez à raconter dès le jour même." primary={{ href: "/order", label: "Commander" }} secondary={{ href: "/offre", label: "Voir le prix et le détail" }} />
       </div>
     </main>
   );
