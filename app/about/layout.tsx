@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "À propos",
-  description: "L’histoire de Loomina, née d’un besoin personnel : permettre à chacun de transmettre son histoire sans avoir à l’écrire.",
+  title: "Notre histoire",
+  description: "Loomina est née d’une histoire de famille : une grand-mère dont la vie méritait un livre, et un petit-fils qui l’a laissée parler.",
   alternates: { canonical: "/about" },
 };
 

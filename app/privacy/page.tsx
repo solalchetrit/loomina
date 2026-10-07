@@ -1,109 +1,80 @@
-'use client';
+import type { Metadata } from "next";
+import LegalPage from "@/components/LegalPage";
 
-import React from 'react';
-import Button from '@/components/ui/Button';
+export const metadata: Metadata = {
+  title: "Politique de confidentialité",
+  description: "Quelles données Loomina collecte, pourquoi, où elles sont stockées, et vos droits.",
+  alternates: { canonical: "/privacy" },
+};
 
 export default function PrivacyPage() {
-    return (
-        <main className="w-full">
+  return (
+    <LegalPage eyebrow="Confidentialité" title="Ce que nous faisons de vos données." updated="7 octobre 2026">
+      <h2>1. Ce que nous collectons</h2>
+      <ul>
+        <li>
+          <strong>À la commande :</strong> prénom, nom, numéro de téléphone et e-mail de la personne qui racontera, et de la
+          personne qui commande si elle est différente. Le paiement est traité par Stripe ; nous ne voyons pas votre numéro de
+          carte.
+        </li>
+        <li>
+          <strong>Pendant les appels :</strong> la transcription de ce que vous dites et de ce que Loomina répond, ainsi que le
+          numéro appelant, la date et la durée de l’appel.
+        </li>
+        <li>
+          <strong>Pour le livre :</strong> les chapitres écrits, vos corrections, et les photographies que vous nous envoyez.
+        </li>
+        <li>
+          <strong>Sur le site :</strong> des mesures d’audience anonymisées (Google Analytics), et les messages que vous nous
+          envoyez via la page contact.
+        </li>
+      </ul>
 
-            {/* Hero Section */}
-            <section className="relative pt-28 pb-8 md:pt-40 md:pb-10 px-5 sm:px-6">
-                <div className="max-w-4xl mx-auto">
-                    <p className="eyebrow">Confidentialité</p>
+      <h2>2. Pourquoi</h2>
+      <p>
+        Uniquement pour écrire, mettre en page, imprimer et vous livrer votre livre, et pour répondre à vos messages. Vos
+        paroles et vos textes ne sont ni revendus, ni utilisés pour autre chose, et ne servent pas à entraîner des modèles
+        d’intelligence artificielle.
+      </p>
 
-                    <h1 className="heading-section mt-4 mb-5 max-w-3xl">
-                        Politique de Confidentialité
-                    </h1>
+      <h2>3. Qui y a accès</h2>
+      <p>
+        La personne de l’équipe qui relit votre livre, et les prestataires techniques strictement nécessaires au service :
+      </p>
+      <ul>
+        <li>
+          <strong>Supabase</strong> (base de données, centre de données à Paris) : stockage de votre profil, des transcriptions
+          et des chapitres.
+        </li>
+        <li>
+          <strong>Twilio</strong> (téléphonie) : acheminement des appels et envoi du code SMS de connexion.
+        </li>
+        <li>
+          <strong>OpenAI</strong> (intelligence artificielle) : transcription de la voix, conduite de l’entretien et écriture
+          du premier jet des chapitres. Les échanges transitent par ses serveurs le temps du traitement, dans le cadre de ses
+          conditions d’utilisation pour les entreprises, qui excluent l’entraînement de ses modèles sur vos données.
+        </li>
+        <li>
+          <strong>Stripe</strong> (paiement) et <strong>Vercel</strong> (hébergement du site).
+        </li>
+      </ul>
 
-                    <p className="font-sans text-[14px] text-[var(--text-muted)]">
-                        Dernière mise à jour : 23 décembre 2024
-                    </p>
-                </div>
-            </section>
+      <h2>4. Combien de temps</h2>
+      <p>
+        Vos transcriptions et vos chapitres sont conservés tant que votre livre est en cours, puis un an après sa livraison,
+        pour permettre une correction ou une réimpression. Vous pouvez demander leur suppression plus tôt à tout moment. Les
+        données de facturation sont conservées le temps imposé par la loi.
+      </p>
 
-            {/* Content */}
-            <section className="pt-6 pb-20 md:pb-28 px-5 sm:px-6 relative z-10">
-                <div className="max-w-4xl mx-auto space-y-6">
+      <h2>5. Vos droits</h2>
+      <p>
+        Vous pouvez à tout moment accéder à vos données, les corriger, les faire supprimer, en limiter le traitement, vous y
+        opposer ou en demander une copie. Il suffit d’écrire à <strong>contact@loomina.eu</strong>. Nous répondons dans le
+        délai légal d’un mois. Vous pouvez aussi saisir la CNIL (cnil.fr).
+      </p>
 
-                    <div className="card rounded-3xl p-6 sm:p-8">
-                        <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">1. Données collectées</h2>
-                        <p>
-                            Dans le cadre de la création de votre livre autobiographique, Loomina collecte et traite les données suivantes :
-                        </p>
-                        <ul className="mt-4">
-                            <li>Enregistrements vocaux des entretiens.</li>
-                            <li>Transcriptions textuelles de ces entretiens.</li>
-                            <li>Photographies personnelles fournies pour l’illustration de l’ouvrage.</li>
-                            <li>Coordonnées (nom, adresse, email, téléphone) pour la livraison et la facturation.</li>
-                        </ul>
-                    </div>
-
-                    <div className="card rounded-3xl p-6 sm:p-8">
-                        <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">2. Utilisation des données et IA</h2>
-                        <p>
-                            Vos données personnelles et souvenirs ne sont utilisés <strong className="text-[var(--text-primary)]">que dans l’unique but de créer votre livre</strong>.
-                            Loomina garantit que vos enregistrements vocaux ne sont pas utilisés pour entraîner des modèles d’intelligence artificielle publics.
-                            L’IA est utilisée comme un outil d’assistance à la transcription et à la rédaction, sous supervision humaine.
-                        </p>
-                    </div>
-
-                    <div className="card rounded-3xl p-6 sm:p-8">
-                        <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">3. Sécurité</h2>
-                        <p>
-                            Loomina attache une importance capitale à la sécurité de vos mémoires.
-                            Toutes les données (audio, texte, images) sont stockées dans un coffre-fort numérique sécurisé et crypté (AES-256).
-                            L’accès est strictement limité au personnel chargé de la production de votre ouvrage.
-                        </p>
-                        <div className="mt-6 flex items-center gap-3 p-4 rounded-2xl bg-[var(--loomina-night)]">
-                            <div className="w-10 h-10 rounded-xl bg-[var(--paper)] shadow-[inset_0_0_0_1px_var(--hairline)] flex items-center justify-center">
-                                <svg className="w-5 h-5 text-[var(--gold-ink)]" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p className="text-sm text-[var(--text-primary)] font-medium">Stockage sécurisé en Europe</p>
-                                <p className="text-xs text-[var(--text-muted)]">Serveurs conformes RGPD</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="card rounded-3xl p-6 sm:p-8">
-                        <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">4. Vos droits</h2>
-                        <p>
-                            Conformément au RGPD, vous disposez d’un droit d’accès, de rectification et de suppression de vos données.
-                            Vous pouvez à tout moment demander la suppression définitive de vos souvenirs numériques de nos serveurs une fois le livre livré,
-                            en nous contactant à <span className="text-[var(--gold-ink)]">contact@loomina.eu</span>.
-                        </p>
-                        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {[
-                                { title: "Accès", desc: "Consultez vos données" },
-                                { title: "Rectification", desc: "Modifiez vos infos" },
-                                { title: "Suppression", desc: "Effacez vos données" },
-                                { title: "Portabilité", desc: "Récupérez vos données" }
-                            ].map((right, idx) => (
-                                <div key={idx} className="bg-[var(--loomina-mist)]/20 rounded-xl p-4 text-center border border-[var(--loomina-mist)]">
-                                    <p className="text-sm text-[var(--text-primary)] font-medium">{right.title}</p>
-                                    <p className="text-xs text-[var(--text-muted)] mt-1">{right.desc}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            {/* CTA */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 text-center">
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button href="/legal" variant="secondary" size="lg">
-                        Mentions légales
-                    </Button>
-                    <Button href="/contact" variant="primary" size="lg">
-                        Nous contacter
-                    </Button>
-                </div>
-            </section>
-        </main>
-    );
+      <h2>6. Responsable du traitement</h2>
+      <p>Solal Chetrit, pour Loomina, projet en cours de création. Contact : contact@loomina.eu.</p>
+    </LegalPage>
+  );
 }

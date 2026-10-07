@@ -1,66 +1,125 @@
 import Link from "next/link";
 import { Section, PageHeader } from "@/components/ui/Section";
 import Accordion from "@/components/ui/Accordion";
-import CtaBand from "@/components/CtaBand";
+import Closing from "@/components/Closing";
+import { LOOMINA_CONFIG } from "@/config/loomina";
+import { OFFER, GUARANTEE } from "@/config/offer";
 
+/**
+ * Chaque réponse ne promet que ce que le service fait aujourd'hui
+ * et que les CGV couvrent. Pas de délai de réponse, pas de spécification
+ * d'impression, pas de paiement en plusieurs fois.
+ */
 const FAQ_CATEGORIES = [
   {
     id: "service",
     category: "Le service",
     questions: [
-      { q: "Comment fonctionne Loomina ?", a: "Vous racontez votre histoire lors d’appels téléphoniques. Notre IA transforme vos paroles en texte littéraire, vous validez chaque chapitre, puis nous imprimons et livrons votre livre." },
-      { q: "Combien de temps dure le processus complet ?", a: "En moyenne 6 à 8 semaines, mais nous nous adaptons à votre rythme : certains avancent en un mois, d’autres prennent plusieurs mois. Il n’y a aucune pression." },
-      { q: "Combien d’appels sont nécessaires ?", a: "Nous recommandons 14 appels thématiques, un par chapitre, mais c’est flexible. Les appels sont illimités : plus de temps sur un sujet, moins sur un autre." },
-      { q: "Quelle est la durée d’un appel ?", a: "Entre 30 minutes et 1 heure en moyenne. Certains chapitres sont plus courts, d’autres plus longs. Vous décidez quand un sujet est terminé." },
+      {
+        q: "Comment fonctionne Loomina ?",
+        a: `Vous appelez le ${LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY} quand vous voulez. Loomina, une intelligence artificielle, mène l’entretien et écrit un chapitre après chaque appel, dans vos mots. Vous relisez, vous corrigez, notre équipe relit tout, et le livre relié arrive chez vous.`,
+      },
+      {
+        q: "Combien de temps dure le processus ?",
+        a: `En général ${OFFER.delay} entre le premier appel et le livre validé, mais c’est votre rythme qui compte : certains avancent en un mois, d’autres prennent plusieurs mois. Il n’y a aucune pression, aucune date limite.`,
+      },
+      {
+        q: "Combien d’appels faut-il ?",
+        a: `Autant que vous voulez. Loomina propose ${OFFER.chapters} thèmes, de l’enfance à aujourd’hui, mais rien n’oblige à les suivre tous : vous pouvez consacrer trois appels à votre enfance et un seul à votre carrière.`,
+      },
+      {
+        q: "Combien de temps dure un appel ?",
+        a: "Le temps que vous voulez : dix minutes ou une heure. Vous pouvez dire « on s’arrête là » à tout moment. Au prochain appel, Loomina reprend là où vous en étiez.",
+      },
+      {
+        q: "Faut-il prendre rendez-vous ?",
+        a: "Non. Vous appelez quand vous voulez, de jour comme de nuit, depuis le numéro donné à la commande : c’est ainsi que Loomina vous reconnaît.",
+      },
     ],
   },
   {
     id: "livre",
     category: "Le livre",
     questions: [
-      { q: "Combien de pages fait le livre final ?", a: "Entre 150 et 250 pages en moyenne. Nous nous adaptons à la richesse de votre récit, sans minimum ni maximum." },
-      { q: "Puis-je ajouter des photos ?", a: "Oui. Envoyez-nous vos photos au format numérique, nous les intégrons au livre et vous aidons à choisir les meilleurs emplacements." },
-      { q: "Quel est le format du livre ?", a: "Format 15 × 23 cm (proche du roman), couverture rigide personnalisée, papier ivoire 90 g, reliure cousue. Un objet conçu pour durer." },
-      { q: "Puis-je relire et modifier le texte ?", a: "Oui, c’est même la règle : vous validez chaque chapitre avant de passer au suivant. Les modifications sont illimitées." },
-      { q: "Recevrai-je une version numérique ?", a: "Oui, un ebook (PDF et EPUB) en plus du livre physique, idéal pour partager avec la famille, même à distance." },
+      {
+        q: "À quoi ressemble le livre ?",
+        a: `Un livre relié, ${OFFER.format}, avec vos photos placées dans le texte. Vous recevez aussi une version numérique (${OFFER.digital}) à partager avec la famille.`,
+      },
+      {
+        q: "Combien de pages fait-il ?",
+        a: "Cela dépend de ce que vous racontez. Il n’y a ni minimum ni maximum : le livre fait la longueur de votre récit.",
+      },
+      {
+        q: "Puis-je ajouter des photos ?",
+        a: "Oui. Envoyez-les par e-mail à contact@loomina.eu, en indiquant à quel souvenir elles se rapportent. Un proche peut le faire pour vous. Nous les plaçons au bon endroit lors de la mise en page.",
+      },
+      {
+        q: "Puis-je relire et modifier le texte ?",
+        a: "Oui, c’est même la règle. Chaque chapitre apparaît dans votre espace auteur après l’appel. Vous dites à Loomina, au prochain appel, ce qu’il faut changer, et vous avez le dernier mot avant l’impression.",
+      },
     ],
   },
   {
     id: "tarifs",
-    category: "Tarifs & paiement",
+    category: "Prix et paiement",
     questions: [
-      { q: "Quel est le prix exact ?", a: "449 € tout compris : appels, rédaction, relecture par notre équipe, mise en page, impression et livraison. Aucun frais caché." },
-      { q: "Y a-t-il des frais supplémentaires ?", a: "Non. Le prix couvre l’intégralité du service, du premier appel à la livraison." },
-      { q: "Puis-je payer en plusieurs fois ?", a: "Pour l’instant, le paiement se fait en une fois par carte bancaire via Stripe. Le paiement en plusieurs fois arrive bientôt." },
-      { q: "Y a-t-il une garantie ?", a: "Oui. Si après le premier appel vous n’êtes pas satisfait, nous vous remboursons intégralement, sans question." },
+      {
+        q: "Quel est le prix exact ?",
+        a: `${OFFER.price} € tout compris : les appels, l’écriture, la relecture, la mise en page, l’impression et la livraison en France métropolitaine. Il n’y a rien à payer en plus.`,
+      },
+      {
+        q: "Comment se passe le paiement ?",
+        a: "En une fois, par carte bancaire, sur une page de paiement sécurisée (Stripe). Loomina ne conserve aucune donnée bancaire.",
+      },
+      {
+        q: "Y a-t-il une garantie ?",
+        a: `Oui. ${GUARANTEE} Vous disposez aussi du droit de rétractation légal de ${OFFER.withdrawalDays} jours à compter de la commande.`,
+      },
     ],
   },
   {
     id: "confidentialite",
-    category: "Confidentialité & sécurité",
+    category: "Confidentialité",
     questions: [
-      { q: "Mes données sont-elles sécurisées ?", a: "Vos enregistrements et textes sont chiffrés (AES-256), stockés sur des serveurs en Europe (RGPD) et jamais partagés avec des tiers. Vous pouvez demander leur suppression à tout moment." },
-      { q: "Qui a accès à mon histoire ?", a: "Uniquement vous et notre équipe, pour la rédaction et la mise en page, sous accord de confidentialité strict." },
-      { q: "Que deviennent mes données après la livraison ?", a: "Nous les conservons 1 an après livraison, pour d’éventuelles modifications ou réimpressions. Passé ce délai, elles sont supprimées, sauf demande contraire." },
+      {
+        q: "Qui entend mes appels et lit mes textes ?",
+        a: "Loomina, pour écrire, et la personne de l’équipe qui relit avant l’impression. Personne d’autre. Vos paroles et vos textes servent uniquement à écrire votre livre ; ils ne sont ni revendus, ni utilisés pour autre chose.",
+      },
+      {
+        q: "Où sont stockées mes données ?",
+        a: (
+          <>
+            Vos textes sont stockés dans l’Union européenne (Paris). Le détail des traitements, dont l’écriture par une
+            intelligence artificielle, est dans notre{" "}
+            <Link href="/privacy" className="link">
+              politique de confidentialité
+            </Link>
+            .
+          </>
+        ),
+      },
+      {
+        q: "Puis-je faire supprimer mes données ?",
+        a: "Oui, à tout moment, en écrivant à contact@loomina.eu. Nous supprimons vos entretiens et vos textes ; vous gardez votre livre.",
+      },
     ],
   },
   {
     id: "cadeau",
-    category: "Cadeau & livraison",
+    category: "Offrir Loomina",
     questions: [
-      { q: "Puis-je offrir Loomina en cadeau ?", a: "Oui. Après commande, vous recevez un bon cadeau élégant à imprimer. La personne nous contacte ensuite pour démarrer son livre." },
-      { q: "Combien de temps pour la livraison ?", a: "Une fois le livre validé, comptez 2 à 3 semaines pour l’impression et la livraison en France métropolitaine, via Colissimo avec suivi." },
-      { q: "Livrez-vous à l’international ?", a: "En France métropolitaine et en Europe (frais de port selon le pays). Contactez-nous pour les autres destinations." },
-      { q: "Puis-je commander plusieurs exemplaires ?", a: "Oui, après réception, à tarif réduit. Idéal pour offrir à toute la famille." },
-    ],
-  },
-  {
-    id: "technique",
-    category: "Technique",
-    questions: [
-      { q: "Ai-je besoin d’un ordinateur ou d’un smartphone ?", a: "Non. Tout se passe par téléphone : nous vous appelons aux horaires convenus. Pour les photos, un e-mail suffit, et nous pouvons vous aider." },
-      { q: "Que se passe-t-il si je rate un appel ?", a: "Aucun problème : nous reprogrammons simplement, sans pénalité ni frais." },
-      { q: "L’IA remplace-t-elle un vrai biographe ?", a: "L’IA transforme vos paroles en texte, mais c’est vous qui racontez, et des rédacteurs humains relisent chaque chapitre. Le meilleur des deux mondes." },
+      {
+        q: "Comment offrir Loomina à un proche ?",
+        a: "À la commande, choisissez « C’est pour offrir » et indiquez le prénom et le numéro de téléphone de la personne qui racontera. C’est elle qui appellera Loomina, depuis ce numéro, quand elle le souhaite. Vous pouvez aussi lui annoncer le cadeau vous-même, avant son premier appel.",
+      },
+      {
+        q: "La personne doit-elle savoir se servir d’un ordinateur ?",
+        a: "Non. Tout se passe au téléphone, fixe ou portable. L’espace auteur, où les chapitres apparaissent, est là pour relire, mais ce n’est pas une obligation : un proche peut relire pour elle, et les corrections se disent de vive voix à Loomina.",
+      },
+      {
+        q: "Livrez-vous ailleurs qu’en France ?",
+        a: "La livraison en France métropolitaine est incluse. Pour une autre destination, écrivez-nous avant de commander : nous vous dirons si c’est possible et à quel coût.",
+      },
     ],
   },
 ];
@@ -69,32 +128,27 @@ export default function FAQPage() {
   return (
     <main className="w-full">
       <PageHeader
-        eyebrow="FAQ"
-        title="Questions"
-        accent="fréquentes."
+        eyebrow="Questions fréquentes"
+        title="Tout ce que l’on nous demande."
         text={
           <>
-            Toutes les réponses sur Loomina. Vous ne trouvez pas la vôtre ?{" "}
-            <Link href="/contact" className="text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4">
+            Vous ne trouvez pas votre réponse ?{" "}
+            <Link href="/contact" className="link">
               Écrivez-nous
             </Link>
-            .
+            , une personne vous répond.
           </>
         }
       />
 
       <Section size="sm">
-        <div className="grid gap-12 lg:grid-cols-[260px_1fr] lg:gap-16">
-          {/* Sommaire */}
+        <div className="grid gap-12 lg:grid-cols-[240px_1fr] lg:gap-20">
           <nav aria-label="Thèmes" className="lg:sticky lg:top-28 lg:self-start">
-            <p className="eyebrow">Thèmes</p>
-            <ol className="mt-4 flex flex-wrap gap-2 lg:flex-col lg:gap-0 lg:divide-y lg:divide-[var(--hairline)]">
+            <p className="t-eyebrow">Thèmes</p>
+            <ol className="rule-top mt-4 flex flex-wrap gap-x-5 gap-y-0 lg:flex-col">
               {FAQ_CATEGORIES.map((c) => (
-                <li key={c.id}>
-                  <a
-                    href={`#${c.id}`}
-                    className="press inline-flex items-center rounded-full bg-[var(--paper)] px-4 py-2 font-sans text-[14px] font-medium text-[var(--ink)] shadow-[inset_0_0_0_1px_var(--hairline)] hover:text-[var(--gold-ink)] lg:w-full lg:rounded-none lg:bg-transparent lg:px-0 lg:py-3 lg:shadow-none"
-                  >
+                <li key={c.id} className="border-b border-[var(--rule)] lg:w-full">
+                  <a href={`#${c.id}`} className="block py-3 font-sans text-[16px] font-medium text-[var(--ink)] underline-offset-4 hover:underline">
                     {c.category}
                   </a>
                 </li>
@@ -102,21 +156,18 @@ export default function FAQPage() {
             </ol>
           </nav>
 
-          {/* Questions */}
           <div className="space-y-16">
             {FAQ_CATEGORIES.map((c) => (
               <section key={c.id} id={c.id} className="scroll-mt-28">
-                <h2 className="reveal font-serif text-[30px] leading-tight tracking-[-0.02em] text-[var(--ink)] md:text-[34px]">{c.category}</h2>
-                <Accordion items={c.questions} className="reveal mt-6" />
+                <h2 className="t-title">{c.category}</h2>
+                <Accordion items={c.questions} className="mt-6" />
               </section>
             ))}
           </div>
         </div>
       </Section>
 
-      <div className="pt-8">
-        <CtaBand title="D’autres" accent="questions ?" text="Notre équipe est là pour vous répondre et vous accompagner." primary={{ href: "/contact", label: "Nous contacter" }} secondary={{ href: "/offre", label: "Découvrir l’offre" }} />
-      </div>
+      <Closing title="Le mieux, c’est encore d’essayer." />
     </main>
   );
 }

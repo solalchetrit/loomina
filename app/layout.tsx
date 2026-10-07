@@ -26,7 +26,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#faf8f5",
+  themeColor: "#fbf9f5",
 };
 
 export const metadata: Metadata = {
@@ -102,7 +102,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${plusJakartaSans.variable} ${newsreader.variable} antialiased min-h-screen bg-[var(--loomina-void)] text-[var(--text-primary)] font-sans selection:bg-[var(--loomina-gold)] selection:text-[var(--loomina-void)] relative`}
+        className={`${plusJakartaSans.variable} ${newsreader.variable} antialiased min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans relative`}
       >
         <Header />
         <main className="relative z-0">

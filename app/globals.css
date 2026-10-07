@@ -8,60 +8,56 @@
 
 /* ================================================================
    LOOMINA — design tokens
-   Papier crème, encre profonde, or en accent. Refonte 2026.
+   Une page de livre : papier crème, encre, un filet d'or.
+   L'or ne colore jamais un texte courant : il souligne, numérote, sépare.
    ================================================================ */
 
 :root {
   /* Surfaces */
-  --loomina-void: #faf8f5;   /* fond de page */
-  --loomina-night: #f5f2ed;  /* section alternée */
-  --loomina-slate: #ebe6de;  /* remplissage discret */
-  --loomina-mist: #d8d2c8;   /* bordures anciennes (compat) */
-  --paper: #fffdf9;          /* cartes */
-
-  /* Or */
-  --loomina-gold: #b8923a;
-  --loomina-gold-light: #d4b06a;
-  --loomina-gold-dark: #8a6c28;
-  --loomina-ember: #c9a45a;
-  --gold-ink: #8a6c28;       /* or lisible pour du texte (≥ 4.5:1 sur crème) */
-
-  /* Accent secondaire (usage rare) */
-  --loomina-aurora: #6b5ce7;
-  --loomina-aurora-light: #8b7ef0;
-  --loomina-cyan: #3db8a0;
+  --paper: #fbf9f5;          /* page */
+  --paper-deep: #f3efe7;     /* bande alternée */
+  --paper-edge: #e4ded2;     /* tranche, remplissages discrets */
 
   /* Encre */
-  --ink: #1a1815;
-  --ink-soft: #2b2824;
-  --text-primary: #1a1815;
-  --text-secondary: #4a4640;
-  --text-muted: #7a756c;
+  --ink: #1b1915;
+  --ink-soft: #2e2a25;
+  --ink-2: #4b463f;          /* texte secondaire, ≥ 7:1 sur papier */
+  --ink-3: #6b655c;          /* texte discret, ≥ 4.5:1 sur papier */
+
+  /* Or : filets, numéros, petites capitales */
+  --gold: #b6903a;
+  --gold-ink: #7f6227;       /* or lisible en texte (≥ 5:1) */
+  --gold-light: #d8b56c;     /* sur fond encre uniquement */
 
   /* Filets */
-  --hairline: rgba(26, 24, 21, 0.09);
-  --hairline-strong: rgba(26, 24, 21, 0.16);
+  --rule: rgba(27, 25, 21, 0.12);
+  --rule-strong: rgba(27, 25, 21, 0.24);
 
   /* États */
-  --success: #2f7a4f;
-  --danger: #b4463c;
+  --success: #2f6f49;
+  --danger: #a8402f;
 
-  /* Compatibilité */
-  --loomina-ink: #1a1815;
-  --loomina-amber: #b8923a;
-  --loomina-amber-strong: #8a6c28;
-  --foreground: #1a1815;
-  --background: #faf8f5;
+  /* Anciens noms, conservés le temps que tout soit migré */
+  --loomina-void: var(--paper);
+  --loomina-night: var(--paper-deep);
+  --loomina-slate: var(--paper-edge);
+  --loomina-mist: var(--paper-edge);
+  --loomina-gold: var(--gold);
+  --loomina-gold-light: var(--gold-light);
+  --loomina-gold-dark: var(--gold-ink);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-2);
+  --text-muted: var(--ink-3);
+  --hairline: var(--rule);
+  --hairline-strong: var(--rule-strong);
 
-  /* Courbes (Emil Kowalski) */
+  /* Courbes */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* ================================================================
    BASE
-   Dans @layer base pour que les utilitaires Tailwind gardent la main.
    ================================================================ */
 
 @layer base {
@@ -75,8 +71,9 @@
   body {
     font-family: var(--font-sans);
     font-weight: 400;
-    color: var(--text-primary);
-    background: var(--loomina-void);
+    font-size: 17px;
+    color: var(--ink);
+    background: var(--paper);
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
@@ -88,12 +85,11 @@
   h1,
   h2,
   h3,
-  h4,
-  h5,
-  h6 {
+  h4 {
     font-family: var(--font-serif);
     font-weight: 400;
     text-wrap: balance;
+    color: var(--ink);
   }
 
   p {
@@ -113,13 +109,14 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--loomina-gold-dark);
+    outline: 2px solid var(--ink);
     outline-offset: 3px;
+    border-radius: 2px;
   }
 
   ::selection {
-    background: var(--loomina-gold);
-    color: var(--loomina-void);
+    background: var(--gold);
+    color: var(--paper);
   }
 }
 
@@ -134,102 +131,119 @@
 }
 
 /* ================================================================
-   COMPOSANTS UTILITAIRES
+   TYPOGRAPHIE
+   Trois tailles de titre, une mesure de lecture, un surtitre en capitales.
    ================================================================ */
 
-/* Cartes papier. Les anciens noms (.glass, .glass-gold) sont conservés
-   pour que toutes les pages héritent du nouveau style sans réécriture. */
-.glass,
-.glass-strong,
-.glass-gold,
-.card {
-  background: var(--paper);
-  border: 1px solid var(--hairline);
-  box-shadow: 0 1px 2px rgba(26, 24, 21, 0.03);
-}
-
-.glass-gold {
-  box-shadow:
-    0 1px 2px rgba(26, 24, 21, 0.03),
-    0 24px 48px -32px rgba(26, 24, 21, 0.25);
-}
-
-/* Anciennement dégradé : désormais un or uni lisible */
-.text-gradient-gold,
-.text-gradient-aurora,
-.text-gradient-premium {
-  color: var(--gold-ink);
-}
-
-.text-gradient-premium {
+.t-display {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 5.6vw, 4.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.022em;
   color: var(--ink);
 }
 
-/* Éléments décoratifs hérités, neutralisés */
-.ambient-orb,
-.glow-gold,
-.glow-gold-strong,
-.glow-aurora {
-  display: none;
-}
-
-.line-glow {
-  height: 1px;
-  background: var(--loomina-gold);
-  opacity: 0.5;
-}
-
-/* Effet de survol des cartes — propriétés explicites, pointeurs fins seulement */
-.hover-lift {
-  transition:
-    transform 250ms var(--ease-out),
-    box-shadow 250ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .hover-lift:hover {
-    transform: translateY(-3px);
-    box-shadow:
-      0 18px 40px -18px rgba(26, 24, 21, 0.18),
-      0 0 0 1px rgba(184, 146, 58, 0.12);
-  }
-}
-
-/* Typographie */
-.heading-display {
-  font-size: clamp(2.6rem, 6.2vw, 4.75rem);
-  line-height: 1.05;
-  letter-spacing: -0.025em;
-  font-weight: 400;
-  color: var(--ink);
-}
-
-.heading-section {
-  font-size: clamp(2.1rem, 4vw, 3.25rem);
+.t-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.6vw, 3rem);
   line-height: 1.08;
-  letter-spacing: -0.02em;
-  font-weight: 400;
+  letter-spacing: -0.018em;
   color: var(--ink);
 }
 
-.eyebrow {
+.t-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 2.2vw, 1.85rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.t-lead {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.t-body {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+
+.t-small {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+/* Surtitre : petites capitales, or. Le seul texte en or du site. */
+.t-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--gold-ink);
 }
 
+/* Numéro de marge, en serif */
+.t-numeral {
+  font-family: var(--font-serif);
+  font-variant-numeric: lining-nums;
+  color: var(--gold-ink);
+}
+
+/* Lien courant : souligné à l'encre, filet or au survol */
+.link {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--rule-strong);
+  transition: text-decoration-color 160ms ease;
+}
+
+.link:hover {
+  text-decoration-color: var(--gold);
+}
+
+/* Texte long (pages légales, histoire) */
 .prose-loomina {
   font-family: var(--font-sans);
   font-size: 17px;
-  line-height: 1.7;
-  color: var(--text-secondary);
+  line-height: 1.75;
+  color: var(--ink-2);
 }
 
-.prose-loomina p + p {
-  margin-top: 1.25em;
+.prose-loomina p + p,
+.prose-loomina ul + p,
+.prose-loomina p + ul {
+  margin-top: 1.1em;
+}
+
+.prose-loomina h2 {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  margin-top: 2.4em;
+  margin-bottom: 0.7em;
+  padding-top: 1.2em;
+  border-top: 1px solid var(--rule);
+}
+
+.prose-loomina h2:first-child {
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.prose-loomina h3 {
+  font-size: 1.25rem;
+  margin-top: 1.8em;
+  margin-bottom: 0.5em;
 }
 
 .prose-loomina strong {
@@ -240,131 +254,140 @@
 .prose-loomina a {
   color: var(--ink);
   text-decoration: underline;
-  text-decoration-color: rgba(184, 146, 58, 0.5);
+  text-decoration-color: var(--rule-strong);
   text-underline-offset: 4px;
-  transition: text-decoration-color 200ms ease;
 }
 
 .prose-loomina a:hover {
-  text-decoration-color: var(--loomina-gold);
+  text-decoration-color: var(--gold);
 }
 
-/* Pages légales : listes lisibles */
 .prose-loomina ul {
-  padding-left: 1.25em;
+  padding-left: 1.2em;
   list-style: disc;
 }
 
 .prose-loomina li + li {
+  margin-top: 0.45em;
+}
+
+/* Extrait de livre : serif, mesure courte, lettrine */
+.book-text {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  hyphens: auto;
+}
+
+.book-text p + p {
+  text-indent: 1.5em;
   margin-top: 0.4em;
 }
 
-/* Champs de formulaire */
+.book-text .dropcap {
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.8;
+  margin: 0.08em 0.1em 0 0;
+  color: var(--gold-ink);
+}
+
+/* ================================================================
+   COMPOSANTS
+   ================================================================ */
+
+.rule-top {
+  border-top: 1px solid var(--ink);
+}
+
+.gold-dash {
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--gold);
+}
+
+/* Champs de formulaire : grands, nets, lisibles */
 .field {
   width: 100%;
-  height: 52px;
-  padding: 0 16px;
-  border-radius: 14px;
-  background: var(--paper);
-  border: 1px solid var(--hairline-strong);
+  min-height: 56px;
+  padding: 0 18px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--rule-strong);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 18px;
   transition:
-    border-color 200ms ease,
-    box-shadow 200ms ease;
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 textarea.field {
   height: auto;
-  padding: 14px 16px;
+  padding: 14px 18px;
   resize: vertical;
-  min-height: 140px;
+  min-height: 160px;
+  line-height: 1.55;
 }
 
 .field::placeholder {
-  color: var(--text-muted);
+  color: var(--ink-3);
+  opacity: 0.8;
 }
 
 .field:focus {
   outline: none;
-  border-color: var(--loomina-gold);
-  box-shadow: 0 0 0 4px rgba(184, 146, 58, 0.14);
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(27, 25, 21, 0.1);
 }
 
 .field[aria-invalid="true"] {
   border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(168, 64, 47, 0.12);
 }
 
 .field-label {
   display: block;
   margin-bottom: 8px;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--ink);
-}
-
-/* Carrousel à défilement magnétique */
-.snap-row {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 4px;
-}
-
-.snap-row::-webkit-scrollbar {
-  display: none;
-}
-
-.snap-row > * {
-  scroll-snap-align: start;
-  flex: 0 0 auto;
 }
 
 /* Bouton : retour tactile immédiat */
 .press {
   transition:
-    transform 160ms var(--ease-out),
-    background-color 200ms ease,
-    color 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    opacity 200ms ease;
+    transform 140ms var(--ease-out),
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    opacity 160ms ease;
 }
 
 .press:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
-/* Grain papier très léger pour les surfaces sombres */
-.paper-grain {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 3px 3px;
+/* Compatibilité : anciennes classes de carte, rendues neutres */
+.card,
+.glass,
+.glass-gold {
+  background: #fff;
+  border: 1px solid var(--rule);
 }
 
 /* ================================================================
    MOTION
-   Entrées au chargement en CSS (hors main thread), ease-out fort.
-   Révélations au scroll : scroll-driven animations quand disponibles,
-   sinon contenu visible d'emblée.
+   Entrée au chargement en CSS, courte. Rien ne bouge au défilement.
    ================================================================ */
 
 @keyframes loomina-rise {
   from {
     opacity: 0;
-    transform: translateY(12px);
-  }
-}
-
-@keyframes loomina-settle {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.97);
+    transform: translateY(10px);
   }
 }
 
@@ -375,44 +398,25 @@ textarea.field {
 }
 
 .rise {
-  animation: loomina-rise 600ms var(--ease-out) both;
+  animation: loomina-rise 520ms var(--ease-out) both;
   animation-delay: calc(var(--i, 0) * 60ms);
 }
 
 .settle {
-  animation: loomina-settle 800ms var(--ease-out) both;
-  animation-delay: calc(120ms + var(--i, 0) * 90ms);
+  animation: loomina-rise 700ms var(--ease-out) both;
+  animation-delay: calc(100ms + var(--i, 0) * 90ms);
 }
 
-@supports (animation-timeline: view()) {
-  .reveal {
-    animation: loomina-rise linear both;
-    animation-timeline: view();
-    animation-range: entry 5% entry 45%;
-  }
+/* Conservé pour les pages pas encore migrées : visible d'emblée. */
+.reveal {
+  opacity: 1;
 }
 
-/* Onde sonore de la carte d'appel (décoratif, marketing) */
-@keyframes loomina-wave {
-  0%,
-  100% {
-    transform: scaleY(0.55);
-  }
-  50% {
-    transform: scaleY(1);
-  }
-}
-
-.wave-bar {
-  transform-origin: center;
-  animation: loomina-wave 1100ms var(--ease-in-out) infinite;
-}
-
-/* Accordéon : hauteur animée via grid (interruptible, pas de JS) */
+/* Accordéon : hauteur animée via grid */
 .acc-panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 250ms var(--ease-out);
+  transition: grid-template-rows 220ms var(--ease-out);
 }
 
 .acc-panel[data-open="true"] {
@@ -424,7 +428,7 @@ textarea.field {
 }
 
 .acc-icon {
-  transition: transform 200ms var(--ease-out);
+  transition: transform 180ms var(--ease-out);
 }
 
 [aria-expanded="true"] .acc-icon {
@@ -442,7 +446,7 @@ textarea.field {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(26, 24, 21, 0.15);
+  border: 2px solid rgba(27, 25, 21, 0.15);
   border-top-color: var(--ink);
   animation: loomina-spin 600ms linear infinite;
 }
@@ -454,19 +458,12 @@ textarea.field {
 
 @media (prefers-reduced-motion: reduce) {
   .rise,
-  .settle,
-  .reveal {
-    animation: loomina-fade 300ms ease both;
-    animation-timeline: auto;
-  }
-
-  .wave-bar {
-    animation: none;
+  .settle {
+    animation: loomina-fade 200ms ease both;
   }
 
   .acc-panel,
   .acc-icon,
-  .hover-lift,
   .press {
     transition-duration: 0ms;
   }
@@ -481,14 +478,10 @@ textarea.field {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--loomina-void);
+  background: var(--paper);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--loomina-mist);
+  background: var(--paper-edge);
   border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--loomina-gold);
 }
