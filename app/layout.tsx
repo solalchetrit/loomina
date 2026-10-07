@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { SITE_CONFIG } from "./config";
 
-// Configuration Serif (Titres élégants)
-const playfair = Playfair_Display({
+// Serif éditoriale (titres, extraits de livre) : Newsreader, dessinée pour la lecture longue.
+const newsreader = Newsreader({
   subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
   variable: "--font-serif",
   display: "swap",
 });
@@ -24,7 +26,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#faf8f5",
+  themeColor: "#fbf9f5",
 };
 
 export const metadata: Metadata = {
@@ -33,7 +35,7 @@ export const metadata: Metadata = {
     default: "Loomina | Écrivez votre autobiographie par téléphone",
     template: "%s | Loomina"
   },
-  description: "Transformez vos souvenirs en un livre d'exception. Loomina est l'IA biographe qui recueille votre histoire par téléphone pour en faire une autobiographie éternelle.",
+  description: "Racontez votre vie au téléphone, Loomina en fait un livre relié. Un chapitre après chaque appel, chaque page relue par notre équipe. Démo gratuite au 01 59 16 93 57.",
   alternates: {
     canonical: "/",
   },
@@ -42,7 +44,7 @@ export const metadata: Metadata = {
   creator: SITE_CONFIG.name,
   publisher: SITE_CONFIG.name,
   openGraph: {
-    title: "Loomina - Votre histoire mérite un livre éternel",
+    title: "Loomina : racontez votre vie au téléphone, recevez un livre",
     description: "Racontez votre vie par téléphone, nous en faisons un livre. Sans écrire une seule ligne.",
     url: SITE_CONFIG.url,
     siteName: SITE_CONFIG.name,
@@ -59,8 +61,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Loomina - Votre histoire, éternelle",
-    description: "La première biographie rédigée 100% par téléphone.",
+    title: "Loomina : votre vie, racontée au téléphone",
+    description: "Racontez votre vie au téléphone, nous en faisons un livre relié.",
     images: ['/og-image.png'],
   },
   robots: {
@@ -100,7 +102,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${plusJakartaSans.variable} ${playfair.variable} antialiased min-h-screen bg-[var(--loomina-void)] text-[var(--text-primary)] font-sans selection:bg-[var(--loomina-gold)] selection:text-[var(--loomina-void)] relative`}
+        className={`${plusJakartaSans.variable} ${newsreader.variable} antialiased min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans relative`}
       >
         <Header />
         <main className="relative z-0">

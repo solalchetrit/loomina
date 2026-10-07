@@ -1,160 +1,86 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
+import { LOOMINA_CONFIG } from "@/config/loomina";
 
-const FOOTER_LINKS = [
-  { href: "/faq", label: "FAQ" },
-  { href: "/contact", label: "Contact" },
-  { href: "/cgv", label: "CGV" },
-  { href: "/legal", label: "Mentions Légales" },
-  { href: "/privacy", label: "Confidentialité" },
-];
-
-const SOCIAL_LINKS = [
+const COLUMNS = [
   {
-    href: "#",
-    label: "Instagram",
-    icon: (
-      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-      </svg>
-    )
+    title: "Loomina",
+    links: [
+      { href: "/experience", label: "Comment ça marche" },
+      { href: "/offre", label: "Le livre et le prix" },
+      { href: "/faq", label: "Questions" },
+      { href: "/about", label: "Notre histoire" },
+    ],
   },
   {
-    href: "#",
-    label: "LinkedIn",
-    icon: (
-      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-      </svg>
-    )
+    title: "Votre livre",
+    links: [
+      { href: "/order", label: "Commander" },
+      { href: "/dashboard", label: "Espace auteur" },
+      { href: "/contact", label: "Nous écrire" },
+    ],
+  },
+  {
+    title: "Légal",
+    links: [
+      { href: "/cgv", label: "Conditions de vente" },
+      { href: "/legal", label: "Mentions légales" },
+      { href: "/privacy", label: "Confidentialité" },
+    ],
   },
 ];
 
+/** Pied de page en colophon : qui écrit, où écrire, où appeler. */
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
+  const year = new Date().getFullYear();
   return (
-    <footer className="relative w-full bg-[var(--loomina-void)] border-t border-[var(--hairline)] overflow-hidden">
-      {/* Main Footer Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 pt-16 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
-        <div className="grid md:grid-cols-12 gap-12 mb-12">
-
-          {/* Brand Column */}
-          <div className="md:col-span-5 space-y-6">
-            <Link href="/" className="inline-block">
-              <div className="relative h-8 w-40">
-                <Image
-                  src="/header-logo-trimmed.png"
-                  alt="Loomina Éditions"
-                  fill
-                  className="object-contain object-left"
-                />
+    <footer className="w-full border-t border-[var(--rule)] bg-[var(--paper-deep)]">
+      <div className="mx-auto w-full max-w-6xl px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-14 sm:px-8">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_2fr]">
+          <div>
+            <Link href="/" className="inline-block" aria-label="Loomina, accueil">
+              <div className="relative h-8 w-36">
+                <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" />
               </div>
             </Link>
-
-            <p className="text-[var(--text-secondary)] text-[15px] leading-relaxed max-w-sm font-sans">
-              La première IA biographe qui transforme vos souvenirs en un livre d&apos;exception.
-              Racontez votre histoire, nous l&apos;écrivons.
+            <p className="t-body mt-5 max-w-xs">Vous racontez votre vie au téléphone. Nous en faisons un livre.</p>
+            <p className="mt-6 font-sans text-[16px] text-[var(--ink-2)]">
+              Pour essayer :{" "}
+              <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="link font-semibold">
+                {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+              </a>
             </p>
-
-            {/* Social Links */}
-            <div className="flex items-center gap-4">
-              {SOCIAL_LINKS.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="press flex h-10 w-10 items-center justify-center rounded-full bg-[var(--paper)] text-[var(--text-muted)] shadow-[inset_0_0_0_1px_var(--hairline)] hover:text-[var(--ink)]"
-                  aria-label={social.label}
-                >
-                  {social.icon}
-                </a>
-              ))}
-            </div>
+            <p className="mt-1 font-sans text-[16px] text-[var(--ink-2)]">
+              Pour nous écrire :{" "}
+              <a href="mailto:contact@loomina.eu" className="link font-semibold">
+                contact@loomina.eu
+              </a>
+            </p>
           </div>
 
-          {/* Navigation Column */}
-          <div className="md:col-span-3">
-            <h4 className="mb-5 font-sans text-[12px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
-              Navigation
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/" className="text-[var(--text-secondary)] hover:text-[var(--ink)] transition-colors duration-200 text-[15px] font-sans">
-                  Accueil
-                </Link>
-              </li>
-              <li>
-                <Link href="/experience" className="text-[var(--text-secondary)] hover:text-[var(--ink)] transition-colors duration-200 text-[15px] font-sans">
-                  L&apos;Expérience
-                </Link>
-              </li>
-              <li>
-                <Link href="/offre" className="text-[var(--text-secondary)] hover:text-[var(--ink)] transition-colors duration-200 text-[15px] font-sans">
-                  L&apos;Offre
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-[var(--text-secondary)] hover:text-[var(--ink)] transition-colors duration-200 text-[15px] font-sans">
-                  À Propos
-                </Link>
-              </li>
-
-            </ul>
-          </div>
-
-          {/* Contact Column */}
-          <div className="md:col-span-4">
-            <h4 className="mb-5 font-sans text-[12px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
-              Une question ?
-            </h4>
-            <p className="text-[var(--text-secondary)] text-[15px] mb-6 font-sans">
-              Notre équipe est à votre écoute pour vous accompagner dans votre projet de biographie.
-            </p>
-            <p className="mb-5 font-sans text-[15px]">
-              <a href="tel:+33159169357" className="font-semibold text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4 transition-colors duration-200 hover:decoration-[var(--loomina-gold)]">01 59 16 93 57</a>
-              <span className="text-[var(--text-muted)]"> · lun.–ven. 9 h–18 h</span>
-            </p>
-            <Link
-              href="/contact"
-              className="press inline-flex h-11 items-center gap-2 rounded-full border border-[var(--hairline-strong)] bg-[var(--paper)] px-5 font-sans text-sm font-semibold text-[var(--ink)] hover:border-[var(--loomina-gold)]"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              Nous écrire
-            </Link>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="h-px bg-[var(--hairline)] mb-8" />
-
-        {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-sans text-[13px] text-[var(--text-muted)]">
-            {FOOTER_LINKS.map((link, index) => (
-              <span key={link.href} className="flex items-center gap-6">
-                <Link
-                  href={link.href}
-                  className="hover:text-[var(--ink)] transition-colors duration-200"
-                >
-                  {link.label}
-                </Link>
-                {index < FOOTER_LINKS.length - 1 && (
-                  <span className="hidden h-1 w-1 rounded-full bg-[var(--loomina-mist)] sm:inline-block" />
-                )}
-              </span>
+          <div className="grid gap-10 sm:grid-cols-3">
+            {COLUMNS.map((col) => (
+              <div key={col.title}>
+                <h2 className="t-eyebrow !font-sans">{col.title}</h2>
+                <ul className="mt-4 space-y-2.5">
+                  {col.links.map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} className="font-sans text-[16px] text-[var(--ink-2)] underline-offset-4 hover:text-[var(--ink)] hover:underline">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
+        </div>
 
-          <div className="font-sans text-[13px] text-[var(--text-muted)]">
-            © {currentYear} Loomina. Tous droits réservés.
-          </div>
+        <div className="mt-12 flex flex-col gap-2 border-t border-[var(--rule)] pt-6 font-sans text-[14px] text-[var(--ink-3)] sm:flex-row sm:items-center sm:justify-between">
+          <p>© {year} Loomina. Projet porté par Solal Chetrit, Paris.</p>
+          <p>Loomina est une intelligence artificielle ; chaque page est relue par une personne.</p>
         </div>
       </div>
-
     </footer>
   );
 }

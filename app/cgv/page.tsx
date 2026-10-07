@@ -1,227 +1,102 @@
-'use client';
+import type { Metadata } from "next";
+import Link from "next/link";
+import LegalPage from "@/components/LegalPage";
+import { OFFER } from "@/config/offer";
 
-import React from 'react';
-import Link from 'next/link';
-import Button from '@/components/ui/Button';
+export const metadata: Metadata = {
+  title: "Conditions générales de vente",
+  description: "Les conditions de vente du service Loomina : prix, paiement, délais, garantie, rétractation, données.",
+  alternates: { canonical: "/cgv" },
+};
 
 export default function CGVPage() {
-    return (
-        <main className="w-full">
+  return (
+    <LegalPage eyebrow="Conditions générales de vente" title="Ce à quoi nous nous engageons." updated="7 octobre 2026">
+      <h2>1. Objet</h2>
+      <p>
+        Les présentes conditions générales de vente (CGV) régissent les relations entre <strong>Loomina</strong>, projet en
+        cours de création porté par Solal Chetrit, personne physique, joignable à contact@loomina.eu (« Loomina »), et toute
+        personne passant commande sur le site www.loomina.eu (« le Client »).
+      </p>
 
-            {/* Hero Section */}
-            <section className="relative pt-28 pb-8 md:pt-40 md:pb-10 px-5 sm:px-6">
-                <div className="max-w-4xl mx-auto">
-                    <p className="eyebrow">L’Offre</p>
+      <h2>2. Le service</h2>
+      <p>Loomina propose la création d’un livre de vie à partir d’entretiens téléphoniques. Le prix comprend :</p>
+      <ul>
+        <li>des entretiens téléphoniques, en nombre libre, menés par une intelligence artificielle ;</li>
+        <li>l’écriture d’un chapitre après chaque entretien, à partir des seules paroles du Client ;</li>
+        <li>la relecture de l’ensemble par une personne de l’équipe avant l’impression ;</li>
+        <li>l’intégration des photographies fournies par le Client ;</li>
+        <li>la mise en page et l’impression d’un exemplaire relié ({OFFER.format}) ;</li>
+        <li>une version numérique ({OFFER.digital}) ;</li>
+        <li>la livraison en France métropolitaine.</li>
+      </ul>
 
-                    <h1 className="heading-section mt-4 mb-5 max-w-3xl">
-                        Conditions Générales de Vente
-                    </h1>
+      <h2>3. Commande</h2>
+      <p>
+        La commande est conclue lorsque le Client a rempli le formulaire de commande, accepté les présentes CGV et réglé
+        l’intégralité du prix. Une confirmation est envoyée par e-mail.
+      </p>
 
-                    <p className="font-sans text-[14px] text-[var(--text-muted)]">
-                        Dernière mise à jour : 23 décembre 2024
-                    </p>
-                </div>
-            </section>
+      <h2>4. Prix et paiement</h2>
+      <p>
+        Le prix du service est de <strong>{OFFER.price} € TTC</strong>, tout compris. Il se règle en une fois, par carte
+        bancaire, via la plateforme sécurisée Stripe. Loomina ne conserve aucune donnée bancaire. Le prix applicable est celui
+        affiché au moment de la validation de la commande.
+      </p>
 
-            {/* Content */}
-            <section className="pt-6 pb-20 md:pb-28 px-5 sm:px-6 relative z-10">
-                <div className="max-w-4xl mx-auto">
-                    <div className="prose-loomina space-y-6">
+      <h2>5. Droit de rétractation</h2>
+      <p>
+        Conformément aux articles L221-18 et suivants du Code de la consommation, le Client dispose de{" "}
+        <strong>{OFFER.withdrawalDays} jours</strong> à compter de la commande pour se rétracter, sans motif, par e-mail à
+        contact@loomina.eu. S’il demande que le service commence avant la fin de ce délai (en passant son premier appel), il
+        peut encore se rétracter, et Loomina conserve une somme proportionnelle au service déjà rendu.
+      </p>
 
-                        {/* Article 1 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">1. Objet</h2>
-                            <p>
-                                Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre <strong className="text-[var(--text-primary)]">Loomina</strong>,
-                                projet en cours de création porté par Solal Chetrit, personne physique,
-                                joignable à contact@loomina.eu (ci-après « Loomina » ou « le Prestataire »),
-                                et toute personne physique ou morale souhaitant bénéficier des services proposés par Loomina (ci-après « le Client »).
-                            </p>
-                            <p className="mt-4">
-                                Les présentes CGV s’appliquent à toute commande passée sur le site internet <strong className="text-[var(--text-primary)]">www.loomina.eu</strong>
-                                ou par tout autre moyen de communication mis à disposition par Loomina.
-                            </p>
-                        </div>
+      <h2>6. Garantie satisfait ou remboursé</h2>
+      <p>
+        Indépendamment du droit de rétractation, Loomina rembourse intégralement le Client qui, après son premier entretien,
+        ne souhaite pas poursuivre, sans avoir à se justifier. La demande doit être faite dans les{" "}
+        <strong>{OFFER.guaranteeDays} jours</strong> qui suivent ce premier appel.
+      </p>
 
-                        {/* Article 2 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">2. Description des Services</h2>
-                            <p>
-                                Loomina propose un service de création de biographies personnalisées assisté par intelligence artificielle, comprenant :
-                            </p>
-                            <ul className="list-disc pl-6 mt-4 space-y-2">
-                                <li>Des entretiens téléphoniques illimités avec le Client pour recueillir son récit de vie</li>
-                                <li>La transformation des enregistrements en texte littéraire via notre technologie d’IA</li>
-                                <li>La relecture et correction professionnelle de chaque chapitre</li>
-                                <li>L’intégration de photographies fournies par le Client</li>
-                                <li>La mise en page éditoriale et la création d’une couverture personnalisée</li>
-                                <li>L’impression d’un exemplaire physique du livre (format 15x23 cm, couverture rigide)</li>
-                                <li>La fourniture d’une version numérique (PDF et EPUB)</li>
-                                <li>La livraison à domicile en France métropolitaine</li>
-                            </ul>
-                        </div>
+      <h2>7. Délais</h2>
+      <p>
+        Le livre est en général validé <strong>{OFFER.delay}</strong> après le premier entretien ; ce délai dépend du rythme du
+        Client, qui appelle quand il le souhaite. Une fois le texte validé, l’impression et l’acheminement prennent{" "}
+        <strong>{OFFER.printDelay}</strong>. La livraison se fait à l’adresse indiquée par le Client, en France métropolitaine ;
+        toute autre destination fait l’objet d’un accord préalable.
+      </p>
 
-                        {/* Article 3 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">3. Commande et Formation du Contrat</h2>
-                            <p>
-                                La commande est finalisée lorsque le Client :
-                            </p>
-                            <ul className="list-disc pl-6 mt-4 space-y-2">
-                                <li>Remplit le formulaire de commande en ligne</li>
-                                <li>Accepte expressément les présentes CGV</li>
-                                <li>Procède au paiement intégral du service</li>
-                            </ul>
-                            <p className="mt-4">
-                                Une confirmation de commande est envoyée par email au Client. Le contrat est réputé conclu à la date de réception du paiement.
-                            </p>
-                        </div>
+      <h2>8. Propriété du récit</h2>
+      <p>
+        Le Client conserve l’intégralité des droits sur son récit. Loomina ne l’utilise que pour réaliser le service
+        (écriture, mise en page, impression) et ne le reproduit ni ne le diffuse sans son accord écrit.
+      </p>
 
-                        {/* Article 4 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">4. Prix et Modalités de Paiement</h2>
-                            <p>
-                                Le prix du service est de <strong className="text-[var(--gold-ink)]">449 euros TTC</strong>, tout compris, sans frais cachés.
-                            </p>
-                            <p className="mt-4">
-                                Le paiement s’effectue en une fois par carte bancaire via la plateforme sécurisée <strong className="text-[var(--text-primary)]">Stripe</strong>.
-                                Loomina ne conserve aucune donnée bancaire.
-                            </p>
-                            <p className="mt-4">
-                                Les prix affichés sur le site sont susceptibles de modification, mais le prix applicable est celui en vigueur
-                                au moment de la validation de la commande par le Client.
-                            </p>
-                        </div>
+      <h2>9. Données personnelles</h2>
+      <p>
+        Les données sont traitées conformément au RGPD, comme décrit dans la{" "}
+        <Link href="/privacy">politique de confidentialité</Link>.
+      </p>
 
-                        {/* Article 5 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">5. Droit de Rétractation</h2>
-                            <p className="mt-4">
-                                Conformément à l’article L221-28 du Code de la consommation, le Client dispose d’un délai de <strong className="text-[var(--text-primary)]">14 jours</strong>
-                                à compter de la conclusion du contrat pour exercer son droit de rétractation, sans avoir à justifier de motifs ni à payer de pénalité.
-                            </p>
-                            <p className="mt-4">
-                                Toutefois, si le Client demande expressément que la prestation commence avant la fin du délai de rétractation,
-                                il renonce à son droit de rétractation dès le début de l’exécution du service.
-                            </p>
-                            <p className="mt-4">
-                                Pour exercer son droit de rétractation, le Client doit notifier Loomina par email à <strong className="text-[var(--gold-ink)]">contact@loomina.eu</strong>.
-                            </p>
-                        </div>
+      <h2>10. Responsabilité</h2>
+      <p>
+        Loomina s’engage à fournir le service avec soin. Sa responsabilité ne peut être engagée en cas de force majeure,
+        d’inexactitude des informations fournies par le Client, ou d’usage du service contraire à sa destination.
+      </p>
 
-                        {/* Article 6 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">6. Garantie Satisfait ou Remboursé</h2>
-                            <p>
-                                Loomina s’engage à rembourser intégralement le Client si, après le premier entretien téléphonique,
-                                le service, sans avoir à se justifier.
-                            </p>
-                            <p className="mt-4">
-                                Cette garantie s’applique uniquement si la demande de remboursement est formulée dans les <strong className="text-[var(--text-primary)]">7 jours</strong>
-                                suivant le premier appel.
-                            </p>
-                        </div>
+      <h2>11. Litiges</h2>
+      <p>
+        En cas de difficulté, le Client écrit d’abord à contact@loomina.eu pour trouver une solution amiable. Conformément à
+        l’article L612-1 du Code de la consommation, il peut ensuite recourir gratuitement à un médiateur de la consommation ;
+        ses coordonnées sont communiquées sur demande. À défaut, les tribunaux français sont compétents.
+      </p>
 
-                        {/* Article 7 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">7. Délais de Réalisation et Livraison</h2>
-                            <p>
-                                Le délai moyen de réalisation du service est de <strong className="text-[var(--text-primary)]">6 à 8 semaines</strong> à compter du premier entretien,
-                                mais peut varier en fonction du rythme du Client et de la complexité du projet.
-                            </p>
-                            <p className="mt-4">
-                                Une fois le livre finalisé et validé par le Client, l’impression et la livraison prennent entre <strong className="text-[var(--text-primary)]">2 et 3 semaines</strong>.
-                            </p>
-                            <p className="mt-4">
-                                La livraison est effectuée à l’adresse indiquée par le Client lors de la commande, en France métropolitaine.
-                                Pour les livraisons en Europe ou à l’international, des frais supplémentaires peuvent s’appliquer.
-                            </p>
-                        </div>
-
-                        {/* Article 8 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">8. Propriété Intellectuelle</h2>
-                            <p>
-                                Le Client conserve l’intégralité des droits d’auteur sur le contenu de son récit de vie.
-                                Loomina s’engage à ne jamais utiliser, reproduire ou diffuser le contenu du livre sans l’autorisation expresse du Client.
-                            </p>
-                            <p className="mt-4">
-                                Le Client accorde à Loomina une licence non exclusive pour utiliser le contenu uniquement dans le cadre de la réalisation du service
-                                (rédaction, mise en page, impression).
-                            </p>
-                        </div>
-
-                        {/* Article 9 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">9. Protection des Données Personnelles</h2>
-                            <p>
-                                Les données personnelles collectées par Loomina sont traitées conformément au Règlement Général sur la Protection des Données (RGPD).
-                                Pour plus d’informations sur la gestion de vos données personnelles,
-                                consultez notre <Link href="/privacy" className="text-[var(--ink)] underline decoration-[var(--loomina-gold)]/50 underline-offset-4">Politique de Confidentialité</Link>.
-                            </p>
-                        </div>
-
-                        {/* Article 10 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">10. Responsabilité</h2>
-                            <p>
-                                Loomina s’engage à fournir un service de qualité conforme aux standards professionnels.
-                                Toutefois, la responsabilité de Loomina ne saurait être engagée en cas de :
-                            </p>
-                            <ul className="list-disc pl-6 mt-4 space-y-2">
-                                <li>Force majeure ou événement indépendant de sa volonté</li>
-                                <li>Inexactitude des informations fournies par le Client</li>
-                                <li>Mauvaise utilisation du service par le Client</li>
-                            </ul>
-                        </div>
-
-                        {/* Article 11 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">11. Résolution des Litiges</h2>
-                            <p>
-                                En cas de litige, le Client est invité à contacter Loomina en priorité à l’adresse <strong className="text-[var(--gold-ink)]">contact@loomina.eu</strong>
-                                afin de rechercher une solution amiable.
-                            </p>
-                            <p className="mt-4">
-                                Conformément à l’article L612-1 du Code de la consommation, le Client peut recourir gratuitement à un médiateur de la consommation
-                                en cas de litige non résolu. Les coordonnées du médiateur compétent seront communiquées sur demande.
-                            </p>
-                            <p className="mt-4">
-                                À défaut de résolution amiable, tout litige relèvera de la compétence exclusive des tribunaux français.
-                            </p>
-                        </div>
-
-                        {/* Article 12 */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">12. Modification des CGV</h2>
-                            <p>
-                                Nous guidons chaque proche avec un fil rouge simple : un temps d’écoute, un atelier de mise en forme, puis des
-                                supports prêts à offrir. L’accueil de la page reflète cette promesse pour rassurer et donner envie d’avancer.
-                            </p>
-                        </div>
-
-                        {/* Contact */}
-                        <div className="card rounded-3xl p-6 sm:p-8">
-                            <h2 className="mb-4 text-[24px] leading-tight tracking-[-0.02em] text-[var(--ink)]">Contact</h2>
-                            <p>
-                                Pour toute question relative aux présentes CGV, vous pouvez nous contacter :
-                            </p>
-                            <ul className="list-none mt-4 space-y-2">
-                                <li><strong className="text-[var(--text-primary)]">Email :</strong> contact@loomina.eu</li>
-                                <li><strong className="text-[var(--text-primary)]">Téléphone :</strong> 01 59 16 93 57</li>
-                            </ul>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA */}
-            <section className="py-16 px-6 md:px-12 lg:px-24 text-center">
-                <Button href="/offre" variant="primary" size="lg">
-                    Découvrir l’offre
-                </Button>
-            </section>
-        </main>
-    );
+      <h2>12. Modification des CGV</h2>
+      <p>
+        Loomina peut modifier les présentes CGV. Les conditions applicables à une commande sont celles en vigueur à la date de
+        cette commande.
+      </p>
+    </LegalPage>
+  );
 }

@@ -16,23 +16,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
+  // Anciennes adresses de la première version du site.
   async redirects() {
     return [
-      {
-        source: "/mission",
-        destination: "/#mission",
-        permanent: true,
-      },
-      {
-        source: "/offres",
-        destination: "/#offres",
-        permanent: true,
-      },
-      {
-        source: "/accompagnement",
-        destination: "/#process",
-        permanent: true,
-      },
+      { source: "/mission", destination: "/about", permanent: true },
+      { source: "/offres", destination: "/offre", permanent: true },
+      { source: "/accompagnement", destination: "/experience", permanent: true },
     ];
   },
 };

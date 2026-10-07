@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description: "Une question sur votre projet de livre ? L’équipe Loomina vous répond sous 24 h.",
+  title: "Nous écrire",
+  description: "Une question sur votre livre, un cadeau à préparer ? Écrivez-nous : c’est le fondateur de Loomina qui vous répond.",
   alternates: { canonical: "/contact" },
 };
 
