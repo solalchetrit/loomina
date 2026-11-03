@@ -1,9 +1,12 @@
-import type { ReactNode } from "react";
 import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
+import Button from "@/components/ui/Button";
+import Icon, { type IconName } from "@/components/ui/Icon";
 import { BookPage } from "@/components/VoiceToPage";
+import { BookCover } from "@/components/home/WhatYouGet";
+import { Contents } from "@/components/home/Themes";
 import Closing from "@/components/Closing";
 import { SITE } from "@/config/site";
-import { OFFER, THEMES } from "@/config/offer";
+import { OFFER } from "@/config/offer";
 
 const BEFORE = [
   {
@@ -42,38 +45,70 @@ const AFTER = [
   },
 ];
 
-/** Une étape du parcours, numérotée dans la suite complète. */
-function Stage({ number, title, text }: { number: number; title: string; text: ReactNode }) {
+type Step = { title: string; text: string };
+
+const PHASES: { id: string; icon: IconName; label: string; title: string; text: string; duration: string; steps: Step[] }[] = [
+  {
+    id: "avant",
+    icon: "gift",
+    label: "Avant",
+    title: "Deux choses à faire, pas plus",
+    text: "Une commande de deux minutes, puis vous appelez quand vous êtes prêt.",
+    duration: "Quelques minutes",
+    steps: BEFORE,
+  },
+  {
+    id: "pendant",
+    icon: "phone",
+    label: "Pendant",
+    title: "Une conversation, pas un interrogatoire",
+    text: "Loomina est une intelligence artificielle conçue pour écouter patiemment. Elle ne vous presse jamais et ne change pas de sujet avant vous.",
+    duration: `En général ${OFFER.delay}`,
+    steps: DURING,
+  },
+  {
+    id: "apres",
+    icon: "book",
+    label: "Après",
+    title: "Le livre, chez vous",
+    text: "Une dernière relecture à deux, puis l’impression. Vous n’avez plus qu’à ouvrir le colis.",
+    duration: OFFER.printDelay,
+    steps: AFTER,
+  },
+];
+
+/** Frise verticale : un fil continu, une pastille numérotée par étape. */
+function Timeline({ steps, start }: { steps: Step[]; start: number }) {
   return (
-    <li className="card flex gap-5 p-6 md:p-7">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[var(--ink)] text-[16px] font-bold text-white" aria-hidden="true">
-        {number}
-      </span>
-      <div>
-        <h3 className="t-heading">
-          <span className="sr-only">{number}. </span>
-          {title}
-        </h3>
-        <p className="t-body mt-2">{text}</p>
-      </div>
-    </li>
+    <ol className="relative">
+      {steps.map((st, i) => {
+        const n = start + i;
+        const last = i === steps.length - 1;
+        return (
+          <li key={st.title} className="relative pb-4 pl-12 last:pb-0 sm:pl-16">
+            {!last && <span aria-hidden="true" className="absolute bottom-0 left-[17px] top-11 w-[2px] rounded bg-[var(--line)] sm:left-[21px] sm:top-12" />}
+            <span
+              aria-hidden="true"
+              className="absolute left-0 top-2 flex h-9 w-9 items-center justify-center rounded-full border-2 sm:h-11 sm:w-11 border-[var(--ink)] bg-white text-[16px] font-extrabold"
+            >
+              {n}
+            </span>
+            <div className="card p-5 sm:p-6 md:p-7">
+              <h3 className="t-heading">
+                <span className="sr-only">Étape {n}. </span>
+                {st.title}
+              </h3>
+              <p className="t-body mt-2">{st.text}</p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
-function Phase({ label, title, text, steps, start }: { label: string; title: string; text?: string; steps: { title: string; text: string }[]; start: number }) {
-  return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
-      <div className="lg:sticky lg:top-32 lg:self-start">
-        <SectionHead eyebrow={label} title={title} text={text} />
-      </div>
-      <ol className="flex flex-col gap-4">
-        {steps.map((st, i) => (
-          <Stage key={st.title} number={start + i} title={st.title} text={st.text} />
-        ))}
-      </ol>
-    </div>
-  );
-}
+/** Numéro de la première étape de chaque temps, pour une numérotation continue de 1 à 7. */
+const STARTS = PHASES.map((_, i) => 1 + PHASES.slice(0, i).reduce((n, p) => n + p.steps.length, 0));
 
 export default function ExperiencePage() {
   return (
@@ -82,46 +117,69 @@ export default function ExperiencePage() {
         eyebrow="Comment ça marche"
         title="Un téléphone, des conversations, un livre"
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
-      />
-
-      <Section size="sm">
-        <Phase label="Avant" title="Deux choses à faire, pas plus" steps={BEFORE} start={1} />
-      </Section>
-
-      <Section className="bg-white">
-        <Phase
-          label="Pendant"
-          title="Une conversation, pas un interrogatoire"
-          text="Loomina est une intelligence artificielle conçue pour écouter patiemment. Elle ne vous presse jamais et ne change pas de sujet avant vous."
-          steps={DURING}
-          start={3}
-        />
-      </Section>
-
-      <Section id="chapitres">
-        <SectionHead
-          eyebrow={`${OFFER.chapters} thèmes`}
-          title="Des points de départ, pas un questionnaire"
-          text="Loomina propose ces thèmes au fil des appels, de l’enfance à aujourd’hui. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
-        />
-        <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {THEMES.map((t) => (
-            <li key={t.title} className="card px-5 py-4">
-              <span className="block text-[17px] font-bold">{t.title}</span>
-              <span className="t-small mt-0.5 block">{t.desc}</span>
-            </li>
+      >
+        <nav aria-label="Les trois temps" className="mt-10 grid gap-3 sm:grid-cols-3">
+          {PHASES.map((p) => (
+            <a key={p.id} href={`#${p.id}`} className="card press flex items-center gap-4 p-4 hover:border-[var(--ink)]">
+              <span className="chip-icon">
+                <Icon name={p.icon} />
+              </span>
+              <span>
+                <b className="block text-[17px]">{p.label}</b>
+                <span className="block text-[14px] text-[var(--ink-3)]">{p.duration}</span>
+              </span>
+            </a>
           ))}
-        </ul>
-      </Section>
+        </nav>
+      </PageHeader>
+
+      {PHASES.map((p, idx) => {
+        const start = STARTS[idx];
+        return (
+          <Section key={p.id} id={p.id} className={idx % 2 === 1 ? "bg-white" : ""}>
+            <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
+              <div className="lg:sticky lg:top-32 lg:self-start">
+                <span className="pill pill-amber">
+                  {p.label} · {p.duration}
+                </span>
+                <h2 className="t-title mt-5">{p.title}</h2>
+                <p className="t-lead mt-5 max-w-md">{p.text}</p>
+              </div>
+              <div>
+                <Timeline steps={p.steps} start={start} />
+                {p.id === "apres" && (
+                  <div className="mt-6 grid items-center gap-6 rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white sm:grid-cols-[130px_1fr] md:p-9">
+                    <BookCover className="max-w-[130px] !py-0" compact />
+                    <div>
+                      <p className="text-[15px] font-bold text-[var(--amber)]">Ce que vous recevez</p>
+                      <p className="mt-2 text-[24px] font-extrabold leading-tight tracking-[-0.02em]">
+                        Un livre relié, {OFFER.format}, et sa version {OFFER.digital}
+                      </p>
+                      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                        <Button href="/order" variant="accent" size="lg">
+                          Commander · {OFFER.price} €
+                        </Button>
+                        <Button href={`tel:${SITE.phone}`} variant="ghost" className="!text-white !decoration-white/40 hover:!decoration-white">
+                          Essayer d’abord la démo
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Section>
+        );
+      })}
 
       <Section className="bg-white">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
-            <SectionHead eyebrow="Ce que Loomina écrit" title="Vos mots, mis en page" />
-            <p className="t-body mt-6 max-w-md">
-              Loomina ne romance pas. Elle garde votre façon de dire les choses, ordonne, et quand un détail manque, elle vous le demande
-              au prochain appel plutôt que de l’inventer.
-            </p>
+            <SectionHead
+              eyebrow="Ce que Loomina écrit"
+              title="Vos mots, mis en page"
+              text="Loomina ne romance pas. Elle garde votre façon de dire les choses, ordonne, et quand un détail manque, elle vous le demande au prochain appel plutôt que de l’inventer."
+            />
             <p className="t-small mt-6">Exemple écrit pour illustrer la méthode : Jeanne n’est pas une cliente réelle.</p>
           </div>
           <BookPage chapter="Chapitre 7" title="La maison de famille" page="112">
@@ -136,8 +194,13 @@ export default function ExperiencePage() {
         </div>
       </Section>
 
-      <Section>
-        <Phase label="Après" title="Le livre, chez vous" steps={AFTER} start={6} />
+      <Section id="chapitres">
+        <SectionHead
+          eyebrow={`${OFFER.chapters} thèmes`}
+          title="Des points de départ, pas un questionnaire"
+          text="Loomina propose ces thèmes au fil des appels. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
+        />
+        <Contents className="mt-10" />
       </Section>
 
       <Closing title="Essayez d’abord, commandez ensuite" />

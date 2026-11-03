@@ -74,24 +74,31 @@ export function Steps({
   items,
   className = "",
 }: {
-  items: { icon: IconName; title: ReactNode; text: ReactNode }[];
+  items: { icon: IconName; title: ReactNode; text: ReactNode; preview?: ReactNode }[];
   className?: string;
 }) {
   return (
     <ol className={`grid gap-4 md:grid-cols-3 ${className}`}>
       {items.map((it, i) => (
-        <li key={i} className="card p-7 md:p-8">
-          <div className="flex items-center justify-between">
-            <span className="chip-icon">
-              <Icon name={it.icon} />
-            </span>
-            <span className="text-[15px] font-bold text-[var(--ink-3)]">
-              <span className="sr-only">Étape </span>
-              {i + 1}
-            </span>
+        <li key={i} className="card flex flex-col p-3">
+          {it.preview && (
+            <div aria-hidden="true" className="flex h-40 items-center justify-center overflow-hidden rounded-[18px] bg-[var(--canvas)] px-5">
+              {it.preview}
+            </div>
+          )}
+          <div className="p-4 pt-5 md:p-5">
+            <div className="flex items-center justify-between">
+              <span className="chip-icon">
+                <Icon name={it.icon} />
+              </span>
+              <span className="text-[15px] font-bold text-[var(--ink-3)]">
+                <span className="sr-only">Étape </span>
+                {i + 1}
+              </span>
+            </div>
+            <h3 className="t-heading mt-5">{it.title}</h3>
+            <div className="t-body mt-2">{it.text}</div>
           </div>
-          <h3 className="t-heading mt-6">{it.title}</h3>
-          <div className="t-body mt-2">{it.text}</div>
         </li>
       ))}
     </ol>
