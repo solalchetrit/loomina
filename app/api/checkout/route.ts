@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { OFFER } from "@/config/offer";
-
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import { stripe } from "@/lib/stripe";
 
 export async function POST(request: NextRequest) {
     try {
@@ -20,7 +17,7 @@ export async function POST(request: NextRequest) {
         const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
         // Create Checkout Session
-        const session = await stripe.checkout.sessions.create({
+        const session = await stripe().checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: [
                 {

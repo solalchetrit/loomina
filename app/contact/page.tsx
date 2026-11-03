@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/ui/Section";
 import ContactForm from "@/components/ContactForm";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 
 const EMAIL = "contact@loomina.eu";
 
@@ -23,8 +23,8 @@ export default function ContactPage() {
             <p className="t-body mt-2">Pour vos photos aussi : envoyez-les ici, en précisant le souvenir qu’elles illustrent.</p>
 
             <p className="t-eyebrow mt-10">Pour essayer Loomina</p>
-            <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="link mt-2 inline-block font-serif text-[clamp(1.6rem,3vw,2.2rem)] leading-tight text-[var(--ink)]">
-              {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+            <a href={`tel:${SITE.phone}`} className="link mt-2 inline-block font-serif text-[clamp(1.6rem,3vw,2.2rem)] leading-tight text-[var(--ink)]">
+              {SITE.phoneDisplay}
             </a>
             <p className="t-body mt-2">
               Ce numéro est celui de Loomina, l’intelligence artificielle qui mène les entretiens. Elle répond à toute heure,

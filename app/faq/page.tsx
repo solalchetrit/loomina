@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Section, PageHeader } from "@/components/ui/Section";
 import Accordion from "@/components/ui/Accordion";
 import Closing from "@/components/Closing";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 import { OFFER, GUARANTEE } from "@/config/offer";
 
 /**
@@ -17,7 +17,7 @@ const FAQ_CATEGORIES = [
     questions: [
       {
         q: "Comment fonctionne Loomina ?",
-        a: `Vous appelez le ${LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY} quand vous voulez. Loomina, une intelligence artificielle, mène l’entretien et écrit un chapitre après chaque appel, dans vos mots. Vous relisez, vous corrigez, notre équipe relit tout, et le livre relié arrive chez vous.`,
+        a: `Vous appelez le ${SITE.phoneDisplay} quand vous voulez. Loomina, une intelligence artificielle, mène l’entretien et écrit un chapitre après chaque appel, dans vos mots. Vous relisez, vous corrigez, notre équipe relit tout, et le livre relié arrive chez vous.`,
       },
       {
         q: "Combien de temps dure le processus ?",

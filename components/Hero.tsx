@@ -1,4 +1,4 @@
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 import Button from "@/components/ui/Button";
 import { OFFER } from "@/config/offer";
 
@@ -81,10 +81,10 @@ export default function Hero() {
           <div className="rise mt-9 w-full max-w-[34rem] border-y border-[var(--ink)] py-5" style={{ "--i": 3 } as React.CSSProperties}>
             <p className="t-eyebrow">Essayez maintenant, c’est gratuit</p>
             <a
-              href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`}
+              href={`tel:${SITE.phone}`}
               className="link mt-2 inline-block font-serif text-[clamp(2.2rem,5vw,3.1rem)] leading-none tracking-[-0.015em] text-[var(--ink)]"
             >
-              {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+              {SITE.phoneDisplay}
             </a>
             <p className="t-body mt-3">
               {OFFER.demoMinutes} minutes avec Loomina : vous racontez un souvenir, elle vous pose quelques questions. Rien n’est

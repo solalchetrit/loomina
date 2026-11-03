@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
 /**
@@ -26,10 +26,10 @@ export default function Closing({
           <div className="lg:justify-self-end lg:text-right">
             <p className="t-eyebrow">Démo gratuite, {OFFER.demoMinutes} minutes</p>
             <a
-              href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`}
+              href={`tel:${SITE.phone}`}
               className="link mt-3 inline-block font-serif text-[clamp(2.4rem,6vw,4.25rem)] leading-none tracking-[-0.02em] text-[var(--ink)]"
             >
-              {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+              {SITE.phoneDisplay}
             </a>
             {secondary && (
               <div className="mt-8">

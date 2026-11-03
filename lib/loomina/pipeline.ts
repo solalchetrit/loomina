@@ -52,33 +52,39 @@ export interface PipelineOutcome {
     reason?: string;
 }
 
+/** Les champs d'un appel que Vapi peut placer à plusieurs profondeurs. */
+interface VapiCallFields {
+    transcript?: string;
+    recordingUrl?: string;
+    durationSeconds?: number | string;
+    customer?: { number?: string };
+    metadata?: { user_id?: string; project_id?: string; demo?: boolean };
+}
+
+/** Un message de webhook Vapi, réduit à ce que Loomina lit. */
+export interface VapiMessage extends VapiCallFields {
+    type?: string;
+    artifact?: VapiCallFields;
+    call?: VapiCallFields & { id?: string };
+}
+
 /** Extraction tolérante : Vapi place ces champs à des profondeurs variables. */
-export function extractCallData(message: Record<string, any>) {
-    const artifact = message?.artifact ?? {};
-    const call = message?.call ?? {};
+export function extractCallData(message: VapiMessage) {
+    const artifact = message.artifact ?? {};
+    const call = message.call ?? {};
 
-    const transcript: string =
-        message?.transcript ?? artifact?.transcript ?? call?.transcript ?? '';
-
-    const recordingUrl: string | null =
-        message?.recordingUrl ?? artifact?.recordingUrl ?? call?.recordingUrl ?? null;
-
-    const durationRaw =
-        message?.durationSeconds ?? artifact?.durationSeconds ?? call?.durationSeconds ?? null;
-
-    const phone: string | null =
-        message?.customer?.number ?? call?.customer?.number ?? null;
-
-    const metadata = call?.metadata ?? message?.metadata ?? {};
+    const transcript = message.transcript ?? artifact.transcript ?? call.transcript ?? '';
+    const durationRaw = message.durationSeconds ?? artifact.durationSeconds ?? call.durationSeconds;
+    const metadata = call.metadata ?? message.metadata ?? {};
 
     return {
         transcript: typeof transcript === 'string' ? transcript.trim() : '',
-        recordingUrl,
+        recordingUrl: message.recordingUrl ?? artifact.recordingUrl ?? call.recordingUrl ?? null,
         durationSeconds: Number.isFinite(Number(durationRaw)) ? Math.round(Number(durationRaw)) : null,
-        phone,
-        userId: (metadata?.user_id as string) ?? null,
-        projectId: (metadata?.project_id as string) ?? null,
-        vapiCallId: (call?.id as string) ?? (message?.call?.id as string) ?? null,
+        phone: message.customer?.number ?? call.customer?.number ?? null,
+        userId: metadata.user_id ?? null,
+        projectId: metadata.project_id ?? null,
+        vapiCallId: call.id ?? null,
     };
 }
 
@@ -117,7 +123,7 @@ interface WriterBrief {
 export async function processEndOfCall(params: {
     profile: Profile;
     project?: Project | null;
-    message: Record<string, any>;
+    message: VapiMessage;
     /** L'événement `call_events` d'origine : rend le traitement rejouable. */
     eventId?: string;
 }): Promise<PipelineOutcome> {

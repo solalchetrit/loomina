@@ -1,7 +1,7 @@
 import { Section, SectionHead, PageHeader, Numbered } from "@/components/ui/Section";
 import { BookPage } from "@/components/VoiceToPage";
 import Closing from "@/components/Closing";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 import { OFFER, THEMES } from "@/config/offer";
 
 const BEFORE = [
@@ -11,7 +11,7 @@ const BEFORE = [
   },
   {
     title: "Vous appelez quand vous êtes prêt",
-    text: `Il n’y a pas de rendez-vous. Vous composez le ${LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY} depuis le numéro de la commande, le jour et à l’heure qui vous conviennent. Loomina vous accueille par votre prénom.`,
+    text: `Il n’y a pas de rendez-vous. Vous composez le ${SITE.phoneDisplay} depuis le numéro de la commande, le jour et à l’heure qui vous conviennent. Loomina vous accueille par votre prénom.`,
   },
 ];
 

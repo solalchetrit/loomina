@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 
 const COLUMNS = [
   {
@@ -46,8 +46,8 @@ export default function Footer() {
             <p className="t-body mt-5 max-w-xs">Vous racontez votre vie au téléphone. Nous en faisons un livre.</p>
             <p className="mt-6 font-sans text-[16px] text-[var(--ink-2)]">
               Pour essayer :{" "}
-              <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="link font-semibold">
-                {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+              <a href={`tel:${SITE.phone}`} className="link font-semibold">
+                {SITE.phoneDisplay}
               </a>
             </p>
             <p className="mt-1 font-sans text-[16px] text-[var(--ink-2)]">

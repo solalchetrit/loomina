@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import LiveBook from "@/components/LiveBook";
 import Button from "@/components/ui/Button";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
 
 type LoginStep = "phone" | "otp";
@@ -29,6 +29,8 @@ export default function DashboardPage() {
   const [justOrdered, setJustOrdered] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
 
+  // localStorage n'existe que dans le navigateur : on le lit après le premier rendu.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -41,6 +43,7 @@ export default function DashboardPage() {
     }
     if (new URLSearchParams(window.location.search).has("session_id")) setJustOrdered(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const logout = useCallback(async (expired = false) => {
     try {
@@ -167,8 +170,8 @@ export default function DashboardPage() {
                 <p className="font-serif text-[22px] leading-tight text-[var(--ink)]">Merci, votre commande est confirmée.</p>
                 <p className="t-body mt-3">
                   Tout commence par un appel : composez le{" "}
-                  <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="link whitespace-nowrap font-semibold">
-                    {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+                  <a href={`tel:${SITE.phone}`} className="link whitespace-nowrap font-semibold">
+                    {SITE.phoneDisplay}
                   </a>{" "}
                   depuis le numéro indiqué à la commande, quand vous voulez. Les chapitres apparaîtront ici.
                 </p>
@@ -287,8 +290,8 @@ export default function DashboardPage() {
           <aside className="space-y-10 lg:sticky lg:top-28 lg:self-start">
             <div>
               <p className="t-eyebrow">Pour continuer</p>
-              <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="link mt-2 inline-block font-serif text-[clamp(1.8rem,3.4vw,2.4rem)] leading-tight text-[var(--ink)]">
-                {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+              <a href={`tel:${SITE.phone}`} className="link mt-2 inline-block font-serif text-[clamp(1.8rem,3.4vw,2.4rem)] leading-tight text-[var(--ink)]">
+                {SITE.phoneDisplay}
               </a>
               <p className="t-body mt-3 max-w-xs">
                 Appelez depuis le numéro de votre commande, quand vous voulez. Loomina reprend là où vous en étiez, et le

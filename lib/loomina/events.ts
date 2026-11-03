@@ -10,7 +10,7 @@
 import { db, findProfileByPhone, findActiveProject, maskPhone } from './db';
 import type { Profile, Project } from './db';
 import { processEndOfCall, extractCallData } from './pipeline';
-import type { PipelineOutcome } from './pipeline';
+import type { PipelineOutcome, VapiMessage } from './pipeline';
 
 export const MAX_ATTEMPTS = 3;
 
@@ -28,7 +28,7 @@ export interface RecordedEvent {
  */
 export async function recordEvent(params: {
     eventType: string;
-    payload: Record<string, unknown>;
+    payload: object;
     vapiCallId: string | null;
     projectId?: string | null;
 }): Promise<RecordedEvent> {
@@ -174,7 +174,8 @@ export async function processEvent(eventId: string): Promise<PipelineOutcome | n
 
         if (error || !event) throw new Error(`Événement ${eventId} introuvable`);
 
-        const message = (event.payload as Record<string, any>)?.message ?? event.payload;
+        const payload = event.payload as { message?: VapiMessage } & VapiMessage;
+        const message = payload.message ?? payload;
         const data = extractCallData(message);
 
         const { profile, project } = await resolveCaller(data.phone, data.userId, data.projectId);

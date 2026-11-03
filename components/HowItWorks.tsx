@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 import { Numbered } from "@/components/ui/Section";
 
 export const STEPS = [
   {
     title: "Vous appelez, quand vous voulez",
-    text: `Après la commande, vous appelez le ${LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY} depuis le numéro donné à l’inscription. Loomina vous reconnaît et reprend là où vous vous étiez arrêté. Un appel dure le temps qu’il vous faut.`,
+    text: `Après la commande, vous appelez le ${SITE.phoneDisplay} depuis le numéro donné à l’inscription. Loomina vous reconnaît et reprend là où vous vous étiez arrêté. Un appel dure le temps qu’il vous faut.`,
   },
   {
     title: "Un chapitre arrive après chaque appel",

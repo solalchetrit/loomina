@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 
 interface Chapter {
   number: number;
@@ -99,8 +99,8 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
         <h2 className="t-title mt-3">{book?.title ?? "Votre histoire"}</h2>
         <p className="t-lead mt-6">
           Aucun chapitre pour le moment. Tout commence par un appel : composez le{" "}
-          <a href={`tel:${LOOMINA_CONFIG.PHONE_NUMBER}`} className="link whitespace-nowrap font-semibold">
-            {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}
+          <a href={`tel:${SITE.phone}`} className="link whitespace-nowrap font-semibold">
+            {SITE.phoneDisplay}
           </a>{" "}
           depuis ce numéro, et Loomina vous accueillera par votre prénom.
         </p>

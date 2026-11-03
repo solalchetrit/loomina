@@ -1,6 +1,6 @@
 import { Section, SectionHead, PageHeader, Numbered } from "@/components/ui/Section";
 import Closing from "@/components/Closing";
-import { LOOMINA_CONFIG } from "@/config/loomina";
+import { SITE } from "@/config/site";
 
 const COMMITMENTS = [
   {
@@ -76,7 +76,7 @@ export default function AboutPage() {
           <div className="prose-loomina mt-6">
             <p>
               Pour toute question, écrivez à <a href="mailto:contact@loomina.eu">contact@loomina.eu</a> ou passez par la{" "}
-              <a href="/contact">page contact</a>. Le {LOOMINA_CONFIG.PHONE_NUMBER_DISPLAY}, lui, est le numéro de Loomina :
+              <a href="/contact">page contact</a>. Le {SITE.phoneDisplay}, lui, est le numéro de Loomina :
               c’est elle qui décroche, à toute heure, pour un essai de trois minutes ou pour vos entretiens.
             </p>
           </div>
