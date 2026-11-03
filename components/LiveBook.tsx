@@ -84,7 +84,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
 
   if (state.kind === "error") {
     return (
-      <p role="alert" className="border-l-2 border-[var(--danger)] pl-4 font-sans text-[16px] text-[var(--danger)]">
+      <p role="alert" className="rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
         {state.message}
       </p>
     );
@@ -94,10 +94,10 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
 
   if (!book || chapters.length === 0) {
     return (
-      <div className="rule-top max-w-2xl pt-8">
+      <div className="card max-w-3xl p-7 md:p-10">
         <p className="t-eyebrow">Votre livre</p>
         <h2 className="t-title mt-3">{book?.title ?? "Votre histoire"}</h2>
-        <p className="t-lead mt-6">
+        <p className="t-lead mt-5">
           Aucun chapitre pour le moment. Tout commence par un appel : composez le{" "}
           <a href={`tel:${SITE.phone}`} className="link whitespace-nowrap font-semibold">
             {SITE.phoneDisplay}
@@ -113,7 +113,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
 
   return (
     <div className="max-w-3xl">
-      <div className="rule-top pt-8">
+      <div className="card p-7 md:p-10">
         <p className="t-eyebrow">Votre livre</p>
         <h2 className="t-title mt-3">{book.title}</h2>
         <p className="t-body mt-4">
@@ -122,13 +122,13 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
         </p>
       </div>
 
-      <nav aria-label="Sommaire" className="mt-10">
-        <p className="t-eyebrow !text-[var(--ink-3)]">Sommaire</p>
-        <ol className="rule-top mt-3">
+      <nav aria-label="Sommaire" className="card mt-4 px-5 py-4 md:px-7">
+        <p className="pt-2 text-[15px] font-bold text-[var(--ink-3)]">Sommaire</p>
+        <ol className="mt-2 divide-y divide-[var(--line-soft)]">
           {chapters.map((c) => (
-            <li key={c.number} className="border-b border-[var(--rule)]">
-              <a href={`#chapitre-${c.number}`} className="flex items-baseline gap-4 py-3 font-sans text-[17px] text-[var(--ink)] hover:underline underline-offset-4">
-                <span className="t-numeral w-8 shrink-0">{c.number}</span>
+            <li key={c.number}>
+              <a href={`#chapitre-${c.number}`} className="flex items-baseline gap-4 py-3 text-[17px] font-semibold text-[var(--ink)] underline-offset-4 hover:underline">
+                <span className="w-8 shrink-0 font-bold text-[var(--amber-ink)]">{c.number}</span>
                 <span className="flex-1">{c.title}</span>
                 <span className="t-small hidden sm:inline">{c.date && formatDate(c.date)}</span>
               </a>
@@ -137,12 +137,11 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
         </ol>
       </nav>
 
-      <div className="mt-16 space-y-20">
+      <div className="mt-4 space-y-4">
         {chapters.map((c) => (
-          <article key={c.number} id={`chapitre-${c.number}`} className="scroll-mt-28">
-            <p className="text-center font-sans text-[12px] font-semibold uppercase tracking-[0.28em] text-[var(--gold-ink)]">Chapitre {c.number}</p>
-            <h3 className="mt-3 text-center font-serif text-[clamp(1.6rem,3vw,2.2rem)] italic leading-tight text-[var(--ink)]">{c.title}</h3>
-            <span aria-hidden="true" className="gold-dash mx-auto mt-6" />
+          <article key={c.number} id={`chapitre-${c.number}`} className="card scroll-mt-32 px-6 py-12 sm:px-12 md:py-16">
+            <p className="text-center text-[14px] font-bold text-[var(--amber-ink)]">Chapitre {c.number}</p>
+            <h3 className="mt-2 text-center font-serif text-[clamp(1.6rem,3vw,2.2rem)] font-normal italic leading-tight tracking-normal text-[var(--ink)]">{c.title}</h3>
             <div className="book-text mx-auto mt-8 max-w-[38rem]" lang="fr">
               {paragraphs(c.content).map((p, i) => (
                 <p key={i}>{p}</p>

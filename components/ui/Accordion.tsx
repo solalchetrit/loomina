@@ -1,16 +1,14 @@
 "use client";
 
 import { useId, useState, type ReactNode } from "react";
+import Icon from "@/components/ui/Icon";
 
 export interface AccordionItem {
   q: string;
   a: ReactNode;
 }
 
-/**
- * Accordéon accessible (bouton + aria-expanded + région).
- * La hauteur est animée en CSS via grid-template-rows.
- */
+/** Accordéon accessible (bouton + aria-expanded + région), dans une carte. */
 export default function Accordion({
   items,
   defaultOpen = null,
@@ -24,36 +22,31 @@ export default function Accordion({
   const baseId = useId();
 
   return (
-    <div className={`rule-top ${className}`}>
+    <div className={`card divide-y divide-[var(--line-soft)] px-5 sm:px-7 ${className}`}>
       {items.map((item, i) => {
         const isOpen = open === i;
         const btnId = `${baseId}-b${i}`;
         const panelId = `${baseId}-p${i}`;
         return (
-          <div key={i} className="border-b border-[var(--rule)]">
-            <h3 className="m-0">
+          <div key={i}>
+            <h3 className="m-0 text-[18px] tracking-[-0.01em]">
               <button
                 type="button"
                 id={btnId}
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="flex w-full items-start justify-between gap-6 py-5 text-left font-sans text-[18px] font-medium leading-snug text-[var(--ink)] md:py-6"
+                className="flex w-full items-center justify-between gap-6 py-5 text-left font-bold leading-snug text-[var(--ink)] md:py-6"
               >
                 <span>{item.q}</span>
-                <span
-                  aria-hidden="true"
-                  className="acc-icon mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center text-[var(--gold-ink)]"
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round">
-                    <path d="M8 3v10M3 8h10" />
-                  </svg>
+                <span aria-hidden="true" className="acc-icon chip-icon chip-icon-neutral !h-9 !w-9 !rounded-[12px]">
+                  <Icon name="plus" size={18} />
                 </span>
               </button>
             </h3>
             <div id={panelId} role="region" aria-labelledby={btnId} className="acc-panel" data-open={isOpen}>
               <div>
-                <div className="t-body max-w-2xl pb-6 pr-10">{item.a}</div>
+                <div className="t-body max-w-2xl pb-6 pr-12">{item.a}</div>
               </div>
             </div>
           </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { formatToE164 } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
-import { RuledList } from "@/components/ui/Section";
+import { CheckList } from "@/components/ui/Section";
 import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
@@ -72,34 +72,32 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="w-full min-h-[80svh] pt-28 pb-20 md:pt-36 md:pb-28">
-      <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-20">
-          <div>
+    <div className="min-h-[80svh] w-full pb-20 pt-32 md:pb-28 md:pt-40">
+      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
+        <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+          <div className="card p-6 sm:p-8 md:p-10">
             {/* Progression */}
-            <ol className="rise flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[15px]" aria-label="Étapes de la commande">
+            <ol className="flex flex-wrap items-center gap-2 text-[15px]" aria-label="Étapes de la commande">
               {STEPS.map((label, i) => {
                 const n = i + 1;
                 const current = n === step;
                 const done = n < step;
                 return (
-                  <li key={label} className="flex items-center gap-3">
-                    <span className={current ? "font-semibold text-[var(--ink)]" : done ? "text-[var(--ink)]" : "text-[var(--ink-3)]"} aria-current={current ? "step" : undefined}>
-                      <span className="t-numeral mr-1.5">{n}.</span>
-                      {label}
+                  <li key={label}>
+                    <span
+                      className={`pill ${current ? "bg-[var(--ink)] text-white" : done ? "pill-amber" : "pill-neutral"}`}
+                      aria-current={current ? "step" : undefined}
+                    >
+                      {n}. {label}
                     </span>
-                    {n < STEPS.length && <span aria-hidden="true" className="h-px w-6 bg-[var(--rule-strong)]" />}
                   </li>
                 );
               })}
             </ol>
 
-            <div className="rise mt-8" style={{ "--i": 1 } as React.CSSProperties}>
-              <h1 className="t-title">
-                {step === 1 ? "À qui se destine ce livre ?" : isGift ? "Qui va raconter son histoire ?" : "Vos coordonnées."}
-              </h1>
-              <span aria-hidden="true" className="gold-dash mt-6" />
-            </div>
+            <h1 className="t-title mt-8">
+              {step === 1 ? "À qui se destine ce livre ?" : isGift ? "Qui va raconter son histoire ?" : "Vos coordonnées"}
+            </h1>
 
             {/* Étape 1 */}
             <div className="mt-8 grid gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Destinataire">
@@ -117,15 +115,15 @@ export default function OrderPage() {
                     role="radio"
                     aria-checked={active}
                     onClick={() => setWho(o.key)}
-                    className={`press flex items-start gap-4 rounded-lg border bg-white p-5 text-left ${
-                      active ? "border-[var(--ink)] ring-1 ring-[var(--ink)]" : "border-[var(--rule-strong)] hover:border-[var(--ink)]"
+                    className={`press flex items-start gap-4 rounded-[20px] border p-5 text-left ${
+                      active ? "border-[var(--ink)] bg-[var(--canvas)] ring-1 ring-[var(--ink)]" : "border-[var(--rule-strong)] bg-white hover:border-[var(--ink)]"
                     }`}
                   >
                     <span className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${active ? "border-[var(--ink)] bg-[var(--ink)]" : "border-[var(--rule-strong)]"}`}>
-                      {active && <span className="h-2 w-2 rounded-full bg-[var(--gold-light)]" />}
+                      {active && <span className="h-2 w-2 rounded-full bg-[var(--amber)]" />}
                     </span>
                     <span>
-                      <span className="block font-serif text-[22px] leading-tight text-[var(--ink)]">{o.title}</span>
+                      <span className="block text-[20px] font-extrabold leading-tight tracking-[-0.02em] text-[var(--ink)]">{o.title}</span>
                       <span className="t-body mt-1 block">{o.text}</span>
                     </span>
                   </button>
@@ -135,7 +133,7 @@ export default function OrderPage() {
 
             {/* Étape 2 */}
             {step === 2 && (
-              <form onSubmit={submit} className="rise mt-10 border-t border-[var(--rule)] pt-10" noValidate>
+              <form onSubmit={submit} className="rise mt-8 border-t border-[var(--line-soft)] pt-8" noValidate>
                 <p className="t-body max-w-xl">
                   {isGift
                     ? "Les coordonnées de la personne qui racontera son histoire. C’est elle qui parlera avec Loomina, et c’est son numéro que Loomina reconnaîtra."
@@ -179,13 +177,13 @@ export default function OrderPage() {
                 </div>
 
                 {submitError && (
-                  <p role="alert" className="mt-6 border-l-2 border-[var(--danger)] pl-4 font-sans text-[16px] text-[var(--danger)]">
+                  <p role="alert" className="mt-6 rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
                     {submitError}
                   </p>
                 )}
 
                 <div className="mt-8">
-                  <Button type="submit" variant="primary" size="lg" fullWidth loading={submitting}>
+                  <Button type="submit" size="lg" loading={submitting} className="w-full">
                     {submitting ? "Ouverture du paiement…" : `Payer ${OFFER.price} € sur la page sécurisée`}
                   </Button>
                   <p className="t-small mt-4">
@@ -201,15 +199,15 @@ export default function OrderPage() {
           </div>
 
           {/* Récapitulatif */}
-          <aside className="rise rule-top pt-6 lg:sticky lg:top-28 lg:self-start" style={{ "--i": 3 } as React.CSSProperties}>
-            <p className="t-eyebrow">Votre commande</p>
-            <p className="mt-3 font-serif text-[24px] leading-tight text-[var(--ink)]">{OFFER.name}</p>
-            <p className="mt-4 font-serif text-[56px] leading-none tracking-[-0.03em] text-[var(--ink)]">
+          <aside className="card p-6 sm:p-8 lg:sticky lg:top-32 lg:self-start">
+            <p className="text-[15px] font-bold text-[var(--ink-3)]">Votre commande</p>
+            <p className="mt-2 text-[20px] font-extrabold leading-tight tracking-[-0.02em]">{OFFER.name}</p>
+            <p className="mt-4 text-[56px] font-extrabold leading-none tracking-[-0.05em]">
               {OFFER.price}
-              <span className="ml-1 align-top text-[0.45em]">{OFFER.currencySymbol}</span>
+              <span className="ml-1 align-top text-[0.45em] tracking-normal">{OFFER.currencySymbol}</span>
             </p>
             <p className="t-small mt-2">Tout compris, livraison incluse.</p>
-            <RuledList className="mt-6" items={INCLUDED.map((i) => ({ title: i.title }))} />
+            <CheckList className="mt-5" items={INCLUDED.map((i) => ({ title: i.title }))} />
             <p className="t-small mt-5">{GUARANTEE}</p>
             <p className="t-small mt-3">
               Une question avant de commander ?{" "}

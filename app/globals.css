@@ -8,48 +8,53 @@
 
 /* ================================================================
    LOOMINA — design tokens
-   Une page de livre : papier crème, encre, un filet d'or.
-   L'or ne colore jamais un texte courant : il souligne, numérote, sépare.
+   Fond clair, encre noire, l'ambre de l'étoile du logo.
+   L'ambre vif sert aux surfaces et aux icônes ; en texte, on prend
+   --amber-ink (≥ 4.5:1 sur le fond).
    ================================================================ */
 
 :root {
   /* Surfaces */
-  --paper: #fbf9f5;          /* page */
-  --paper-deep: #f3efe7;     /* bande alternée */
-  --paper-edge: #e4ded2;     /* tranche, remplissages discrets */
+  --canvas: #f7f7f4;         /* fond de page */
+  --surface: #ffffff;        /* cartes */
+  --surface-2: #f2f1ec;      /* puce d'icône, bande discrète */
+  --line: #e7e6e1;           /* bord de carte */
+  --line-soft: #efeeea;      /* séparateur dans une carte */
 
   /* Encre */
-  --ink: #1b1915;
-  --ink-soft: #2e2a25;
-  --ink-2: #4b463f;          /* texte secondaire, ≥ 7:1 sur papier */
-  --ink-3: #6b655c;          /* texte discret, ≥ 4.5:1 sur papier */
+  --ink: #161616;
+  --ink-soft: #2b2b28;
+  --ink-2: #4a4a45;          /* texte secondaire, ≥ 8:1 */
+  --ink-3: #66665f;          /* texte discret, ≥ 5:1 */
 
-  /* Or : filets, numéros, petites capitales */
-  --gold: #b6903a;
-  --gold-ink: #7f6227;       /* or lisible en texte (≥ 5:1) */
-  --gold-light: #d8b56c;     /* sur fond encre uniquement */
-
-  /* Filets */
-  --rule: rgba(27, 25, 21, 0.12);
-  --rule-strong: rgba(27, 25, 21, 0.24);
+  /* Ambre, la couleur de l'étoile */
+  --amber: #ee9b2d;          /* bouton de démo, icônes sur fond sombre */
+  --amber-ink: #95580a;      /* ambre lisible en texte courant (5:1) */
+  --amber-display: #c27610;  /* ambre des grands titres seulement (3.3:1) */
+  --amber-soft: #fcebd2;     /* fond de pastille */
+  --amber-line: #f6ddb5;
+  --amber-deep: #6f4005;     /* texte sur --amber-soft */
 
   /* États */
-  --success: #2f6f49;
+  --success: #2f5b3a;
+  --success-soft: #e3f0e5;
   --danger: #a8402f;
 
-  /* Anciens noms, conservés le temps que tout soit migré */
-  --loomina-void: var(--paper);
-  --loomina-night: var(--paper-deep);
-  --loomina-slate: var(--paper-edge);
-  --loomina-mist: var(--paper-edge);
-  --loomina-gold: var(--gold);
-  --loomina-gold-light: var(--gold-light);
-  --loomina-gold-dark: var(--gold-ink);
-  --text-primary: var(--ink);
-  --text-secondary: var(--ink-2);
-  --text-muted: var(--ink-3);
-  --hairline: var(--rule);
-  --hairline-strong: var(--rule-strong);
+  /* Rayons et ombres */
+  --radius-card: 24px;
+  --radius-btn: 16px;
+  --shadow-float: 0 40px 80px -40px rgba(22, 22, 22, 0.28);
+  --shadow-bar: 0 10px 30px -18px rgba(22, 22, 22, 0.25);
+
+  /* Anciens noms, pointant vers la nouvelle palette */
+  --paper: var(--canvas);
+  --paper-deep: var(--surface-2);
+  --paper-edge: var(--line);
+  --gold: var(--amber);
+  --gold-ink: var(--amber-ink);
+  --gold-light: var(--amber);
+  --rule: var(--line);
+  --rule-strong: #d4d3cc;
 
   /* Courbes */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -63,22 +68,20 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 96px;
+    scroll-padding-top: 112px;
     -webkit-tap-highlight-color: transparent;
     -webkit-text-size-adjust: 100%;
   }
 
   body {
     font-family: var(--font-sans);
-    font-weight: 400;
-    font-size: 17px;
+    font-size: 18px;
+    line-height: 1.6;
     color: var(--ink);
-    background: var(--paper);
+    background: var(--canvas);
     margin: 0;
-    padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    line-height: 1.6;
     overflow-x: hidden;
   }
 
@@ -86,8 +89,9 @@
   h2,
   h3,
   h4 {
-    font-family: var(--font-serif);
-    font-weight: 400;
+    font-family: var(--font-sans);
+    font-weight: 800;
+    letter-spacing: -0.03em;
     text-wrap: balance;
     color: var(--ink);
   }
@@ -97,8 +101,7 @@
   }
 
   a,
-  button,
-  [role="button"] {
+  button {
     touch-action: manipulation;
   }
 
@@ -109,19 +112,15 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--ink);
+    outline: 3px solid var(--amber);
     outline-offset: 3px;
-    border-radius: 2px;
+    border-radius: 6px;
   }
 
   ::selection {
-    background: var(--gold);
-    color: var(--paper);
+    background: var(--amber-soft);
+    color: var(--ink);
   }
-}
-
-.font-serif {
-  font-family: var(--font-serif);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -132,88 +131,77 @@
 
 /* ================================================================
    TYPOGRAPHIE
-   Trois tailles de titre, une mesure de lecture, un surtitre en capitales.
+   Une seule famille, Plus Jakarta Sans. Le serif est réservé aux
+   extraits de livre : c'est ce que le client recevra imprimé.
    ================================================================ */
 
 .t-display {
-  font-family: var(--font-serif);
-  font-size: clamp(2.5rem, 5.6vw, 4.5rem);
+  font-size: clamp(2.6rem, 5.6vw, 4.6rem);
+  font-weight: 800;
   line-height: 1.04;
-  letter-spacing: -0.022em;
-  color: var(--ink);
+  letter-spacing: -0.03em;
 }
 
 .t-title {
-  font-family: var(--font-serif);
-  font-size: clamp(2rem, 3.6vw, 3rem);
-  line-height: 1.08;
-  letter-spacing: -0.018em;
-  color: var(--ink);
+  font-size: clamp(2.1rem, 3.8vw, 3rem);
+  font-weight: 800;
+  line-height: 1.07;
+  letter-spacing: -0.032em;
 }
 
 .t-heading {
-  font-family: var(--font-serif);
-  font-size: clamp(1.5rem, 2.2vw, 1.85rem);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--ink);
+  font-size: clamp(1.3rem, 1.8vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
 }
 
 .t-lead {
-  font-family: var(--font-sans);
-  font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+  font-size: clamp(1.12rem, 1.5vw, 1.28rem);
   line-height: 1.6;
   color: var(--ink-2);
 }
 
 .t-body {
-  font-family: var(--font-sans);
   font-size: 17px;
-  line-height: 1.7;
+  line-height: 1.65;
   color: var(--ink-2);
 }
 
 .t-small {
-  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.55;
   color: var(--ink-3);
 }
 
-/* Surtitre : petites capitales, or. Le seul texte en or du site. */
+/* Petit titre au-dessus d'une section, quand il apporte une information. */
 .t-eyebrow {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--gold-ink);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--amber-ink);
 }
 
-/* Numéro de marge, en serif */
-.t-numeral {
-  font-family: var(--font-serif);
-  font-variant-numeric: lining-nums;
-  color: var(--gold-ink);
+.t-accent {
+  color: var(--amber-display);
 }
 
-/* Lien courant : souligné à l'encre, filet or au survol */
 .link {
   color: var(--ink);
+  font-weight: 600;
   text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 2px;
   text-underline-offset: 4px;
-  text-decoration-color: var(--rule-strong);
+  text-decoration-color: var(--amber-line);
   transition: text-decoration-color 160ms ease;
 }
 
 .link:hover {
-  text-decoration-color: var(--gold);
+  text-decoration-color: var(--amber);
 }
 
 /* Texte long (pages légales, histoire) */
 .prose-loomina {
-  font-family: var(--font-sans);
   font-size: 17px;
   line-height: 1.75;
   color: var(--ink-2);
@@ -226,40 +214,38 @@
 }
 
 .prose-loomina h2 {
-  font-size: 1.6rem;
-  line-height: 1.2;
-  margin-top: 2.4em;
-  margin-bottom: 0.7em;
-  padding-top: 1.2em;
-  border-top: 1px solid var(--rule);
+  font-size: 1.45rem;
+  line-height: 1.25;
+  margin-top: 2.2em;
+  margin-bottom: 0.6em;
 }
 
 .prose-loomina h2:first-child {
   margin-top: 0;
-  border-top: 0;
-  padding-top: 0;
 }
 
 .prose-loomina h3 {
-  font-size: 1.25rem;
-  margin-top: 1.8em;
-  margin-bottom: 0.5em;
+  font-size: 1.15rem;
+  margin-top: 1.6em;
+  margin-bottom: 0.4em;
 }
 
 .prose-loomina strong {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .prose-loomina a {
   color: var(--ink);
+  font-weight: 600;
   text-decoration: underline;
-  text-decoration-color: var(--rule-strong);
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--amber-line);
   text-underline-offset: 4px;
 }
 
 .prose-loomina a:hover {
-  text-decoration-color: var(--gold);
+  text-decoration-color: var(--amber);
 }
 
 .prose-loomina ul {
@@ -271,11 +257,11 @@
   margin-top: 0.45em;
 }
 
-/* Extrait de livre : serif, mesure courte, lettrine */
+/* Extrait de livre : serif, comme la page imprimée */
 .book-text {
   font-family: var(--font-serif);
-  font-size: 1.15rem;
-  line-height: 1.65;
+  font-size: 1.14rem;
+  line-height: 1.7;
   color: var(--ink-soft);
   hyphens: auto;
 }
@@ -287,25 +273,71 @@
 
 .book-text .dropcap {
   float: left;
-  font-size: 3.6em;
+  font-size: 3.4em;
   line-height: 0.8;
   margin: 0.08em 0.1em 0 0;
-  color: var(--gold-ink);
+  color: var(--amber-ink);
 }
 
 /* ================================================================
    COMPOSANTS
    ================================================================ */
 
-.rule-top {
-  border-top: 1px solid var(--ink);
+/* Carte : fond blanc, bord fin, coins généreux */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
 }
 
-.gold-dash {
-  display: block;
-  width: 2.5rem;
-  height: 1px;
-  background: var(--gold);
+.card-float {
+  box-shadow: var(--shadow-float);
+}
+
+/* Puce d'icône carrée à coins doux */
+.chip-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--amber-soft);
+  color: var(--amber-ink);
+}
+
+.chip-icon-neutral {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+/* Pastille d'état */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.pill-amber {
+  background: var(--amber-soft);
+  color: var(--amber-deep);
+}
+
+.pill-green {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.pill-neutral {
+  background: var(--surface-2);
+  color: var(--ink-2);
 }
 
 /* Champs de formulaire : grands, nets, lisibles */
@@ -313,8 +345,8 @@
   width: 100%;
   min-height: 56px;
   padding: 0 18px;
-  border-radius: 10px;
-  background: #fff;
+  border-radius: 14px;
+  background: var(--surface);
   border: 1px solid var(--rule-strong);
   color: var(--ink);
   font-family: var(--font-sans);
@@ -325,7 +357,6 @@
 }
 
 textarea.field {
-  height: auto;
   padding: 14px 18px;
   resize: vertical;
   min-height: 160px;
@@ -340,30 +371,30 @@ textarea.field {
 .field:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(27, 25, 21, 0.1);
+  box-shadow: 0 0 0 4px var(--amber-soft);
 }
 
 .field[aria-invalid="true"] {
   border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(168, 64, 47, 0.12);
+  box-shadow: 0 0 0 4px rgba(168, 64, 47, 0.12);
 }
 
 .field-label {
   display: block;
   margin-bottom: 8px;
-  font-family: var(--font-sans);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink);
 }
 
-/* Bouton : retour tactile immédiat */
+/* Retour tactile immédiat */
 .press {
   transition:
     transform 140ms var(--ease-out),
     background-color 160ms ease,
     color 160ms ease,
     border-color 160ms ease,
+    box-shadow 160ms ease,
     opacity 160ms ease;
 }
 
@@ -371,23 +402,15 @@ textarea.field {
   transform: scale(0.98);
 }
 
-/* Compatibilité : anciennes classes de carte, rendues neutres */
-.card,
-.glass,
-.glass-gold {
-  background: #fff;
-  border: 1px solid var(--rule);
-}
-
 /* ================================================================
    MOTION
-   Entrée au chargement en CSS, courte. Rien ne bouge au défilement.
+   Une seule entrée, au chargement de l'accueil. Rien au défilement.
    ================================================================ */
 
 @keyframes loomina-rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
 }
 
@@ -398,18 +421,14 @@ textarea.field {
 }
 
 .rise {
+  animation: loomina-rise 560ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* Les lignes de la carte d'activité arrivent l'une après l'autre. */
+.feed-in {
   animation: loomina-rise 520ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 60ms);
-}
-
-.settle {
-  animation: loomina-rise 700ms var(--ease-out) both;
-  animation-delay: calc(100ms + var(--i, 0) * 90ms);
-}
-
-/* Conservé pour les pages pas encore migrées : visible d'emblée. */
-.reveal {
-  opacity: 1;
+  animation-delay: calc(350ms + var(--i, 0) * 160ms);
 }
 
 /* Accordéon : hauteur animée via grid */
@@ -446,7 +465,7 @@ textarea.field {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(27, 25, 21, 0.15);
+  border: 2px solid rgba(22, 22, 22, 0.15);
   border-top-color: var(--ink);
   animation: loomina-spin 600ms linear infinite;
 }
@@ -458,7 +477,7 @@ textarea.field {
 
 @media (prefers-reduced-motion: reduce) {
   .rise,
-  .settle {
+  .feed-in {
     animation: loomina-fade 200ms ease both;
   }
 
@@ -467,21 +486,4 @@ textarea.field {
   .press {
     transition-duration: 0ms;
   }
-}
-
-/* ================================================================
-   SCROLLBAR
-   ================================================================ */
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--paper);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--paper-edge);
-  border-radius: 4px;
 }

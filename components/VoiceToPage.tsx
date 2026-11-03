@@ -3,6 +3,9 @@
  * Exemple écrit pour illustrer la méthode, présenté comme tel.
  */
 
+import { Section, SectionHead } from "@/components/ui/Section";
+import Icon from "@/components/ui/Icon";
+
 const SPOKEN = [
   { who: "Loomina", text: "Vous me parliez de la ferme de vos grands-parents. Qu’est-ce qu’on voyait en entrant dans la cour ?" },
   {
@@ -18,65 +21,69 @@ const SPOKEN = [
 
 export function BookPage({ chapter, title, children, page }: { chapter: string; title: string; children: React.ReactNode; page?: string }) {
   return (
-    <div className="bg-white px-7 py-10 shadow-[0_0_0_1px_var(--rule),0_30px_60px_-44px_rgba(27,25,21,0.45)] sm:px-12 sm:py-14">
-      <p className="text-center font-sans text-[12px] font-semibold uppercase tracking-[0.28em] text-[var(--gold-ink)]">{chapter}</p>
-      <p className="mt-3 text-center font-serif text-[26px] italic leading-tight text-[var(--ink)]">{title}</p>
-      <span className="gold-dash mx-auto mt-6" />
+    <div className="card h-full px-7 py-10 sm:px-12 sm:py-12">
+      <p className="text-center text-[14px] font-bold text-[var(--amber-ink)]">{chapter}</p>
+      <p className="mt-2 text-center font-serif text-[26px] italic leading-tight text-[var(--ink)]">{title}</p>
       <div className="book-text mt-8" lang="fr">
         {children}
       </div>
-      {page && <p className="mt-8 text-center font-serif text-[14px] text-[var(--ink-3)]">— {page} —</p>}
+      {page && <p className="mt-8 text-center font-serif text-[14px] text-[var(--ink-3)]">{page}</p>}
     </div>
   );
 }
 
 export default function VoiceToPage() {
   return (
-    <section id="exemple" className="w-full scroll-mt-24 bg-[var(--paper-deep)] py-20 md:py-28">
-      <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
-        <div className="max-w-2xl">
-          <p className="t-eyebrow">De la voix à la page</p>
-          <h2 className="t-title mt-4">Vous parlez comme vous parlez. Le livre garde votre voix.</h2>
-          <span aria-hidden="true" className="gold-dash mt-6" />
-          <p className="t-lead mt-6 max-w-xl">
-            À gauche, un moment d’appel. À droite, ce qu’il devient dans le livre : mis en forme, sans rien ajouter que vous
-            n’ayez dit.
-          </p>
-        </div>
+    <Section id="exemple" className="bg-white">
+      <SectionHead
+        eyebrow="De la voix à la page"
+        title="Vous parlez comme vous parlez, le livre garde votre voix"
+        text="À gauche, un moment d’appel. À droite, ce qu’il devient dans le livre : mis en forme, sans rien ajouter que vous n’ayez dit."
+      />
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-2 lg:gap-14">
-          <figure className="flex flex-col">
-            <figcaption className="t-eyebrow !text-[var(--ink-3)]">Au téléphone</figcaption>
-            <div className="rule-top mt-4 flex-1 space-y-5 pt-6">
-              {SPOKEN.map((line, i) => (
-                <p key={i} className="t-body grid grid-cols-[5.5rem_1fr] gap-3">
-                  <span className={`font-semibold ${line.who === "Loomina" ? "text-[var(--ink-3)]" : "text-[var(--ink)]"}`}>{line.who}</span>
-                  <span className={line.who === "Loomina" ? "text-[var(--ink-3)]" : ""}>{line.text}</span>
-                </p>
-              ))}
-            </div>
-          </figure>
+      <div className="mt-12 grid gap-4 lg:grid-cols-2">
+        <figure className="flex flex-col rounded-[var(--radius-card)] bg-[var(--canvas)] p-5 sm:p-7">
+          <figcaption className="flex items-center gap-3 text-[15px] font-bold">
+            <span className="chip-icon !h-9 !w-9 !rounded-[12px]">
+              <Icon name="phone" size={18} />
+            </span>
+            Au téléphone
+          </figcaption>
+          <ul className="mt-6 flex flex-1 flex-col gap-3">
+            {SPOKEN.map((line, i) => {
+              const isLoomina = line.who === "Loomina";
+              return (
+                <li key={i} className={`max-w-[88%] ${isLoomina ? "self-start" : "self-end"}`}>
+                  <p className={`text-[13px] font-bold ${isLoomina ? "text-[var(--ink-3)]" : "text-right text-[var(--amber-ink)]"}`}>{line.who}</p>
+                  <p
+                    className={`mt-1 rounded-[20px] px-4 py-3 text-[16px] leading-relaxed ${
+                      isLoomina ? "rounded-tl-md bg-white text-[var(--ink-2)]" : "rounded-tr-md bg-[var(--ink)] text-white"
+                    }`}
+                  >
+                    {line.text}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </figure>
 
-          <figure className="flex flex-col">
-            <figcaption className="t-eyebrow !text-[var(--ink-3)]">Dans le livre</figcaption>
-            <div className="mt-4 flex-1">
-              <BookPage chapter="Chapitre II" title="La cour au tilleul" page="27">
-                <p>
-                  <span className="dropcap">E</span>n entrant dans la cour, on ne voyait que lui : un tilleul immense. Ma grand-mère faisait sécher
-                  ses fleurs à son pied, étalées sur des draps, et leur odeur montait jusque dans la cuisine.
-                </p>
-                <p>
-                  Le samedi, c’était le jour du pain. Le tilleul et le pain chaud se mêlaient alors dans toute la maison. J’avais
-                  le droit de façonner une petite boule, la mienne, qu’elle marquait d’une croix du bout de son couteau pour
-                  qu’on la reconnaisse.
-                </p>
-              </BookPage>
-            </div>
-          </figure>
-        </div>
-
-        <p className="t-small mt-8">Exemple écrit pour illustrer la méthode : Jeanne n’est pas une cliente réelle.</p>
+        <figure className="flex flex-col">
+          <figcaption className="sr-only">Dans le livre</figcaption>
+          <BookPage chapter="Chapitre 2" title="La cour au tilleul" page="27">
+            <p>
+              <span className="dropcap">E</span>n entrant dans la cour, on ne voyait que lui : un tilleul immense. Ma grand-mère faisait sécher ses
+              fleurs à son pied, étalées sur des draps, et leur odeur montait jusque dans la cuisine.
+            </p>
+            <p>
+              Le samedi, c’était le jour du pain. Le tilleul et le pain chaud se mêlaient alors dans toute la maison. J’avais le droit
+              de façonner une petite boule, la mienne, qu’elle marquait d’une croix du bout de son couteau pour qu’on la reconnaisse.
+            </p>
+          </BookPage>
+        </figure>
       </div>
-    </section>
+
+      <p className="t-small mt-6">Exemple écrit pour illustrer la méthode : Jeanne n’est pas une cliente réelle.</p>
+    </Section>
   );
 }

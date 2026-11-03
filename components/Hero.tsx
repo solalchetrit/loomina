@@ -1,127 +1,95 @@
+import type { CSSProperties } from "react";
 import { SITE } from "@/config/site";
-import Button from "@/components/ui/Button";
 import { OFFER } from "@/config/offer";
+import Button from "@/components/ui/Button";
+import Icon, { type IconName } from "@/components/ui/Icon";
 
-const FACTS = [
-  { value: `${OFFER.demoMinutes} min`, label: "pour essayer, gratuitement" },
-  { value: `${OFFER.chapters} thèmes`, label: "de l’enfance à aujourd’hui" },
-  { value: OFFER.delay, label: "du premier appel au livre" },
-  { value: `${OFFER.price} €`, label: "tout compris, livraison incluse" },
+type FeedItem = { icon: IconName; title: string; detail: string; badge?: { label: string; tone: "amber" | "green" }; highlight?: boolean };
+
+/** Une semaine type dans l'espace auteur. Exemple, présenté comme tel. */
+const FEED: FeedItem[] = [
+  { icon: "phone", title: "Appel terminé, 32 minutes", detail: "Les dimanches à la mer", highlight: true },
+  { icon: "pen", title: "Chapitre 4 écrit", detail: "« L’été de mes seize ans »", badge: { label: "À relire", tone: "amber" } },
+  { icon: "check", title: "Chapitre 3 relu par l’équipe", detail: "Deux corrections, prêt pour le livre", badge: { label: "Validé", tone: "green" } },
+  { icon: "image", title: "3 photos ajoutées", detail: "Envoyées par sa fille" },
 ];
 
-/** Illustration : le livre relié et une page de chapitre. Purement décoratif. */
-function BookVisual() {
+function ActivityCard() {
   return (
-    <div aria-hidden="true" className="relative mx-auto aspect-[5/6] w-full max-w-[340px] select-none sm:max-w-[420px] lg:max-w-[460px]">
-      {/* Page d'extrait, derrière le livre */}
-      <div
-        className="settle absolute right-0 top-[6%] w-[54%] rotate-[4deg] bg-white px-[7%] py-[6%] shadow-[0_24px_48px_-28px_rgba(27,25,21,0.4),0_0_0_1px_var(--rule)]"
-        style={{ "--i": 1 } as React.CSSProperties}
-      >
-        <p className="text-center font-sans text-[9px] font-semibold uppercase tracking-[0.24em] text-[var(--gold-ink)] sm:text-[10px]">Chapitre III</p>
-        <p className="mt-2 text-center font-serif text-[15px] italic leading-tight text-[var(--ink)] sm:text-[18px]">L’été de mes seize ans</p>
-        <span className="gold-dash mx-auto mt-3 !w-6" />
-        <p className="mt-3 font-serif text-[10px] leading-[1.6] text-[var(--ink-2)] sm:text-[11.5px]">
-          <span className="float-left mr-[3px] mt-[2px] font-serif text-[2.8em] leading-[0.75] text-[var(--gold-ink)]">C</span>haque dimanche, nous prenions le car jusqu’à la mer. Ma mère
-          emportait des pêches enveloppées dans du papier journal, et mon père chantait tout le trajet…
-        </p>
-        <div className="mt-3 space-y-1.5">
-          <div className="h-[3px] w-full bg-[var(--paper-edge)]" />
-          <div className="h-[3px] w-11/12 bg-[var(--paper-edge)]" />
-          <div className="h-[3px] w-4/6 bg-[var(--paper-edge)]" />
-        </div>
-      </div>
+    <figure className="card card-float w-full min-w-0 p-5 sm:p-6" aria-label="Exemple : une semaine dans l’espace auteur">
+      <figcaption className="flex items-center justify-between gap-3 border-b border-[var(--line-soft)] px-1 pb-4">
+        <span className="text-[17px] font-bold">
+          Le livre de Jeanne <span className="font-medium text-[var(--ink-3)]">· cette semaine</span>
+        </span>
+        <span className="pill pill-neutral">Exemple</span>
+      </figcaption>
 
-      {/* Le livre relié */}
-      <div className="settle absolute left-[2%] top-[20%] w-[52%]" style={{ "--i": 0 } as React.CSSProperties}>
-        <div className="relative aspect-[3/4.3] -rotate-[3deg]">
-          <div className="absolute inset-y-[1.5%] -right-[4%] w-[6%] rounded-r-[3px] bg-[repeating-linear-gradient(90deg,#f3eee4_0px,#f3eee4_1px,#e2dbcd_1px,#e2dbcd_2px)]" />
-          <div className="absolute inset-0 overflow-hidden rounded-[3px_7px_7px_3px] bg-[linear-gradient(145deg,#2c2823_0%,#1b1915_55%,#121110_100%)] shadow-[0_40px_60px_-30px_rgba(27,25,21,0.7),0_12px_24px_-12px_rgba(27,25,21,0.4)]">
-            <div className="absolute inset-y-0 left-0 w-[9%] bg-[linear-gradient(90deg,rgba(0,0,0,0.45),rgba(255,255,255,0.07)_60%,rgba(0,0,0,0.25))]" />
-            <div className="absolute inset-[9%_8%_9%_15%] border border-[var(--gold-light)]/35" />
-            <div className="absolute inset-[9%_8%_9%_15%] flex flex-col items-center justify-between py-[14%] text-center">
-              <span className="font-sans text-[8px] font-semibold uppercase tracking-[0.32em] text-[var(--gold-light)]/80 sm:text-[9px]">Livre de vie</span>
-              <div>
-                <p className="font-serif text-[22px] italic leading-[1.05] text-[#ecd9ae] sm:text-[28px]">
-                  Les saisons
-                  <br />
-                  de Jeanne
-                </p>
-                <div className="mx-auto mt-3 h-px w-8 bg-[var(--gold-light)]/60" />
-              </div>
-              <span className="font-serif text-[9px] tracking-[0.18em] text-[var(--gold-light)]/70 sm:text-[10px]">LOOMINA</span>
-            </div>
-            <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0)_38%)]" />
-          </div>
-        </div>
+      <ul className="mt-4 flex flex-col gap-2.5">
+        {FEED.map((item, i) => (
+          <li
+            key={item.title}
+            className={`feed-in flex items-center gap-3.5 rounded-[18px] border px-3.5 py-3 sm:px-4 ${
+              item.highlight ? "border-[var(--amber-line)] bg-[#fdf3e4]" : "border-[var(--line-soft)]"
+            }`}
+            style={{ "--i": i } as CSSProperties}
+          >
+            <span className={`chip-icon !h-10 !w-10 !rounded-[12px] ${item.highlight ? "!bg-white" : "chip-icon-neutral"}`}>
+              <Icon name={item.icon} size={20} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <b className="block text-[16px] leading-snug">{item.title}</b>
+              <span className="block truncate text-[14px] text-[var(--ink-3)]">{item.detail}</span>
+            </span>
+            {item.badge && <span className={`pill pill-${item.badge.tone}`}>{item.badge.label}</span>}
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-4 flex gap-8 border-t border-[var(--line-soft)] px-1 pt-4">
+        <p className="leading-tight">
+          <b className="text-[28px] font-extrabold tracking-[-0.03em]">4</b> <span className="text-[14px] text-[var(--ink-3)]">chapitres écrits</span>
+        </p>
+        <p className="leading-tight">
+          <b className="text-[28px] font-extrabold tracking-[-0.03em]">0</b> <span className="text-[14px] text-[var(--ink-3)]">ligne écrite par Jeanne</span>
+        </p>
       </div>
-    </div>
+    </figure>
   );
 }
 
+const REASSURANCE = ["Relecture humaine de chaque page", `Remboursé sous ${OFFER.guaranteeDays} jours`, "Paiement sécurisé par Stripe"];
+
 export default function Hero() {
   return (
-    <section id="home" className="relative w-full overflow-hidden">
-      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pb-16 pt-28 sm:px-8 md:pt-36 lg:min-h-[min(88svh,820px)] lg:grid-cols-[1.15fr_1fr] lg:gap-12 lg:pb-20 lg:pt-32">
-        <div className="flex flex-col items-start">
-          <p className="rise t-eyebrow" style={{ "--i": 0 } as React.CSSProperties}>
-            Biographie par téléphone · livre relié
-          </p>
-
-          <h1 className="rise t-display mt-5" style={{ "--i": 1 } as React.CSSProperties}>
-            Racontez votre vie au téléphone. Nous en faisons un livre.
+    <section className="w-full">
+      <div className="mx-auto grid w-full max-w-[1240px] items-center gap-12 px-5 pb-12 pt-32 sm:px-6 md:pt-40 lg:grid-cols-[1.08fr_1fr] lg:gap-14 lg:pb-20">
+        <div className="min-w-0">
+          <h1 className="rise t-display" style={{ "--i": 0 } as CSSProperties}>
+            Racontez votre vie au téléphone <span className="t-accent">et recevez‑la en livre</span>
           </h1>
-
-          <p className="rise t-lead mt-6 max-w-[34rem]" style={{ "--i": 2 } as React.CSSProperties}>
-            Vous parlez, comme à quelqu’un qui vous écoute vraiment. Après chaque appel, Loomina écrit un chapitre dans vos
-            mots. Notre équipe relit chaque page, et vous recevez le livre relié chez vous.
+          <p className="rise t-lead mt-6 max-w-[33rem]" style={{ "--i": 1 } as CSSProperties}>
+            Loomina mène l’entretien avec vous, écrit un chapitre après chaque appel, et notre équipe relit chaque page. Vous
+            n’écrivez rien : vous parlez.
           </p>
-
-          {/* La démo : l'action la plus simple, donc la plus visible */}
-          <div className="rise mt-9 w-full max-w-[34rem] border-y border-[var(--ink)] py-5" style={{ "--i": 3 } as React.CSSProperties}>
-            <p className="t-eyebrow">Essayez maintenant, c’est gratuit</p>
-            <a
-              href={`tel:${SITE.phone}`}
-              className="link mt-2 inline-block font-serif text-[clamp(2.2rem,5vw,3.1rem)] leading-none tracking-[-0.015em] text-[var(--ink)]"
-            >
-              {SITE.phoneDisplay}
-            </a>
-            <p className="t-body mt-3">
-              {OFFER.demoMinutes} minutes avec Loomina : vous racontez un souvenir, elle vous pose quelques questions. Rien n’est
-              enregistré. Prix d’un appel normal.
-            </p>
-          </div>
-
-          <div className="rise mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center" style={{ "--i": 4 } as React.CSSProperties}>
-            <Button href="/order" variant="primary" size="lg" className="w-full sm:w-auto">
-              Commander · {OFFER.price} €
+          <div className="rise mt-9 flex flex-col gap-3 sm:flex-row" style={{ "--i": 2 } as CSSProperties}>
+            <Button href="/order" size="lg">
+              Commander le livre
             </Button>
-            <Button href="/experience" variant="ghost" size="lg" className="w-full sm:w-auto">
-              Comment ça marche
+            <Button href={`tel:${SITE.phone}`} variant="secondary" size="lg">
+              Appeler la démo · {SITE.phoneDisplay}
             </Button>
           </div>
+          <ul className="rise mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[15px] text-[var(--ink-3)]" style={{ "--i": 3 } as CSSProperties}>
+            {REASSURANCE.map((r) => (
+              <li key={r} className="flex items-center gap-2">
+                <Icon name="check" size={18} className="text-[var(--amber-ink)]" />
+                {r}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <BookVisual />
-      </div>
-
-      <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
-        <dl className="grid grid-cols-2 border-t border-[var(--rule)] md:grid-cols-4">
-          {FACTS.map((fact, i) => (
-            <div
-              key={fact.label}
-              className={[
-                "flex flex-col-reverse justify-end py-6 md:py-8",
-                i % 2 === 1 ? "border-l border-[var(--rule)] pl-5 md:pl-8" : "",
-                i === 2 ? "md:border-l md:border-[var(--rule)] md:pl-8" : "",
-                i > 1 ? "border-t border-[var(--rule)] md:border-t-0" : "",
-              ].join(" ")}
-            >
-              <dt className="mt-2 font-sans text-[15px] text-[var(--ink-3)]">{fact.label}</dt>
-              <dd className="font-serif text-[26px] leading-none tracking-[-0.01em] text-[var(--ink)] md:text-[32px]">{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <ActivityCard />
       </div>
     </section>
   );

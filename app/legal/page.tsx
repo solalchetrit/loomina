@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function LegalMentionsPage() {
   return (
-    <LegalPage eyebrow="Mentions légales" title="Qui édite ce site." updated="7 octobre 2026">
+    <LegalPage eyebrow="Mentions légales" title="Qui édite ce site" updated="7 octobre 2026">
       <h2>1. Éditeur</h2>
       <p>
         Le site www.loomina.eu est édité par <strong>Loomina</strong>, projet en cours de création porté par Solal Chetrit,

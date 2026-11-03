@@ -153,12 +153,11 @@ export default function DashboardPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="w-full px-5 pt-28 pb-20 sm:px-8 md:pt-36">
-        <div className="mx-auto grid w-full max-w-6xl gap-12 lg:grid-cols-[1fr_1fr] lg:gap-20">
+      <div className="w-full px-5 pb-20 pt-32 sm:px-6 md:pt-40">
+        <div className="mx-auto grid w-full max-w-[1240px] items-start gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <div className="rise">
             <p className="t-eyebrow">Espace auteur</p>
-            <h1 className="t-display mt-4">{loginStep === "phone" ? "Retrouvez votre livre." : "Votre code est parti."}</h1>
-            <span aria-hidden="true" className="gold-dash mt-6" />
+            <h1 className="t-display mt-3">{loginStep === "phone" ? "Retrouvez votre livre" : "Votre code est parti"}</h1>
             <p className="t-lead mt-6 max-w-md">
               {loginStep === "phone"
                 ? "Entrez le numéro de téléphone donné à la commande. Nous vous envoyons un code par SMS, rien d’autre à retenir."
@@ -166,8 +165,8 @@ export default function DashboardPage() {
             </p>
 
             {justOrdered && loginStep === "phone" && (
-              <div className="rule-top mt-10 max-w-md pt-6">
-                <p className="font-serif text-[22px] leading-tight text-[var(--ink)]">Merci, votre commande est confirmée.</p>
+              <div className="mt-8 max-w-md rounded-[20px] border border-[var(--amber-line)] bg-[#fdf3e4] p-6">
+                <p className="text-[19px] font-extrabold tracking-[-0.02em]">Merci, votre commande est confirmée.</p>
                 <p className="t-body mt-3">
                   Tout commence par un appel : composez le{" "}
                   <a href={`tel:${SITE.phone}`} className="link whitespace-nowrap font-semibold">
@@ -179,13 +178,13 @@ export default function DashboardPage() {
             )}
 
             {sessionExpired && (
-              <p role="status" className="t-body mt-8 max-w-md border-l-2 border-[var(--gold)] pl-4">
+              <p role="status" className="t-body mt-8 max-w-md rounded-[14px] bg-[var(--surface-2)] px-4 py-3">
                 Votre session a expiré. Reconnectez-vous pour relire votre livre.
               </p>
             )}
           </div>
 
-          <form onSubmit={loginStep === "phone" ? requestOtp : verifyOtp} className="rise rule-top pt-8 lg:pt-10" style={{ "--i": 2 } as React.CSSProperties}>
+          <form onSubmit={loginStep === "phone" ? requestOtp : verifyOtp} className="rise card card-float p-6 sm:p-8 md:p-10" style={{ "--i": 2 } as React.CSSProperties}>
             {loginStep === "phone" ? (
               <div>
                 <label htmlFor="phone" className="field-label">
@@ -223,7 +222,7 @@ export default function DashboardPage() {
                   placeholder="000000"
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                  className="field h-16 text-center font-serif text-[32px] tracking-[0.35em]"
+                  className="field h-16 text-center text-[30px] font-bold tracking-[0.35em]"
                   aria-describedby={error ? "login-error" : undefined}
                   aria-invalid={error ? true : undefined}
                   autoFocus
@@ -238,13 +237,13 @@ export default function DashboardPage() {
             </label>
 
             {error && (
-              <p id="login-error" role="alert" className="mt-5 border-l-2 border-[var(--danger)] pl-4 font-sans text-[16px] text-[var(--danger)]">
+              <p id="login-error" role="alert" className="mt-5 rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
                 {error}
               </p>
             )}
 
             <div className="mt-6">
-              <Button type="submit" variant="primary" size="lg" fullWidth loading={loading}>
+              <Button type="submit" size="lg" loading={loading} className="w-full">
                 {loading ? "Un instant…" : loginStep === "phone" ? "Recevoir mon code" : "Ouvrir mon espace"}
               </Button>
             </div>
@@ -255,7 +254,7 @@ export default function DashboardPage() {
               </button>
             )}
 
-            <div className="mt-10 border-t border-[var(--rule)] pt-6">
+            <div className="mt-8 border-t border-[var(--line-soft)] pt-6">
               <p className="t-body">
                 Pas encore de livre en cours ?{" "}
                 <Link href="/order" className="link font-medium">
@@ -274,33 +273,33 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full pt-28 pb-24 md:pt-32 md:pb-32">
-      <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
-        <header className="rise flex flex-col gap-6 border-b border-[var(--ink)] pb-8 md:flex-row md:items-end md:justify-between">
+    <div className="w-full pb-24 pt-32 md:pb-32 md:pt-40">
+      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
+        <header className="rise flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="t-eyebrow">Espace auteur</p>
-            <h1 className="t-display mt-3">{firstName ? `Bonjour, ${firstName}.` : "Bonjour."}</h1>
+            <h1 className="t-display mt-3">{firstName ? `Bonjour ${firstName}` : "Bonjour"}</h1>
           </div>
-          <button type="button" onClick={() => logout(false)} className="link self-start font-sans text-[16px] md:self-auto">
+          <Button onClick={() => logout(false)} variant="secondary" className="self-start md:self-auto">
             Se déconnecter
-          </button>
+          </Button>
         </header>
 
-        <div className="mt-12 grid gap-14 lg:grid-cols-[1fr_1.7fr] lg:gap-20">
-          <aside className="space-y-10 lg:sticky lg:top-28 lg:self-start">
-            <div>
-              <p className="t-eyebrow">Pour continuer</p>
-              <a href={`tel:${SITE.phone}`} className="link mt-2 inline-block font-serif text-[clamp(1.8rem,3.4vw,2.4rem)] leading-tight text-[var(--ink)]">
+        <div className="mt-10 grid gap-4 lg:grid-cols-[1fr_1.9fr]">
+          <aside className="flex flex-col gap-4 lg:sticky lg:top-32 lg:self-start">
+            <div className="rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white">
+              <p className="text-[15px] font-bold text-[var(--amber)]">Pour continuer</p>
+              <a href={`tel:${SITE.phone}`} className="mt-2 inline-block text-[clamp(1.8rem,3vw,2.2rem)] font-extrabold tracking-[-0.03em] text-white underline decoration-white/30 underline-offset-4 hover:decoration-white">
                 {SITE.phoneDisplay}
               </a>
-              <p className="t-body mt-3 max-w-xs">
+              <p className="mt-3 text-[16px] leading-relaxed text-[#cfcfc8]">
                 Appelez depuis le numéro de votre commande, quand vous voulez. Loomina reprend là où vous en étiez, et le
                 chapitre apparaît ici après l’appel.
               </p>
             </div>
-            <div>
-              <p className="t-eyebrow">Vos photos</p>
-              <p className="t-body mt-3 max-w-xs">
+            <div className="card p-7">
+              <p className="text-[17px] font-bold">Vos photos</p>
+              <p className="t-body mt-2">
                 Envoyez-les à{" "}
                 <a href={`mailto:contact@loomina.eu?subject=${encodeURIComponent("Photos pour mon livre")}`} className="link font-medium">
                   contact@loomina.eu
@@ -308,9 +307,9 @@ export default function DashboardPage() {
                 , en précisant le souvenir qu’elles illustrent. Nous les placerons dans le livre.
               </p>
             </div>
-            <div>
-              <p className="t-eyebrow">Une question</p>
-              <p className="t-body mt-3 max-w-xs">
+            <div className="card p-7">
+              <p className="text-[17px] font-bold">Une question</p>
+              <p className="t-body mt-2">
                 <Link href="/contact" className="link font-medium">
                   Écrivez-nous
                 </Link>
@@ -319,9 +318,9 @@ export default function DashboardPage() {
             </div>
           </aside>
 
-          <main className="rise" style={{ "--i": 2 } as React.CSSProperties}>
+          <div className="rise" style={{ "--i": 2 } as React.CSSProperties}>
             <LiveBook onUnauthorized={onUnauthorized} />
-          </main>
+          </div>
         </div>
       </div>
     </div>

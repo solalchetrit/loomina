@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { Section, SectionHead, PageHeader, RuledList } from "@/components/ui/Section";
+import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
 import Accordion from "@/components/ui/Accordion";
-import Button from "@/components/ui/Button";
+import Icon, { type IconName } from "@/components/ui/Icon";
+import OfferCard from "@/components/OfferCard";
 import Closing from "@/components/Closing";
-import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
+import { OFFER, GUARANTEE } from "@/config/offer";
 
-const DETAILS = [
+const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
   {
+    icon: "phone",
     title: "Les appels",
     items: [
       "Autant d’appels qu’il vous faut, sans rendez-vous",
@@ -15,6 +17,7 @@ const DETAILS = [
     ],
   },
   {
+    icon: "pen",
     title: "L’écriture",
     items: [
       "Un chapitre écrit après chaque appel, dans vos mots",
@@ -23,6 +26,7 @@ const DETAILS = [
     ],
   },
   {
+    icon: "book",
     title: "Le livre",
     items: [
       `Relié, ${OFFER.format}`,
@@ -54,45 +58,30 @@ const FAQ = [
 
 export default function OffrePage() {
   return (
-    <main className="w-full">
+    <>
       <PageHeader
         eyebrow="Le livre et le prix"
-        title="Un prix, tout compris."
+        title="Un prix, tout compris"
         text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus."
       >
-        <div className="rise mt-12 grid gap-10 border-y border-[var(--ink)] py-10 lg:grid-cols-[1fr_1.2fr] lg:gap-20" style={{ "--i": 2 } as React.CSSProperties}>
-          <div>
-            <h2 className="t-heading">{OFFER.name}</h2>
-            <p className="mt-6 font-serif text-[96px] leading-[0.85] tracking-[-0.035em] text-[var(--ink)] md:text-[120px]">
-              {OFFER.price}
-              <span className="ml-1 align-top text-[0.42em]">{OFFER.currencySymbol}</span>
-            </p>
-            <p className="t-small mt-5">Paiement unique par carte, sécurisé par Stripe.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button href="/order" variant="primary" size="lg" className="w-full sm:w-auto">
-                Commander
-              </Button>
-            </div>
-            <p className="t-small mt-5 max-w-sm">{GUARANTEE}</p>
-          </div>
-          <div>
-            <p className="t-eyebrow">Ce qui est inclus</p>
-            <RuledList className="mt-4" items={INCLUDED} />
-          </div>
+        <div className="mt-12">
+          <OfferCard showDetailLink={false} />
         </div>
       </PageHeader>
 
       <Section>
-        <SectionHead eyebrow="En détail" title="Ce que couvre le prix." />
-        <div className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
-          {DETAILS.map((g, i) => (
-            <div key={g.title} className="rule-top pt-5">
-              <span className="t-numeral text-[18px]">0{i + 1}</span>
-              <h3 className="t-heading mt-2">{g.title}</h3>
-              <ul className="mt-5 space-y-3">
+        <SectionHead title="Ce que couvre le prix, en détail" />
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {DETAILS.map((g) => (
+            <div key={g.title} className="card p-7 md:p-8">
+              <span className="chip-icon">
+                <Icon name={g.icon} />
+              </span>
+              <h3 className="t-heading mt-6">{g.title}</h3>
+              <ul className="mt-4 space-y-3">
                 {g.items.map((it) => (
                   <li key={it} className="t-body flex gap-3">
-                    <span aria-hidden="true" className="mt-[0.8em] h-px w-4 shrink-0 bg-[var(--gold)]" />
+                    <Icon name="check" size={20} className="mt-[3px] shrink-0 text-[var(--amber-ink)]" />
                     <span>{it}</span>
                   </li>
                 ))}
@@ -102,23 +91,23 @@ export default function OffrePage() {
         </div>
       </Section>
 
-      <Section tone="alt">
-        <div className="grid gap-10 lg:grid-cols-[1fr_1.7fr] lg:gap-20">
+      <Section className="bg-white">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
           <SectionHead
             eyebrow="Pourquoi ce prix"
-            title="Entre le biographe et le cahier."
+            title="Entre le biographe et le cahier"
             text="Un biographe professionnel se paie plusieurs milliers d’euros et demande des rendez-vous. Écrire seul demande des mois, et beaucoup n’y arrivent pas. Loomina tient entre les deux : vous ne faites que parler, et une personne relit."
           />
-          <div className="t-body max-w-xl lg:pt-2">
+          <div className="t-body max-w-xl space-y-5 lg:pt-10">
             <p>
-              Le prix couvre tout, de l’appel à la livraison. Il n’y a pas d’option payante, pas d’abonnement, et le livre
-              reste votre propriété : vous conservez l’intégralité des droits sur votre récit.
+              Le prix couvre tout, de l’appel à la livraison. Il n’y a pas d’option payante, pas d’abonnement, et le livre reste votre
+              propriété : vous conservez l’intégralité des droits sur votre récit.
             </p>
-            <p className="mt-5">
+            <p>
               Si vous souhaitez d’autres exemplaires pour la famille, écrivez-nous après réception : nous vous faisons un devis
               d’impression, sans marge sur le texte.
             </p>
-            <p className="mt-5">
+            <p>
               Les conditions complètes sont dans les{" "}
               <Link href="/cgv" className="link">
                 conditions générales de vente
@@ -129,11 +118,10 @@ export default function OffrePage() {
         </div>
       </Section>
 
-      <Section size="md">
-        <div className="grid gap-10 lg:grid-cols-[1fr_1.7fr] lg:gap-20">
+      <Section>
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
           <SectionHead
-            eyebrow="Avant de commander"
-            title="Quatre questions."
+            title="Avant de commander"
             text={
               <>
                 Les autres réponses sont dans les{" "}
@@ -148,7 +136,7 @@ export default function OffrePage() {
         </div>
       </Section>
 
-      <Closing title="Pas encore sûr ? Essayez trois minutes." />
-    </main>
+      <Closing title="Pas encore sûr ? Essayez trois minutes" />
+    </>
   );
 }

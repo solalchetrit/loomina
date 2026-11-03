@@ -1,56 +1,53 @@
 import type { ReactNode } from "react";
+import Icon, { type IconName } from "@/components/ui/Icon";
 
 /** Conteneur de section : largeur, gouttières et rythme vertical communs. */
 export function Section({
   id,
   children,
   className = "",
-  tone = "default",
   size = "md",
 }: {
   id?: string;
   children: ReactNode;
   className?: string;
-  tone?: "default" | "alt";
   size?: "sm" | "md" | "lg";
 }) {
-  const pad = { sm: "py-14 md:py-20", md: "py-20 md:py-28", lg: "py-24 md:py-32" }[size];
-  const bg = tone === "alt" ? "bg-[var(--paper-deep)]" : "";
+  const pad = { sm: "py-12 md:py-16", md: "py-16 md:py-24", lg: "py-20 md:py-28" }[size];
   return (
-    <section id={id} className={`relative w-full scroll-mt-24 ${pad} ${bg} ${className}`}>
-      <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">{children}</div>
+    <section id={id} className={`w-full scroll-mt-28 ${pad} ${className}`}>
+      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">{children}</div>
     </section>
   );
 }
 
-/**
- * Tête de section « ouverture de chapitre » : surtitre en petites capitales,
- * titre serif aligné à gauche, court filet or. C'est la signature du site.
- */
+/** Tête de section : titre gras, texte d'introduction, petit titre optionnel. */
 export function SectionHead({
   eyebrow,
   title,
   text,
   as: Tag = "h2",
+  align = "left",
   className = "",
 }: {
   eyebrow?: string;
   title: ReactNode;
   text?: ReactNode;
   as?: "h1" | "h2";
+  align?: "left" | "center";
   className?: string;
 }) {
+  const center = align === "center" ? "mx-auto text-center" : "";
   return (
-    <div className={`max-w-2xl ${className}`}>
+    <div className={`max-w-2xl ${center} ${className}`}>
       {eyebrow && <p className="t-eyebrow">{eyebrow}</p>}
-      <Tag className={`${eyebrow ? "mt-4" : ""} ${Tag === "h1" ? "t-display" : "t-title"}`}>{title}</Tag>
-      <span aria-hidden="true" className="gold-dash mt-6" />
-      {text && <p className="t-lead mt-6 max-w-xl">{text}</p>}
+      <Tag className={`${eyebrow ? "mt-3" : ""} ${Tag === "h1" ? "t-display" : "t-title"}`}>{title}</Tag>
+      {text && <p className={`t-lead mt-5 ${align === "center" ? "mx-auto" : ""} max-w-xl`}>{text}</p>}
     </div>
   );
 }
 
-/** En-tête de page, sous le header fixe. Même signature, plus d'air. */
+/** En-tête de page, sous le menu flottant. */
 export function PageHeader({
   eyebrow,
   title,
@@ -63,55 +60,46 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <section className="relative w-full pt-28 pb-10 md:pt-40 md:pb-14">
-      <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
-        <div className="rise">
-          <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} />
-        </div>
+    <section className="w-full pb-8 pt-32 md:pb-12 md:pt-40">
+      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
+        <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise" />
         {children}
       </div>
     </section>
   );
 }
 
-/**
- * Liste numérotée éditoriale : numéro serif dans la marge, titre, texte.
- * Remplace les grilles de cartes.
- */
-export function Numbered({
+/** Étapes d'un parcours, en cartes numérotées : le contenu est une vraie suite. */
+export function Steps({
   items,
-  start = 1,
   className = "",
 }: {
-  items: { title: ReactNode; text: ReactNode }[];
-  start?: number;
+  items: { icon: IconName; title: ReactNode; text: ReactNode }[];
   className?: string;
 }) {
   return (
-    <ol className={`rule-top ${className}`}>
+    <ol className={`grid gap-4 md:grid-cols-3 ${className}`}>
       {items.map((it, i) => (
-        <li
-          key={i}
-          className="grid gap-2 border-b border-[var(--rule)] py-7 sm:grid-cols-[4rem_1fr] sm:gap-6 md:py-9"
-        >
-          <span className="t-numeral text-[34px] leading-none md:text-[40px]" aria-hidden="true">
-            {start + i}
-          </span>
-          <div>
-            <h3 className="t-heading">
-              <span className="sr-only">{start + i}. </span>
-              {it.title}
-            </h3>
-            <div className="t-body mt-3 max-w-2xl">{it.text}</div>
+        <li key={i} className="card p-7 md:p-8">
+          <div className="flex items-center justify-between">
+            <span className="chip-icon">
+              <Icon name={it.icon} />
+            </span>
+            <span className="text-[15px] font-bold text-[var(--ink-3)]">
+              <span className="sr-only">Étape </span>
+              {i + 1}
+            </span>
           </div>
+          <h3 className="t-heading mt-6">{it.title}</h3>
+          <div className="t-body mt-2">{it.text}</div>
         </li>
       ))}
     </ol>
   );
 }
 
-/** Liste à filets : titre en gras, détail dessous. */
-export function RuledList({
+/** Liste cochée : titre en gras, détail à la suite. */
+export function CheckList({
   items,
   className = "",
 }: {
@@ -119,11 +107,14 @@ export function RuledList({
   className?: string;
 }) {
   return (
-    <ul className={`rule-top ${className}`}>
+    <ul className={`divide-y divide-[var(--line-soft)] ${className}`}>
       {items.map((it, i) => (
-        <li key={i} className="border-b border-[var(--rule)] py-4">
-          <span className="block font-sans text-[17px] font-semibold text-[var(--ink)]">{it.title}</span>
-          {it.detail && <span className="t-body mt-0.5 block">{it.detail}</span>}
+        <li key={i} className="flex gap-3 py-3.5">
+          <Icon name="check" className="mt-[3px] shrink-0 text-[var(--amber-ink)]" />
+          <span className="text-[17px] leading-snug text-[var(--ink-2)]">
+            <b className="font-bold text-[var(--ink)]">{it.title}</b>
+            {it.detail && <>, {it.detail}</>}
+          </span>
         </li>
       ))}
     </ul>

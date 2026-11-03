@@ -1,25 +1,33 @@
-"use client";
-
-import React from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
+
+type Variant = "primary" | "secondary" | "accent" | "ghost";
 
 interface ButtonProps {
   href?: string;
   onClick?: () => void;
-  children: React.ReactNode;
-  variant?: "primary" | "secondary" | "ghost";
-  size?: "sm" | "md" | "lg";
+  children: ReactNode;
+  variant?: Variant;
+  size?: "md" | "lg";
   className?: string;
-  fullWidth?: boolean;
   disabled?: boolean;
   type?: "button" | "submit";
   loading?: boolean;
 }
 
-/**
- * Trois boutons, un seul dessin : rectangle à coins doux, pas d'ombre, pas d'icône.
- * Hauteur minimale 48 px (cible tactile confortable pour tous les âges).
- */
+const VARIANTS: Record<Variant, string> = {
+  primary: "bg-[var(--ink)] text-white hover:bg-[var(--ink-soft)]",
+  secondary: "border border-[var(--rule-strong)] bg-white text-[var(--ink)] hover:border-[var(--ink)]",
+  accent: "bg-[var(--amber)] text-[var(--ink)] hover:bg-[#f4ac4b]",
+  ghost: "text-[var(--ink)] underline decoration-[var(--amber-line)] decoration-2 underline-offset-4 hover:decoration-[var(--amber)]",
+};
+
+const SIZES = {
+  md: "min-h-12 px-5 text-[16px]",
+  lg: "min-h-14 px-7 text-[17px]",
+};
+
+/** Quatre boutons, un seul dessin : coins doux, pas d'ombre. Cible tactile de 48 px minimum. */
 export default function Button({
   href,
   onClick,
@@ -27,46 +35,27 @@ export default function Button({
   variant = "primary",
   size = "md",
   className = "",
-  fullWidth = false,
   disabled = false,
   type = "button",
   loading = false,
 }: ButtonProps) {
-  const sizeClasses = {
-    sm: "h-11 px-4 text-[15px]",
-    md: "h-12 px-6 text-[16px]",
-    lg: "h-14 px-8 text-[17px]",
-  }[size];
-
-  const variantClasses = {
-    primary: "bg-[var(--ink)] text-[var(--paper)] hover:bg-[var(--ink-soft)] disabled:opacity-50 disabled:cursor-not-allowed",
-    secondary:
-      "bg-transparent text-[var(--ink)] border border-[var(--ink)] hover:bg-[var(--ink)] hover:text-[var(--paper)] disabled:opacity-50",
-    ghost: "bg-transparent text-[var(--ink)] underline decoration-[var(--rule-strong)] underline-offset-4 hover:decoration-[var(--gold)]",
-  }[variant];
-
-  const base = `press inline-flex items-center justify-center gap-2 rounded-lg font-sans font-semibold tracking-[-0.005em] cursor-pointer select-none whitespace-nowrap ${
-    fullWidth ? "w-full" : ""
-  } ${sizeClasses} ${variantClasses} ${className}`;
+  const cls = `press inline-flex items-center justify-center gap-2 rounded-[var(--radius-btn)] py-2 text-center font-bold sm:whitespace-nowrap tracking-[-0.01em] select-none disabled:cursor-not-allowed disabled:opacity-50 ${SIZES[size]} ${VARIANTS[variant]} ${className}`;
 
   if (href && !disabled) {
-    const external = href.startsWith("tel:") || href.startsWith("mailto:") || href.startsWith("http");
-    if (external) {
-      return (
-        <a href={href} className={base}>
-          {children}
-        </a>
-      );
-    }
-    return (
-      <Link href={href} className={base}>
+    const external = /^(tel:|mailto:|https?:)/.test(href);
+    return external ? (
+      <a href={href} className={cls}>
+        {children}
+      </a>
+    ) : (
+      <Link href={href} className={cls}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} className={base} disabled={disabled || loading} aria-busy={loading || undefined}>
+    <button type={type} onClick={onClick} className={cls} disabled={disabled || loading} aria-busy={loading || undefined}>
       {loading && <span className={`spinner ${variant === "primary" ? "spinner-light" : ""}`} aria-hidden="true" />}
       {children}
     </button>

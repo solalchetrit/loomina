@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
-// Serif éditoriale (titres, extraits de livre) : Newsreader, dessinée pour la lecture longue.
+// Serif des extraits de livre uniquement : c'est la page que le client recevra.
 const newsreader = Newsreader({
   subsets: ["latin"],
   style: ["normal", "italic"],
@@ -19,7 +19,7 @@ const newsreader = Newsreader({
 // Sans-serif du texte courant.
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -28,7 +28,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#fbf9f5",
+  themeColor: "#f7f7f4",
 };
 
 export const metadata: Metadata = {
@@ -91,12 +91,10 @@ export default function RootLayout({
   return (
     <html lang="fr" className="scroll-smooth" suppressHydrationWarning>
       <body
-        className={`${plusJakartaSans.variable} ${newsreader.variable} antialiased min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans relative`}
+        className={`${plusJakartaSans.variable} ${newsreader.variable} min-h-screen bg-[var(--canvas)] font-sans text-[var(--ink)] antialiased`}
       >
         <Header />
-        <main className="relative z-0">
-          {children}
-        </main>
+        <main>{children}</main>
         <Footer />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-3F6NDBKRJ8" strategy="afterInteractive" />
         <Script id="gtag" strategy="afterInteractive">

@@ -30,42 +30,47 @@ const COLUMNS = [
   },
 ];
 
-/** Pied de page en colophon : qui écrit, où écrire, où appeler. */
 export default function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="w-full border-t border-[var(--rule)] bg-[var(--paper-deep)]">
-      <div className="mx-auto w-full max-w-6xl px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-14 sm:px-8">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_2fr]">
+    <footer className="w-full border-t border-[var(--line)] bg-white">
+      <div className="mx-auto w-full max-w-[1240px] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-14 sm:px-6">
+        <div className="grid gap-12 md:grid-cols-[1.3fr_2fr]">
           <div>
             <Link href="/" className="inline-block" aria-label="Loomina, accueil">
-              <div className="relative h-8 w-36">
-                <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" />
-              </div>
+              <span className="relative block h-[30px] w-[128px]">
+                <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" sizes="128px" />
+              </span>
             </Link>
             <p className="t-body mt-5 max-w-xs">Vous racontez votre vie au téléphone. Nous en faisons un livre.</p>
-            <p className="mt-6 font-sans text-[16px] text-[var(--ink-2)]">
-              Pour essayer :{" "}
-              <a href={`tel:${SITE.phone}`} className="link font-semibold">
-                {SITE.phoneDisplay}
-              </a>
-            </p>
-            <p className="mt-1 font-sans text-[16px] text-[var(--ink-2)]">
-              Pour nous écrire :{" "}
-              <a href="mailto:contact@loomina.eu" className="link font-semibold">
-                contact@loomina.eu
-              </a>
-            </p>
+            <dl className="mt-6 space-y-1 text-[16px]">
+              <div>
+                <dt className="inline text-[var(--ink-3)]">Démo gratuite : </dt>
+                <dd className="inline">
+                  <a href={`tel:${SITE.phone}`} className="link">
+                    {SITE.phoneDisplay}
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt className="inline text-[var(--ink-3)]">Nous écrire : </dt>
+                <dd className="inline">
+                  <a href="mailto:contact@loomina.eu" className="link">
+                    contact@loomina.eu
+                  </a>
+                </dd>
+              </div>
+            </dl>
           </div>
 
           <div className="grid gap-10 sm:grid-cols-3">
             {COLUMNS.map((col) => (
               <div key={col.title}>
-                <h2 className="t-eyebrow !font-sans">{col.title}</h2>
+                <h2 className="text-[15px] font-bold tracking-normal text-[var(--ink)]">{col.title}</h2>
                 <ul className="mt-4 space-y-2.5">
                   {col.links.map((l) => (
                     <li key={l.href}>
-                      <Link href={l.href} className="font-sans text-[16px] text-[var(--ink-2)] underline-offset-4 hover:text-[var(--ink)] hover:underline">
+                      <Link href={l.href} className="text-[16px] text-[var(--ink-2)] hover:text-[var(--ink)] hover:underline hover:underline-offset-4">
                         {l.label}
                       </Link>
                     </li>
@@ -76,7 +81,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-[var(--rule)] pt-6 font-sans text-[14px] text-[var(--ink-3)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-2 border-t border-[var(--line)] pt-6 text-[14px] text-[var(--ink-3)] sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} Loomina. Projet porté par Solal Chetrit, Paris.</p>
           <p>Loomina est une intelligence artificielle ; chaque page est relue par une personne.</p>
         </div>

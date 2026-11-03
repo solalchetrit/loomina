@@ -1,40 +1,36 @@
 import Link from "next/link";
-import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
-import { Numbered } from "@/components/ui/Section";
+import { Section, SectionHead, Steps } from "@/components/ui/Section";
+import type { IconName } from "@/components/ui/Icon";
 
-export const STEPS = [
+export const STEPS: { icon: IconName; title: string; text: string }[] = [
   {
+    icon: "phone",
     title: "Vous appelez, quand vous voulez",
-    text: `Après la commande, vous appelez le ${SITE.phoneDisplay} depuis le numéro donné à l’inscription. Loomina vous reconnaît et reprend là où vous vous étiez arrêté. Un appel dure le temps qu’il vous faut.`,
+    text: "Depuis le numéro donné à la commande, fixe ou portable. Loomina vous reconnaît et reprend là où vous vous étiez arrêté.",
   },
   {
-    title: "Un chapitre arrive après chaque appel",
-    text: `Loomina l’écrit dans vos mots, sans rien inventer, et vous le retrouvez dans votre espace auteur. Au prochain appel, vous dites ce qu’il faut changer. ${OFFER.chapters} thèmes vous guident, de l’enfance à aujourd’hui ; vous pouvez en sauter ou en ajouter.`,
+    icon: "pen",
+    title: "Un chapitre après chaque appel",
+    text: "Écrit dans vos mots, sans rien inventer. Vous le relisez dans votre espace et dites ce qu’il faut changer.",
   },
   {
-    title: "Nous relisons, mettons en page, imprimons",
-    text: `Notre équipe relit chaque page, place vos photos et compose le livre. Il arrive relié chez vous, en général ${OFFER.delay} après le premier appel, avec sa version numérique à partager.`,
+    icon: "book",
+    title: "Le livre arrive chez vous",
+    text: `Notre équipe relit chaque page, place vos photos et fait imprimer le livre. En général ${OFFER.delay} après le premier appel.`,
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="parcours" className="w-full scroll-mt-24 py-20 md:py-28">
-      <div className="mx-auto grid w-full max-w-6xl gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_1.7fr] lg:gap-20">
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          <p className="t-eyebrow">Comment ça se passe</p>
-          <h2 className="t-title mt-4">Rien à installer, rien à écrire.</h2>
-          <span aria-hidden="true" className="gold-dash mt-6" />
-          <p className="t-lead mt-6 max-w-sm">Un téléphone suffit, fixe ou portable. Trois étapes, et le livre est chez vous.</p>
-          <p className="mt-8">
-            <Link href="/experience" className="link font-sans text-[16px] font-medium">
-              Le détail, appel par appel
-            </Link>
-          </p>
-        </div>
-        <Numbered items={STEPS} />
+    <Section id="parcours">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <SectionHead title="Trois étapes, et rien à écrire" text="Pas d’application, pas de rendez-vous. Un téléphone suffit." />
+        <Link href="/experience" className="link shrink-0 text-[16px]">
+          Le détail, appel par appel
+        </Link>
       </div>
-    </section>
+      <Steps items={STEPS} className="mt-10" />
+    </Section>
   );
 }

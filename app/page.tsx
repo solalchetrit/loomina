@@ -2,11 +2,11 @@ import Link from "next/link";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import VoiceToPage from "@/components/VoiceToPage";
+import OfferCard from "@/components/OfferCard";
 import Closing from "@/components/Closing";
 import Accordion from "@/components/ui/Accordion";
-import Button from "@/components/ui/Button";
-import { RuledList } from "@/components/ui/Section";
-import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
+import { Section, SectionHead } from "@/components/ui/Section";
+import { GUARANTEE } from "@/config/offer";
 
 const QUESTIONS = [
   {
@@ -25,96 +25,65 @@ const QUESTIONS = [
     q: "Je veux l’offrir. Comment ça se passe ?",
     a: "À la commande, indiquez le prénom et le numéro de la personne qui racontera. C’est elle qui appellera Loomina, depuis ce numéro, quand elle le souhaite.",
   },
-  {
-    q: "Et si ça ne me plaît pas ?",
-    a: GUARANTEE,
-  },
+  { q: "Et si ça ne me plaît pas ?", a: GUARANTEE },
 ];
 
 export default function Home() {
   return (
-    <div className="relative flex w-full flex-col items-center">
+    <>
       <Hero />
       <HowItWorks />
       <VoiceToPage />
 
-      {/* --- LE PRIX --- */}
-      <section id="offre" className="w-full scroll-mt-24 py-20 md:py-28">
-        <div className="mx-auto grid w-full max-w-6xl gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
-          <div>
-            <p className="t-eyebrow">Le prix</p>
-            <h2 className="t-title mt-4">Un prix, tout compris.</h2>
-            <span aria-hidden="true" className="gold-dash mt-6" />
-            <p className="t-lead mt-6 max-w-md">
-              Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à
-              payer en plus.
-            </p>
-            <p className="mt-10 font-serif text-[88px] leading-[0.85] tracking-[-0.03em] text-[var(--ink)] md:text-[104px]">
-              {OFFER.price}
-              <span className="ml-1 text-[0.45em] align-top">{OFFER.currencySymbol}</span>
-            </p>
-            <p className="t-small mt-4">Paiement unique et sécurisé par Stripe.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button href="/order" variant="primary" size="lg" className="w-full sm:w-auto">
-                Commander
-              </Button>
-              <Button href="/offre" variant="secondary" size="lg" className="w-full sm:w-auto">
-                Tout le détail
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <RuledList items={INCLUDED} />
-            <p className="t-body mt-6">
-              <span className="font-semibold text-[var(--ink)]">Satisfait ou remboursé. </span>
-              {GUARANTEE}
-            </p>
-          </div>
+      <Section id="offre">
+        <SectionHead title="Un prix, tout compris" text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Rien à payer en plus." />
+        <div className="mt-10">
+          <OfferCard />
         </div>
-      </section>
+      </Section>
 
-      {/* --- LE MOT DU FONDATEUR, à la place d'avis clients que nous n'avons pas encore --- */}
-      <section className="w-full bg-[var(--paper-deep)] py-20 md:py-28">
-        <figure className="mx-auto max-w-3xl px-5 sm:px-8">
-          <blockquote className="font-serif text-[clamp(1.5rem,3vw,2.15rem)] leading-[1.4] tracking-[-0.01em] text-[var(--ink)]">
-            « Ma grand-mère avait une vie passionnante, que je ne connaissais qu’en partie. Nous voulions qu’elle l’écrive, mais
-            écrire lui demandait trop. Alors nous l’avons laissée parler. Son livre est aujourd’hui dans notre salon, et c’est
-            pour que d’autres familles aient le leur que Loomina existe. »
+      {/* Le mot du fondateur, à la place d'avis clients que nous n'avons pas encore. */}
+      <Section size="sm">
+        <figure className="card mx-auto max-w-4xl p-8 md:p-12">
+          <blockquote className="text-[clamp(1.3rem,2.4vw,1.75rem)] font-semibold leading-[1.45] tracking-[-0.015em] text-[var(--ink)]">
+            « Ma grand-mère avait une vie passionnante, que je ne connaissais qu’en partie. Écrire lui demandait trop, alors nous l’avons
+            laissée parler. Son livre est aujourd’hui dans notre salon, et c’est pour que d’autres familles aient le leur que Loomina
+            existe. »
           </blockquote>
-          <figcaption className="t-body mt-8">
-            <span className="font-semibold text-[var(--ink)]">Solal Chetrit</span>, fondateur de Loomina ·{" "}
+          <figcaption className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-[16px]">
+            <span>
+              <b>Solal Chetrit</b>, fondateur
+            </span>
             <Link href="/about" className="link">
               Notre histoire
             </Link>
           </figcaption>
         </figure>
-      </section>
+      </Section>
 
-      {/* --- QUESTIONS --- */}
-      <section id="questions" className="w-full scroll-mt-24 py-20 md:py-28">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 sm:px-8 lg:grid-cols-[1fr_1.7fr] lg:gap-20">
-          <div>
-            <p className="t-eyebrow">Avant de commencer</p>
-            <h2 className="t-title mt-4">Vos questions.</h2>
-            <span aria-hidden="true" className="gold-dash mt-6" />
-            <p className="t-lead mt-6 max-w-sm">
-              Les autres réponses sont dans les{" "}
-              <Link href="/faq" className="link">
-                questions fréquentes
-              </Link>
-              , ou{" "}
-              <Link href="/contact" className="link">
-                écrivez-nous
-              </Link>
-              .
-            </p>
-          </div>
+      <Section id="questions">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+          <SectionHead
+            title="Vos questions"
+            text={
+              <>
+                Les autres réponses sont dans les{" "}
+                <Link href="/faq" className="link">
+                  questions fréquentes
+                </Link>
+                , ou{" "}
+                <Link href="/contact" className="link">
+                  écrivez-nous
+                </Link>
+                .
+              </>
+            }
+          />
           <Accordion items={QUESTIONS} />
         </div>
-      </section>
+      </Section>
 
       <Closing />
-    </div>
+    </>
   );
 }

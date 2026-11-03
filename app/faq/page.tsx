@@ -126,10 +126,10 @@ const FAQ_CATEGORIES = [
 
 export default function FAQPage() {
   return (
-    <main className="w-full">
+    <>
       <PageHeader
         eyebrow="Questions fréquentes"
-        title="Tout ce que l’on nous demande."
+        title="Tout ce que l’on nous demande"
         text={
           <>
             Vous ne trouvez pas votre réponse ?{" "}
@@ -142,23 +142,22 @@ export default function FAQPage() {
       />
 
       <Section size="sm">
-        <div className="grid gap-12 lg:grid-cols-[240px_1fr] lg:gap-20">
-          <nav aria-label="Thèmes" className="lg:sticky lg:top-28 lg:self-start">
-            <p className="t-eyebrow">Thèmes</p>
-            <ol className="rule-top mt-4 flex flex-wrap gap-x-5 gap-y-0 lg:flex-col">
+        <div className="grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-16">
+          <nav aria-label="Thèmes" className="lg:sticky lg:top-32 lg:self-start">
+            <ul className="flex flex-wrap gap-2 lg:flex-col">
               {FAQ_CATEGORIES.map((c) => (
-                <li key={c.id} className="border-b border-[var(--rule)] lg:w-full">
-                  <a href={`#${c.id}`} className="block py-3 font-sans text-[16px] font-medium text-[var(--ink)] underline-offset-4 hover:underline">
+                <li key={c.id}>
+                  <a href={`#${c.id}`} className="block rounded-[14px] border border-[var(--line)] bg-white px-4 py-2.5 text-[16px] font-semibold hover:border-[var(--ink)]">
                     {c.category}
                   </a>
                 </li>
               ))}
-            </ol>
+            </ul>
           </nav>
 
-          <div className="space-y-16">
+          <div className="space-y-14">
             {FAQ_CATEGORIES.map((c) => (
-              <section key={c.id} id={c.id} className="scroll-mt-28">
+              <section key={c.id} id={c.id} className="scroll-mt-32">
                 <h2 className="t-title">{c.category}</h2>
                 <Accordion items={c.questions} className="mt-6" />
               </section>
@@ -167,7 +166,7 @@ export default function FAQPage() {
         </div>
       </Section>
 
-      <Closing title="Le mieux, c’est encore d’essayer." />
-    </main>
+      <Closing title="Le mieux, c’est encore d’essayer" />
+    </>
   );
 }

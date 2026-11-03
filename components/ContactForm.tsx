@@ -54,9 +54,9 @@ export default function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div role="status" className="rule-top pt-6">
+      <div role="status" className="card p-7 md:p-10">
         <p className="t-eyebrow">Message reçu</p>
-        <h2 className="t-title mt-3">Merci, {form.name.split(" ")[0]}.</h2>
+        <h2 className="t-title mt-3">Merci, {form.name.split(" ")[0]}</h2>
         <p className="t-lead mt-5 max-w-md">
           Votre message est bien arrivé. Nous vous répondons à <span className="font-semibold text-[var(--ink)]">{form.email}</span>.
         </p>
@@ -70,7 +70,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="rule-top pt-6">
+    <form onSubmit={submit} noValidate className="card relative p-7 md:p-10">
       <div className="grid gap-6 sm:grid-cols-2">
         <Input label="Votre nom" name="name" autoComplete="name" value={form.name} onChange={set("name")} error={errors.name} required />
         <Input
@@ -91,7 +91,7 @@ export default function ContactForm() {
         <label htmlFor="subject" className="field-label">
           Votre message concerne
         </label>
-        <select id="subject" name="subject" value={form.subject} onChange={set("subject")} className="field appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><path d=%22M4 6l4 4 4-4%22 fill=%22none%22 stroke=%22%231b1915%22 stroke-width=%221.5%22/></svg>')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat pr-12">
+        <select id="subject" name="subject" value={form.subject} onChange={set("subject")} className="field appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><path d=%22M4 6l4 4 4-4%22 fill=%22none%22 stroke=%22%23161616%22 stroke-width=%221.5%22/></svg>')] bg-[length:16px] bg-[right_16px_center] bg-no-repeat pr-12">
           {SUBJECTS.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
@@ -111,7 +111,7 @@ export default function ContactForm() {
       </div>
 
       {serverError && (
-        <p role="alert" className="mt-6 border-l-2 border-[var(--danger)] pl-4 font-sans text-[16px] text-[var(--danger)]">
+        <p role="alert" className="mt-6 rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
           {serverError}
         </p>
       )}
