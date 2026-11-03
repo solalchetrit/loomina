@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Script from "next/script";
 import Footer from "@/components/Footer";
+import MobileCta from "@/components/MobileCta";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
@@ -96,6 +97,7 @@ export default function RootLayout({
         <Header />
         <main>{children}</main>
         <Footer />
+        <MobileCta />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-3F6NDBKRJ8" strategy="afterInteractive" />
         <Script id="gtag" strategy="afterInteractive">
           {`window.dataLayer = window.dataLayer || [];

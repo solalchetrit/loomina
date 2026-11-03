@@ -5,6 +5,8 @@
 
 import { Section, SectionHead } from "@/components/ui/Section";
 import Icon from "@/components/ui/Icon";
+import Button from "@/components/ui/Button";
+import { SITE } from "@/config/site";
 
 const SPOKEN = [
   { who: "Loomina", text: "Vous me parliez de la ferme de vos grands-parents. Qu’est-ce qu’on voyait en entrant dans la cour ?" },
@@ -83,7 +85,12 @@ export default function VoiceToPage() {
         </figure>
       </div>
 
-      <p className="t-small mt-6">Exemple écrit pour illustrer la méthode : Jeanne n’est pas une cliente réelle.</p>
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="t-small">Exemple écrit pour illustrer la méthode : Jeanne n’est pas une cliente réelle.</p>
+        <Button href={`tel:${SITE.phone}`} variant="secondary" className="shrink-0">
+          Écouter Loomina par vous-même
+        </Button>
+      </div>
     </Section>
   );
 }

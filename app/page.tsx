@@ -1,5 +1,10 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
+import Facts from "@/components/home/Facts";
+import Audiences from "@/components/home/Audiences";
+import WhatYouGet from "@/components/home/WhatYouGet";
+import Themes from "@/components/home/Themes";
+import Compare from "@/components/home/Compare";
 import HowItWorks from "@/components/HowItWorks";
 import VoiceToPage from "@/components/VoiceToPage";
 import OfferCard from "@/components/OfferCard";
@@ -32,8 +37,13 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <Facts />
       <HowItWorks />
       <VoiceToPage />
+      <Audiences />
+      <WhatYouGet />
+      <Themes />
+      <Compare />
 
       <Section id="offre">
         <SectionHead title="Un prix, tout compris" text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Rien à payer en plus." />

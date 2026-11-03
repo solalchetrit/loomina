@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { OFFER } from "@/config/offer";
 import { Section, SectionHead, Steps } from "@/components/ui/Section";
+import Button from "@/components/ui/Button";
+import { SITE } from "@/config/site";
 import type { IconName } from "@/components/ui/Icon";
 
 export const STEPS: { icon: IconName; title: string; text: string }[] = [
@@ -31,6 +33,12 @@ export default function HowItWorks() {
         </Link>
       </div>
       <Steps items={STEPS} className="mt-10" />
+      <div className="mt-8 flex flex-col items-start gap-4 rounded-[var(--radius-card)] bg-[var(--amber-soft)] p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
+        <p className="text-[17px] font-bold text-[var(--amber-deep)]">Le plus simple pour comprendre, c’est d’essayer : {OFFER.demoMinutes} minutes, gratuitement.</p>
+        <Button href={`tel:${SITE.phone}`} className="shrink-0">
+          Appeler le {SITE.phoneDisplay}
+        </Button>
+      </div>
     </Section>
   );
 }
