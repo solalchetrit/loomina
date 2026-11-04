@@ -4,19 +4,17 @@ import { PageHeader } from "@/components/ui/Section";
 
 /** Gabarit des pages légales : le texte dans une carte, les autres pages à côté. */
 export default function LegalPage({
-  eyebrow,
   title,
   updated,
   children,
 }: {
-  eyebrow: string;
   title: string;
   updated: string;
   children: ReactNode;
 }) {
   return (
     <>
-      <PageHeader eyebrow={eyebrow} title={title} text={`Dernière mise à jour : ${updated}.`} />
+      <PageHeader title={title} text={`Dernière mise à jour : ${updated}.`} />
       <section className="w-full pb-24 md:pb-32">
         <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">

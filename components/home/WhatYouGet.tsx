@@ -42,11 +42,10 @@ export default function WhatYouGet({ showDetailLink = true }: { showDetailLink?:
         <BookCover />
         <div>
           <SectionHead
-            eyebrow="Ce que vous recevez"
             title="Votre histoire, en livre et pour longtemps"
             text="Pas un fichier oublié dans un ordinateur : un livre qu’on pose sur la table, qu’on prête, qu’on relit."
           />
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2" data-reveal>
             {FEATURES.map((f) => (
               <li key={f.title} className="flex gap-4 rounded-[20px] bg-[var(--canvas)] p-5">
                 <span className="chip-icon !bg-white">

@@ -5,7 +5,7 @@ import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
 /** Le prix et ce qu'il comprend : deux cartes côte à côte. */
 export default function OfferCard({ showDetailLink = true }: { showDetailLink?: boolean }) {
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_1.15fr]">
+    <div className="grid gap-4 lg:grid-cols-[1fr_1.15fr]" data-reveal>
       <div className="card flex flex-col p-8 md:p-10">
         <p className="text-[16px] font-bold text-[var(--ink-2)]">{OFFER.name}</p>
         <p className="mt-3 text-[80px] font-extrabold leading-none tracking-[-0.05em] md:text-[96px]">

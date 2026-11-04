@@ -34,7 +34,12 @@ export default function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="w-full border-t border-[var(--line)] bg-white">
-      <div className="mx-auto w-full max-w-[1240px] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-14 sm:px-6">
+      <div className="mx-auto w-full max-w-[1240px] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-16 sm:px-6 md:pt-24">
+        {/* La devise de Loomina, en clôture de chaque page. */}
+        <p data-reveal className="mb-16 md:mb-24">
+          <span className="block text-[clamp(2.4rem,6.2vw,5.6rem)] font-extrabold leading-[0.98] tracking-[-0.045em]">Vos souvenirs méritent</span>
+          <span className="block text-[clamp(2.4rem,6.2vw,5.6rem)] font-extrabold leading-[0.98] tracking-[-0.045em] text-[var(--amber-display)]">l’éternité.</span>
+        </p>
         <div className="grid gap-12 md:grid-cols-[1.3fr_2fr]">
           <div>
             <Link href="/" className="inline-block" aria-label="Loomina, accueil">

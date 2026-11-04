@@ -114,7 +114,6 @@ export default function ExperiencePage() {
   return (
     <>
       <PageHeader
-        eyebrow="Comment ça marche"
         title="Un téléphone, des conversations, un livre"
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
       >
@@ -176,7 +175,6 @@ export default function ExperiencePage() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
             <SectionHead
-              eyebrow="Ce que Loomina écrit"
               title="Vos mots, mis en page"
               text="Loomina ne romance pas. Elle garde votre façon de dire les choses, ordonne, et quand un détail manque, elle vous le demande au prochain appel plutôt que de l’inventer."
             />
@@ -196,7 +194,6 @@ export default function ExperiencePage() {
 
       <Section id="chapitres">
         <SectionHead
-          eyebrow={`${OFFER.chapters} thèmes`}
           title="Des points de départ, pas un questionnaire"
           text="Loomina propose ces thèmes au fil des appels. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
         />

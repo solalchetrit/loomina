@@ -9,7 +9,6 @@ export default function ContactPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Nous écrire"
         title="Une question ? Une personne vous répond"
         text="Un projet de livre, un cadeau à préparer, un doute avant de commander : écrivez-nous, c’est Solal, le fondateur, qui lit et répond."
       />

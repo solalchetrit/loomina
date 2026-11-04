@@ -128,7 +128,6 @@ export default function FAQPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Questions fréquentes"
         title="Tout ce que l’on nous demande"
         text={
           <>

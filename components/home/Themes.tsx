@@ -41,7 +41,6 @@ export default function Themes() {
       <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
         <div>
           <SectionHead
-            eyebrow="Ce que vous raconterez"
             title="Le sommaire de votre livre est déjà là"
             text="Loomina vous guide d’un thème à l’autre, de l’enfance à ce que vous voulez transmettre. Vous en sautez, vous vous attardez, vous en ajoutez : c’est votre récit, dans votre ordre."
           />

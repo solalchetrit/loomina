@@ -62,7 +62,6 @@ export default function OffrePage() {
   return (
     <>
       <PageHeader
-        eyebrow="Le livre et le prix"
         title="Un prix, tout compris"
         text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus."
       >

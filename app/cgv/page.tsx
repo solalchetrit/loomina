@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CGVPage() {
   return (
-    <LegalPage eyebrow="Conditions générales de vente" title="Ce à quoi nous nous engageons" updated="7 octobre 2026">
+    <LegalPage title="Ce à quoi nous nous engageons" updated="7 octobre 2026">
       <h2>1. Objet</h2>
       <p>
         Les présentes conditions générales de vente (CGV) régissent les relations entre <strong>Loomina</strong>, projet en

@@ -38,12 +38,11 @@ export default function VoiceToPage() {
   return (
     <Section id="exemple" className="bg-white">
       <SectionHead
-        eyebrow="De la voix à la page"
         title="Vous parlez comme vous parlez, le livre garde votre voix"
         text="À gauche, un moment d’appel. À droite, ce qu’il devient dans le livre : mis en forme, sans rien ajouter que vous n’ayez dit."
       />
 
-      <div className="mt-12 grid gap-4 lg:grid-cols-2">
+      <div className="mt-12 grid gap-4 lg:grid-cols-2" data-reveal>
         <figure className="flex flex-col rounded-[var(--radius-card)] bg-[var(--canvas)] p-5 sm:p-7">
           <figcaption className="flex items-center gap-3 text-[15px] font-bold">
             <span className="chip-icon !h-9 !w-9 !rounded-[12px]">

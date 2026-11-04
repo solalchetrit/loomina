@@ -30,7 +30,6 @@ export default function AboutPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Notre histoire"
         title="Tout a commencé avec ma grand-mère"
         text="Loomina est née d’une histoire de famille : une vie qui méritait un livre, et une personne pour qui écrire était devenu trop difficile."
       />
@@ -72,7 +71,7 @@ export default function AboutPage() {
       </Section>
 
       <Section>
-        <SectionHead eyebrow="Nos engagements" title="Quatre règles qui ne bougent pas" />
+        <SectionHead title="Quatre règles qui ne bougent pas" />
         <ul className="mt-10 grid gap-4 sm:grid-cols-2">
           {COMMITMENTS.map((c) => (
             <li key={c.title} className="card p-7 md:p-8">

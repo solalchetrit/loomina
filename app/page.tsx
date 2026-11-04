@@ -3,7 +3,7 @@ import Hero from "@/components/Hero";
 import Facts from "@/components/home/Facts";
 import Audiences from "@/components/home/Audiences";
 import WhatYouGet from "@/components/home/WhatYouGet";
-import Themes from "@/components/home/Themes";
+import ThemePicker from "@/components/home/ThemePicker";
 import Compare from "@/components/home/Compare";
 import HowItWorks from "@/components/HowItWorks";
 import VoiceToPage from "@/components/VoiceToPage";
@@ -42,7 +42,7 @@ export default function Home() {
       <VoiceToPage />
       <Audiences />
       <WhatYouGet />
-      <Themes />
+      <ThemePicker />
       <Compare />
 
       <Section id="offre">

@@ -24,7 +24,7 @@ export default function Audiences() {
   return (
     <Section id="pour-qui">
       <SectionHead title="Pour vous, ou pour quelqu’un que vous aimez" text="La même méthode, deux façons de commencer." />
-      <div className="mt-10 grid gap-4 md:grid-cols-2">
+      <div className="mt-10 grid gap-4 md:grid-cols-2" data-reveal>
         {AUDIENCES.map((a) => (
           <div
             key={a.title}
