@@ -24,6 +24,8 @@ export interface ProjectOverview {
 
 export interface Overview {
   firstName: string | null;
+  /** Livre d'exemple du mode démo local (lib/loomina/demo.ts). */
+  demo?: boolean;
   prefs: Prefs;
   project: ProjectOverview | null;
 }

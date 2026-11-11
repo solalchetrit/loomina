@@ -90,6 +90,12 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
           </Button>
         </header>
 
+        {data?.demo && (
+          <p className="mt-6 rounded-[14px] bg-[var(--amber-soft)] px-4 py-3 text-[15px] font-semibold text-[var(--amber-deep)]">
+            Mode démo local : livre d’exemple de Jeanne, rien n’est lu ni écrit en base.
+          </p>
+        )}
+
         <nav aria-label="Rubriques de l’espace auteur" className="-mx-5 mt-8 overflow-x-auto px-5 sm:mx-0 sm:px-0">
           <ul className="flex w-max gap-1 rounded-full bg-white p-1.5 shadow-[inset_0_0_0_1px_var(--line)]">
             {TABS.map((t) => (

@@ -3,12 +3,14 @@ import { db } from '@/lib/loomina/db';
 import { currentAuthor, splitTopics } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
 import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
+import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /** Tout ce que l'espace auteur affiche, hors texte des chapitres (voir /api/user/stories). */
 export async function GET(request: NextRequest) {
+    if (DEMO_DATA) return NextResponse.json(demoOverview());
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;

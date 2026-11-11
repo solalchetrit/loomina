@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
+import { DEMO_DATA, demoSavePrefs } from '@/lib/loomina/demo';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,10 @@ const clean = (v: unknown, max: number): string | null | undefined => {
  * Lus par l'assistant vocal au prochain appel (lib/loomina/assistant.ts) et par l'Écrivain.
  */
 export async function PATCH(request: NextRequest) {
+    if (DEMO_DATA) {
+        demoSavePrefs(await request.json().catch(() => ({})));
+        return NextResponse.json({ saved: true });
+    }
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;

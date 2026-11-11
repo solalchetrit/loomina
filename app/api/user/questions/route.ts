@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
+import { DEMO_DATA, demoAddQuestion } from '@/lib/loomina/demo';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,11 @@ export const dynamic = 'force-dynamic';
  * le retire une fois la réponse obtenue.
  */
 export async function POST(request: NextRequest) {
+    if (DEMO_DATA) {
+        const { question } = (await request.json().catch(() => ({}))) as { question?: string };
+        if (!question?.trim()) return NextResponse.json({ error: 'Question trop courte' }, { status: 400 });
+        return NextResponse.json({ openQuestions: demoAddQuestion(question.trim().slice(0, 280)) });
+    }
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;
