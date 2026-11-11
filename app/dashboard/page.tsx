@@ -41,6 +41,17 @@ export default function DashboardPage() {
     } catch {
       /* stockage indisponible : on demandera le code */
     }
+    // Poste local : ouverture directe de l'espace du numéro de .env.local (voir /api/auth/dev).
+    if (process.env.NODE_ENV === "development") {
+      fetch("/api/auth/dev", { method: "POST" })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data: { phone?: string } | null) => {
+          if (!data?.phone) return;
+          setPhone(data.phone);
+          setIsLoggedIn(true);
+        })
+        .catch(() => {});
+    }
     if (new URLSearchParams(window.location.search).has("session_id")) setJustOrdered(true);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
