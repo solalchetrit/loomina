@@ -8,12 +8,20 @@ const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_VERIFY_SERVICE_SID = process.env.TWILIO_VERIFY_SERVICE_SID;
 
+/**
+ * Connexion locale sans SMS, pour tester l'espace auteur sur `next dev`.
+ * Active seulement hors production ET avec LOOMINA_DEV_LOGIN=true : le code
+ * 000000 ouvre la session d'un numéro qui existe vraiment dans `profiles`.
+ */
+const DEV_LOGIN = process.env.NODE_ENV === "development" && process.env.LOOMINA_DEV_LOGIN === "true";
+const DEV_CODE = "000000";
+
 export async function POST(request: NextRequest) {
     console.log("=== [Verify API] Request received ===");
 
     try {
         // Check for required environment variables
-        if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_VERIFY_SERVICE_SID) {
+        if (!DEV_LOGIN && (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_VERIFY_SERVICE_SID)) {
             console.error("[Verify API] Missing Twilio environment variables");
             return NextResponse.json({ message: "Server configuration error" }, { status: 500 });
         }
@@ -57,6 +65,11 @@ export async function POST(request: NextRequest) {
                 }, { status: 404 });
             }
 
+            if (DEV_LOGIN) {
+                console.info(`[Verify API] Connexion locale : entrez le code ${DEV_CODE}`);
+                return NextResponse.json({ status: "pending", dev: true });
+            }
+
             const response = await fetch(
                 `https://verify.twilio.com/v2/Services/${TWILIO_VERIFY_SERVICE_SID}/Verifications`,
                 {
@@ -95,6 +108,20 @@ export async function POST(request: NextRequest) {
 
             if (!otp_code) {
                 return NextResponse.json({ message: "Missing OTP code" }, { status: 400 });
+            }
+
+            if (DEV_LOGIN) {
+                if (otp_code !== DEV_CODE || !(await findProfileByPhone(formattedPhone))) {
+                    return NextResponse.json({ message: "Code incorrect ou expiré", valid: false }, { status: 401 });
+                }
+                const devResponse = NextResponse.json({ status: "approved", valid: true });
+                devResponse.cookies.set(SESSION_COOKIE, await signSession(formattedPhone), {
+                    httpOnly: true,
+                    sameSite: "lax",
+                    maxAge: 60 * 60 * 24 * 7,
+                    path: "/",
+                });
+                return devResponse;
             }
 
             const response = await fetch(
