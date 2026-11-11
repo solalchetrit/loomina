@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import LiveBook from "@/components/LiveBook";
+import AuthorSpace from "@/components/author/AuthorSpace";
 import Button from "@/components/ui/Button";
 import { SITE } from "@/config/site";
 import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
@@ -25,7 +25,6 @@ export default function DashboardPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState<string | null>(null);
   const [justOrdered, setJustOrdered] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
 
@@ -68,7 +67,6 @@ export default function DashboardPage() {
       /* ignore */
     }
     setIsLoggedIn(false);
-    setFirstName(null);
     setOtpCode("");
     setLoginStep("phone");
     setSessionExpired(expired);
@@ -76,20 +74,6 @@ export default function DashboardPage() {
 
   const onUnauthorized = useCallback(() => logout(true), [logout]);
 
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    (async () => {
-      try {
-        const res = await fetch("/api/user/me");
-        if (res.status === 401) return onUnauthorized();
-        if (!res.ok) return;
-        const data = await res.json();
-        setFirstName(data.first_name || (data.full_name ? String(data.full_name).split(" ")[0] : null));
-      } catch {
-        /* le prénom est un confort, pas une condition */
-      }
-    })();
-  }, [isLoggedIn, onUnauthorized]);
 
   const requestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -283,57 +267,5 @@ export default function DashboardPage() {
     );
   }
 
-  return (
-    <div className="w-full pb-24 pt-32 md:pb-32 md:pt-40">
-      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
-        <header className="rise flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="t-eyebrow">Espace auteur</p>
-            <h1 className="t-display mt-3">{firstName ? `Bonjour ${firstName}` : "Bonjour"}</h1>
-          </div>
-          <Button onClick={() => logout(false)} variant="secondary" className="self-start md:self-auto">
-            Se déconnecter
-          </Button>
-        </header>
-
-        <div className="mt-10 grid gap-4 lg:grid-cols-[1fr_1.9fr]">
-          <aside className="flex flex-col gap-4 lg:sticky lg:top-32 lg:self-start">
-            <div className="rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white">
-              <p className="text-[15px] font-bold text-[var(--amber)]">Pour continuer</p>
-              <a href={`tel:${SITE.phone}`} className="mt-2 inline-block text-[clamp(1.8rem,3vw,2.2rem)] font-extrabold tracking-[-0.03em] text-white underline decoration-white/30 underline-offset-4 hover:decoration-white">
-                {SITE.phoneDisplay}
-              </a>
-              <p className="mt-3 text-[16px] leading-relaxed text-[#cfcfc8]">
-                Appelez depuis le numéro de votre commande, quand vous voulez. Loomina reprend là où vous en étiez, et le
-                chapitre apparaît ici après l’appel.
-              </p>
-            </div>
-            <div className="card p-7">
-              <p className="text-[17px] font-bold">Vos photos</p>
-              <p className="t-body mt-2">
-                Envoyez-les à{" "}
-                <a href={`mailto:contact@loomina.eu?subject=${encodeURIComponent("Photos pour mon livre")}`} className="link font-medium">
-                  contact@loomina.eu
-                </a>
-                , en précisant le souvenir qu’elles illustrent. Nous les placerons dans le livre.
-              </p>
-            </div>
-            <div className="card p-7">
-              <p className="text-[17px] font-bold">Une question</p>
-              <p className="t-body mt-2">
-                <Link href="/contact" className="link font-medium">
-                  Écrivez-nous
-                </Link>
-                , une personne vous répond.
-              </p>
-            </div>
-          </aside>
-
-          <div className="rise" style={{ "--i": 2 } as React.CSSProperties}>
-            <LiveBook onUnauthorized={onUnauthorized} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <AuthorSpace onLogout={() => logout(false)} onUnauthorized={onUnauthorized} />;
 }
