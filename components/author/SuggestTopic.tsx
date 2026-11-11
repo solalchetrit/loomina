@@ -20,6 +20,7 @@ export default function SuggestTopic({
 }) {
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +33,11 @@ export default function SuggestTopic({
         body: JSON.stringify({ question: text }),
       });
       if (res.status === 401) return onUnauthorized();
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setErrorText(res.status === 409 && typeof data.error === "string" ? data.error : null);
+        throw new Error();
+      }
       const data = await res.json();
       onAdded(data.openQuestions);
       setText("");
@@ -78,7 +83,7 @@ export default function SuggestTopic({
           </Button>
           <p role="status" className="text-[15px] font-semibold">
             {status === "saved" && <span className="text-[var(--success)]">C’est noté, Loomina vous en parlera.</span>}
-            {status === "error" && <span className="text-[var(--danger)]">L’envoi n’a pas abouti. Réessayez.</span>}
+            {status === "error" && <span className="text-[var(--danger)]">{errorText ?? "L’envoi n’a pas abouti. Réessayez."}</span>}
           </p>
         </div>
       </form>

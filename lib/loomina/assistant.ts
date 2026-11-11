@@ -14,7 +14,8 @@
 import type { Phase } from './phases';
 import { PHASE_KEYS } from './phases';
 import type { Profile, Project, SystemPrompt } from './db';
-import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext } from './context';
+import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
+import type { LoominaContext } from './context';
 
 /**
  * LE réglage qui change tout côté coût.
@@ -46,7 +47,7 @@ const TRANSCRIBER = {
 
 /** Salutation du tout premier appel, quand la mémoire du projet est vide. */
 export const FIRST_CALL_MESSAGE_TEMPLATE =
-    "Bonjour {{first_name}}, c'est Loumina, {{votre}} biographe. Je suis ravi de faire {{votre}} connaissance ! Comment ça va aujourd'hui ?";
+    "Bonjour {{first_name}}, c'est Loumina, {{votre}} biographe. Je suis ravi de faire {{ta}} connaissance ! Comment ça va aujourd'hui ?";
 
 export interface BuildAssistantInput {
     profile: Profile;
@@ -69,14 +70,23 @@ export function fillTemplate(template: string, vars: Record<string, string>): st
     });
 }
 
+function projectContext(project: Project): LoominaContext {
+    return isEmptyContext(project.context)
+        ? contextFromLegacy(project.global_context)
+        : normalizeContext(project.context);
+}
+
+/** Premier appel : aucune mémoire d'entretien (un sujet suggéré n'en est pas une). */
+export function isFirstCall(project: Project): boolean {
+    return !hasCallMemory(projectContext(project)) && !project.global_context?.trim();
+}
+
 export function buildTemplateVars(
     profile: Profile,
     project: Project,
     phase: Phase
 ): Record<string, string> {
-    const ctx = isEmptyContext(project.context)
-        ? contextFromLegacy(project.global_context)
-        : normalizeContext(project.context);
+    const ctx = projectContext(project);
 
     const firstName =
         profile.first_name?.trim() ||
@@ -97,6 +107,8 @@ export function buildTemplateVars(
         first_name_spoken: firstNameSpoken,
         vous: tu ? 'te' : 'vous',
         votre: tu ? 'ton' : 'votre',
+        // Devant un nom féminin : « ta connaissance », pas « ton connaissance ».
+        ta: tu ? 'ta' : 'votre',
         vos: tu ? 'tes' : 'vos',
         vous_sujet: tu ? 'tu' : 'vous',
         // Conjugaisons utilisées par les gabarits de première phrase en base.
@@ -150,6 +162,71 @@ export function pronunciationBlock(vars: Record<string, string>): string {
     return lines.join('\n');
 }
 
+/**
+ * Ce que l'espace auteur a changé pour CET appel. Ajouté par le code après
+ * le prompt de phase (en base) : les règles valent pour les quatre phases,
+ * et l'entrée comme la sortie (Vapi, serveur vocal) passent par ici.
+ *
+ * - Les sujets proposés sur le site : le site promet « Loomina l'abordera
+ *   au prochain appel ». Noyés dans les « questions encore ouvertes » du
+ *   contexte, ils n'étaient jamais posés.
+ * - Les réglages déjà faits sur le site : ne pas redemander tu/vous et les
+ *   sujets à éviter au premier appel.
+ * - Un livre offert : le narrateur découvre peut-être le principe.
+ */
+export function sessionBlock(profile: Profile, project: Project, vars: Record<string, string>): string {
+    const ctx = projectContext(project);
+    const first = isFirstCall(project);
+    const meta = (project.project_metadata ?? {}) as Record<string, unknown>;
+    const name = vars.first_name;
+    const tu = vars.politeness_preference === 'tu';
+    const parts: string[] = [];
+
+    const suggestions = ctx.suggested_topics ?? [];
+    if (suggestions.length) {
+        parts.push(
+            [
+                `# SUJETS DEMANDÉS DEPUIS L'ESPACE AUTEUR (par ${name} ou un proche)`,
+                ...suggestions.map((t, i) => `${i + 1}. ${t}`),
+                `- Aborde le sujet n° 1 au cours de cet appel. S'il reste du temps et que ${name} est en forme, le suivant. Jamais plus de deux par appel.`,
+                "- Choisis le bon moment : quand une histoire vient de se terminer, ou quand la conversation s'essouffle. Ne coupe jamais un récit pour ça.",
+                `- Présente-le simplement, sans dire qui l'a écrit : « On m'a glissé une question sur ${tu ? 'ton' : 'votre'} espace : … ». Reformule-le en ${tu ? 'tutoyant' : 'vouvoyant'} si besoin.`,
+                `- Si le sujet touche un sujet sensible ci-dessus, ne l'aborde pas. Si ${name} préfère ne pas en parler, n'insiste pas et passe à autre chose.`,
+                first
+                    ? "- Au premier appel, garde-le pour la seconde moitié : d'abord faire connaissance."
+                    : "- Ne laisse pas OÙ REPRENDRE empêcher ce sujet : s'il ne trouve pas sa place après la première histoire, amène-le ensuite.",
+            ].join('\n')
+        );
+    }
+
+    if (first) {
+        const lines: string[] = [];
+        if (meta.prefs_set_at) {
+            lines.push(
+                `- Tutoiement ou vouvoiement : déjà choisi sur le site (« ${vars.politeness_preference} »). Ne pose PAS la question.`
+            );
+        }
+        if (profile.sensitive_topics?.trim()) {
+            lines.push(
+                "- Les sujets à laisser de côté sont déjà connus (voir PRÉFÉRENCES). Ne demande PAS s'il y a des sujets à éviter."
+            );
+        }
+        if (lines.length) {
+            parts.push(['# PREMIER APPEL : RÉGLAGES DÉJÀ FAITS SUR LE SITE', ...lines, '- Passe directement aux étapes suivantes du premier appel.'].join('\n'));
+        }
+        if (meta.is_gift === true) {
+            parts.push(
+                [
+                    '# UN LIVRE OFFERT',
+                    `Ce livre a été offert à ${name} par un proche. ${name} découvre peut-être le principe : si l'idée surprend ou fait hésiter, explique en une phrase (« On va discuter au téléphone, à ${tu ? 'ton' : 'votre'} rythme, et j'en ferai un livre de ${tu ? 'tes' : 'vos'} souvenirs. ») et rassure. Ne cite aucun prix.`,
+                ].join('\n')
+            );
+        }
+    }
+
+    return parts.join('\n\n');
+}
+
 /** « Solal » → « S-O-L-A-L », pour que le modèle épelle les vraies lettres. */
 export function spellOut(name: string): string {
     return Array.from(name.trim().toUpperCase()).filter((c) => c !== ' ').join('-');
@@ -172,8 +249,10 @@ export function buildAssistant({
 }: BuildAssistantInput) {
     const vars = buildTemplateVars(profile, project, phase);
 
-    const systemPrompt =
-        fillTemplate(prompt.prompt_content ?? '', vars) + '\n\n' + pronunciationBlock(vars);
+    const session = sessionBlock(profile, project, vars);
+    const systemPrompt = [fillTemplate(prompt.prompt_content ?? '', vars), session, pronunciationBlock(vars)]
+        .filter((part) => part.trim())
+        .join('\n\n');
 
     // Dans la première phrase, seule la graphie parlée compte : c'est le TTS
     // qui la lit, personne ne la voit écrite.
@@ -182,8 +261,7 @@ export function buildAssistant({
     // en base est écrit pour les appels suivants ; ici on salue une première
     // fois. Le test « nouveau client » du 04/09 disait « Ravi de vous
     // retrouver » à quelqu'un qu'on n'avait jamais eu au téléphone.
-    const isFirstCall = isEmptyContext(project.context) && !project.global_context?.trim();
-    const template = isFirstCall
+    const template = isFirstCall(project)
         ? FIRST_CALL_MESSAGE_TEMPLATE
         : prompt.first_message_template?.trim() ||
           `Bonjour {{first_name_spoken}} ! Ici Loumina, {{votre}} biographe. Je suis heureux de {{vous}} retrouver.`;

@@ -20,11 +20,11 @@
  * ferait avancer la phase une seconde fois), et pas de second chapitre.
  */
 
-import { db, findActiveProject, getRecentChapters, getNextChapterNumber } from './db';
+import { db, findActiveProject, getRecentChapters, getNextChapterNumber, getChapterOutline } from './db';
 import type { Profile, Project } from './db';
 import { toPhase, isFinalPhase } from './phases';
 import type { Phase } from './phases';
-import { normalizeContext, contextFromLegacy, isEmptyContext } from './context';
+import { normalizeContext, contextFromLegacy, isEmptyContext, remainingSuggestions } from './context';
 import type { LoominaContext } from './context';
 import { runDirector, DIRECTOR_MODEL } from './director';
 import type { DirectorResult } from './director';
@@ -106,6 +106,9 @@ interface AnalysisLog {
     next_topic_id?: number | null;
     project_update?: Record<string, unknown> & { context?: unknown };
     family_members?: DirectorResult['family_members'];
+    /** Sujets suggérés montrés au Directeur, et ceux qu'il a jugés abordés. */
+    suggestions_shown?: string[];
+    covered_suggestions?: number[];
 }
 
 /** Ce que l'Écrivain a besoin de savoir de l'analyse, rejouable depuis la base. */
@@ -211,7 +214,17 @@ export async function processEndOfCall(params: {
         // PLUS RÉCENT a déjà été analysé : sa mémoire et sa phase font foi,
         // réappliquer l'ancienne analyse les effacerait.
         const newer = await hasNewerAnalysis(project.id, existing!.created_at);
-        if (!newer && log.project_update) await applyProjectUpdate(project.id, log.project_update);
+        if (!newer && log.project_update) {
+            await applyProjectUpdate(
+                project.id,
+                await withLatestSuggestions(
+                    project.id,
+                    log.project_update,
+                    log.suggestions_shown ?? [],
+                    log.covered_suggestions ?? []
+                )
+            );
+        }
         await applyProfileAndFamily({
             projectId: project.id,
             profile: params.profile,
@@ -242,6 +255,7 @@ export async function processEndOfCall(params: {
             firstName: params.profile.first_name ?? params.profile.full_name ?? 'le narrateur',
             politeness: params.profile.politeness_preference,
             durationSeconds: data.durationSeconds,
+            sensitiveTopics: params.profile.sensitive_topics,
         });
 
         await persistDirectorResult({ project, profile: params.profile, interviewId, director });
@@ -299,7 +313,10 @@ export async function processEndOfCall(params: {
         };
     }
 
-    const previousChapters = await getRecentChapters(project.id, 3);
+    const [previousChapters, outline] = await Promise.all([
+        getRecentChapters(project.id, 3),
+        getChapterOutline(project.id),
+    ]);
 
     const writer = await runWriter({
         transcript: data.transcript,
@@ -309,6 +326,8 @@ export async function processEndOfCall(params: {
         writingStyle: brief.writingStyle,
         titleHint: brief.titleHint,
         material: brief.material,
+        outline,
+        sensitiveTopics: params.profile.sensitive_topics,
     });
 
     // ---------------------------------------------------------
@@ -397,6 +416,8 @@ async function persistDirectorResult(params: {
                 next_topic_id: director.next_topic_id,
                 project_update: projectUpdate,
                 family_members: director.family_members,
+                suggestions_shown: director.context.suggested_topics ?? [],
+                covered_suggestions: director.covered_suggestions,
                 model: DIRECTOR_MODEL,
                 at: new Date().toISOString(),
             },
@@ -405,7 +426,15 @@ async function persistDirectorResult(params: {
     if (logError) throw new Error(`Écriture de l'analyse impossible : ${logError.message}`);
 
     // -- projects
-    await applyProjectUpdate(project.id, projectUpdate);
+    await applyProjectUpdate(
+        project.id,
+        await withLatestSuggestions(
+            project.id,
+            projectUpdate,
+            director.context.suggested_topics ?? [],
+            director.covered_suggestions
+        )
+    );
 
     await applyProfileAndFamily({
         projectId: project.id,
@@ -413,6 +442,24 @@ async function persistDirectorResult(params: {
         profileUpdates: director.profile_updates,
         familyMembers: director.family_members,
     });
+}
+
+/**
+ * Les sujets suggérés sont relus en base juste avant l'écriture : l'auteur
+ * a pu en ajouter un pendant l'appel ou pendant l'analyse. On retire ceux
+ * que le Directeur a jugés abordés, on garde tous les autres.
+ */
+async function withLatestSuggestions(
+    projectId: string,
+    update: Record<string, unknown> & { context?: unknown },
+    shown: string[],
+    covered: number[]
+): Promise<Record<string, unknown>> {
+    const { data, error } = await db().from('projects').select('context').eq('id', projectId).single();
+    if (error) throw new Error(`Lecture projects impossible : ${error.message}`);
+    const latest = normalizeContext(data?.context).suggested_topics ?? [];
+    const context = normalizeContext(update.context);
+    return { ...update, context: { ...context, suggested_topics: remainingSuggestions(shown, covered, latest) } };
 }
 
 /** Idempotent : réappliquer la même mise à jour ne change rien. */

@@ -48,6 +48,14 @@ export interface LoominaContext {
     family: FamilyEntry[];
     key_themes: string[];
     open_questions: string[];
+    /**
+     * Sujets proposés depuis l'espace auteur (« Suggérer un sujet ») par
+     * l'auteur ou un proche. Gérés par le CODE, jamais réécrits par le
+     * Directeur : il signale seulement ceux qui ont été abordés, et le
+     * pipeline les retire (voir pipeline.ts). Sinon une suggestion ajoutée
+     * pendant un appel serait écrasée par la réécriture du contexte.
+     */
+    suggested_topics?: string[];
     last_call?: {
         date?: string;
         summary?: string;
@@ -71,6 +79,7 @@ const MAX_THEMES = 25;
 const MAX_QUESTIONS = 15;
 const MAX_PLACES = 20;
 const MAX_SPELLINGS = 20;
+const MAX_SUGGESTIONS = 10;
 const MAX_TEXT = 600;
 
 function str(v: unknown, max = MAX_TEXT): string | undefined {
@@ -160,6 +169,7 @@ export function normalizeContext(input: unknown): LoominaContext {
         family,
         key_themes: strArray(raw.key_themes, MAX_THEMES),
         open_questions: strArray(raw.open_questions, MAX_QUESTIONS),
+        suggested_topics: strArray(raw.suggested_topics, MAX_SUGGESTIONS),
         last_call: {
             date: str(lastCallRaw.date, 40),
             summary: str(lastCallRaw.summary, 1200),
@@ -228,6 +238,46 @@ export function renderContext(ctx: LoominaContext): string {
 }
 
 /**
+ * Les sujets suggérés depuis le site, numérotés pour que le Directeur
+ * puisse dire lesquels ont été abordés. Vide si rien n'est en attente.
+ */
+export function renderSuggestions(ctx: LoominaContext): string {
+    const list = ctx.suggested_topics ?? [];
+    return list.map((t, i) => `${i + 1}. ${t}`).join('\n');
+}
+
+/**
+ * Ce que l'espace auteur montre sous « Ce que Loomina garde en tête » :
+ * d'abord les sujets proposés par la famille, puis les points que le
+ * Directeur veut éclaircir.
+ */
+export function pendingTopics(ctx: LoominaContext): string[] {
+    const seen = new Set<string>();
+    return [...(ctx.suggested_topics ?? []), ...(ctx.open_questions ?? [])].filter((q) => {
+        const k = q.trim().toLowerCase();
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+    });
+}
+
+/**
+ * Retire les sujets suggérés que le Directeur a marqués comme abordés.
+ *
+ * `shown` est la liste présentée au Directeur (numérotée à partir de 1),
+ * `latest` celle relue en base juste avant l'écriture : une suggestion
+ * ajoutée pendant l'appel n'a pas été montrée, elle reste.
+ */
+export function remainingSuggestions(shown: string[], covered: number[], latest: string[]): string[] {
+    const done = new Set(
+        covered
+            .filter((n) => Number.isInteger(n) && n >= 1 && n <= shown.length)
+            .map((n) => shown[n - 1].trim().toLowerCase())
+    );
+    return latest.filter((t) => !done.has(t.trim().toLowerCase()));
+}
+
+/**
  * Reprise de l'historique : convertit l'ancien `global_context` textuel
  * en contexte structuré minimal, pour ne rien perdre lors de la bascule.
  */
@@ -239,6 +289,24 @@ export function contextFromLegacy(globalContext: string | null): LoominaContext 
             summary: globalContext.trim().slice(-4000),
         },
     };
+}
+
+/**
+ * Le projet a-t-il déjà une mémoire d'appel ? Un contexte qui ne contient
+ * qu'un sujet suggéré depuis le site n'est PAS une mémoire : le narrateur
+ * n'a encore jamais parlé à Loomina, il ne faut pas le « retrouver ».
+ */
+export function hasCallMemory(ctx: LoominaContext): boolean {
+    const id = ctx.identity ?? {};
+    return Boolean(
+        id.full_name ||
+            id.birth ||
+            id.places?.length ||
+            ctx.timeline?.length ||
+            ctx.family?.length ||
+            ctx.key_themes?.length ||
+            ctx.last_call?.summary
+    );
 }
 
 export function isEmptyContext(ctx: unknown): boolean {

@@ -49,9 +49,17 @@ export async function PATCH(request: NextRequest) {
             if (error) throw new Error(error.message);
         }
 
+        const projectUpdates: Record<string, unknown> = {};
         const title = clean(body.title, 120);
-        if (title !== undefined && project) {
-            const { error } = await db().from('projects').update({ title }).eq('id', project.id);
+        if (title !== undefined) projectUpdates.title = title;
+        // Trace que l'auteur a réglé l'entretien lui-même : au premier appel,
+        // l'assistant ne redemande pas tutoiement et sujets à éviter
+        // (sessionBlock dans lib/loomina/assistant.ts).
+        if (profileUpdates.politeness_preference || 'sensitive_topics' in profileUpdates) {
+            projectUpdates.project_metadata = { ...(project?.project_metadata ?? {}), prefs_set_at: new Date().toISOString() };
+        }
+        if (project && Object.keys(projectUpdates).length) {
+            const { error } = await db().from('projects').update(projectUpdates).eq('id', project.id);
             if (error) throw new Error(error.message);
         }
 
