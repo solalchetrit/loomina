@@ -5,6 +5,10 @@ import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import type { Prefs } from "./types";
 
+const DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const DAY_LABELS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
+const HOURS = Array.from({ length: 12 }, (_, i) => `${String(9 + i).padStart(2, "0")}:00`).flatMap((h) => [h, h.replace(":00", ":30")]).filter((h) => h <= "20:30");
+
 const STYLES = ["Naturel et sobre", "Chaleureux et vivant", "Littéraire et soigné", "Simple, comme je parle"];
 
 /** Réglages de l'entretien et du livre. Lus par Loomina dès l'appel suivant. */
@@ -168,6 +172,79 @@ export default function Settings({
             )}
             <p className="t-small mt-2">Loomina ne les abordera pas. Vous restez libre d’en parler vous-même.</p>
           </div>
+        </div>
+      </section>
+
+      <section className="card p-6 md:p-8 lg:col-span-2" aria-labelledby="reglages-rendezvous">
+        <h2 id="reglages-rendezvous" className="t-heading">
+          Rendez-vous et nouvelles
+        </h2>
+        <div className="mt-5 grid gap-6 md:grid-cols-2">
+          <fieldset>
+            <legend className="field-label">Loomina vous appelle de lui-même</legend>
+            <div className="flex flex-wrap gap-2">
+              {DAYS.map((d, i) => {
+                const day = i + 1;
+                const on = form.callSchedule.days.includes(day);
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    aria-pressed={on}
+                    aria-label={DAY_LABELS[i]}
+                    onClick={() => {
+                      const days = on ? form.callSchedule.days.filter((x) => x !== day) : [...form.callSchedule.days, day].sort();
+                      update({ callSchedule: { ...form.callSchedule, days, active: days.length > 0 } });
+                    }}
+                    className={`press min-h-12 min-w-14 rounded-full px-3 text-[15px] font-bold ${
+                      on ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
+                    }`}
+                  >
+                    {d}
+                  </button>
+                );
+              })}
+            </div>
+            <label htmlFor="heure-appel" className="field-label mt-4 block">
+              À quelle heure
+            </label>
+            <select
+              id="heure-appel"
+              className="field max-w-[12rem]"
+              value={form.callSchedule.time}
+              onChange={(e) => update({ callSchedule: { ...form.callSchedule, time: e.target.value } })}
+            >
+              {HOURS.map((h) => (
+                <option key={h} value={h}>
+                  {`${Number(h.slice(0, 2))} h${h.endsWith("30") ? " 30" : ""}`}
+                </option>
+              ))}
+            </select>
+            <p className="t-small mt-2">
+              {form.callSchedule.days.length
+                ? "Loomina appellera le numéro de votre commande à ces moments-là. Vous pouvez toujours appeler quand vous voulez."
+                : "Choisissez un ou plusieurs jours. Sans jour choisi, c’est vous qui appelez, quand vous voulez."}
+            </p>
+          </fieldset>
+          <fieldset>
+            <legend className="field-label">Prévenir quand un chapitre est prêt</legend>
+            <div className="flex gap-2">
+              {[true, false].map((v) => (
+                <button
+                  key={String(v)}
+                  type="button"
+                  aria-pressed={form.smsChapter === v}
+                  onClick={() => update({ smsChapter: v })}
+                  className={`press min-h-12 flex-1 rounded-full text-[16px] font-bold ${
+                    form.smsChapter === v ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
+                  }`}
+                >
+                  {v ? "Oui, par SMS" : "Non merci"}
+                </button>
+              ))}
+            </div>
+            <p className="t-small mt-2">Un SMS arrive quelques minutes après l’appel, avec le lien vers le nouveau chapitre.</p>
+          </fieldset>
         </div>
       </section>
 

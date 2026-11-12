@@ -5,6 +5,10 @@ export interface Prefs {
   firstNamePhonetic: string | null;
   writingStyle: string | null;
   sensitiveTopics: string[];
+  /** SMS « Votre chapitre est prêt » (activé par défaut). */
+  smsChapter: boolean;
+  /** Rendez-vous d'appel réguliers (1 = lundi … 7 = dimanche, heure de Paris). */
+  callSchedule: { active: boolean; days: number[]; time: string };
 }
 
 export interface ProjectOverview {
@@ -13,6 +17,8 @@ export interface ProjectOverview {
   progress: number;
   completed: boolean;
   nextTopic: string | null;
+  /** « chaque mardi à 15 h », ou null si pas de rendez-vous. */
+  scheduleText?: string | null;
   chapters: number;
   words: number;
   timeline: { year: number | null; event: string }[];

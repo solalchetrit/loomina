@@ -29,6 +29,7 @@ import type { LoominaContext } from './context';
 import { runDirector } from './director';
 import type { DirectorResult } from './director';
 import { runWriter } from './writer';
+import { notifyChapterReady } from './sms';
 
 /**
  * Seuils du garde-fou.
@@ -360,6 +361,14 @@ export async function processEndOfCall(params: {
         .update({ processing_status: 'processed' })
         .eq('id', interviewId);
 
+    // Après l'écriture seulement : un essai repris qui retrouve le chapitre
+    // déjà écrit (plus haut) ne renvoie pas le SMS.
+    await notifyChapterReady({
+        profile: params.profile,
+        projectMetadata: project.project_metadata,
+        title: writer.chapter_title,
+    });
+
     return {
         status: 'processed',
         interviewId,
@@ -445,7 +454,7 @@ async function persistDirectorResult(params: {
 }
 
 /**
- * Les sujets suggérés sont relus en base juste avant l'écriture : l'auteur
+ * Les sujets suggérés et les corrections de l'auteur sont relus en base juste avant l'écriture : l'auteur
  * a pu en ajouter un pendant l'appel ou pendant l'analyse. On retire ceux
  * que le Directeur a jugés abordés, on garde tous les autres.
  */
@@ -457,9 +466,18 @@ async function withLatestSuggestions(
 ): Promise<Record<string, unknown>> {
     const { data, error } = await db().from('projects').select('context').eq('id', projectId).single();
     if (error) throw new Error(`Lecture projects impossible : ${error.message}`);
-    const latest = normalizeContext(data?.context).suggested_topics ?? [];
+    const fresh = normalizeContext(data?.context);
+    const latest = fresh.suggested_topics ?? [];
     const context = normalizeContext(update.context);
-    return { ...update, context: { ...context, suggested_topics: remainingSuggestions(shown, covered, latest) } };
+    return {
+        ...update,
+        context: {
+            ...context,
+            suggested_topics: remainingSuggestions(shown, covered, latest),
+            // Une correction écrite par l'auteur pendant l'analyse est gardée.
+            author_corrections: fresh.author_corrections ?? context.author_corrections ?? [],
+        },
+    };
 }
 
 /** Idempotent : réappliquer la même mise à jour ne change rien. */
