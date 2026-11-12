@@ -10,6 +10,11 @@ on:
       - 'lib/loomina/**'
       - 'scripts/bench/**'
   workflow_dispatch:
+    inputs:
+      voix:
+        description: "Modèle de l'assistant vocal pour la conversation simulée"
+        required: false
+        default: gpt-4o
 
 jobs:
   banc:
@@ -17,6 +22,7 @@ jobs:
     timeout-minutes: 20
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      BENCH_VOICE_MODEL: ${{ inputs.voix || 'gpt-4o' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,7 +35,7 @@ jobs:
         run: npm run bench
       - name: Rapport
         if: always() && env.OPENAI_API_KEY != ''
-        run: cat scripts/bench/rapports/*.md >> "$GITHUB_STEP_SUMMARY"
+        run: cat scripts/bench/rapports/*.md >> "$GITHUB_STEP_SUMMARY" || echo "Pas de rapport (le banc s'est arrêté avant la fin)." >> "$GITHUB_STEP_SUMMARY"
       - name: Pas de clé OpenAI
         if: env.OPENAI_API_KEY == ''
         run: echo "Secret OPENAI_API_KEY absent, banc sauté." >> "$GITHUB_STEP_SUMMARY"
