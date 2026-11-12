@@ -203,6 +203,9 @@ async function main() {
             failed += ko;
             total += r.checks.length;
             console.log(ko ? `${ko} échec(s)` : 'ok');
+            for (const x of r.checks.filter((y) => !y.ok)) console.log(`   ✗ ${x.label}`);
+            for (const i of r.inventions) console.log(`   inventé ? ${i}`);
+            if (ko) console.log(`   question suivante : ${r.director.next_question}`);
             lines.push(
                 `## ${ko ? '❌' : '✅'} ${c.nom} (${f})`,
                 `Directeur ${r.director.model} ${(r.tDirector / 1000).toFixed(0)} s · Écrivain ${(r.tWriter / 1000).toFixed(0)} s · ${r.words} mots`,
@@ -217,7 +220,7 @@ async function main() {
         } catch (err) {
             failed += 1;
             total += 1;
-            console.log('erreur');
+            console.log(`erreur : ${err instanceof Error ? err.message : String(err)}`);
             lines.push(`## ❌ ${c.nom} (${f})`, `Erreur : ${err instanceof Error ? err.message : String(err)}`, '');
         }
     }
@@ -229,6 +232,7 @@ async function main() {
         failed += ko;
         total += v.checks.length;
         console.log(ko ? `${ko} échec(s)` : 'ok');
+        for (const x of v.checks.filter((y) => !y.ok)) console.log(`   ✗ ${x.label}`);
         lines.push(`## ${ko ? '❌' : '✅'} Conversation simulée (voix ${VOICE_MODEL})`, '', ...v.checks.map((x) => `- ${x.ok ? '✅' : '❌'} ${x.label}`), '', '<details><summary>Conversation</summary>', '', v.transcript, '', '</details>', '');
     }
 
