@@ -32,13 +32,63 @@ function openai(): OpenAI {
     // Le Directeur répond en ~20 s. Sans délai, le SDK attend jusqu'à 10 min et réessaie deux fois. Budget total
     // sous les 300 s de la fonction : Directeur 2 × 45 s + Écrivain 200 s.
     // la fonction Vercel (300 s) était tuée avant, et l'appel restait bloqué.
-    client = new OpenAI({ apiKey, timeout: 45_000, maxRetries: 1 });
+    // Pas de nouvel essai du SDK : en cas d'échec on passe au modèle de
+    // repli, plus rapide. Budget : 60 s + 45 s + Écrivain 180 s < 300 s.
+    client = new OpenAI({ apiKey, maxRetries: 0 });
     return client;
 }
 
-export const DIRECTOR_MODEL = 'gpt-4o';
+/**
+ * 12/11/2026 : gpt-4o → gpt-5.5 (raisonnement « low »), le modèle de
+ * l'Écrivain. Le Directeur décide de la mémoire du livre, de la phase et de
+ * la question du prochain appel : c'est là qu'un modèle qui raisonne paie.
+ * gpt-4o reste en repli si gpt-5.5 échoue ou dépasse le délai, pour qu'un
+ * appel ne reste jamais sans analyse. `LOOMINA_DIRECTOR_MODEL` permet de
+ * revenir en arrière sans déployer de code.
+ */
+export const DIRECTOR_MODEL = process.env.LOOMINA_DIRECTOR_MODEL?.trim() || 'gpt-5.5';
+export const DIRECTOR_REASONING_EFFORT = 'low';
+export const DIRECTOR_FALLBACK_MODEL = 'gpt-4o';
 export const DIRECTOR_MAX_TOKENS = 2048;
+/** Réflexion comprise, pour un modèle à raisonnement. */
+export const DIRECTOR_MAX_COMPLETION_TOKENS = 12000;
 export const DIRECTOR_TEMPERATURE = 0.3;
+
+function isReasoningModel(model: string): boolean {
+    return /^(gpt-5|o\d)/.test(model);
+}
+
+async function complete(model: string, system: string, user: string, timeoutMs: number): Promise<string> {
+    const messages = [
+        { role: 'system' as const, content: system },
+        { role: 'user' as const, content: user },
+    ];
+    const completion = isReasoningModel(model)
+        ? await openai().chat.completions.create(
+              {
+                  model,
+                  max_completion_tokens: DIRECTOR_MAX_COMPLETION_TOKENS,
+                  reasoning_effort: DIRECTOR_REASONING_EFFORT,
+                  response_format: { type: 'json_object' },
+                  messages,
+              },
+              { timeout: timeoutMs }
+          )
+        : await openai().chat.completions.create(
+              {
+                  model,
+                  max_tokens: DIRECTOR_MAX_TOKENS,
+                  temperature: DIRECTOR_TEMPERATURE,
+                  response_format: { type: 'json_object' },
+                  messages,
+              },
+              { timeout: timeoutMs }
+          );
+    const raw = completion.choices[0]?.message?.content;
+    if (!raw) throw new Error(`Directeur (${model}) : réponse vide du modèle`);
+    JSON.parse(raw); // un JSON invalide déclenche le repli
+    return raw;
+}
 
 export interface DirectorResult {
     context: LoominaContext;
@@ -49,6 +99,8 @@ export interface DirectorResult {
     covered_topic_ids: number[];
     /** Numéros (à partir de 1) des sujets suggérés depuis le site abordés dans cet appel. */
     covered_suggestions: number[];
+    /** Modèle qui a réellement produit l'analyse (principal ou repli). */
+    model: string;
     next_topic_id: number | null;
     chapter_title_hint: string | null;
     /**
@@ -190,6 +242,8 @@ interface DirectorInput {
     durationSeconds: number | null;
     /** `profiles.sensitive_topics` : réglés sur le site ou dits au téléphone. */
     sensitiveTopics?: string | null;
+    /** Banc d'essai : forcer un modèle. */
+    model?: string;
 }
 
 function userPrompt(params: Omit<DirectorInput, 'phase'>): string {
@@ -213,26 +267,21 @@ ${params.transcript}`;
 }
 
 export async function runDirector(params: DirectorInput): Promise<DirectorResult> {
-    const completion = await openai().chat.completions.create({
-        model: DIRECTOR_MODEL,
-        max_tokens: DIRECTOR_MAX_TOKENS,
-        temperature: DIRECTOR_TEMPERATURE,
-        response_format: { type: 'json_object' },
-        messages: [
-            { role: 'system', content: systemPrompt(params.phase) },
-            { role: 'user', content: userPrompt(params) },
-        ],
-    });
-
-    const raw = completion.choices[0]?.message?.content;
-    if (!raw) throw new Error('Directeur : réponse vide du modèle');
-
-    let parsed: Record<string, unknown>;
+    const system = systemPrompt(params.phase);
+    const user = userPrompt(params);
+    let model = params.model ?? DIRECTOR_MODEL;
+    let raw: string;
     try {
-        parsed = JSON.parse(raw);
-    } catch {
-        throw new Error(`Directeur : JSON invalide — ${raw.slice(0, 300)}`);
+        raw = await complete(model, system, user, 60_000);
+    } catch (err) {
+        if (model === DIRECTOR_FALLBACK_MODEL) throw err;
+        console.warn(
+            `[directeur] ${model} en échec (${err instanceof Error ? err.message : String(err)}), repli sur ${DIRECTOR_FALLBACK_MODEL}`
+        );
+        model = DIRECTOR_FALLBACK_MODEL;
+        raw = await complete(model, system, user, 45_000);
     }
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
 
     const progress = clamp(Number(parsed.progress_percentage) || 0, 0, 100);
     const phase = params.phase;
@@ -243,6 +292,7 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     const context = { ...normalizeContext(parsed.context), suggested_topics: suggestions };
 
     return {
+        model,
         context,
         progress_percentage: progress,
         sentiment_score: clamp(Number(parsed.sentiment_score) || 0, -1, 1),

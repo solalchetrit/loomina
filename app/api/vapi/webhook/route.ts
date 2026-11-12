@@ -143,13 +143,9 @@ async function handleAssistantRequest(
     }
 
     const phase = toPhase(project.phase);
-    const prompt = await getSystemPrompt(phase);
-
-    if (!prompt?.prompt_content) {
-        // Sans prompt en base, impossible de mener l'entretien.
-        console.error(`[vapi] Aucun system_prompt pour la phase ${phase}`);
-        return NextResponse.json(buildUnknownCallerAssistant(url));
-    }
+    // Ne sert plus qu'à la première phrase : le prompt vit dans le code
+    // (lib/loomina/voice-prompt.ts). Une base lente ne doit pas couper l'appel.
+    const prompt = await getSystemPrompt(phase).catch(() => null);
 
     const payload = buildAssistant({ profile, project, prompt, phase, serverUrl: url });
 

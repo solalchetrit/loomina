@@ -13,6 +13,7 @@
 
 import type { Phase } from './phases';
 import { PHASE_KEYS } from './phases';
+import { voicePromptTemplate } from './voice-prompt';
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
@@ -52,7 +53,8 @@ export const FIRST_CALL_MESSAGE_TEMPLATE =
 export interface BuildAssistantInput {
     profile: Profile;
     project: Project;
-    prompt: SystemPrompt;
+    /** Ligne `system_prompts` de la phase : ne sert plus qu'à la première phrase. */
+    prompt: SystemPrompt | null;
     phase: Phase;
     serverUrl: string;
 }
@@ -163,15 +165,13 @@ export function pronunciationBlock(vars: Record<string, string>): string {
 }
 
 /**
- * Ce que l'espace auteur a changé pour CET appel. Ajouté par le code après
- * le prompt de phase (en base) : les règles valent pour les quatre phases,
+ * Ce que l'espace auteur a changé pour CET appel. Ajouté après le prompt
+ * de phase (voice-prompt.ts) : les règles valent pour les quatre phases,
  * et l'entrée comme la sortie (Vapi, serveur vocal) passent par ici.
  *
  * - Les sujets proposés sur le site : le site promet « Loomina l'abordera
  *   au prochain appel ». Noyés dans les « questions encore ouvertes » du
  *   contexte, ils n'étaient jamais posés.
- * - Les réglages déjà faits sur le site : ne pas redemander tu/vous et les
- *   sujets à éviter au premier appel.
  * - Un livre offert : le narrateur découvre peut-être le principe.
  */
 export function sessionBlock(profile: Profile, project: Project, vars: Record<string, string>): string {
@@ -200,20 +200,6 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
     }
 
     if (first) {
-        const lines: string[] = [];
-        if (meta.prefs_set_at) {
-            lines.push(
-                `- Tutoiement ou vouvoiement : déjà choisi sur le site (« ${vars.politeness_preference} »). Ne pose PAS la question.`
-            );
-        }
-        if (profile.sensitive_topics?.trim()) {
-            lines.push(
-                "- Les sujets à laisser de côté sont déjà connus (voir PRÉFÉRENCES). Ne demande PAS s'il y a des sujets à éviter."
-            );
-        }
-        if (lines.length) {
-            parts.push(['# PREMIER APPEL : RÉGLAGES DÉJÀ FAITS SUR LE SITE', ...lines, '- Passe directement aux étapes suivantes du premier appel.'].join('\n'));
-        }
         if (meta.is_gift === true) {
             parts.push(
                 [
@@ -250,7 +236,14 @@ export function buildAssistant({
     const vars = buildTemplateVars(profile, project, phase);
 
     const session = sessionBlock(profile, project, vars);
-    const systemPrompt = [fillTemplate(prompt.prompt_content ?? '', vars), session, pronunciationBlock(vars)]
+    const meta = (project.project_metadata ?? {}) as Record<string, unknown>;
+    const template = voicePromptTemplate({
+        phase,
+        firstCall: isFirstCall(project),
+        politenessAlreadySet: Boolean(meta.prefs_set_at),
+        topicsAlreadyKnown: Boolean(profile.sensitive_topics?.trim()),
+    });
+    const systemPrompt = [fillTemplate(template, vars), session, pronunciationBlock(vars)]
         .filter((part) => part.trim())
         .join('\n\n');
 
@@ -261,12 +254,12 @@ export function buildAssistant({
     // en base est écrit pour les appels suivants ; ici on salue une première
     // fois. Le test « nouveau client » du 04/09 disait « Ravi de vous
     // retrouver » à quelqu'un qu'on n'avait jamais eu au téléphone.
-    const template = isFirstCall(project)
+    const greeting = isFirstCall(project)
         ? FIRST_CALL_MESSAGE_TEMPLATE
-        : prompt.first_message_template?.trim() ||
+        : prompt?.first_message_template?.trim() ||
           `Bonjour {{first_name_spoken}} ! Ici Loumina, {{votre}} biographe. Je suis heureux de {{vous}} retrouver.`;
     const firstMessage = spokenForm(
-        fillTemplate(template, { ...vars, first_name: vars.first_name_spoken })
+        fillTemplate(greeting, { ...vars, first_name: vars.first_name_spoken })
     );
 
     return {

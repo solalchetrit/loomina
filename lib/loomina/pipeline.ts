@@ -26,7 +26,7 @@ import { toPhase, isFinalPhase } from './phases';
 import type { Phase } from './phases';
 import { normalizeContext, contextFromLegacy, isEmptyContext, remainingSuggestions } from './context';
 import type { LoominaContext } from './context';
-import { runDirector, DIRECTOR_MODEL } from './director';
+import { runDirector } from './director';
 import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 
@@ -418,7 +418,7 @@ async function persistDirectorResult(params: {
                 family_members: director.family_members,
                 suggestions_shown: director.context.suggested_topics ?? [],
                 covered_suggestions: director.covered_suggestions,
-                model: DIRECTOR_MODEL,
+                model: director.model,
                 at: new Date().toISOString(),
             },
         })
