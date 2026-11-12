@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { DEMO_DATA, demoSavePrefs } from '@/lib/loomina/demo';
+import { normalizeSchedule } from '@/lib/loomina/schedule';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -55,9 +56,21 @@ export async function PATCH(request: NextRequest) {
         // Trace que l'auteur a réglé l'entretien lui-même : au premier appel,
         // l'assistant ne redemande pas tutoiement et sujets à éviter
         // (sessionBlock dans lib/loomina/assistant.ts).
+        const meta: Record<string, unknown> = { ...(project?.project_metadata ?? {}) };
+        let metaChanged = false;
         if (profileUpdates.politeness_preference || 'sensitive_topics' in profileUpdates) {
-            projectUpdates.project_metadata = { ...(project?.project_metadata ?? {}), prefs_set_at: new Date().toISOString() };
+            meta.prefs_set_at = new Date().toISOString();
+            metaChanged = true;
         }
+        if (typeof body.smsChapter === 'boolean') {
+            meta.sms_chapter = body.smsChapter;
+            metaChanged = true;
+        }
+        if (body.callSchedule !== undefined) {
+            meta.call_schedule = normalizeSchedule(body.callSchedule);
+            metaChanged = true;
+        }
+        if (metaChanged) projectUpdates.project_metadata = meta;
         if (project && Object.keys(projectUpdates).length) {
             const { error } = await db().from('projects').update(projectUpdates).eq('id', project.id);
             if (error) throw new Error(error.message);

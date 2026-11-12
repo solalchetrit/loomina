@@ -56,6 +56,13 @@ export interface LoominaContext {
      * pendant un appel serait écrasée par la réécriture du contexte.
      */
     suggested_topics?: string[];
+    /**
+     * Corrections écrites par l'auteur sur l'espace auteur (« Ma grand-mère
+     * s'appelait Rose, pas Rosa »). Elles font foi sur le transcript et sur
+     * la mémoire. Gérées par le code comme les sujets suggérés : le
+     * Directeur les applique mais ne peut pas les effacer.
+     */
+    author_corrections?: string[];
     last_call?: {
         date?: string;
         summary?: string;
@@ -80,6 +87,7 @@ const MAX_QUESTIONS = 15;
 const MAX_PLACES = 20;
 const MAX_SPELLINGS = 20;
 const MAX_SUGGESTIONS = 10;
+const MAX_CORRECTIONS = 30;
 const MAX_TEXT = 600;
 
 function str(v: unknown, max = MAX_TEXT): string | undefined {
@@ -170,6 +178,7 @@ export function normalizeContext(input: unknown): LoominaContext {
         key_themes: strArray(raw.key_themes, MAX_THEMES),
         open_questions: strArray(raw.open_questions, MAX_QUESTIONS),
         suggested_topics: strArray(raw.suggested_topics, MAX_SUGGESTIONS),
+        author_corrections: strArray(raw.author_corrections, MAX_CORRECTIONS),
         last_call: {
             date: str(lastCallRaw.date, 40),
             summary: str(lastCallRaw.summary, 1200),
@@ -198,6 +207,13 @@ export function renderContext(ctx: LoominaContext): string {
                 : null,
         ].filter(Boolean);
         parts.push(`## Identité\n${bits.join('\n')}`);
+    }
+
+    if (ctx.author_corrections?.length) {
+        parts.push(
+            "## Corrections de l'auteur (elles font foi sur tout le reste, transcript compris)\n" +
+                ctx.author_corrections.map((c) => `- ${c}`).join('\n')
+        );
     }
 
     if (ctx.timeline?.length) {

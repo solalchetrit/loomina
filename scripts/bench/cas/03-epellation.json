@@ -1,0 +1,15 @@
+{
+  "nom": "Nom épelé, à reprendre lettre pour lettre",
+  "phase": 1,
+  "prenom": "Rachel",
+  "tutoiement": "vous",
+  "sujets_sensibles": "",
+  "contexte": {},
+  "transcript": "AI: Bonjour Rachel, c'est Loumina, votre biographe. Je suis ravi de faire votre connaissance ! Comment ça va aujourd'hui ?\nUser: Très bien merci.\nAI: Pour commencer, racontez-moi où vous avez grandi. À quoi ressemblait la maison ?\nUser: J'ai grandi à Oran, puis on est arrivés à Marseille quand j'avais douze ans. Mon nom de jeune fille c'est Benchetrite. Ça s'écrit B, E, N, C, H, E, T, R, I, T, E.\nAI: Merci. Et à Marseille, où habitiez-vous ?\nUser: Dans le quartier de la Belle de Mai, au troisième étage, sans ascenseur. Mon père, Albert, réparait des montres dans une petite boutique en bas. Il me laissait tenir la loupe.\nAI: La loupe… Qu'est-ce que vous voyiez à travers ?\nUser: Les petits rouages, les rubis. Il disait que chaque montre avait un cœur. Je trouvais ça magique.\nAI: Merci Rachel, c'était un beau début. À bientôt ! ##END_CALL##",
+  "attendu": {
+    "matiere": ["rich", "thin"],
+    "doit_contenir_contexte": ["Benchetrite"],
+    "doit_contenir_chapitre": ["Benchetrite", "Albert"],
+    "annees_interdites": [1960, 1961, 1962, 1963, 1964, 1965]
+  }
+}
