@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
-import { normalizeContext } from '@/lib/loomina/context';
+import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
 import { DEMO_DATA, demoAddQuestion } from '@/lib/loomina/demo';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * Un sujet suggéré par l'auteur ou un proche. Il rejoint les « questions encore
- * ouvertes » du contexte, que l'assistant reçoit au prochain appel ; le Directeur
- * le retire une fois la réponse obtenue.
+ * Un sujet suggéré par l'auteur ou un proche. Il rejoint `suggested_topics`,
+ * que l'assistant reçoit au prochain appel dans un bloc à part, avec la
+ * consigne de l'aborder (lib/loomina/assistant.ts). Le Directeur signale
+ * quand il a été traité et le pipeline le retire.
  */
 export async function POST(request: NextRequest) {
     if (DEMO_DATA) {
@@ -28,13 +29,20 @@ export async function POST(request: NextRequest) {
         if (question.length < 5) return NextResponse.json({ error: 'Question trop courte' }, { status: 400 });
 
         const context = normalizeContext(author.project.context);
-        // La plus récente en tête : normalizeContext plafonne la liste à 15.
-        const next = normalizeContext({ ...context, open_questions: [question, ...context.open_questions] });
+        if ((context.suggested_topics?.length ?? 0) >= 10) {
+            return NextResponse.json(
+                { error: 'Dix sujets attendent déjà : Loomina les abordera avant d’en ajouter d’autres.' },
+                { status: 409 }
+            );
+        }
+        // La plus ancienne en tête : c'est elle que l'assistant aborde en premier.
+        // normalizeContext déduplique et plafonne la liste à 10.
+        const next = normalizeContext({ ...context, suggested_topics: [...(context.suggested_topics ?? []), question] });
 
         const { error } = await db().from('projects').update({ context: next }).eq('id', author.project.id);
         if (error) throw new Error(error.message);
 
-        return NextResponse.json({ openQuestions: next.open_questions });
+        return NextResponse.json({ openQuestions: pendingTopics(next) });
     } catch (err) {
         console.error('[user/questions]', err);
         return NextResponse.json({ error: 'Database error' }, { status: 500 });

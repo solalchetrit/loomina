@@ -139,6 +139,23 @@ export function renderPreviousChapters(chapters: ChapterSummary[]): string {
     return parts.join('\n\n');
 }
 
+/** Le sommaire, utile seulement quand il dépasse les chapitres fournis en entier. */
+export function renderOutline(outline?: Array<{ chapter_number: number; title: string | null }>): string {
+    if (!outline || outline.length <= 3) return '';
+    const lines = outline.map((c) => `- ${c.chapter_number}. ${c.title ?? 'Sans titre'}`).join('\n');
+    return `# SOMMAIRE DU LIVRE À CE JOUR (ces sujets sont déjà racontés : n'écris pas un second chapitre sur le même, et choisis un titre différent)\n${lines}\n\n`;
+}
+
+/**
+ * Sujets que le narrateur a demandé de laisser de côté. Il peut y revenir
+ * de lui-même au téléphone ; le livre, lui, sera lu par toute la famille.
+ */
+export function renderSensitive(topics?: string | null): string {
+    const t = topics?.trim();
+    if (!t) return '';
+    return `# SUJETS SENSIBLES (demandés par le narrateur)\n${t}\nN'en écris rien de plus que ce que le narrateur en a dit lui-même dans ce transcript, avec retenue, sans détail douloureux ajouté ni commentaire. S'il les a seulement effleurés, laisse-les de côté.\n\n`;
+}
+
 export async function runWriter(params: {
     transcript: string;
     context: LoominaContext;
@@ -148,6 +165,10 @@ export async function runWriter(params: {
     titleHint: string | null;
     /** Évaluation du Directeur : « thin » impose un chapitre de quelques phrases. */
     material?: 'thin' | 'rich';
+    /** Sommaire complet du livre (tous les chapitres, pas seulement les trois derniers). */
+    outline?: Array<{ chapter_number: number; title: string | null }>;
+    /** `profiles.sensitive_topics` */
+    sensitiveTopics?: string | null;
 }): Promise<WriterResult> {
     const thinNote =
         params.material === 'thin'
@@ -165,9 +186,10 @@ Phase ${params.phase} — ${PHASE_LABELS[params.phase]}
 # CONTEXTE DU PROJET (pour la cohérence, PAS pour inventer)
 ${renderContext(params.context)}
 
-# CHAPITRES DÉJÀ ÉCRITS (ne pas les reraconter)
+${renderOutline(params.outline)}# CHAPITRES DÉJÀ ÉCRITS (ne pas les reraconter)
 ${renderPreviousChapters(params.previousChapters)}
 
+${renderSensitive(params.sensitiveTopics)}
 ${params.titleHint ? `# PISTE DE TITRE SUGGÉRÉE PAR LE DIRECTEUR\n${params.titleHint}\n` : ''}
 # TRANSCRIPT DE L'APPEL — SOURCE UNIQUE DES FAITS
 ${params.transcript}`;

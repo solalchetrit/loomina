@@ -185,6 +185,24 @@ export async function getRecentChapters(projectId: string, limit = 3): Promise<C
     return ((data as ChapterSummary[]) ?? []).reverse();
 }
 
+/**
+ * Le sommaire complet (numéros et titres). L'Écrivain ne reçoit le texte
+ * que des trois derniers chapitres : sans le sommaire, il ignorait ce que
+ * racontaient les chapitres plus anciens et pouvait les réécrire.
+ */
+export async function getChapterOutline(projectId: string): Promise<Array<{ chapter_number: number; title: string | null }>> {
+    const { data, error } = await db()
+        .from('chapters')
+        .select('chapter_number, title')
+        .eq('project_id', projectId)
+        .neq('status', 'archived')
+        .order('chapter_number', { ascending: true })
+        .limit(200);
+
+    if (error) throw new Error(`Lecture chapters impossible : ${error.message}`);
+    return (data as Array<{ chapter_number: number; title: string | null }>) ?? [];
+}
+
 export async function getNextChapterNumber(projectId: string): Promise<number> {
     const { data, error } = await db()
         .from('chapters')

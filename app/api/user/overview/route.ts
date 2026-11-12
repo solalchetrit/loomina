@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor, splitTopics } from '@/lib/loomina/author';
-import { normalizeContext } from '@/lib/loomina/context';
+import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
 import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
 import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
 
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
                 timeline: context.timeline,
                 family: context.family.map(({ name, relation, deceased }) => ({ name, relation, deceased })),
                 themes: context.key_themes,
-                openQuestions: context.open_questions,
+                openQuestions: pendingTopics(context),
                 calls: interviews.data.map((i) => ({
                     date: i.created_at as string,
                     minutes: i.duration_seconds ? Math.max(1, Math.round((i.duration_seconds as number) / 60)) : null,

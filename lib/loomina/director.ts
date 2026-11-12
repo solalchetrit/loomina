@@ -47,6 +47,8 @@ export interface DirectorResult {
     call_summary: string;
     next_question: string;
     covered_topic_ids: number[];
+    /** Numéros (à partir de 1) des sujets suggérés depuis le site abordés dans cet appel. */
+    covered_suggestions: number[];
     next_topic_id: number | null;
     chapter_title_hint: string | null;
     /**
@@ -136,6 +138,13 @@ BON : "La dernière fois, vous m'avez parlé des étés à Casablanca chez votre
 
 Si le transcript est trop pauvre pour accrocher un fait précis, propose une question d'ouverture douce sur la phase en cours.
 
+Ne bâtis JAMAIS \`next_question\` sur un sujet de la liste « Sujets à laisser de côté », même si le narrateur l'a évoqué dans cet appel.
+Si un récit est resté inachevé à la fin de l'appel, reprends-le : c'est presque toujours la meilleure question. Sinon, et si un sujet suggéré depuis le site attend, tu peux ouvrir sur lui.
+
+# SUJETS SUGGÉRÉS DEPUIS LE SITE (\`covered_suggestions\`)
+L'auteur ou ses proches ont pu proposer des sujets sur l'espace auteur ; ils te sont donnés numérotés. Ne les recopie PAS dans le contexte : le code les gère.
+Renvoie dans \`covered_suggestions\` les numéros de ceux que le narrateur a réellement abordés dans cet appel (il a raconté quelque chose dessus, ou a dit qu'il ne souhaitait pas en parler). Un sujet seulement effleuré par l'assistant, sans réponse, n'est pas couvert.
+
 # FORMAT DE SORTIE
 Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
 
@@ -153,6 +162,7 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
   "call_summary": "3 à 5 phrases sur ce qui s'est dit dans CET appel",
   "next_question": "",
   "covered_topic_ids": [],
+  "covered_suggestions": [],
   "next_topic_id": null,
   "chapter_title_hint": "",
   "chapter_material": "none | thin | rich",
@@ -171,15 +181,27 @@ Pour \`profile_updates\` : ne renseigne un champ que si l'interlocuteur l'a EXPR
 - \`sensitive_topics\` ne contient que les sujets nouvellement identifiés comme douloureux ou à éviter, formulés en quelques mots chacun (ex. "son père", "le divorce de 1998").`;
 }
 
-function userPrompt(params: {
+interface DirectorInput {
     transcript: string;
     context: LoominaContext;
+    phase: Phase;
     firstName: string;
     politeness: string | null;
     durationSeconds: number | null;
-}): string {
+    /** `profiles.sensitive_topics` : réglés sur le site ou dits au téléphone. */
+    sensitiveTopics?: string | null;
+}
+
+function userPrompt(params: Omit<DirectorInput, 'phase'>): string {
+    const suggestions = params.context.suggested_topics ?? [];
     return `# CONTEXTE ACCUMULÉ
 ${renderContext(params.context)}
+
+# SUJETS À LAISSER DE CÔTÉ (demandés par le narrateur)
+${params.sensitiveTopics?.trim() || 'Aucun'}
+
+# SUJETS SUGGÉRÉS DEPUIS LE SITE, EN ATTENTE
+${suggestions.length ? suggestions.map((t, i) => `${i + 1}. ${t}`).join('\n') : 'Aucun'}
 
 # INTERLOCUTEUR
 Prénom : ${params.firstName}
@@ -190,14 +212,7 @@ Durée de l'appel : ${params.durationSeconds ?? 'inconnue'} secondes
 ${params.transcript}`;
 }
 
-export async function runDirector(params: {
-    transcript: string;
-    context: LoominaContext;
-    phase: Phase;
-    firstName: string;
-    politeness: string | null;
-    durationSeconds: number | null;
-}): Promise<DirectorResult> {
+export async function runDirector(params: DirectorInput): Promise<DirectorResult> {
     const completion = await openai().chat.completions.create({
         model: DIRECTOR_MODEL,
         max_tokens: DIRECTOR_MAX_TOKENS,
@@ -222,8 +237,13 @@ export async function runDirector(params: {
     const progress = clamp(Number(parsed.progress_percentage) || 0, 0, 100);
     const phase = params.phase;
 
+    const suggestions = params.context.suggested_topics ?? [];
+    // Les suggestions ne passent jamais par la plume du modèle : on garde
+    // celles qu'il a reçues, le pipeline retire les sujets couverts.
+    const context = { ...normalizeContext(parsed.context), suggested_topics: suggestions };
+
     return {
-        context: normalizeContext(parsed.context),
+        context,
         progress_percentage: progress,
         sentiment_score: clamp(Number(parsed.sentiment_score) || 0, -1, 1),
         call_summary: text(parsed.call_summary, 2000) ?? '',
@@ -231,6 +251,7 @@ export async function runDirector(params: {
             text(parsed.next_question, 600) ??
             "Reprenons là où nous nous étions arrêtés. De quoi aimeriez-vous me parler aujourd'hui ?",
         covered_topic_ids: intArray(parsed.covered_topic_ids),
+        covered_suggestions: intArray(parsed.covered_suggestions).filter((n) => n >= 1 && n <= suggestions.length),
         next_topic_id: intOrNull(parsed.next_topic_id),
         chapter_title_hint: text(parsed.chapter_title_hint, 160) ?? null,
         chapter_material: chapterMaterial(parsed.chapter_material),
