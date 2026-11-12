@@ -102,6 +102,8 @@ const state = {
         firstNamePhonetic: null as string | null,
         writingStyle: 'Chaleureux et vivant',
         sensitiveTopics: ['La maladie de Pierre'],
+        smsChapter: true,
+        callSchedule: { active: true, days: [2], time: '15:00' } as { active: boolean; days: number[]; time: string },
     },
     openQuestions: [
         'Raconte-nous ta rencontre avec papa à la poste',
@@ -133,6 +135,7 @@ export function demoOverview() {
             progress: 60,
             completed: false,
             nextTopic: 'Vous avez évoqué votre retraite en 2008. Qu’avez-vous fait de ce temps retrouvé, la première année ?',
+            scheduleText: state.prefs.callSchedule.active ? 'chaque mardi à 15 h' : null,
             chapters: CHAPTERS.length,
             words: CHAPTERS.reduce((n, c) => n + words(c.content), 0),
             timeline: [

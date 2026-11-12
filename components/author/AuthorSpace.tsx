@@ -10,6 +10,7 @@ import SuggestTopic from "./SuggestTopic";
 import LifeStory from "./LifeStory";
 import Calls from "./Calls";
 import Settings from "./Settings";
+import Photos from "./Photos";
 import { formatDate, type Overview } from "./types";
 
 const TABS = [
@@ -23,7 +24,7 @@ const TABS = [
 type Tab = (typeof TABS)[number]["id"];
 
 /** Le prochain appel : le numéro, et le sujet que Loomina a prévu d'aborder. */
-function NextCall({ topic }: { topic: string | null }) {
+function NextCall({ topic, schedule }: { topic: string | null; schedule?: string | null }) {
   return (
     <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white md:p-8" aria-labelledby="prochain-appel">
       <h2 id="prochain-appel" className="text-[15px] font-bold tracking-normal text-[var(--amber)]">
@@ -44,7 +45,9 @@ function NextCall({ topic }: { topic: string | null }) {
         >
           {SITE.phoneDisplay}
         </a>
-        <p className="mt-3 text-[15px] text-[#cfcfc8]">Depuis le numéro de votre commande, quand vous voulez.</p>
+        <p className="mt-3 text-[15px] text-[#cfcfc8]">
+          {schedule ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.` : "Depuis le numéro de votre commande, quand vous voulez."}
+        </p>
       </div>
     </section>
   );
@@ -136,7 +139,7 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
             <div className="flex flex-col gap-4">
               {project && <Progress project={project} />}
               <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-                <NextCall topic={project?.nextTopic ?? null} />
+                <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />
                 {project ? (
                   <SuggestTopic
                     questions={project.openQuestions}
@@ -171,18 +174,11 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
               <aside className="flex flex-col gap-4 lg:sticky lg:top-32 lg:self-start">
                 <div className="card p-7">
                   <p className="text-[17px] font-bold">Corriger un passage</p>
-                  <p className="t-body mt-2">Dites-le à Loomina au prochain appel : le chapitre sera réécrit avec votre correction.</p>
-                </div>
-                <div className="card p-7">
-                  <p className="text-[17px] font-bold">Vos photos</p>
                   <p className="t-body mt-2">
-                    Envoyez-les à{" "}
-                    <a href={`mailto:contact@loomina.eu?subject=${encodeURIComponent("Photos pour mon livre")}`} className="link">
-                      contact@loomina.eu
-                    </a>
-                    , en précisant le souvenir qu’elles illustrent.
+                    Sous chaque chapitre, « Corriger ce chapitre » : décrivez l’erreur, Loomina propose le texte corrigé, vous le relisez. La correction vaudra aussi pour la suite du livre.
                   </p>
                 </div>
+                <Photos onUnauthorized={onUnauthorized} />
               </aside>
             </div>
           )}

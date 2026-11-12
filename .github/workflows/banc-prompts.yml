@@ -1,0 +1,35 @@
+# Banc d'essai des prompts : rejoue les entretiens types de scripts/bench/cas
+# avec le vrai Directeur et le vrai Écrivain à chaque PR qui touche la chaîne
+# d'appel. Il faut le secret OPENAI_API_KEY dans les réglages du dépôt
+# (Settings → Secrets and variables → Actions). Sans lui, le banc est sauté.
+name: Banc des prompts
+
+on:
+  pull_request:
+    paths:
+      - 'lib/loomina/**'
+      - 'scripts/bench/**'
+  workflow_dispatch:
+
+jobs:
+  banc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Rejouer les entretiens types
+        if: env.OPENAI_API_KEY != ''
+        run: npm run bench
+      - name: Rapport
+        if: always() && env.OPENAI_API_KEY != ''
+        run: cat scripts/bench/rapports/*.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Pas de clé OpenAI
+        if: env.OPENAI_API_KEY == ''
+        run: echo "Secret OPENAI_API_KEY absent, banc sauté." >> "$GITHUB_STEP_SUMMARY"

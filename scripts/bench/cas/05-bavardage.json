@@ -1,0 +1,10 @@
+{
+  "nom": "Rien de racontable",
+  "phase": 2,
+  "prenom": "Louise",
+  "tutoiement": "vous",
+  "sujets_sensibles": "",
+  "contexte": { "identity": { "full_name": "Louise Martin" }, "last_call": { "summary": "Louise a parlé de son école." } },
+  "transcript": "AI: Bonjour Louise ! Comment allez-vous ?\nUser: Ça va. Dites, vous êtes un robot ?\nAI: Je suis un assistant, oui, je vous écoute et j'écris votre livre.\nUser: Ah d'accord. Et ça coûte combien ce truc ? C'est ma fille qui m'a offert ça.\nAI: Tout est déjà réglé, ne vous inquiétez pas. Voulez-vous qu'on parle de votre école ?\nUser: Pas aujourd'hui, j'ai un rendez-vous chez le médecin. Rappelez-moi la semaine prochaine.\nAI: Très bien, à la semaine prochaine Louise ! ##END_CALL##",
+  "attendu": { "matiere": ["none"] }
+}

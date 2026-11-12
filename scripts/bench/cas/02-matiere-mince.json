@@ -1,0 +1,17 @@
+{
+  "nom": "Appel court, matière mince",
+  "phase": 3,
+  "prenom": "Annie",
+  "tutoiement": "tu",
+  "sujets_sensibles": "",
+  "contexte": {
+    "identity": { "full_name": "Annie Roux", "birth": "1952" },
+    "last_call": { "summary": "Annie a parlé de son mariage en 1975." }
+  },
+  "transcript": "AI: Bonjour Annie ! La dernière fois, tu m'as parlé de ton mariage. Tu travaillais où à cette époque ?\nUser: J'étais secrétaire dans une banque, au Crédit Lyonnais.\nAI: Au Crédit Lyonnais… Qu'est-ce que tu y faisais au quotidien ?\nUser: Du courrier, surtout. Écoute, je suis un peu fatiguée aujourd'hui, on peut s'arrêter là ?\nAI: Bien sûr Annie. Repose-toi, on reprendra la prochaine fois. À bientôt ! ##END_CALL##",
+  "attendu": {
+    "matiere": ["thin", "none"],
+    "mots_max": 160,
+    "mots_interdits_chapitre": ["passion", "camaraderie", "fierté"]
+  }
+}

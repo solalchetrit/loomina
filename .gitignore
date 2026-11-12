@@ -37,5 +37,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# serveur vocal
+/voice/node_modules
+/voice/.env
+/voice/.public-url
+/voice/spool/
+
 # skills design : fichiers de travail
 .taste-skill/
+scripts/bench/rapports/

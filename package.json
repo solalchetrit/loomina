@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "check": "tsc --noEmit && eslint"
+    "check": "tsc --noEmit && eslint",
+    "bench": "npx -y tsx@4.19.2 --tsconfig tsconfig.json scripts/bench/run.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.87.1",

@@ -4,6 +4,7 @@ import { currentAuthor, splitTopics } from '@/lib/loomina/author';
 import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
 import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
 import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
+import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,6 +23,8 @@ export async function GET(request: NextRequest) {
             firstNamePhonetic: profile.first_name_phonetic,
             writingStyle: profile.writing_style,
             sensitiveTopics: splitTopics(profile.sensitive_topics),
+            smsChapter: (project?.project_metadata as Record<string, unknown> | null)?.sms_chapter !== false,
+            callSchedule: normalizeSchedule((project?.project_metadata as Record<string, unknown> | null)?.call_schedule),
         };
 
         if (!project) {
@@ -53,6 +56,7 @@ export async function GET(request: NextRequest) {
                 progress: Math.max(0, Math.min(100, project.phase_progress ?? 0)),
                 completed: project.status === 'completed',
                 nextTopic: project.next_question_strategy,
+                scheduleText: describeSchedule(prefs.callSchedule),
                 chapters: chapters.data.length,
                 words: chapters.data.reduce((n, c) => n + ((c.word_count as number) ?? 0), 0),
                 timeline: context.timeline,
