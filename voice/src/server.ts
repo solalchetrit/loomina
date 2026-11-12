@@ -21,6 +21,7 @@ import { flushSpool } from './report.ts';
 import { conversationRelayTwiml, sayAndHangupTwiml } from './twiml.ts';
 import { planForCaller } from './plan.ts';
 import { CallSession } from './session.ts';
+import { startTimers } from './scheduler.ts';
 
 const sessions = new Map<string, CallSession>();
 
@@ -69,6 +70,18 @@ async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse):
     const from = params.From ?? '';
     const to = params.To ?? '';
     const customer = direction.startsWith('outbound') ? to : from;
+
+    // Rendez-vous automatique tombé sur un répondeur : un message court, et
+    // on raccroche plutôt que de mener un entretien avec une messagerie.
+    if ((params.AnsweredBy ?? '').startsWith('machine') || params.AnsweredBy === 'fax') {
+        console.info(`[voice] ${callSid} : répondeur, message laissé`);
+        return reply(
+            res,
+            200,
+            sayAndHangupTwiml("Bonjour, c'est Loumina, votre biographe, pour notre rendez-vous. Je vous rappellerai au prochain créneau. Vous pouvez aussi m'appeler quand vous voulez. À bientôt !"),
+            'text/xml'
+        );
+    }
 
     try {
         const plan = await planForCaller(customer || null);
@@ -212,6 +225,8 @@ server.listen(config.port, () => {
     // Rapports restés en attente (site injoignable, redémarrage) : au
     // démarrage puis chaque minute.
     void flushSpool();
+    // Rendez-vous d'appel et rattrapage : un numéro déjà en ligne n'est pas rappelé.
+    startTimers((phone) => [...sessions.values()].some((s) => s.active && (s.from === phone || s.to === phone)));
     setInterval(() => {
         void flushSpool();
         // Ménage des sessions terminées dont le WebSocket n'a jamais fermé.

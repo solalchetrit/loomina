@@ -61,11 +61,9 @@ export async function planForCaller(customerNumber: string | null): Promise<Call
     }
 
     const phase = toPhase(project.phase);
-    const prompt = await getSystemPrompt(phase);
-    if (!prompt?.prompt_content) {
-        console.error(`[plan] aucun system_prompt pour la phase ${phase} → démo`);
-        return fromVapiShape(buildUnknownCallerAssistant(serverUrl), DEMO_MAX_SECONDS, true, 'demo');
-    }
+    // Le prompt vit dans le code (lib/loomina/voice-prompt.ts) ; la base ne
+    // donne plus que la première phrase. Une base lente ne coupe pas l'appel.
+    const prompt = await getSystemPrompt(phase).catch(() => null);
 
     const payload = buildAssistant({ profile, project, prompt, phase, serverUrl });
     return fromVapiShape(payload, config.limits.maxCallSeconds, false, `phase-${phase}`);

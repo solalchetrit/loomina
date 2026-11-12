@@ -61,7 +61,17 @@ sur Vercel ; `/api/call` passe alors par Twilio au lieu de Vapi.
 | `VOICE_LANGUAGE` | langue STT/TTS | `fr-FR` |
 | `VOICE_STT_MODEL` | modèle Deepgram | `nova-3-general` |
 | `VOICE_MAX_CALL_SECONDS` | durée max d'un entretien | `2700` |
-| `VOICE_SILENCE_SECONDS` | silence avant relance, puis fin | `45` |
+| `VOICE_SILENCE_SECONDS` | silence avant relance, puis fin | `60` |
+| `CRON_SECRET` | même valeur que sur Vercel : rattrape les appels en échec toutes les 5 min | absent = pas de rattrapage ici |
+| `CALL_SCHEDULER` | rendez-vous d'appel réguliers choisis dans l'espace auteur (`off` pour couper) | `on` |
+
+## Rendez-vous et rattrapage
+
+`src/scheduler.ts` tourne avec le serveur. Chaque minute, il cherche les livres
+dont l'auteur a choisi des jours et une heure (Réglages → Rendez-vous) et, à
+l'heure de Paris dite, appelle le narrateur comme le bouton « Me faire appeler ».
+Un seul essai par créneau ; un répondeur reçoit un message court. Toutes les
+5 minutes, il demande au site de retraiter les appels dont l'analyse a échoué.
 
 Ce que mesure chaque appel : latence du modèle (premier mot), interruptions,
 tours et mots de chaque côté, tokens. Les latences voix/transcription sont

@@ -7,7 +7,7 @@
  */
 
 import type { Profile } from './db';
-import { SITE } from '@/config/site';
+import { SITE } from '../../config/site';
 
 export async function sendSms(to: string, body: string): Promise<boolean> {
     const sid = process.env.TWILIO_ACCOUNT_SID;

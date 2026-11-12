@@ -23,6 +23,10 @@ export const config = {
     /** Site Next.js qui reçoit le rapport de fin d'appel */
     nextBaseUrl: required('NEXT_BASE_URL').replace(/\/$/, ''),
     webhookSecret: required('VAPI_WEBHOOK_SECRET'),
+    /** Rattrapage des appels en échec toutes les 5 min (/api/jobs/process du site). Facultatif. */
+    cronSecret: process.env.CRON_SECRET?.trim() || null,
+    /** Rendez-vous d'appel réguliers (voir scheduler.ts). « off » pour couper. */
+    schedulerEnabled: optional('CALL_SCHEDULER', 'on') !== 'off',
 
     twilio: {
         accountSid: required('TWILIO_ACCOUNT_SID'),
