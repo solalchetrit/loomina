@@ -35,7 +35,7 @@ jobs:
         run: npm run bench
       - name: Rapport
         if: always() && env.OPENAI_API_KEY != ''
-        run: cat scripts/bench/rapports/*.md >> "$GITHUB_STEP_SUMMARY"
+        run: cat scripts/bench/rapports/*.md >> "$GITHUB_STEP_SUMMARY" || echo "Pas de rapport (le banc s'est arrêté avant la fin)." >> "$GITHUB_STEP_SUMMARY"
       - name: Pas de clé OpenAI
         if: env.OPENAI_API_KEY == ''
         run: echo "Secret OPENAI_API_KEY absent, banc sauté." >> "$GITHUB_STEP_SUMMARY"
