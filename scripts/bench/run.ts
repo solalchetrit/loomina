@@ -71,13 +71,14 @@ async function judgeInventions(transcript: string, context: string, chapter: str
             {
                 role: 'system',
                 content:
-                    "Tu vérifies un chapitre d'autobiographie. Seules les lignes « User: » du transcript et le contexte fourni sont des faits. Liste chaque détail factuel du chapitre (lieu, date, personne, objet, action, émotion attribuée, motivation) qui n'y figure PAS. Les reformulations fidèles ne comptent pas. Réponds en JSON : {\"inventions\": [\"…\"]}.",
+                    "Tu vérifies un chapitre d'autobiographie. Seules les lignes « User: » du transcript et le contexte fourni sont des faits. Classe chaque élément du chapitre absent de ces sources en deux listes. « faits » : un lieu, une date, une personne, un objet, un événement, une parole, une émotion ou une motivation attribuée, un oubli ou un souvenir affirmé (« je ne me rappelle plus… », « cette phrase m'est restée »). « tournures » : une image, un adjectif ou une liaison de style qui n'ajoute aucune information sur la vie du narrateur. Les reformulations fidèles ne comptent nulle part. Réponds en JSON : {\"faits\": [\"…\"], \"tournures\": [\"…\"]}.",
             },
             { role: 'user', content: `# CONTEXTE\n${context}\n\n# TRANSCRIPT\n${transcript}\n\n# CHAPITRE\n${chapter}` },
         ],
     });
     const parsed = JSON.parse(res.choices[0]?.message?.content ?? '{}');
-    return Array.isArray(parsed.inventions) ? parsed.inventions.map(String) : [];
+    const list = (v: unknown) => (Array.isArray(v) ? v.map(String) : []);
+    return [...list(parsed.faits), ...list(parsed.tournures).map((t) => `(tournure) ${t}`)];
 }
 
 async function runCase(c: Case) {
@@ -131,7 +132,8 @@ async function runCase(c: Case) {
         if (a.mots_min) checks.push({ ok: words >= a.mots_min, label: `au moins ${a.mots_min} mots (${words})` });
         if (a.mots_max) checks.push({ ok: words <= a.mots_max, label: `au plus ${a.mots_max} mots (${words})` });
         inventions = await judgeInventions(c.transcript, renderContext(context), chapter);
-        checks.push({ ok: inventions.length <= 2, label: `détails inventés : ${inventions.length} (tolérance 2)` });
+        const facts = inventions.filter((i) => !i.startsWith('(tournure)')).length;
+        checks.push({ ok: facts <= 1, label: `faits inventés : ${facts} (tolérance 1)` });
     }
 
     return { c, director, chapter, words, inventions, checks, tDirector, tWriter };
@@ -233,6 +235,7 @@ async function main() {
         total += v.checks.length;
         console.log(ko ? `${ko} échec(s)` : 'ok');
         for (const x of v.checks.filter((y) => !y.ok)) console.log(`   ✗ ${x.label}`);
+        if (ko) console.log(v.transcript.split('\n').map((l) => `   ${l}`).join('\n'));
         lines.push(`## ${ko ? '❌' : '✅'} Conversation simulée (voix ${VOICE_MODEL})`, '', ...v.checks.map((x) => `- ${x.ok ? '✅' : '❌'} ${x.label}`), '', '<details><summary>Conversation</summary>', '', v.transcript, '', '</details>', '');
     }
 
