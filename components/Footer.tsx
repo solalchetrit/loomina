@@ -89,7 +89,7 @@ export default function Footer() {
 
         <div className="mt-12 flex flex-col gap-2 border-t border-[var(--line)] pt-6 text-[14px] text-[var(--ink-3)] sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} Loomina. Projet porté par Solal Chetrit, Paris.</p>
-          <p>Loomina est une intelligence artificielle ; chaque page est relue par une personne.</p>
+          <p>Loomina est une intelligence artificielle ; votre livre est relu par notre équipe.</p>
         </div>
       </div>
     </footer>

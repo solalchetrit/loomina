@@ -62,7 +62,7 @@ export default function AboutPage() {
               </p>
               <p>
                 Loomina existe pour que d’autres familles aient le leur. Le service est jeune, et c’est une toute petite équipe : les
-                entretiens sont menés par une intelligence artificielle, mais chaque page est relue par une personne, et quand vous nous
+                entretiens sont menés par une intelligence artificielle, mais votre livre est relu par notre équipe, et quand vous nous
                 écrivez, c’est moi qui vous réponds.
               </p>
             </div>

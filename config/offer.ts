@@ -29,7 +29,7 @@ export const OFFER = {
 export const INCLUDED: { title: string; detail: string }[] = [
   { title: "Les entretiens par téléphone", detail: "autant d’appels qu’il vous faut, quand vous voulez" },
   { title: "Un chapitre écrit après chaque appel", detail: "dans vos mots, à relire et corriger" },
-  { title: "Une relecture humaine", detail: "notre équipe relit chaque page avant l’impression" },
+  { title: "Une relecture humaine", detail: "notre équipe relit votre livre avant l’impression" },
   { title: "Vos photos dans le livre", detail: "envoyées par e-mail, nous les plaçons pour vous" },
   { title: "Le livre relié, livré chez vous", detail: `${OFFER.format}, avec sa version ${OFFER.digital} pour la famille` },
 ];

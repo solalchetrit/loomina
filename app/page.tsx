@@ -6,6 +6,7 @@ import WhatYouGet from "@/components/home/WhatYouGet";
 import ThemePicker from "@/components/home/ThemePicker";
 import Compare from "@/components/home/Compare";
 import HowItWorks from "@/components/HowItWorks";
+import AuthorShowcase from "@/components/AuthorShowcase";
 import VoiceToPage from "@/components/VoiceToPage";
 import OfferCard from "@/components/OfferCard";
 import Closing from "@/components/Closing";
@@ -24,7 +25,7 @@ const QUESTIONS = [
   },
   {
     q: "Est-ce qu’une machine écrit mon livre ?",
-    a: "Loomina, une intelligence artificielle, mène les entretiens et écrit le premier jet de chaque chapitre, sans rien inventer. Vous relisez, vous corrigez, puis notre équipe relit chaque page avant l’impression.",
+    a: "Loomina mène les entretiens et écrit le premier jet de chaque chapitre, sans rien inventer, dans le style que vous avez choisi. Vous relisez et corrigez dans votre espace auteur, puis notre équipe relit votre livre avant l’impression.",
   },
   {
     q: "Je veux l’offrir. Comment ça se passe ?",
@@ -39,11 +40,11 @@ export default function Home() {
       <Hero />
       <Facts />
       <HowItWorks />
-      <VoiceToPage />
+      <AuthorShowcase className="bg-white" />
       <Audiences />
-      <WhatYouGet />
+      <VoiceToPage />
       <ThemePicker />
-      <Compare />
+      <WhatYouGet />
 
       <Section id="offre">
         <SectionHead title="Un prix, tout compris" text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Rien à payer en plus." />
@@ -51,6 +52,8 @@ export default function Home() {
           <OfferCard />
         </div>
       </Section>
+
+      <Compare />
 
       {/* Le mot du fondateur, à la place d'avis clients que nous n'avons pas encore. */}
       <Section size="sm">
