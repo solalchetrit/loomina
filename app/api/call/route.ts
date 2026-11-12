@@ -48,11 +48,8 @@ export async function POST(request: NextRequest) {
         }
 
         const phase = toPhase(project.phase);
-        const prompt = await getSystemPrompt(phase);
-        if (!prompt?.prompt_content) {
-            console.error(`[call] Aucun system_prompt pour la phase ${phase}`);
-            return NextResponse.json({ message: 'System Prompt not found' }, { status: 500 });
-        }
+        // Ne sert plus qu'à la première phrase : le prompt vit dans le code.
+        const prompt = await getSystemPrompt(phase).catch(() => null);
 
         const serverUrl =
             process.env.VAPI_SERVER_URL?.trim() ||

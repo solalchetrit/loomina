@@ -1,0 +1,18 @@
+{
+  "nom": "L'assistant suggère, le narrateur dément",
+  "phase": 3,
+  "prenom": "Gérard",
+  "tutoiement": "vous",
+  "sujets_sensibles": "son fils Thomas",
+  "contexte": {
+    "identity": { "full_name": "Gérard Lemoine" },
+    "family": [{ "name": "Thomas", "relation": "fils" }]
+  },
+  "transcript": "AI: Bonjour Gérard ! Parlez-moi de votre métier.\nUser: J'étais conducteur de train à la SNCF, sur la ligne Paris-Lyon.\nAI: Ça devait être une vraie passion, j'imagine que vous rêviez de trains depuis l'enfance ?\nUser: Non, pas du tout. C'était un travail, c'est tout. Mon oncle m'avait trouvé la place.\nAI: Je vois. Vous vous souvenez de votre premier trajet ?\nUser: Oui, c'était un matin d'hiver, il neigeait sur le Morvan. J'avais les mains qui tremblaient sur la manette. Le chef m'a dit : fais comme si c'était une voiture, petit.\nAI: Merci Gérard. On en reparlera. À bientôt. ##END_CALL##",
+  "attendu": {
+    "matiere": ["rich", "thin"],
+    "mots_interdits_chapitre": ["passion", "rêvais", "rêve", "Thomas"],
+    "mots_interdits_question": ["Thomas"],
+    "doit_contenir_chapitre": ["Morvan"]
+  }
+}
