@@ -1,81 +1,82 @@
-const STEPS = [
+import Link from "next/link";
+import { OFFER } from "@/config/offer";
+import { SITE } from "@/config/site";
+import { Section, SectionHead, Steps } from "@/components/ui/Section";
+import Button from "@/components/ui/Button";
+import { BookCover } from "@/components/home/WhatYouGet";
+import type { IconName } from "@/components/ui/Icon";
+
+/** Aperçu 1 : un appel en cours. */
+function CallPreview() {
+  const bars = [10, 22, 34, 18, 40, 26, 14, 30, 38, 20, 12, 28, 36, 16, 24];
+  return (
+    <div className="w-full max-w-[260px] rounded-[18px] bg-white p-4 shadow-[var(--shadow-bar)]">
+      <div className="flex items-center justify-between text-[13px]">
+        <b>Loomina</b>
+        <span className="pill pill-green !py-0.5">En ligne · 12:04</span>
+      </div>
+      <div className="mt-4 flex h-10 items-center gap-[5px]">
+        {bars.map((h, i) => (
+          <span key={i} className="w-[5px] rounded-full bg-[var(--amber)]" style={{ height: h }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Aperçu 2 : un chapitre fraîchement écrit. */
+function ChapterPreview() {
+  return (
+    <div className="w-full max-w-[260px] rounded-[14px] bg-white px-5 py-4 shadow-[var(--shadow-bar)]">
+      <p className="text-[11px] font-bold text-[var(--amber-ink)]">Chapitre 4</p>
+      <p className="mt-1 font-serif text-[17px] italic leading-tight">L’été de mes seize ans</p>
+      <div className="mt-3 space-y-1.5">
+        <span className="block h-[5px] w-full rounded bg-[var(--line)]" />
+        <span className="block h-[5px] w-11/12 rounded bg-[var(--line)]" />
+        <span className="block h-[5px] w-4/5 rounded bg-[var(--line)]" />
+      </div>
+      <span className="pill pill-amber mt-3 !py-0.5 !text-[11px]">À relire</span>
+    </div>
+  );
+}
+
+export const STEPS: { icon: IconName; title: string; text: string; preview: React.ReactNode }[] = [
   {
-    chapter: "01",
-    title: "L’inscription",
-    description:
-      "Tout commence par une simple commande. Vous accédez aussitôt à votre espace personnel, et Loomina vous appelle quand vous le souhaitez.",
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
-    ),
+    icon: "phone",
+    title: "Vous appelez, quand vous voulez",
+    text: "Depuis le numéro donné à la commande, fixe ou portable. Loomina vous reconnaît et reprend là où vous vous étiez arrêté.",
+    preview: <CallPreview />,
   },
   {
-    chapter: "02",
-    title: "Les conversations",
-    description:
-      "À votre rythme, vous échangez par téléphone avec Loomina. Elle vous écoute, vous guide et ravive vos souvenirs les plus précieux.",
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-    ),
+    icon: "pen",
+    title: "Un chapitre après chaque appel",
+    text: "Écrit dans vos mots, sans rien inventer. Vous le relisez dans votre espace et dites ce qu’il faut changer.",
+    preview: <ChapterPreview />,
   },
   {
-    chapter: "03",
-    title: "La rédaction",
-    description:
-      "Votre voix devient une prose élégante. Notre équipe relit ensuite chaque page pour un style fluide et soigné.",
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-    ),
-  },
-  {
-    chapter: "04",
-    title: "L’héritage",
-    description:
-      "Vous recevez chez vous un beau livre relié, prêt à être transmis. Votre histoire est désormais éternelle.",
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-    ),
+    icon: "book",
+    title: "Le livre arrive chez vous",
+    text: `Notre équipe relit chaque page, place vos photos et fait imprimer le livre. En général ${OFFER.delay} après le premier appel.`,
+    preview: <BookCover className="max-w-[96px] !py-0" compact />,
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="process" className="relative w-full scroll-mt-24 py-24 md:py-32">
-      <div className="mx-auto w-full max-w-7xl px-5 sm:px-6">
-        {/* En-tête */}
-        <div className="reveal grid gap-6 md:grid-cols-[1fr_1fr] md:items-end">
-          <div>
-            <p className="font-sans text-[12px] font-semibold uppercase tracking-[0.2em] text-[var(--gold-ink)]">
-              Le parcours
-            </p>
-            <h2 className="mt-4 font-serif text-[clamp(2.25rem,4.5vw,3.5rem)] leading-[1.05] tracking-[-0.03em] text-[var(--ink)]">
-              Votre histoire, <em className="text-[var(--gold-ink)]">étape par étape.</em>
-            </h2>
-          </div>
-          <p className="max-w-md font-sans text-[17px] leading-relaxed text-[var(--text-secondary)] md:justify-self-end">
-            Un parcours simple et accompagné, du premier appel jusqu’au livre que vous tiendrez entre vos mains.
-          </p>
-        </div>
-
-        {/* Étapes */}
-        <ol className="mt-14 grid gap-px overflow-hidden rounded-3xl bg-[var(--hairline)] shadow-[0_0_0_1px_var(--hairline)] sm:grid-cols-2 lg:grid-cols-4 md:mt-20">
-          {STEPS.map((step) => (
-            <li key={step.chapter} className="reveal flex flex-col bg-[var(--paper)] p-7 font-sans md:p-8">
-              <div className="flex items-center justify-between">
-                <span className="font-serif text-[15px] italic text-[var(--gold-ink)]">Chapitre {step.chapter}</span>
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--loomina-night)] text-[var(--ink)] shadow-[inset_0_0_0_1px_var(--hairline)]">
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.4} aria-hidden="true">
-                    {step.icon}
-                  </svg>
-                </span>
-              </div>
-              <h3 className="mt-6 font-serif text-[26px] leading-tight tracking-[-0.02em] text-[var(--ink)] sm:mt-10 md:mt-14">
-                {step.title}
-              </h3>
-              <p className="mt-3 font-sans text-[15px] leading-relaxed text-[var(--text-secondary)]">{step.description}</p>
-            </li>
-          ))}
-        </ol>
+    <Section id="parcours">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <SectionHead title="Trois étapes, et rien à écrire" text="Pas d’application, pas de rendez-vous. Un téléphone suffit." />
+        <Link href="/experience" className="link shrink-0 text-[16px]">
+          Le détail, appel par appel
+        </Link>
       </div>
-    </section>
+      <Steps items={STEPS} className="mt-10" />
+      <div className="mt-6 flex flex-col items-start gap-4 rounded-[var(--radius-card)] bg-[var(--amber-soft)] p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
+        <p className="text-[17px] font-bold text-[var(--amber-deep)]">Le plus simple pour comprendre, c’est d’essayer : {OFFER.demoMinutes} minutes, gratuitement.</p>
+        <Button href={`tel:${SITE.phone}`} className="shrink-0">
+          Appeler le {SITE.phoneDisplay}
+        </Button>
+      </div>
+    </Section>
   );
 }

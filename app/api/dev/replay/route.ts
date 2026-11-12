@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
     let writingStyle: string | null = body.writingStyle ?? null;
     let firstName: string = body.firstName ?? 'le narrateur';
     let durationSeconds: number | null = body.durationSeconds ?? null;
+    let sensitiveTopics: string | null = body.sensitiveTopics ?? null;
     let source = 'payload';
 
     // Rejouer un appel réel déjà archivé
@@ -94,12 +95,13 @@ export async function POST(request: NextRequest) {
 
             const { data: profile } = await db()
                 .from('profiles')
-                .select('first_name, writing_style')
+                .select('first_name, writing_style, sensitive_topics')
                 .eq('id', project.user_id)
                 .single();
             if (profile) {
                 firstName = profile.first_name ?? firstName;
                 writingStyle = writingStyle ?? profile.writing_style;
+                sensitiveTopics = sensitiveTopics ?? profile.sensitive_topics;
             }
         }
     }
@@ -109,7 +111,7 @@ export async function POST(request: NextRequest) {
     }
 
     const t0 = Date.now();
-    const director = await runDirector({ transcript, context, phase, firstName, politeness: null, durationSeconds });
+    const director = await runDirector({ transcript, context, phase, firstName, politeness: null, durationSeconds, sensitiveTopics });
     const tDirector = Date.now() - t0;
 
     const t1 = Date.now();
@@ -120,6 +122,8 @@ export async function POST(request: NextRequest) {
         phase,
         writingStyle,
         titleHint: director.chapter_title_hint,
+        material: director.chapter_material === 'thin' ? 'thin' : 'rich',
+        sensitiveTopics,
     });
     const tWriter = Date.now() - t1;
 
@@ -138,6 +142,8 @@ export async function POST(request: NextRequest) {
             sentiment: director.sentiment_score,
             nextPhase: director.resolved.next_phase,
             nextQuestion: director.next_question,
+            material: director.chapter_material,
+            coveredSuggestions: director.covered_suggestions,
             summary: director.call_summary,
             familyFound: director.family_members.map((f) => `${f.full_name} (${f.relation})`),
             contextRendered: renderContext(director.context),

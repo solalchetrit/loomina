@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
 import { formatToE164 } from '@/lib/phone';
-import { findProfileByPhone } from '@/lib/loomina/db';
+import { db, findProfileByPhone } from '@/lib/loomina/db';
+import { stripe } from '@/lib/stripe';
 
 /**
  * Provisionnement d'un client après paiement.
@@ -25,24 +25,7 @@ import { findProfileByPhone } from '@/lib/loomina/db';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-/**
- * Service role obligatoire : `auth.admin.createUser` l'exige, et les tables
- * sont en RLS sans policy. Avec la clé anon, tout échouerait silencieusement.
- */
-function db() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !key) {
-        throw new Error(
-            'SUPABASE_SERVICE_ROLE_KEY ou NEXT_PUBLIC_SUPABASE_URL manquante : ' +
-            'provisionnement impossible.'
-        );
-    }
-    return createClient(url, key, { auth: { persistSession: false } });
-}
 
 export async function POST(request: NextRequest) {
     const payload = await request.text();
@@ -54,7 +37,7 @@ export async function POST(request: NextRequest) {
             console.error('[stripe] signature ou secret absent');
             return NextResponse.json({ error: 'configuration' }, { status: 400 });
         }
-        event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
+        event = stripe().webhooks.constructEvent(payload, sig, endpointSecret);
     } catch (err) {
         console.error('[stripe] signature invalide', err);
         return NextResponse.json({ error: 'signature' }, { status: 400 });

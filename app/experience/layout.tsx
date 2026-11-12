@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "L’Expérience",
-  description: "Trois phases, quatorze chapitres : comment Loomina transforme vos conversations téléphoniques en un livre de vie relié.",
+  title: "Comment ça marche",
+  description: "Avant, pendant, après : comment vos appels téléphoniques deviennent un livre relié, étape par étape, et les 14 thèmes proposés.",
   alternates: { canonical: "/experience" },
 };
 

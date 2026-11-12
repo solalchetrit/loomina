@@ -20,11 +20,11 @@
  * ferait avancer la phase une seconde fois), et pas de second chapitre.
  */
 
-import { db, findActiveProject, getRecentChapters, getNextChapterNumber } from './db';
+import { db, findActiveProject, getRecentChapters, getNextChapterNumber, getChapterOutline } from './db';
 import type { Profile, Project } from './db';
 import { toPhase, isFinalPhase } from './phases';
 import type { Phase } from './phases';
-import { normalizeContext, contextFromLegacy, isEmptyContext } from './context';
+import { normalizeContext, contextFromLegacy, isEmptyContext, remainingSuggestions } from './context';
 import type { LoominaContext } from './context';
 import { runDirector, DIRECTOR_MODEL } from './director';
 import type { DirectorResult } from './director';
@@ -52,33 +52,39 @@ export interface PipelineOutcome {
     reason?: string;
 }
 
+/** Les champs d'un appel que Vapi peut placer à plusieurs profondeurs. */
+interface VapiCallFields {
+    transcript?: string;
+    recordingUrl?: string;
+    durationSeconds?: number | string;
+    customer?: { number?: string };
+    metadata?: { user_id?: string; project_id?: string; demo?: boolean };
+}
+
+/** Un message de webhook Vapi, réduit à ce que Loomina lit. */
+export interface VapiMessage extends VapiCallFields {
+    type?: string;
+    artifact?: VapiCallFields;
+    call?: VapiCallFields & { id?: string };
+}
+
 /** Extraction tolérante : Vapi place ces champs à des profondeurs variables. */
-export function extractCallData(message: Record<string, any>) {
-    const artifact = message?.artifact ?? {};
-    const call = message?.call ?? {};
+export function extractCallData(message: VapiMessage) {
+    const artifact = message.artifact ?? {};
+    const call = message.call ?? {};
 
-    const transcript: string =
-        message?.transcript ?? artifact?.transcript ?? call?.transcript ?? '';
-
-    const recordingUrl: string | null =
-        message?.recordingUrl ?? artifact?.recordingUrl ?? call?.recordingUrl ?? null;
-
-    const durationRaw =
-        message?.durationSeconds ?? artifact?.durationSeconds ?? call?.durationSeconds ?? null;
-
-    const phone: string | null =
-        message?.customer?.number ?? call?.customer?.number ?? null;
-
-    const metadata = call?.metadata ?? message?.metadata ?? {};
+    const transcript = message.transcript ?? artifact.transcript ?? call.transcript ?? '';
+    const durationRaw = message.durationSeconds ?? artifact.durationSeconds ?? call.durationSeconds;
+    const metadata = call.metadata ?? message.metadata ?? {};
 
     return {
         transcript: typeof transcript === 'string' ? transcript.trim() : '',
-        recordingUrl,
+        recordingUrl: message.recordingUrl ?? artifact.recordingUrl ?? call.recordingUrl ?? null,
         durationSeconds: Number.isFinite(Number(durationRaw)) ? Math.round(Number(durationRaw)) : null,
-        phone,
-        userId: (metadata?.user_id as string) ?? null,
-        projectId: (metadata?.project_id as string) ?? null,
-        vapiCallId: (call?.id as string) ?? (message?.call?.id as string) ?? null,
+        phone: message.customer?.number ?? call.customer?.number ?? null,
+        userId: metadata.user_id ?? null,
+        projectId: metadata.project_id ?? null,
+        vapiCallId: call.id ?? null,
     };
 }
 
@@ -100,6 +106,9 @@ interface AnalysisLog {
     next_topic_id?: number | null;
     project_update?: Record<string, unknown> & { context?: unknown };
     family_members?: DirectorResult['family_members'];
+    /** Sujets suggérés montrés au Directeur, et ceux qu'il a jugés abordés. */
+    suggestions_shown?: string[];
+    covered_suggestions?: number[];
 }
 
 /** Ce que l'Écrivain a besoin de savoir de l'analyse, rejouable depuis la base. */
@@ -117,7 +126,7 @@ interface WriterBrief {
 export async function processEndOfCall(params: {
     profile: Profile;
     project?: Project | null;
-    message: Record<string, any>;
+    message: VapiMessage;
     /** L'événement `call_events` d'origine : rend le traitement rejouable. */
     eventId?: string;
 }): Promise<PipelineOutcome> {
@@ -205,11 +214,23 @@ export async function processEndOfCall(params: {
         // PLUS RÉCENT a déjà été analysé : sa mémoire et sa phase font foi,
         // réappliquer l'ancienne analyse les effacerait.
         const newer = await hasNewerAnalysis(project.id, existing!.created_at);
-        if (!newer && log.project_update) await applyProjectUpdate(project.id, log.project_update);
+        if (!newer && log.project_update) {
+            await applyProjectUpdate(
+                project.id,
+                await withLatestSuggestions(
+                    project.id,
+                    log.project_update,
+                    log.suggestions_shown ?? [],
+                    log.covered_suggestions ?? []
+                )
+            );
+        }
         await applyProfileAndFamily({
             projectId: project.id,
             profile: params.profile,
-            profileUpdates: newer ? null : (log.profile_updates as DirectorResult['profile_updates'] | undefined) ?? null,
+            // Un appel plus récent fait foi pour le style et le tutoiement ;
+            // les sujets sensibles, eux, ne font que s'ajouter : on les garde.
+            profileUpdates: replayProfileUpdates(log.profile_updates, newer),
             familyMembers: log.family_members ?? [],
         });
         brief = {
@@ -234,6 +255,7 @@ export async function processEndOfCall(params: {
             firstName: params.profile.first_name ?? params.profile.full_name ?? 'le narrateur',
             politeness: params.profile.politeness_preference,
             durationSeconds: data.durationSeconds,
+            sensitiveTopics: params.profile.sensitive_topics,
         });
 
         await persistDirectorResult({ project, profile: params.profile, interviewId, director });
@@ -291,7 +313,10 @@ export async function processEndOfCall(params: {
         };
     }
 
-    const previousChapters = await getRecentChapters(project.id, 3);
+    const [previousChapters, outline] = await Promise.all([
+        getRecentChapters(project.id, 3),
+        getChapterOutline(project.id),
+    ]);
 
     const writer = await runWriter({
         transcript: data.transcript,
@@ -301,6 +326,8 @@ export async function processEndOfCall(params: {
         writingStyle: brief.writingStyle,
         titleHint: brief.titleHint,
         material: brief.material,
+        outline,
+        sensitiveTopics: params.profile.sensitive_topics,
     });
 
     // ---------------------------------------------------------
@@ -389,6 +416,8 @@ async function persistDirectorResult(params: {
                 next_topic_id: director.next_topic_id,
                 project_update: projectUpdate,
                 family_members: director.family_members,
+                suggestions_shown: director.context.suggested_topics ?? [],
+                covered_suggestions: director.covered_suggestions,
                 model: DIRECTOR_MODEL,
                 at: new Date().toISOString(),
             },
@@ -397,7 +426,15 @@ async function persistDirectorResult(params: {
     if (logError) throw new Error(`Écriture de l'analyse impossible : ${logError.message}`);
 
     // -- projects
-    await applyProjectUpdate(project.id, projectUpdate);
+    await applyProjectUpdate(
+        project.id,
+        await withLatestSuggestions(
+            project.id,
+            projectUpdate,
+            director.context.suggested_topics ?? [],
+            director.covered_suggestions
+        )
+    );
 
     await applyProfileAndFamily({
         projectId: project.id,
@@ -405,6 +442,24 @@ async function persistDirectorResult(params: {
         profileUpdates: director.profile_updates,
         familyMembers: director.family_members,
     });
+}
+
+/**
+ * Les sujets suggérés sont relus en base juste avant l'écriture : l'auteur
+ * a pu en ajouter un pendant l'appel ou pendant l'analyse. On retire ceux
+ * que le Directeur a jugés abordés, on garde tous les autres.
+ */
+async function withLatestSuggestions(
+    projectId: string,
+    update: Record<string, unknown> & { context?: unknown },
+    shown: string[],
+    covered: number[]
+): Promise<Record<string, unknown>> {
+    const { data, error } = await db().from('projects').select('context').eq('id', projectId).single();
+    if (error) throw new Error(`Lecture projects impossible : ${error.message}`);
+    const latest = normalizeContext(data?.context).suggested_topics ?? [];
+    const context = normalizeContext(update.context);
+    return { ...update, context: { ...context, suggested_topics: remainingSuggestions(shown, covered, latest) } };
 }
 
 /** Idempotent : réappliquer la même mise à jour ne change rien. */
@@ -498,4 +553,13 @@ async function hasNewerAnalysis(projectId: string, createdAt: string): Promise<b
         .limit(1);
     if (error) throw new Error(`Lecture interviews impossible : ${error.message}`);
     return (data?.length ?? 0) > 0;
+}
+
+function replayProfileUpdates(
+    updates: AnalysisLog['profile_updates'],
+    newer: boolean
+): DirectorResult['profile_updates'] | null {
+    if (!updates) return null;
+    const u = updates as DirectorResult['profile_updates'];
+    return newer ? { writing_style: null, politeness_preference: null, sensitive_topics: u.sensitive_topics ?? [] } : u;
 }

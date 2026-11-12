@@ -1,63 +1,27 @@
-import { MetadataRoute } from 'next'
-import { SITE_CONFIG } from './config'
+import type { MetadataRoute } from "next";
+import { SITE } from "@/config/site";
+
+type Frequency = MetadataRoute.Sitemap[number]["changeFrequency"];
+
+/** Pages publiques, de la plus importante à la moins importante. */
+const PAGES: [path: string, priority: number, changeFrequency: Frequency][] = [
+  ["", 1, "monthly"],
+  ["/offre", 0.9, "monthly"],
+  ["/experience", 0.8, "monthly"],
+  ["/about", 0.6, "yearly"],
+  ["/faq", 0.6, "yearly"],
+  ["/contact", 0.5, "yearly"],
+  ["/legal", 0.3, "yearly"],
+  ["/privacy", 0.3, "yearly"],
+  ["/cgv", 0.3, "yearly"],
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const now = new Date();
-
-    return [
-        {
-            url: SITE_CONFIG.url,
-            lastModified: now,
-            changeFrequency: 'monthly',
-            priority: 1,
-        },
-        {
-            url: `${SITE_CONFIG.url}/offre`,
-            lastModified: now,
-            changeFrequency: 'monthly',
-            priority: 0.9,
-        },
-        {
-            url: `${SITE_CONFIG.url}/experience`,
-            lastModified: now,
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: `${SITE_CONFIG.url}/about`,
-            lastModified: now,
-            changeFrequency: 'yearly',
-            priority: 0.6,
-        },
-        {
-            url: `${SITE_CONFIG.url}/faq`,
-            lastModified: now,
-            changeFrequency: 'yearly',
-            priority: 0.6,
-        },
-        {
-            url: `${SITE_CONFIG.url}/contact`,
-            lastModified: now,
-            changeFrequency: 'yearly',
-            priority: 0.5,
-        },
-        {
-            url: `${SITE_CONFIG.url}/legal`,
-            lastModified: now,
-            changeFrequency: 'yearly',
-            priority: 0.3,
-        },
-        {
-            url: `${SITE_CONFIG.url}/privacy`,
-            lastModified: now,
-            changeFrequency: 'yearly',
-            priority: 0.3,
-        },
-        {
-            url: `${SITE_CONFIG.url}/cgv`,
-            lastModified: now,
-            changeFrequency: 'yearly',
-            priority: 0.3,
-        },
-    ]
+  const lastModified = new Date();
+  return PAGES.map(([path, priority, changeFrequency]) => ({
+    url: `${SITE.url}${path}`,
+    lastModified,
+    changeFrequency,
+    priority,
+  }));
 }

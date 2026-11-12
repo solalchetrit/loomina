@@ -8,92 +8,92 @@
 
 /* ================================================================
    LOOMINA — design tokens
-   Papier crème, encre profonde, or en accent. Refonte 2026.
+   Fond clair, encre noire, l'ambre de l'étoile du logo.
+   L'ambre vif sert aux surfaces et aux icônes ; en texte, on prend
+   --amber-ink (≥ 4.5:1 sur le fond).
    ================================================================ */
 
 :root {
   /* Surfaces */
-  --loomina-void: #faf8f5;   /* fond de page */
-  --loomina-night: #f5f2ed;  /* section alternée */
-  --loomina-slate: #ebe6de;  /* remplissage discret */
-  --loomina-mist: #d8d2c8;   /* bordures anciennes (compat) */
-  --paper: #fffdf9;          /* cartes */
-
-  /* Or */
-  --loomina-gold: #b8923a;
-  --loomina-gold-light: #d4b06a;
-  --loomina-gold-dark: #8a6c28;
-  --loomina-ember: #c9a45a;
-  --gold-ink: #8a6c28;       /* or lisible pour du texte (≥ 4.5:1 sur crème) */
-
-  /* Accent secondaire (usage rare) */
-  --loomina-aurora: #6b5ce7;
-  --loomina-aurora-light: #8b7ef0;
-  --loomina-cyan: #3db8a0;
+  --canvas: #f7f7f4;         /* fond de page */
+  --surface: #ffffff;        /* cartes */
+  --surface-2: #f2f1ec;      /* puce d'icône, bande discrète */
+  --line: #e7e6e1;           /* bord de carte */
+  --line-soft: #efeeea;      /* séparateur dans une carte */
 
   /* Encre */
-  --ink: #1a1815;
-  --ink-soft: #2b2824;
-  --text-primary: #1a1815;
-  --text-secondary: #4a4640;
-  --text-muted: #7a756c;
+  --ink: #161616;
+  --ink-soft: #2b2b28;
+  --ink-2: #4a4a45;          /* texte secondaire, ≥ 8:1 */
+  --ink-3: #66665f;          /* texte discret, ≥ 5:1 */
 
-  /* Filets */
-  --hairline: rgba(26, 24, 21, 0.09);
-  --hairline-strong: rgba(26, 24, 21, 0.16);
+  /* Ambre, la couleur de l'étoile */
+  --amber: #ee9b2d;          /* bouton de démo, icônes sur fond sombre */
+  --amber-ink: #95580a;      /* ambre lisible en texte courant (5:1) */
+  --amber-display: #c27610;  /* ambre des grands titres seulement (3.3:1) */
+  --amber-soft: #fcebd2;     /* fond de pastille */
+  --amber-line: #f6ddb5;
+  --amber-deep: #6f4005;     /* texte sur --amber-soft */
 
   /* États */
-  --success: #2f7a4f;
-  --danger: #b4463c;
+  --success: #2f5b3a;
+  --success-soft: #e3f0e5;
+  --danger: #a8402f;
 
-  /* Compatibilité */
-  --loomina-ink: #1a1815;
-  --loomina-amber: #b8923a;
-  --loomina-amber-strong: #8a6c28;
-  --foreground: #1a1815;
-  --background: #faf8f5;
+  /* Rayons et ombres */
+  --radius-card: 24px;
+  --radius-btn: 999px;
+  --shadow-float: 0 40px 80px -40px rgba(22, 22, 22, 0.28);
+  --shadow-bar: 0 10px 30px -18px rgba(22, 22, 22, 0.25);
 
-  /* Courbes (Emil Kowalski) */
+  /* Anciens noms, pointant vers la nouvelle palette */
+  --paper: var(--canvas);
+  --paper-deep: var(--surface-2);
+  --paper-edge: var(--line);
+  --gold: var(--amber);
+  --gold-ink: var(--amber-ink);
+  --gold-light: var(--amber);
+  --rule: var(--line);
+  --rule-strong: #d4d3cc;
+
+  /* Courbes */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* ================================================================
    BASE
-   Dans @layer base pour que les utilitaires Tailwind gardent la main.
    ================================================================ */
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 96px;
+    scroll-padding-top: 112px;
     -webkit-tap-highlight-color: transparent;
     -webkit-text-size-adjust: 100%;
   }
 
   body {
     font-family: var(--font-sans);
-    font-weight: 400;
-    color: var(--text-primary);
-    background: var(--loomina-void);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--canvas);
     margin: 0;
-    padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    line-height: 1.6;
     overflow-x: hidden;
   }
 
   h1,
   h2,
   h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-serif);
-    font-weight: 400;
+  h4 {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    letter-spacing: -0.03em;
     text-wrap: balance;
+    color: var(--ink);
   }
 
   p {
@@ -101,8 +101,7 @@
   }
 
   a,
-  button,
-  [role="button"] {
+  button {
     touch-action: manipulation;
   }
 
@@ -113,18 +112,15 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--loomina-gold-dark);
+    outline: 3px solid var(--amber);
     outline-offset: 3px;
+    border-radius: 6px;
   }
 
   ::selection {
-    background: var(--loomina-gold);
-    color: var(--loomina-void);
+    background: var(--amber-soft);
+    color: var(--ink);
   }
-}
-
-.font-serif {
-  font-family: var(--font-serif);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -134,237 +130,294 @@
 }
 
 /* ================================================================
-   COMPOSANTS UTILITAIRES
+   TYPOGRAPHIE
+   Une seule famille, Plus Jakarta Sans. Le serif est réservé aux
+   extraits de livre : c'est ce que le client recevra imprimé.
    ================================================================ */
 
-/* Cartes papier. Les anciens noms (.glass, .glass-gold) sont conservés
-   pour que toutes les pages héritent du nouveau style sans réécriture. */
-.glass,
-.glass-strong,
-.glass-gold,
-.card {
-  background: var(--paper);
-  border: 1px solid var(--hairline);
-  box-shadow: 0 1px 2px rgba(26, 24, 21, 0.03);
+.t-hero {
+  font-size: clamp(3rem, 7.2vw, 6.4rem);
+  font-weight: 800;
+  line-height: 0.96;
+  letter-spacing: -0.045em;
 }
 
-.glass-gold {
-  box-shadow:
-    0 1px 2px rgba(26, 24, 21, 0.03),
-    0 24px 48px -32px rgba(26, 24, 21, 0.25);
-}
-
-/* Anciennement dégradé : désormais un or uni lisible */
-.text-gradient-gold,
-.text-gradient-aurora,
-.text-gradient-premium {
-  color: var(--gold-ink);
-}
-
-.text-gradient-premium {
-  color: var(--ink);
-}
-
-/* Éléments décoratifs hérités, neutralisés */
-.ambient-orb,
-.glow-gold,
-.glow-gold-strong,
-.glow-aurora {
-  display: none;
-}
-
-.line-glow {
-  height: 1px;
-  background: var(--loomina-gold);
-  opacity: 0.5;
-}
-
-/* Effet de survol des cartes — propriétés explicites, pointeurs fins seulement */
-.hover-lift {
-  transition:
-    transform 250ms var(--ease-out),
-    box-shadow 250ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .hover-lift:hover {
-    transform: translateY(-3px);
-    box-shadow:
-      0 18px 40px -18px rgba(26, 24, 21, 0.18),
-      0 0 0 1px rgba(184, 146, 58, 0.12);
-  }
-}
-
-/* Typographie */
-.heading-display {
-  font-size: clamp(2.75rem, 7vw, 5.25rem);
-  line-height: 1.02;
-  letter-spacing: -0.035em;
-  font-weight: 400;
-  color: var(--ink);
-}
-
-.heading-section {
-  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
-  line-height: 1.05;
+.t-display {
+  font-size: clamp(2.6rem, 5.6vw, 4.6rem);
+  font-weight: 800;
+  line-height: 1.04;
   letter-spacing: -0.03em;
-  font-weight: 400;
-  color: var(--ink);
 }
 
-.eyebrow {
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold-ink);
+.t-title {
+  font-size: clamp(2.1rem, 3.8vw, 3rem);
+  font-weight: 800;
+  line-height: 1.07;
+  letter-spacing: -0.032em;
 }
 
-.prose-loomina {
-  font-family: var(--font-sans);
+.t-heading {
+  font-size: clamp(1.3rem, 1.8vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.t-lead {
+  font-size: clamp(1.12rem, 1.5vw, 1.28rem);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.t-body {
   font-size: 17px;
-  line-height: 1.7;
-  color: var(--text-secondary);
+  line-height: 1.65;
+  color: var(--ink-2);
 }
 
-.prose-loomina p + p {
-  margin-top: 1.25em;
+.t-small {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+/* Petit titre au-dessus d'une section, quand il apporte une information. */
+.t-eyebrow {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--amber-ink);
+}
+
+.t-accent {
+  color: var(--amber-display);
+}
+
+.link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--amber-line);
+  transition: text-decoration-color 160ms ease;
+}
+
+.link:hover {
+  text-decoration-color: var(--amber);
+}
+
+/* Texte long (pages légales, histoire) */
+.prose-loomina {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.prose-loomina p + p,
+.prose-loomina ul + p,
+.prose-loomina p + ul {
+  margin-top: 1.1em;
+}
+
+.prose-loomina h2 {
+  font-size: 1.45rem;
+  line-height: 1.25;
+  margin-top: 2.2em;
+  margin-bottom: 0.6em;
+}
+
+.prose-loomina h2:first-child {
+  margin-top: 0;
+}
+
+.prose-loomina h3 {
+  font-size: 1.15rem;
+  margin-top: 1.6em;
+  margin-bottom: 0.4em;
 }
 
 .prose-loomina strong {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .prose-loomina a {
   color: var(--ink);
+  font-weight: 600;
   text-decoration: underline;
-  text-decoration-color: rgba(184, 146, 58, 0.5);
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--amber-line);
   text-underline-offset: 4px;
-  transition: text-decoration-color 200ms ease;
 }
 
 .prose-loomina a:hover {
-  text-decoration-color: var(--loomina-gold);
+  text-decoration-color: var(--amber);
 }
 
-/* Pages légales : listes lisibles */
 .prose-loomina ul {
-  padding-left: 1.25em;
+  padding-left: 1.2em;
   list-style: disc;
 }
 
 .prose-loomina li + li {
+  margin-top: 0.45em;
+}
+
+/* Extrait de livre : serif, comme la page imprimée */
+.book-text {
+  font-family: var(--font-serif);
+  font-size: 1.14rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  hyphens: auto;
+}
+
+.book-text p + p {
+  text-indent: 1.5em;
   margin-top: 0.4em;
 }
 
-/* Champs de formulaire */
+.book-text .dropcap {
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.8;
+  margin: 0.08em 0.1em 0 0;
+  color: var(--amber-ink);
+}
+
+/* ================================================================
+   COMPOSANTS
+   ================================================================ */
+
+/* Carte : fond blanc, bord fin, coins généreux */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+
+.card-float {
+  box-shadow: var(--shadow-float);
+}
+
+/* Puce d'icône carrée à coins doux */
+.chip-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--amber-soft);
+  color: var(--amber-ink);
+}
+
+.chip-icon-neutral {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+/* Pastille d'état */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.pill-amber {
+  background: var(--amber-soft);
+  color: var(--amber-deep);
+}
+
+.pill-green {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.pill-neutral {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+/* Champs de formulaire : grands, nets, lisibles */
 .field {
   width: 100%;
-  height: 52px;
-  padding: 0 16px;
+  min-height: 56px;
+  padding: 0 18px;
   border-radius: 14px;
-  background: var(--paper);
-  border: 1px solid var(--hairline-strong);
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 18px;
   transition:
-    border-color 200ms ease,
-    box-shadow 200ms ease;
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 textarea.field {
-  height: auto;
-  padding: 14px 16px;
+  padding: 14px 18px;
   resize: vertical;
-  min-height: 140px;
+  min-height: 160px;
+  line-height: 1.55;
 }
 
 .field::placeholder {
-  color: var(--text-muted);
+  color: var(--ink-3);
+  opacity: 0.8;
 }
 
 .field:focus {
   outline: none;
-  border-color: var(--loomina-gold);
-  box-shadow: 0 0 0 4px rgba(184, 146, 58, 0.14);
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px var(--amber-soft);
 }
 
 .field[aria-invalid="true"] {
   border-color: var(--danger);
+  box-shadow: 0 0 0 4px rgba(168, 64, 47, 0.12);
 }
 
 .field-label {
   display: block;
   margin-bottom: 8px;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: var(--ink);
 }
 
-/* Carrousel à défilement magnétique */
-.snap-row {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 4px;
-}
-
-.snap-row::-webkit-scrollbar {
-  display: none;
-}
-
-.snap-row > * {
-  scroll-snap-align: start;
-  flex: 0 0 auto;
-}
-
-/* Bouton : retour tactile immédiat */
+/* Retour tactile immédiat */
 .press {
   transition:
-    transform 160ms var(--ease-out),
-    background-color 200ms ease,
-    color 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    opacity 200ms ease;
+    transform 140ms var(--ease-out),
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
 }
 
 .press:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-/* Grain papier très léger pour les surfaces sombres */
-.paper-grain {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 3px 3px;
+  transform: scale(0.98);
 }
 
 /* ================================================================
    MOTION
-   Entrées au chargement en CSS (hors main thread), ease-out fort.
-   Révélations au scroll : scroll-driven animations quand disponibles,
-   sinon contenu visible d'emblée.
+   Une seule entrée, au chargement de l'accueil. Rien au défilement.
    ================================================================ */
 
 @keyframes loomina-rise {
   from {
     opacity: 0;
     transform: translateY(12px);
-  }
-}
-
-@keyframes loomina-settle {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.97);
   }
 }
 
@@ -375,44 +428,70 @@ textarea.field {
 }
 
 .rise {
-  animation: loomina-rise 600ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 60ms);
+  animation: loomina-rise 560ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
 }
 
-.settle {
-  animation: loomina-settle 800ms var(--ease-out) both;
-  animation-delay: calc(120ms + var(--i, 0) * 90ms);
+/* Le dernier événement de la carte vivante glisse en tête de liste. */
+@keyframes loomina-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.98);
+  }
 }
 
+.feed-new {
+  animation: loomina-drop 620ms var(--ease-out) both;
+}
+
+/*
+ * Apparition au défilement, en CSS pur (animation-timeline) : les enfants directs
+ * d'un bloc [data-reveal] montent l'un après l'autre quand le bloc entre à l'écran.
+ * Un navigateur qui ne connaît pas les timelines de défilement affiche tout, d'emblée.
+ */
 @supports (animation-timeline: view()) {
-  .reveal {
-    animation: loomina-rise linear both;
-    animation-timeline: view();
-    animation-range: entry 5% entry 45%;
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] > * {
+      animation: loomina-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 55%;
+    }
+
+    [data-reveal] > :nth-child(2) { animation-range: entry 10% entry 62%; }
+    [data-reveal] > :nth-child(3) { animation-range: entry 15% entry 69%; }
+    [data-reveal] > :nth-child(n + 4) { animation-range: entry 20% entry 76%; }
   }
 }
 
-/* Onde sonore de la carte d'appel (décoratif, marketing) */
-@keyframes loomina-wave {
-  0%,
-  100% {
-    transform: scaleY(0.55);
-  }
-  50% {
-    transform: scaleY(1);
-  }
+/* Barres de voix : elles respirent doucement, comme une conversation. */
+@keyframes loomina-voice {
+  0%, 100% { transform: scaleY(0.45); }
+  50% { transform: scaleY(1); }
 }
 
-.wave-bar {
-  transform-origin: center;
-  animation: loomina-wave 1100ms var(--ease-in-out) infinite;
+.voice-bar {
+  transform-origin: bottom;
+  animation: loomina-voice 1100ms ease-in-out infinite;
 }
 
-/* Accordéon : hauteur animée via grid (interruptible, pas de JS) */
+/* Cartes cliquables : elles répondent sous la main. */
+.lift {
+  transition:
+    transform 260ms var(--ease-out),
+    box-shadow 260ms var(--ease-out),
+    border-color 200ms ease;
+}
+
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 40px -28px rgba(22, 22, 22, 0.35);
+}
+
+/* Accordéon : hauteur animée via grid */
 .acc-panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 250ms var(--ease-out);
+  transition: grid-template-rows 220ms var(--ease-out);
 }
 
 .acc-panel[data-open="true"] {
@@ -424,7 +503,7 @@ textarea.field {
 }
 
 .acc-icon {
-  transition: transform 200ms var(--ease-out);
+  transition: transform 180ms var(--ease-out);
 }
 
 [aria-expanded="true"] .acc-icon {
@@ -442,7 +521,7 @@ textarea.field {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(26, 24, 21, 0.15);
+  border: 2px solid rgba(22, 22, 22, 0.15);
   border-top-color: var(--ink);
   animation: loomina-spin 600ms linear infinite;
 }
@@ -454,41 +533,21 @@ textarea.field {
 
 @media (prefers-reduced-motion: reduce) {
   .rise,
-  .settle,
-  .reveal {
-    animation: loomina-fade 300ms ease both;
-    animation-timeline: auto;
+  .feed-new {
+    animation: loomina-fade 200ms ease both;
   }
 
-  .wave-bar {
+  .lift:hover {
+    transform: none;
+  }
+
+  .voice-bar {
     animation: none;
   }
 
   .acc-panel,
   .acc-icon,
-  .hover-lift,
   .press {
     transition-duration: 0ms;
   }
-}
-
-/* ================================================================
-   SCROLLBAR
-   ================================================================ */
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--loomina-void);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--loomina-mist);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--loomina-gold);
 }

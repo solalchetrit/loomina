@@ -29,6 +29,7 @@ import { findProfileByPhone, findActiveProject, getSystemPrompt, db, maskPhone }
 import { toPhase } from '@/lib/loomina/phases';
 import { buildAssistant, buildUnknownCallerAssistant } from '@/lib/loomina/assistant';
 import { extractCallData } from '@/lib/loomina/pipeline';
+import type { VapiMessage } from '@/lib/loomina/pipeline';
 import { recordEvent, processEvent } from '@/lib/loomina/events';
 import { checkSharedSecret } from '@/lib/loomina/secret';
 
@@ -75,15 +76,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
     }
 
-    let body: Record<string, any>;
+    let body: { message?: VapiMessage } & VapiMessage;
     try {
         body = await request.json();
     } catch {
         return NextResponse.json({ error: 'invalid json' }, { status: 400 });
     }
 
-    const message = body?.message ?? body;
-    const type: string = message?.type ?? 'unknown';
+    const message = body.message ?? body;
+    const type = message.type ?? 'unknown';
 
     try {
         switch (type) {
@@ -118,12 +119,11 @@ export async function POST(request: NextRequest) {
 
 async function handleAssistantRequest(
     request: NextRequest,
-    message: Record<string, any>,
+    message: VapiMessage,
     startedAt: number
 ) {
     const url = serverUrl(request);
-    const phone: string | null =
-        message?.customer?.number ?? message?.call?.customer?.number ?? null;
+    const phone = message.customer?.number ?? message.call?.customer?.number ?? null;
 
     if (!phone) {
         console.warn('[vapi] assistant-request sans numéro appelant');
@@ -165,8 +165,8 @@ async function handleAssistantRequest(
 // ------------------------------------------------------------
 
 async function handleEndOfCall(
-    body: Record<string, any>,
-    message: Record<string, any>,
+    body: object,
+    message: VapiMessage,
     startedAt: number
 ) {
     const data = extractCallData(message);
@@ -174,8 +174,8 @@ async function handleEndOfCall(
     // Démonstration pour appelant inconnu : promesse « rien n'est
     // enregistré ». L'assistant n'envoie normalement pas de rapport, mais
     // si Vapi en envoie un, on ne l'archive pas.
-    const metadata = message?.call?.metadata ?? message?.metadata ?? {};
-    if (metadata?.demo === true) {
+    const metadata = message.call?.metadata ?? message.metadata ?? {};
+    if (metadata.demo === true) {
         console.info('[vapi] end-of-call d\'une démo ignoré (rien n\'est conservé)');
         return NextResponse.json({ received: true, demo: true, stored: false });
     }
@@ -225,7 +225,7 @@ export async function GET() {
     checks.supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL ? 'ok' : 'MANQUANTE';
     checks.service_role = process.env.SUPABASE_SERVICE_ROLE_KEY ? 'ok' : 'MANQUANTE';
     checks.openai = process.env.OPENAI_API_KEY ? 'ok' : 'MANQUANTE';
-    checks.webhook_secret = process.env.VAPI_WEBHOOK_SECRET ? 'ok' : 'non défini (webhook ouvert)';
+    checks.webhook_secret = process.env.VAPI_WEBHOOK_SECRET ? 'ok' : 'non défini (refusé en production)';
 
     try {
         const { error } = await db().from('call_events').select('id').limit(1);

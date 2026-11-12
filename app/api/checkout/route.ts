@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import { OFFER } from "@/config/offer";
+import { stripe } from "@/lib/stripe";
 
 export async function POST(request: NextRequest) {
     try {
@@ -19,18 +17,18 @@ export async function POST(request: NextRequest) {
         const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
         // Create Checkout Session
-        const session = await stripe.checkout.sessions.create({
+        const session = await stripe().checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: [
                 {
                     price_data: {
                         currency: "eur",
                         product_data: {
-                            name: "Biographie Loomina - Coffret Premium",
-                            description: "Accompagnement, Interviews IA, Édition et Impression.",
+                            name: `Loomina — ${OFFER.name}`,
+                            description: `Entretiens par téléphone, écriture, relecture humaine, livre relié (${OFFER.format}) livré chez vous, version numérique.`,
                             images: ["https://www.loomina.eu/hero-book-v2.png"],
                         },
-                        unit_amount: 44900, // 449.00 EUR
+                        unit_amount: OFFER.price * 100,
                     },
                     quantity: 1,
                 },

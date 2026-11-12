@@ -1,110 +1,129 @@
 import type { ReactNode } from "react";
+import Icon, { type IconName } from "@/components/ui/Icon";
 
 /** Conteneur de section : largeur, gouttières et rythme vertical communs. */
 export function Section({
   id,
   children,
   className = "",
-  tone = "default",
   size = "md",
 }: {
   id?: string;
   children: ReactNode;
   className?: string;
-  tone?: "default" | "alt";
   size?: "sm" | "md" | "lg";
 }) {
-  const pad = { sm: "py-14 md:py-20", md: "py-20 md:py-28", lg: "py-24 md:py-32" }[size];
-  const bg = tone === "alt" ? "bg-[var(--loomina-night)]" : "";
+  const pad = { sm: "py-14 md:py-20", md: "py-20 md:py-32", lg: "py-24 md:py-40" }[size];
   return (
-    <section id={id} className={`relative w-full scroll-mt-24 ${pad} ${bg} ${className}`}>
-      <div className="mx-auto w-full max-w-7xl px-5 sm:px-6">{children}</div>
+    <section id={id} className={`w-full scroll-mt-28 ${pad} ${className}`}>
+      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">{children}</div>
     </section>
   );
 }
 
-/** En-tête de section : surtitre, titre (avec partie en or), texte. */
-export function SectionHeading({
+/** Tête de section : titre gras, texte d'introduction, petit titre optionnel. */
+export function SectionHead({
   eyebrow,
   title,
-  accent,
   text,
-  align = "center",
   as: Tag = "h2",
+  align = "left",
   className = "",
 }: {
   eyebrow?: string;
   title: ReactNode;
-  accent?: ReactNode;
   text?: ReactNode;
-  align?: "center" | "left";
   as?: "h1" | "h2";
+  align?: "left" | "center";
   className?: string;
 }) {
-  const center = align === "center";
+  const center = align === "center" ? "mx-auto text-center" : "";
   return (
-    <div className={`reveal ${center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"} ${className}`}>
-      {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-      <Tag className={`${eyebrow ? "mt-4" : ""} ${Tag === "h1" ? "heading-display" : "heading-section"}`}>
-        {title}
-        {accent && (
-          <>
-            {" "}
-            <em className="text-[var(--gold-ink)]">{accent}</em>
-          </>
-        )}
-      </Tag>
-      {text && (
-        <p className={`mt-5 font-sans text-[17px] leading-relaxed text-[var(--text-secondary)] ${center ? "mx-auto max-w-2xl" : "max-w-2xl"}`}>
-          {text}
-        </p>
-      )}
+    <div className={`max-w-2xl ${center} ${className}`} data-reveal={Tag === "h2" ? "" : undefined}>
+      {eyebrow && <p className="t-eyebrow">{eyebrow}</p>}
+      <Tag className={`${eyebrow ? "mt-3" : ""} ${Tag === "h1" ? "t-display" : "t-title"}`}>{title}</Tag>
+      {text && <p className={`t-lead mt-5 ${align === "center" ? "mx-auto" : ""} max-w-xl`}>{text}</p>}
     </div>
   );
 }
 
-/** En-tête de page (sous le header fixe). */
+/** En-tête de page, sous le menu flottant. */
 export function PageHeader({
   eyebrow,
   title,
-  accent,
   text,
   children,
-  align = "center",
 }: {
   eyebrow?: string;
   title: ReactNode;
-  accent?: ReactNode;
   text?: ReactNode;
   children?: ReactNode;
-  align?: "center" | "left";
 }) {
   return (
-    <section className="relative w-full overflow-hidden pt-28 pb-12 md:pt-40 md:pb-16">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(60%_60%_at_50%_0%,rgba(212,176,106,0.14),transparent_70%)]"
-      />
-      <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-6">
-        <div className={`rise ${align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}`}>
-          {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-          <h1 className={`${eyebrow ? "mt-4" : ""} heading-display`}>
-            {title}
-            {accent && (
-              <>
-                {" "}
-                <em className="text-[var(--gold-ink)]">{accent}</em>
-              </>
-            )}
-          </h1>
-          {text && (
-            <p className={`mt-6 font-sans text-lg leading-relaxed text-[var(--text-secondary)] ${align === "center" ? "mx-auto max-w-2xl" : "max-w-2xl"}`}>
-              {text}
-            </p>
-          )}
-        </div>
+    <section className="w-full pb-8 pt-32 md:pb-12 md:pt-40">
+      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
+        <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise" />
         {children}
       </div>
     </section>
+  );
+}
+
+/** Étapes d'un parcours, en cartes numérotées : le contenu est une vraie suite. */
+export function Steps({
+  items,
+  className = "",
+}: {
+  items: { icon: IconName; title: ReactNode; text: ReactNode; preview?: ReactNode }[];
+  className?: string;
+}) {
+  return (
+    <ol className={`grid gap-4 md:grid-cols-3 ${className}`} data-reveal>
+      {items.map((it, i) => (
+        <li key={i} className="card flex flex-col p-3">
+          {it.preview && (
+            <div aria-hidden="true" className="flex h-40 items-center justify-center overflow-hidden rounded-[18px] bg-[var(--canvas)] px-5">
+              {it.preview}
+            </div>
+          )}
+          <div className="p-4 pt-5 md:p-5">
+            <div className="flex items-center justify-between">
+              <span className="chip-icon">
+                <Icon name={it.icon} />
+              </span>
+              <span className="text-[15px] font-bold text-[var(--ink-3)]">
+                <span className="sr-only">Étape </span>
+                {i + 1}
+              </span>
+            </div>
+            <h3 className="t-heading mt-5">{it.title}</h3>
+            <div className="t-body mt-2">{it.text}</div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** Liste cochée : titre en gras, détail à la suite. */
+export function CheckList({
+  items,
+  className = "",
+}: {
+  items: { title: ReactNode; detail?: ReactNode }[];
+  className?: string;
+}) {
+  return (
+    <ul className={`divide-y divide-[var(--line-soft)] ${className}`}>
+      {items.map((it, i) => (
+        <li key={i} className="flex gap-3 py-3.5">
+          <Icon name="check" className="mt-[3px] shrink-0 text-[var(--amber-ink)]" />
+          <span className="text-[17px] leading-snug text-[var(--ink-2)]">
+            <b className="font-bold text-[var(--ink)]">{it.title}</b>
+            {it.detail && <>, {it.detail}</>}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
