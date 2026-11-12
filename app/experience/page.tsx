@@ -1,10 +1,11 @@
 import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
-import Icon, { type IconName } from "@/components/ui/Icon";
+import { type IconName } from "@/components/ui/Icon";
 import { BookPage } from "@/components/VoiceToPage";
 import { BookCover } from "@/components/home/WhatYouGet";
 import { Contents } from "@/components/home/Themes";
 import Closing from "@/components/Closing";
+import AuthorShowcase from "@/components/AuthorShowcase";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
@@ -30,7 +31,7 @@ const DURING = [
   },
   {
     title: "Le chapitre est écrit après l’appel",
-    text: "Dans vos mots, sans rien inventer. Vous le retrouvez dans votre espace auteur. Au prochain appel, vous dites ce qu’il faut changer, préciser ou retirer.",
+    text: "Dans vos mots, sans rien inventer, et dans le style d’écriture que vous avez choisi. Vous le retrouvez dans votre espace auteur : vous le corrigez vous-même, ou vous le dites à Loomina au prochain appel.",
   },
 ];
 
@@ -116,21 +117,7 @@ export default function ExperiencePage() {
       <PageHeader
         title="Un téléphone, des conversations, un livre"
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
-      >
-        <nav aria-label="Les trois temps" className="mt-10 grid gap-3 sm:grid-cols-3">
-          {PHASES.map((p) => (
-            <a key={p.id} href={`#${p.id}`} className="card press flex items-center gap-4 p-4 hover:border-[var(--ink)]">
-              <span className="chip-icon">
-                <Icon name={p.icon} />
-              </span>
-              <span>
-                <b className="block text-[17px]">{p.label}</b>
-                <span className="block text-[14px] text-[var(--ink-3)]">{p.duration}</span>
-              </span>
-            </a>
-          ))}
-        </nav>
-      </PageHeader>
+      />
 
       {PHASES.map((p, idx) => {
         const start = STARTS[idx];
@@ -170,6 +157,8 @@ export default function ExperiencePage() {
           </Section>
         );
       })}
+
+      <AuthorShowcase />
 
       <Section className="bg-white">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">

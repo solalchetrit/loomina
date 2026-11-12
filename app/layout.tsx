@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     default: "Loomina | Écrivez votre autobiographie par téléphone",
     template: "%s | Loomina"
   },
-  description: `Racontez votre vie au téléphone, Loomina en fait un livre relié. Un chapitre après chaque appel, chaque page relue par notre équipe. Démo gratuite au ${SITE.phoneDisplay}.`,
+  description: `Racontez votre vie au téléphone, Loomina en fait un livre relié. Un chapitre après chaque appel, votre livre relu par notre équipe. Démo gratuite au ${SITE.phoneDisplay}.`,
   alternates: {
     canonical: "/",
   },

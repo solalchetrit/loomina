@@ -50,13 +50,13 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
   {
     icon: "pen",
     title: "Un chapitre après chaque appel",
-    text: "Écrit dans vos mots, sans rien inventer. Vous le relisez dans votre espace et dites ce qu’il faut changer.",
+    text: "Loomina l’écrit dans vos mots, dans le style que vous avez choisi. Vous le relisez dans votre espace auteur et le corrigez : le livre se construit à deux.",
     preview: <ChapterPreview />,
   },
   {
     icon: "book",
     title: "Le livre arrive chez vous",
-    text: `Notre équipe relit chaque page, place vos photos et fait imprimer le livre. En général ${OFFER.delay} après le premier appel.`,
+    text: `Quand votre récit est complet, notre équipe relit le livre, y place vos photos et l’envoie à l’impression. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé.`,
     preview: <BookCover className="max-w-[96px] !py-0" compact />,
   },
 ];

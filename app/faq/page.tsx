@@ -17,7 +17,7 @@ const FAQ_CATEGORIES = [
     questions: [
       {
         q: "Comment fonctionne Loomina ?",
-        a: `Vous appelez le ${SITE.phoneDisplay} quand vous voulez. Loomina, une intelligence artificielle, mène l’entretien et écrit un chapitre après chaque appel, dans vos mots. Vous relisez, vous corrigez, notre équipe relit tout, et le livre relié arrive chez vous.`,
+        a: `Vous appelez le ${SITE.phoneDisplay} quand vous voulez. Loomina mène l’entretien et écrit un chapitre après chaque appel, dans vos mots. Vous relisez, vous corrigez, notre équipe relit tout, et le livre relié arrive chez vous.`,
       },
       {
         q: "Combien de temps dure le processus ?",

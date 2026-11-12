@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CGVPage() {
   return (
-    <LegalPage title="Ce à quoi nous nous engageons" updated="7 octobre 2026">
+    <LegalPage title="Ce à quoi nous nous engageons" updated="12 novembre 2026">
       <h2>1. Objet</h2>
       <p>
         Les présentes conditions générales de vente (CGV) régissent les relations entre <strong>Loomina</strong>, projet en
@@ -52,11 +52,17 @@ export default function CGVPage() {
         peut encore se rétracter, et Loomina conserve une somme proportionnelle au service déjà rendu.
       </p>
 
-      <h2>6. Garantie satisfait ou remboursé</h2>
+      <h2 id="garantie" className="scroll-mt-32">6. Garantie satisfait ou remboursé</h2>
       <p>
         Indépendamment du droit de rétractation, Loomina rembourse intégralement le Client qui, après son premier entretien,
         ne souhaite pas poursuivre, sans avoir à se justifier. La demande doit être faite dans les{" "}
-        <strong>{OFFER.guaranteeDays} jours</strong> qui suivent ce premier appel.
+        <strong>{OFFER.guaranteeDays} jours</strong> qui suivent ce premier appel, par e-mail à contact@loomina.eu ou par le
+        formulaire de contact, en indiquant le numéro de téléphone donné à la commande.
+      </p>
+      <p>
+        Le remboursement porte sur la totalité du prix payé. Il est effectué par le même moyen de paiement que la commande, au
+        plus tard 14 jours après la demande. Les chapitres déjà écrits sont alors supprimés, sauf si le Client demande à les
+        recevoir. Passé ce délai de {OFFER.guaranteeDays} jours, seul le droit de rétractation prévu à l’article 5 s’applique.
       </p>
 
       <h2>7. Délais</h2>

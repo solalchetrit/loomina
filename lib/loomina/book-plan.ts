@@ -1,5 +1,5 @@
 /**
- * Le livre rangé par périodes de vie.
+ * Le livre rangé par thèmes.
  *
  * Les chapitres naissent dans l'ordre des appels : un souvenir d'enfance
  * peut arriver après un chapitre sur la retraite. Pour l'impression, on
@@ -47,10 +47,10 @@ export async function buildBookPlan(params: {
         messages: [
             {
                 role: 'system',
-                content: `Tu prépares le plan d'une autobiographie avant impression. Les chapitres ont été écrits dans l'ordre des entretiens, pas dans l'ordre de la vie.
-- Regroupe-les en 2 à 7 parties qui suivent la chronologie de la vie (enfance, jeunesse, vie adulte, aujourd'hui, messages…). Un chapitre de réflexion ou de messages aux proches va à la fin.
-- Chaque chapitre apparaît exactement une fois. Dans une partie, range-les dans l'ordre chronologique.
-- Titre de partie : court (2 à 6 mots), concret, tiré des chapitres (un lieu, une époque). Aucun fait qui n'y figure pas.
+                content: `Tu prépares le plan d'une autobiographie avant impression. Les chapitres ont été écrits dans l'ordre des entretiens, pas regroupés par sujet.
+- Regroupe-les en 2 à 7 parties par grand thème de la vie (par exemple : la famille, les lieux de l'enfance, le sport, les études, le travail, les voyages, les messages aux proches). Un chapitre de réflexion ou de messages aux proches va à la fin.
+- Range les parties dans un ordre de lecture naturel, en suivant à peu près la vie. Chaque chapitre apparaît exactement une fois. Dans une partie, range-les dans l'ordre chronologique.
+- Titre de partie : court (2 à 6 mots), concret, tiré des chapitres. Aucun fait qui n'y figure pas.
 Réponds en JSON : { "parts": [ { "title": "…", "chapters": [3, 1] } ] }`,
             },
             { role: 'user', content: `# MÉMOIRE DU LIVRE\n${renderContext(params.context)}\n\n# CHAPITRES\n${list}` },

@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
-/** Le plan par périodes enregistré, s'il existe. */
+/** Le plan par thèmes enregistré, s'il existe. */
 export async function GET(request: NextRequest) {
     if (DEMO_DATA) return NextResponse.json({ plan: null });
     const author = await currentAuthor(request);
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ plan });
 }
 
-/** Range (ou range à nouveau) les chapitres par périodes de vie. */
+/** Range (ou range à nouveau) les chapitres par thèmes. */
 export async function POST(request: NextRequest) {
     if (DEMO_DATA) {
         // Démo : un plan simple, sans appel au modèle.
