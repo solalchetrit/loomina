@@ -10,6 +10,11 @@ on:
       - 'lib/loomina/**'
       - 'scripts/bench/**'
   workflow_dispatch:
+    inputs:
+      voix:
+        description: "Modèle de l'assistant vocal pour la conversation simulée"
+        required: false
+        default: gpt-4o
 
 jobs:
   banc:
@@ -17,6 +22,7 @@ jobs:
     timeout-minutes: 20
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      BENCH_VOICE_MODEL: ${{ inputs.voix || 'gpt-4o' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

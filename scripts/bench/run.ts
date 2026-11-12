@@ -165,7 +165,7 @@ async function simulateVoice() {
         history.push({ role: 'user', content: said.choices[0]?.message?.content ?? '' });
         const reply = await openai.chat.completions.create({
             model: VOICE_MODEL,
-            temperature: 0.7,
+            ...(VOICE_MODEL.startsWith('gpt-4') ? { temperature: 0.7 } : { reasoning_effort: 'none' as const }),
             messages: [{ role: 'system', content: system }, ...history],
         });
         history.push({ role: 'assistant', content: reply.choices[0]?.message?.content ?? '' });
@@ -233,7 +233,7 @@ async function main() {
         const ko = v.checks.filter((x) => !x.ok).length;
         failed += ko;
         total += v.checks.length;
-        console.log(ko ? `${ko} échec(s)` : 'ok');
+        console.log(ko ? `${ko} échec(s) (voix ${VOICE_MODEL})` : `ok (voix ${VOICE_MODEL})`);
         for (const x of v.checks.filter((y) => !y.ok)) console.log(`   ✗ ${x.label}`);
         if (ko) console.log(v.transcript.split('\n').map((l) => `   ${l}`).join('\n'));
         lines.push(`## ${ko ? '❌' : '✅'} Conversation simulée (voix ${VOICE_MODEL})`, '', ...v.checks.map((x) => `- ${x.ok ? '✅' : '❌'} ${x.label}`), '', '<details><summary>Conversation</summary>', '', v.transcript, '', '</details>', '');
