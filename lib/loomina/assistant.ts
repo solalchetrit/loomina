@@ -12,8 +12,9 @@
  */
 
 import type { Phase } from './phases';
-import { PHASE_KEYS } from './phases';
-import { voicePromptTemplate } from './voice-prompt';
+import { PHASE_KEYS, toPhase, isFinalPhase } from './phases';
+import { voicePromptTemplate, PHASE_OBJECTIVES } from './voice-prompt';
+import { readPhaseState, spokenPhase } from './phase-plan';
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
@@ -181,6 +182,28 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
     const name = vars.first_name;
     const tu = vars.politeness_preference === 'tu';
     const parts: string[] = [];
+
+    // Tous les sujets de la phase sont couverts : avant de passer à la suite,
+    // on demande à la personne. C'est elle qui décide (voir phase-plan.ts).
+    const phase = toPhase(project.phase);
+    if (!first && readPhaseState(meta, phase).check === 'to_ask') {
+        const here = spokenPhase(phase, tu);
+        const final = isFinalPhase(phase);
+        const ask = final
+            ? `« Je crois qu'on a fait un beau tour de ${tu ? 'ta' : 'votre'} vie. ${tu ? 'Tu veux' : 'Vous voulez'} encore ajouter quelque chose, ou on considère que le livre est complet ? »`
+            : `« Je crois qu'on a bien fait le tour de ${here}. ${tu ? 'Tu veux' : 'Vous voulez'} y ajouter quelque chose, ou on passe à ${spokenPhase((phase + 1) as Phase, tu)} ? »`;
+        parts.push(
+            [
+                '# FAIRE LE POINT AVANT DE PASSER À LA SUITE (priorité sur OÙ REPRENDRE)',
+                `${name} a raconté tout ce qu'on attendait sur ${here}. Juste après la réponse à ta salutation, avant toute autre question, dis-le simplement et demande, avec tes mots : ${ask}`,
+                `- Si ${name} veut ajouter quelque chose : écoute, creuse comme d'habitude, et reste sur ${here} pour cet appel.`,
+                final
+                    ? `- Si ${name} dit que le livre est complet : remercie chaleureusement, dis que le livre va maintenant être préparé et qu'un appel reste possible à tout moment pour ajouter un souvenir, puis termine l'appel.`
+                    : `- Si ${name} veut passer à la suite : enchaîne dans ce même appel sur ${spokenPhase((phase + 1) as Phase, tu)}, avec une première question ouverte tirée de ces pistes.\n${fillTemplate(PHASE_OBJECTIVES[(phase + 1) as Phase], vars)}`,
+                `- Ne parle jamais de « phase » ni de numéro : ${name} ne connaît pas ces mots.`,
+            ].join('\n')
+        );
+    }
 
     const suggestions = ctx.suggested_topics ?? [];
     if (suggestions.length) {

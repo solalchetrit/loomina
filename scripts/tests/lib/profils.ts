@@ -28,6 +28,8 @@ export interface Seed {
     contexte?: Record<string, unknown>;
     questionSuivante?: string | null;
     livreOffert?: boolean;
+    /** État de la phase : sujets déjà couverts, question « on passe à la suite ? » à poser. */
+    etatPhase?: { covered: string[]; check: 'to_ask' | 'wait' | null };
 }
 
 export interface TestAccount {
@@ -91,6 +93,7 @@ export async function createAccount(seed: Seed, runId: string): Promise<TestAcco
                 sms_chapter: false,
                 is_gift: seed.livreOffert === true,
                 ...(seed.prefsReglees ? { prefs_set_at: new Date().toISOString() } : {}),
+                ...(seed.etatPhase ? { phase_state: { phase: seed.phase ?? 1, ...seed.etatPhase } } : {}),
             },
         })
         .select('*')

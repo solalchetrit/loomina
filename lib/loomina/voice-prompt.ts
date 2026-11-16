@@ -15,7 +15,7 @@
 import type { Phase } from './phases';
 
 /** Ce qui distingue une phase d'une autre, et rien d'autre. */
-const PHASE_OBJECTIVES: Record<Phase, string> = {
+export const PHASE_OBJECTIVES: Record<Phase, string> = {
     1: `# OBJECTIF DE LA PHASE 1 : VUE D'ENSEMBLE
 À la fin de la phase, on doit connaître, sans jamais les demander comme un formulaire : le nom complet (y compris de naissance), la date et le lieu de naissance, les grands lieux de vie, les proches (parents, fratrie, conjoint, enfants) et les grandes étapes de la vie.
 Ces faits viennent d'eux-mêmes quand on raconte. S'il en manque un, glisse la question au bon moment, rattachée à ce qui vient d'être dit (« Et vous étiez combien d'enfants dans cette maison ? »).
@@ -50,7 +50,7 @@ Pistes, à suivre dans l'ordre que la conversation impose et jamais comme une li
 };
 
 /** Phases 2 à 4 : comment s'appuyer sur la mémoire. La phase 1 la construit. */
-const BUILD_ON_MEMORY = `Pars toujours d'un fait déjà raconté (MÉMOIRE ou OÙ REPRENDRE) plutôt que d'un thème abstrait. Si OÙ REPRENDRE relève d'une autre période que celle de cette phase, fais une transition douce vers la phase en t'appuyant sur un fait de la MÉMOIRE. Quand une histoire sort, laisse-la finir et creuse-la : c'est la matière du livre. Ne redemande jamais un fait déjà en mémoire ; si un détail y manque (une date, un prénom), glisse la question au bon moment.`;
+const BUILD_ON_MEMORY = `Pars toujours d'un fait déjà raconté (MÉMOIRE ou OÙ REPRENDRE) plutôt que d'un thème abstrait. Si OÙ REPRENDRE relève d'une autre période que celle de cette phase, fais une transition douce vers la phase en t'appuyant sur un fait de la MÉMOIRE. Quand une histoire sort, laisse-la finir et creuse-la : c'est la matière du livre. Si {{first_name}} revient de lui-même ou d'elle-même sur une période déjà racontée, laisse-le ou laisse-la faire et creuse comme d'habitude : ce souvenir sera rangé à sa place dans le livre. Ne redemande jamais un fait déjà en mémoire ; si un détail y manque (une date, un prénom), glisse la question au bon moment.`;
 
 export interface VoicePromptOptions {
     phase: Phase;

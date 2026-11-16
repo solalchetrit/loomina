@@ -9,6 +9,8 @@ import type { Processed } from './pile';
 import type { Expectation } from '../scenarios';
 import { normalizeContext, renderContext } from '../../../lib/loomina/context';
 import { countWords } from '../../../lib/loomina/writer';
+import { readPhaseState, PHASE_AXES } from '../../../lib/loomina/phase-plan';
+import { toPhase } from '../../../lib/loomina/phases';
 
 export type Gravite = 'bloquant' | 'important' | 'mineur';
 export interface Check {
@@ -92,6 +94,10 @@ export function liveChecks(call: CallResult, attendu: Expectation, tutoiement: '
         }
         checks.push({ ok: !offender, gravite: 'bloquant', domaine: 'direct', label: `Loomina n'aborde pas d'elle-même « ${w} »${offender ? ` — elle a dit : « ${offender.slice(0, 120)} »` : ''}` });
     }
+    if (attendu.loominaDit?.length) {
+        const said = attendu.loominaDit.filter((w) => all.some((t) => has(t, w)));
+        checks.push({ ok: said.length > 0, gravite: 'important', domaine: 'direct', label: `Loomina fait le point avant de passer à la suite (mots attendus : ${attendu.loominaDit.join(', ')} ; entendus : ${said.join(', ') || 'aucun'})` });
+    }
     for (const w of attendu.loominaSans ?? []) {
         const offender = all.find((t) => has(t, w));
         checks.push({ ok: !offender, gravite: 'important', domaine: 'direct', label: `Loomina ne dit jamais « ${w} »${offender ? ` — elle a dit : « ${offender.slice(0, 120)} »` : ''}` });
@@ -160,7 +166,8 @@ export function dbChecks(params: {
         B(chapter.latest_interview_id === interview.id, 'le chapitre est rattaché à son entretien');
         B(Boolean(chapter.title?.trim()) && chapter.title !== 'Attente', `le chapitre a un titre (« ${chapter.title} »)`, 'important', 'chapitre');
         B(chapter.word_count === countWords(chapter.content_markdown), `nombre de mots enregistré exact (${chapter.word_count})`, 'mineur');
-        B(chapter.phase === before.project.phase, `chapitre rangé dans la phase de l'appel (${chapter.phase})`, 'important');
+        B(chapter.phase === (log.chapter_phase ?? before.project.phase), `chapitre rangé dans la période racontée (phase ${chapter.phase}, appel passé en phase ${before.project.phase})`, 'important');
+        if (attendu.chapitrePhase) B(chapter.phase === attendu.chapitrePhase, `chapitre rangé en phase ${chapter.phase} (attendu ${attendu.chapitrePhase})`, 'important');
         const expectedRange = log.chapter_material === 'thin' ? [20, 260] : [250, 2200];
         B(chapter.word_count >= expectedRange[0] && chapter.word_count <= expectedRange[1], `longueur cohérente avec la matière « ${log.chapter_material} » (${chapter.word_count} mots)`, 'important', 'chapitre');
         B(!/^#\s/m.test(chapter.content_markdown) && !/\b(le client|la cliente|le narrateur|la narratrice)\b/i.test(chapter.content_markdown), 'pas de titre de niveau 1 ni de « le client » dans le texte', 'important', 'chapitre');
@@ -168,12 +175,19 @@ export function dbChecks(params: {
         for (const w of attendu.chapitreSans ?? []) B(!has(chapter.content_markdown, w) && !has(chapter.title ?? '', w), `le chapitre ne contient pas « ${w} »`, 'bloquant', 'chapitre');
     }
 
-    // Phase : jamais en arrière, un cran au plus, et seulement à 100 %.
-    const pb = before.project.phase;
-    const pa = after.project.phase;
-    B(pa === pb || (pa === pb + 1 && log.progress >= 100), `phase ${pb} → ${pa}, progression ${before.project.phase_progress} % → ${log.progress} %`);
-    B(after.project.phase_progress === (pa === pb ? log.progress : 0), 'la progression en base est celle de l\'analyse (remise à zéro quand la phase change)', 'mineur');
-    if (pa === pb) B(log.progress >= (before.project.phase_progress ?? 0) - 15, `la progression ne recule pas franchement (${before.project.phase_progress} % → ${log.progress} %)`, 'important');
+    // Phase : jamais en arrière, un cran au plus, et seulement après que la
+    // personne a répondu « on passe à la suite » à la question posée.
+    const pb = toPhase(before.project.phase);
+    const pa = toPhase(after.project.phase);
+    const stateBefore = readPhaseState(before.project.project_metadata, pb);
+    const stateAfter = readPhaseState(after.project.project_metadata, pa);
+    B(pa === pb || (pa === pb + 1 && stateBefore.check === 'to_ask' && log.phase_answer === 'advance'), `phase ${pb} → ${pa} (question « on passe à la suite ? » ${stateBefore.check === 'to_ask' ? 'à poser' : 'pas à poser'}, réponse lue : ${log.phase_answer})`);
+    B(after.project.phase_progress === Math.round((100 * stateAfter.covered.length) / PHASE_AXES[pa].length), `progression = sujets couverts (${stateAfter.covered.length} sur ${PHASE_AXES[pa].length} : ${stateAfter.covered.join(', ') || 'aucun'})`, 'important');
+    if (pa === pb) B(stateBefore.covered.every((k) => stateAfter.covered.includes(k)), 'un sujet coché reste coché');
+    B(pa !== pb || stateAfter.check !== 'to_ask' || stateAfter.covered.length === PHASE_AXES[pa].length, 'la question « on passe à la suite ? » n\'est prévue que si tous les sujets sont couverts');
+    if (attendu.phaseApres) B(pa === attendu.phaseApres, `phase après l'appel : ${pa} (attendu ${attendu.phaseApres})`, 'important');
+    if (attendu.questionDePassage) B(stateAfter.check === attendu.questionDePassage, `question de passage après l'appel : « ${stateAfter.check} » (attendu « ${attendu.questionDePassage} »)`, 'important');
+    if (attendu.livreTermine !== undefined) B((after.project.status === 'completed') === attendu.livreTermine, `livre ${after.project.status === 'completed' ? 'terminé' : 'en cours'} (attendu ${attendu.livreTermine ? 'terminé' : 'en cours'})`, 'important');
 
     // Question suivante.
     const q = after.project.next_question_strategy ?? '';

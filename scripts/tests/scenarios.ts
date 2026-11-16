@@ -34,6 +34,15 @@ export interface Expectation {
     anneesInterdites?: number[];
     /** Part minimale de mots dits par le narrateur (0 à 1). */
     partNarrateurMin?: number;
+    /** Phase attendue après l'appel. */
+    phaseApres?: 1 | 2 | 3 | 4;
+    /** Phase sous laquelle le chapitre doit être rangé. */
+    chapitrePhase?: 1 | 2 | 3 | 4;
+    /** État de la question « on ajoute ou on passe à la suite ? » après l'appel. */
+    questionDePassage?: 'to_ask' | 'wait';
+    livreTermine?: boolean;
+    /** Mots que Loomina doit prononcer (au moins un). */
+    loominaDit?: string[];
     /** Le narrateur est-il resté dans le rôle : mots que Loomina ne doit pas écrire. */
     loominaSans?: string[];
 }
@@ -381,6 +390,78 @@ export const SCENARIOS: Scenario[] = [
         behaviour: { silenceA: 6 },
         attendu: { issue: ['processed'], fin: ['silence'] },
     },
+    {
+        id: '15-passage-accepte',
+        titre: 'Phase complète : « on passe à la suite »',
+        question: 'Quand tous les sujets de l\'enfance sont couverts, Loomina fait-elle le point, et un « oui » fait-il passer à la vie d\'adulte ?',
+        seed: {
+            slug: 'passage', prenom: 'Colette', nom: 'Besson', phase: 2, progression: 100, prefsReglees: true,
+            etatPhase: { covered: ['maison', 'proches', 'ecole', 'figures', 'depart'], check: 'to_ask' },
+            contexte: {
+                identity: { full_name: 'Colette Besson', birth: '1946 à Annecy', places: ['Annecy', 'Lyon'] },
+                family: [{ name: 'Marius', relation: 'père', deceased: true, note: 'menuisier' }, { name: 'Adèle', relation: 'mère', deceased: true }, { name: 'René', relation: 'frère' }],
+                timeline: [{ year: 1946, event: 'Naissance à Annecy' }, { year: 1964, event: 'Départ pour Lyon, école d\'infirmières' }],
+                key_themes: ['la maison au bord du lac', 'l\'atelier de menuiserie du père', 'l\'école des sœurs', 'mademoiselle Favre, l\'institutrice', 'le départ pour Lyon à dix-huit ans'],
+                last_call: { summary: 'Colette a raconté son départ d\'Annecy pour l\'école d\'infirmières de Lyon, à dix-huit ans, sa mère sur le quai de la gare.' },
+            },
+            questionSuivante: 'La dernière fois, vous m\'avez raconté votre mère sur le quai de la gare d\'Annecy. Racontez-moi votre arrivée à Lyon.',
+        },
+        persona: {
+            prenom: 'Colette',
+            fiche: `Colette Besson, 80 ans, née en 1946 à Annecy. Père Marius, menuisier ; mère Adèle ; frère René. Partie à dix-huit ans à l'école d'infirmières de Lyon. Infirmière à l'hôpital Édouard-Herriot pendant trente-huit ans, d'abord en chirurgie puis aux urgences de nuit. A rencontré son mari, Bernard, ambulancier, une nuit de garde en 1971. Deux fils. Appartement à la Croix-Rousse.`,
+            maniere: VOUS_BAVARD,
+            consignes: 'Si le biographe te demande si tu veux ajouter quelque chose sur ton enfance ou passer à la suite, réponds que non, tu as tout dit, on peut passer à la suite. Ensuite raconte volontiers ta vie d\'infirmière. Après une dizaine de réponses, dis que tu vas te reposer.',
+        },
+        attendu: { issue: ['processed'], phaseApres: 3, chapitrePhase: 3, loominaDit: ['ajouter', 'la suite'] },
+    },
+    {
+        id: '16-passage-refuse',
+        titre: 'Phase complète : « attendez, j\'ai oublié quelque chose »',
+        question: 'Si la personne veut ajouter un souvenir, reste-t-on dans la phase sans reposer la question tout de suite ?',
+        seed: {
+            slug: 'reste', prenom: 'Colette', nom: 'Besson', phase: 2, progression: 100, prefsReglees: true,
+            etatPhase: { covered: ['maison', 'proches', 'ecole', 'figures', 'depart'], check: 'to_ask' },
+            contexte: {
+                identity: { full_name: 'Colette Besson', birth: '1946 à Annecy', places: ['Annecy', 'Lyon'] },
+                family: [{ name: 'Marius', relation: 'père', deceased: true, note: 'menuisier' }, { name: 'Adèle', relation: 'mère', deceased: true }, { name: 'René', relation: 'frère' }],
+                timeline: [{ year: 1946, event: 'Naissance à Annecy' }, { year: 1964, event: 'Départ pour Lyon, école d\'infirmières' }],
+                key_themes: ['la maison au bord du lac', 'l\'atelier de menuiserie du père', 'l\'école des sœurs', 'mademoiselle Favre, l\'institutrice', 'le départ pour Lyon à dix-huit ans'],
+                last_call: { summary: 'Colette a raconté son départ d\'Annecy pour l\'école d\'infirmières de Lyon, à dix-huit ans.' },
+            },
+            questionSuivante: 'La dernière fois, vous m\'avez raconté votre départ d\'Annecy. Racontez-moi votre arrivée à Lyon.',
+        },
+        persona: {
+            prenom: 'Colette',
+            fiche: `Colette Besson, 80 ans, née en 1946 à Annecy. Père Marius, menuisier ; mère Adèle ; frère René. Un souvenir d'enfance qu'elle n'a jamais raconté : l'hiver 1956, le lac d'Annecy gelé, son père qui lui avait fabriqué une luge en frêne dans l'atelier, René qui l'a cassée le premier jour, et la gifle, la seule que son père ait jamais donnée. Et les dimanches chez la tante Ginette, à Talloires, qui tenait une pension de famille.`,
+            maniere: VOUS_BAVARD,
+            consignes: 'Si le biographe te demande si tu veux ajouter quelque chose sur ton enfance ou passer à la suite, réponds : « Ah si, attendez, je ne vous ai jamais raconté l\'hiver où le lac a gelé. » Puis raconte la luge, et ensuite les dimanches chez la tante Ginette. Tu restes sur ton enfance pendant tout l\'appel. Après une dizaine de réponses, dis que tu vas te reposer.',
+        },
+        attendu: { issue: ['processed'], phaseApres: 2, chapitrePhase: 2, questionDePassage: 'wait', loominaDit: ['ajouter', 'la suite'], chapitreContient: ['luge'] },
+    },
+    {
+        id: '17-retour-en-arriere',
+        titre: 'En pleine vie d\'adulte, un souvenir d\'enfance revient',
+        question: 'Un souvenir d\'enfance raconté en phase 3 est-il écouté et rangé dans l\'enfance ?',
+        seed: {
+            slug: 'retour', prenom: 'Albert', nom: 'Costes', phase: 3, progression: 40, prefsReglees: true,
+            etatPhase: { covered: ['metier', 'lieux_adulte'], check: null },
+            contexte: {
+                identity: { full_name: 'Albert Costes', birth: '1944 à Millau', places: ['Millau', 'Montpellier'] },
+                family: [{ name: 'Émilienne', relation: 'mère', deceased: true }, { name: 'Jean', relation: 'père', deceased: true, note: 'gantier' }],
+                timeline: [{ year: 1944, event: 'Naissance à Millau' }, { year: 1966, event: 'Entre comme comptable aux Caves de Roquefort' }],
+                key_themes: ['enfance à Millau', 'comptable aux Caves de Roquefort', 'la maison de Montpellier'],
+                last_call: { summary: 'Albert a raconté ses débuts de comptable aux Caves de Roquefort et l\'achat de la maison de Montpellier.' },
+            },
+            questionSuivante: 'La dernière fois, vous m\'avez parlé de la maison de Montpellier. Racontez-moi comment vous avez rencontré votre femme.',
+        },
+        persona: {
+            prenom: 'Albert',
+            fiche: `Albert Costes, 82 ans, né en 1944 à Millau. Père Jean, gantier dans une ganterie de Millau ; mère Émilienne. Comptable aux Caves de Roquefort. Sa femme, Josette. Un souvenir d'enfance qui lui est revenu cette semaine : à huit ans, il accompagnait son père à la ganterie le jeudi ; l'odeur du cuir d'agneau, les femmes qui cousaient à la main près des fenêtres, la paire de gants trop grande que son père lui avait taillée dans des chutes, et la crue du Tarn qui avait inondé l'atelier.`,
+            maniere: VOUS_BAVARD,
+            consignes: 'Dès ta première vraie réponse, dis que tu voudrais d\'abord revenir sur quelque chose de ton enfance qui t\'est revenu cette semaine : la ganterie de ton père. Tu ne parles QUE de ce souvenir d\'enfance pendant tout l\'appel, en détail, même si le biographe te ramène à ta femme : « on verra ça la prochaine fois ». Après une dizaine de réponses, dis que tu vas te reposer.',
+        },
+        attendu: { issue: ['processed'], phaseApres: 3, chapitrePhase: 2, chapitreContient: ['gant'] },
+    },
 ];
 
 /**
@@ -404,7 +485,7 @@ JEUNESSE (1956-1964). Pensionnaire au cours complémentaire, puis École normale
 VIE ADULTE (1964-2002). A rencontré Pierre Vidal, vétérinaire de campagne, en 1963, un soir où il est venu soigner la vache du voisin et a frappé chez elle pour demander de l'eau chaude. Mariage en août 1964 à Saint-Flour. Trois enfants : Françoise (1965), Bernard (1967), Catherine (1971). Installation à Murat en 1966, puis à Clermont-Ferrand en 1978 quand Pierre a pris un poste à l'école vétérinaire. Elle a été institutrice puis directrice de l'école Jules-Ferry de Chamalières jusqu'à sa retraite en 2002. Fierté : un ancien élève, Karim, devenu médecin, qui lui écrit encore chaque année. Passion : le jardin, les rosiers, et la chorale. Voyage marquant : la Grèce en 1985, à deux, pour leurs vingt ans de mariage plus un. Épreuve : la maladie de Pierre (Parkinson, à partir de 2008), dont elle s'est occupée jusqu'à sa mort en 2016.
 
 AUJOURD'HUI. Sept petits-enfants, deux arrière-petites-filles. Le déjeuner du dimanche, les mots croisés, la chorale le jeudi. Ce qu'elle veut transmettre : le goût de l'effort, la curiosité, « ne jamais laisser quelqu'un au bord du chemin ». Elle aimerait que le livre se termine sur le jardin.`,
-        maniere: 'Tu vouvoies. Tu parles bien, avec précision, comme une ancienne institutrice, mais simplement : 3 à 6 phrases par réponse. Tu as de l\'humour. Tu dis « mon pauvre père », « ma foi ». Si on te demande, tu préfères le vouvoiement et tu n\'as pas de sujet interdit.',
+        maniere: 'Tu vouvoies. Tu parles bien, avec précision, comme une ancienne institutrice, mais simplement : 3 à 6 phrases par réponse. Tu as de l\'humour. Tu dis « mon pauvre père », « ma foi ». Si on te demande, tu préfères le vouvoiement et tu n\'as pas de sujet interdit. Si le biographe te demande si tu veux ajouter quelque chose ou passer à la suite, tu réponds franchement : la suite, sauf si un souvenir de cette période te revient.',
     },
     consignesParAppel: {
         1: 'C\'est le tout premier appel : tu ne sais pas trop comment ça marche, c\'est Antoine qui t\'a offert le livre. Après une douzaine de réponses, dis que tu as ta chorale.',

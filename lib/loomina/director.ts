@@ -20,7 +20,9 @@
 
 import OpenAI from 'openai';
 import type { Phase } from './phases';
-import { PHASE_GOALS, PHASE_LABELS, isFinalPhase, nextPhase } from './phases';
+import { PHASE_GOALS, PHASE_LABELS, isFinalPhase, toPhase } from './phases';
+import { PHASE_AXES, AXIS_RULE, stepPhase } from './phase-plan';
+import type { PhaseState, PhaseAnswer } from './phase-plan';
 import type { LoominaContext } from './context';
 import { normalizeContext, renderContext } from './context';
 
@@ -92,7 +94,18 @@ async function complete(model: string, system: string, user: string, timeoutMs: 
 
 export interface DirectorResult {
     context: LoominaContext;
+    /** Part des sujets couverts dans la phase en cours après cet appel (calculée, jamais estimée). */
     progress_percentage: number;
+    /** Sujets de la phase analysée couverts à ce jour. */
+    covered_axes: string[];
+    /** Réponse à « on ajoute quelque chose ou on passe à la suite ? ». */
+    phase_answer: PhaseAnswer;
+    /** État de phase à enregistrer dans `project_metadata.phase_state`. */
+    phase_state: PhaseState;
+    /** La personne a confirmé que le livre est complet. */
+    project_completed: boolean;
+    /** Période de vie à laquelle appartient ce que le narrateur a raconté : le chapitre y est rangé. */
+    chapter_phase: Phase;
     sentiment_score: number;
     call_summary: string;
     next_question: string;
@@ -127,14 +140,6 @@ export interface DirectorResult {
         next_phase: Phase;
     };
 }
-
-/** Ce qui suffit pour tenir une phase pour faite. */
-const PHASE_DONE: Record<Phase, string> = {
-    1: "La phase 1 est une vue d'ensemble, pas un récit : elle est faite dès que la mémoire contient l'identité (nom, naissance), les parents et la fratrie, et les grandes étapes de la vie au moins nommées (métier, vie de famille, lieux). Elle n'a pas besoin d'anecdotes. Deux ou trois appels suffisent.",
-    2: "La phase 2 est faite quand l'enfance et la jeunesse ont donné plusieurs scènes concrètes : la maison et les lieux, les parents et la fratrie, l'école ou les jeux, et le moment où l'on quitte la maison.",
-    3: "La phase 3 est faite quand la vie adulte a donné plusieurs scènes concrètes : le métier, la vie de couple et de famille, les lieux de vie, et au moins une passion ou une épreuve.",
-    4: "La phase 4 est faite quand la personne a dit ce qu'elle veut transmettre, a parlé de sa vie d'aujourd'hui et a dit comment elle aimerait que le livre se termine.",
-};
 
 function systemPrompt(phase: Phase): string {
     return `Tu es **le Directeur de biographie** de Loomina.
@@ -175,15 +180,21 @@ Reste sous 1 500 tokens. Si tu dois couper, garde ce qui sert à écrire le livr
 Un récit que le narrateur a annoncé sans le raconter (« je vous en reparlerai », un deuil ou une épreuve seulement nommés) reste dans \`open_questions\` tant qu'il n'a pas été raconté ou refusé : c'est souvent une page importante du livre.
 \`open_questions\` : huit au plus, seulement ce qui compte pour le livre (identité, dates des grandes étapes, proches principaux, un récit resté inachevé). Pas le nom de famille d'un personnage secondaire, pas le nom officiel d'un lieu.
 
-# CALIBRAGE DE LA PROGRESSION (\`progress_percentage\`)
-Évalue la couverture de la phase ${phase}, pas de la vie entière, en tenant compte de TOUT ce que contient déjà la mémoire, pas seulement de cet appel.
-${PHASE_DONE[phase]}
-- 0-25   : un seul sujet effleuré
-- 26-50  : plusieurs sujets abordés, encore peu de matière
-- 51-80  : l'essentiel de la phase est là, il reste un ou deux axes à ouvrir
-- 81-99  : il ne manque qu'un point précis, que tu nommes dans \`next_question\`
-- 100    : la phase a donné ce qu'on attend d'elle pour le livre
-La progression ne recule jamais : elle vaut au moins la « progression enregistrée » qu'on te donne. Ne cherche pas l'exhaustivité : un livre de vie n'épuise aucune période, et une phase qui ne se termine jamais empêche le livre d'avancer.
+# SUJETS DE LA PHASE (\`covered_axes\`)
+La phase ${phase} avance selon l'information reçue, pas selon le nombre d'appels. Voici ses sujets, avec leur clé :
+${PHASE_AXES[phase].map((a) => `- ${a.key} : ${a.label}`).join('\n')}
+${AXIS_RULE[phase]}
+Renvoie dans \`covered_axes\` les clés de TOUS les sujets couverts à ce jour, en tenant compte de la mémoire et de cet appel. Les sujets déjà cochés (donnés plus bas) le restent. Sois juste : un sujet coché trop tôt donne un livre creux, un sujet jamais coché empêche le livre d'avancer.
+
+# LE POINT SUR LA PHASE (\`phase_answer\`)
+Quand tous les sujets sont couverts, l'assistant demande au narrateur, au début de l'appel, s'il veut ajouter quelque chose ou passer à la suite (pour la phase 4 : si le livre est complet). On te dit plus bas si cette question devait être posée dans cet appel.
+- "advance" : la question a été posée et le narrateur a choisi de passer à la suite (ou a dit qu'il n'avait rien à ajouter).
+- "stay" : la question a été posée et le narrateur a voulu ajouter quelque chose, ou a continué sur la phase en cours.
+- "none" : la question ne devait pas être posée, n'a pas été posée, ou n'a pas reçu de réponse claire.
+Si la réponse est "advance", \`next_question\` ouvre la phase suivante${isFinalPhase(phase) ? ' (ici, le livre est complet : une question ouverte et douce suffit)' : ` : ${PHASE_GOALS[(phase + 1) as Phase]}`}
+
+# PÉRIODE RACONTÉE (\`chapter_phase\`)
+Le narrateur peut revenir sur une période déjà couverte, ou prendre de l'avance. Dis à quelle période appartient l'essentiel de ce qu'il a raconté dans CET appel, pour que le chapitre soit rangé au bon endroit : 2 = enfance et jeunesse, 3 = vie adulte, 4 = regard sur sa vie, messages, vie d'aujourd'hui, 1 = seulement un survol général de sa vie. En cas de doute, ${phase}.
 
 # MATIÈRE POUR UN CHAPITRE (\`chapter_material\`)
 L'Écrivain ne doit écrire que s'il y a quelque chose à raconter. Évalue ce que le narrateur (lignes « User: ») a réellement apporté de NOUVEAU dans cet appel :
@@ -227,7 +238,9 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
     "open_questions": [],
     "last_call":      { "date": "", "summary": "", "topics": [] }
   },
-  "progress_percentage": 0,
+  "covered_axes": [],
+  "phase_answer": "none",
+  "chapter_phase": ${phase},
   "sentiment_score": 0.0,
   "call_summary": "3 à 5 phrases sur ce qui s'est dit dans CET appel",
   "next_question": "",
@@ -260,10 +273,8 @@ interface DirectorInput {
     durationSeconds: number | null;
     /** `profiles.sensitive_topics` : réglés sur le site ou dits au téléphone. */
     sensitiveTopics?: string | null;
-    /** `projects.phase_progress` avant cet appel : la progression ne recule pas. */
-    previousProgress?: number | null;
-    /** Appels déjà analysés dans cette phase, celui-ci compris. */
-    callsInPhase?: number;
+    /** État de la phase avant cet appel (`project_metadata.phase_state`). */
+    phaseState?: PhaseState;
     /** Banc d'essai : forcer un modèle. */
     model?: string;
 }
@@ -285,8 +296,8 @@ Tutoiement/vouvoiement : ${params.politeness === 'tu' ? 'tu — rédige `next_qu
 Durée de l'appel : ${params.durationSeconds ?? 'inconnue'} secondes
 
 # OÙ EN EST LA PHASE
-Progression enregistrée avant cet appel : ${Math.round(params.previousProgress ?? 0)} %
-Appels dans cette phase, celui-ci compris : ${params.callsInPhase ?? 1}
+Sujets déjà cochés : ${params.phaseState?.covered.length ? params.phaseState.covered.join(', ') : 'aucun'}
+Question « on ajoute quelque chose ou on passe à la suite ? » à poser dans cet appel : ${params.phaseState?.check === 'to_ask' ? 'OUI' : 'non'}
 
 # TRANSCRIPT DE L'APPEL
 ${params.transcript}`;
@@ -310,12 +321,12 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     const parsed = JSON.parse(raw) as Record<string, unknown>;
 
     const phase = params.phase;
-    const progress = resolveProgress({
-        phase,
-        estimated: clamp(Number(parsed.progress_percentage) || 0, 0, 100),
-        previous: params.previousProgress ?? 0,
-        callsInPhase: params.callsInPhase ?? 1,
-    });
+    const before: PhaseState = params.phaseState ?? { phase, covered: [], check: null };
+    const answer: PhaseAnswer =
+        before.check === 'to_ask' && (parsed.phase_answer === 'advance' || parsed.phase_answer === 'stay') ? parsed.phase_answer : 'none';
+    // Le passage de phase est décidé par le CODE (phase-plan.ts), à partir
+    // des sujets couverts et de la réponse de la personne.
+    const step = stepPhase(before, parsed.covered_axes, answer);
 
     const suggestions = params.context.suggested_topics ?? [];
     // Les suggestions ne passent jamais par la plume du modèle : on garde
@@ -329,7 +340,12 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     return {
         model,
         context,
-        progress_percentage: progress,
+        progress_percentage: step.progress,
+        covered_axes: step.nextPhase === phase ? step.state.covered : PHASE_AXES[phase].map((a) => a.key),
+        phase_answer: answer,
+        phase_state: step.state,
+        project_completed: step.completed,
+        chapter_phase: toPhase(parsed.chapter_phase, phase),
         sentiment_score: clamp(Number(parsed.sentiment_score) || 0, -1, 1),
         call_summary: text(parsed.call_summary, 2000) ?? '',
         next_question:
@@ -344,41 +360,13 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
         profile_updates: profileUpdates(parsed.profile_updates),
         resolved: {
             phase,
-            // La transition de phase est décidée par le CODE, jamais par le
-            // modèle. Auparavant Make écrivait `lower(next_phase)` — une
-            // chaîne libre générée par GPT — directement en base.
-            next_phase: nextPhase(phase, progress),
+            next_phase: step.nextPhase,
         },
     };
 }
 
-/**
- * Nombre d'appels au bout duquel une phase est tenue pour faite, quoi qu'en
- * dise le modèle. Sans ce plafond, la progression oscillait entre 60 et
- * 92 % d'un appel à l'autre sans jamais atteindre 100 : sur un livre simulé
- * de huit appels (16/11/2026), le projet n'a jamais quitté la phase 1 alors
- * que la narratrice en était à ses premiers postes d'institutrice.
- */
-export const MAX_CALLS_IN_PHASE: Record<Phase, number> = { 1: 3, 2: 6, 3: 8, 4: 4 };
-
-/**
- * Nombre d'appels en dessous duquel une phase ne se termine pas. Sans ce
- * plancher, la phase 2 se bouclait en un appel dès que l'enfance avait été
- * survolée en phase 1, et un livre simulé arrivait en phase 4 au septième
- * appel avec 7 000 mots.
- */
-export const MIN_CALLS_IN_PHASE: Record<Phase, number> = { 1: 1, 2: 3, 3: 4, 4: 2 };
-
-/** La progression retenue : jamais en recul dans une phase, et bornée en nombre d'appels. */
-export function resolveProgress(p: { phase: Phase; estimated: number; previous: number; callsInPhase: number }): number {
-    if (p.callsInPhase >= MAX_CALLS_IN_PHASE[p.phase]) return 100;
-    const progress = Math.max(p.estimated, clamp(p.previous, 0, 100));
-    // Pas de phase expédiée : avant le nombre d'appels minimal, on reste à 95.
-    return p.callsInPhase < MIN_CALLS_IN_PHASE[p.phase] ? Math.min(progress, 95) : progress;
-}
-
 export function shouldCompleteProject(result: DirectorResult): boolean {
-    return isFinalPhase(result.resolved.phase) && result.progress_percentage >= 100;
+    return result.project_completed;
 }
 
 // ------------------------------------------------------------
