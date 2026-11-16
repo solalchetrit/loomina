@@ -11,14 +11,17 @@ export const JUDGE_MODEL = process.env.BANC_JUGE_MODEL ?? 'gpt-4.1';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 2, timeout: 180_000 });
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-async function judge(system: string, user: string): Promise<any> {
+/** Le chapitre et le livre demandent un juge plus fin : gpt-4.1 prend les reformulations fidèles pour des inventions. */
+export const FINE_JUDGE_MODEL = process.env.BANC_JUGE_FIN_MODEL ?? 'gpt-5.5';
+
+async function judge(system: string, user: string, model = JUDGE_MODEL): Promise<any> {
     const res = await openai.chat.completions.create({
-        model: JUDGE_MODEL,
-        ...(/^(gpt-5|o\d)/.test(JUDGE_MODEL) ? { reasoning_effort: 'low' as const } : { temperature: 0 }),
+        model,
+        ...(/^(gpt-5|o\d)/.test(model) ? { reasoning_effort: 'low' as const } : { temperature: 0 }),
         response_format: { type: 'json_object' },
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
     });
-    track(JUDGE_MODEL, res.usage);
+    track(model, res.usage);
     try {
         return JSON.parse(res.choices[0]?.message?.content ?? '{}');
     } catch {
@@ -45,6 +48,7 @@ export async function judgeLive(params: {
     sensibles: string;
     suggestions: string[];
     premierAppel: boolean;
+    demo?: boolean;
 }): Promise<LiveVerdict> {
     const out = await judge(
         `Tu évalues un biographe téléphonique (« Loomina ») qui recueille les souvenirs d'une personne, souvent âgée, pour en faire un livre. Tu lis l'appel et tu notes UNIQUEMENT les répliques de Loomina.
@@ -76,7 +80,7 @@ Réponds en JSON : {"ecoute":0,"relances":0,"naturel":0,"respect":0,"problemes":
 Tutoiement/vouvoiement attendu : ${params.tutoiement}
 Sujets sensibles à ne pas aborder : ${params.sensibles || 'aucun'}
 Sujets suggérés depuis l'espace auteur, à aborder : ${params.suggestions.length ? params.suggestions.join(' | ') : 'aucun'}
-Premier appel : ${params.premierAppel ? 'oui (Loomina ne sait rien encore)' : 'non'}
+Premier appel : ${params.premierAppel ? 'oui (Loomina ne sait rien encore)' : 'non'}${params.demo ? "\nCet appel est une DÉMONSTRATION de trois minutes pour un appelant inconnu : quatre questions sur un seul souvenir, puis Loomina explique le service et renvoie vers le site. C'est son rôle ici, pas une sortie de rôle." : ''}
 
 # MÉMOIRE DONT LOOMINA DISPOSAIT AVANT L'APPEL
 ${params.memory}
@@ -147,7 +151,8 @@ ${params.previous || '(aucun)'}
 ${params.transcript}
 
 # CHAPITRE À VÉRIFIER — « ${params.title} »
-${params.chapter}`
+${params.chapter}`,
+        FINE_JUDGE_MODEL
     );
     return {
         inventions: list(out.inventions),
@@ -232,7 +237,8 @@ Rends en JSON :
 - "verdict" : trois phrases directes pour le fondateur du service.
 
 {"note":0,"repetitions":[],"contradictions":[],"trous":[],"points_forts":[],"verdict":""}`,
-        chapters
+        chapters,
+        FINE_JUDGE_MODEL
     );
     return {
         note: num(out.note),

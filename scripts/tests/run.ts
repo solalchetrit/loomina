@@ -183,6 +183,7 @@ async function runScenario(sc: Scenario): Promise<ScenarioResult> {
                       sensibles: before?.profile.sensitive_topics ?? '',
                       suggestions: before ? normalizeContext(before.project.context).suggested_topics ?? [] : [],
                       premierAppel: !before || before.interviews.length === 0,
+                      demo: !account,
                   }).catch(() => null)
                 : Promise.resolve(null);
 

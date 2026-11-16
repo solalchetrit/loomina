@@ -203,6 +203,8 @@ BON : "La dernière fois, vous m'avez parlé des étés à Casablanca chez votre
 
 Si le transcript est trop pauvre pour accrocher un fait précis, propose une question d'ouverture douce sur la phase en cours.
 
+Si l'interlocuteur a demandé le tutoiement ou le vouvoiement PENDANT cet appel, rédige \`next_question\` ainsi, même si la consigne reçue dit l'inverse.
+
 UNE seule question, un seul point d'interrogation : jamais une liste de renseignements (« votre nom complet, votre date et votre lieu de naissance ? »), jamais deux questions reliées par « et ». S'il manque un fait d'identité ou une date, ne le demande pas ici : note-le dans \`open_questions\`, l'assistant le glissera au bon moment.
 
 Ne bâtis JAMAIS \`next_question\` sur un sujet de la liste « Sujets à laisser de côté », même si le narrateur l'a évoqué dans cet appel.

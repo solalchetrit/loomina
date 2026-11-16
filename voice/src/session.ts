@@ -181,6 +181,24 @@ export class CallSession {
         let firstTokenAt: number | null = null;
         let spoken = '';
         let pending = '';
+        // Une seule question par réplique : après le premier point
+        // d'interrogation, le reste de la réponse n'est plus lu (on continue
+        // seulement à guetter le marqueur de fin d'appel).
+        let asked = false;
+        const say = (text: string) => {
+            if (asked || !text) return;
+            let out = text;
+            const q = out.indexOf('?');
+            if (config.limits.oneQuestion && q >= 0) {
+                // Garder les guillemets ou l'espace qui ferment la question.
+                const tail = /^[\s»"”]*/.exec(out.slice(q + 1))?.[0] ?? '';
+                out = out.slice(0, q + 1) + tail.trimEnd();
+                asked = true;
+            }
+            this.sendText(out, false);
+            spoken += out;
+            this.spokenSoFar = spoken;
+        };
         this.spokenSoFar = '';
         // Le délai du client OpenAI ne couvre que l'arrivée de la réponse :
         // un flux qui s'arrête en route n'était jamais coupé. Sans nouveau
@@ -231,20 +249,20 @@ export class CallSession {
                 if (idx >= 0) {
                     this.endRequested = true;
                     const before = pending.slice(0, idx);
-                    if (before) { this.sendText(before, false); spoken += before; this.spokenSoFar = spoken; }
+                    say(before);
                     pending = '';
                     break;
                 }
                 // Garder un éventuel début de marqueur ("##END") en attente.
                 const keep = partialMarkerLength(pending);
                 const emit = pending.slice(0, pending.length - keep);
-                if (emit) { this.sendText(emit, false); spoken += emit; this.spokenSoFar = spoken; }
+                say(emit);
                 pending = pending.slice(pending.length - keep);
             }
 
             if (controller.signal.aborted && !stalled) return;
             if (stalled) throw new Error('flux OpenAI muet depuis 8 s');
-            if (pending && !pending.includes('#')) { this.sendText(pending, false); spoken += pending; }
+            if (pending && !pending.includes('#')) say(pending);
             this.sendText('', true);
         } catch (err) {
             if (controller.signal.aborted && !stalled) return;
