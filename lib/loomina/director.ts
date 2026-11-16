@@ -172,6 +172,7 @@ Tu reçois le contexte accumulé et le nouveau transcript.
 Tu renvoies le contexte **complet, fusionné et mis à jour** — pas un ajout.
 Cela veut dire : fusionner les doublons, préciser ce qui était vague, retirer une question qui a trouvé sa réponse.
 Reste sous 1 500 tokens. Si tu dois couper, garde ce qui sert à écrire le livre.
+Un récit que le narrateur a annoncé sans le raconter (« je vous en reparlerai », un deuil ou une épreuve seulement nommés) reste dans \`open_questions\` tant qu'il n'a pas été raconté ou refusé : c'est souvent une page importante du livre.
 \`open_questions\` : huit au plus, seulement ce qui compte pour le livre (identité, dates des grandes étapes, proches principaux, un récit resté inachevé). Pas le nom de famille d'un personnage secondaire, pas le nom officiel d'un lieu.
 
 # CALIBRAGE DE LA PROGRESSION (\`progress_percentage\`)
@@ -182,7 +183,7 @@ ${PHASE_DONE[phase]}
 - 51-80  : l'essentiel de la phase est là, il reste un ou deux axes à ouvrir
 - 81-99  : il ne manque qu'un point précis, que tu nommes dans \`next_question\`
 - 100    : la phase a donné ce qu'on attend d'elle pour le livre
-La progression ne recule jamais : elle vaut au moins la « progression enregistrée » qu'on te donne. Ne cherche pas l'exhaustivité : un livre de vie n'épuise aucune période, et une phase qui ne se termine jamais empêche le livre d'avancer. Si le narrateur raconte déjà, en détail, des périodes qui relèvent des phases suivantes, la phase en cours est faite : mets 100.
+La progression ne recule jamais : elle vaut au moins la « progression enregistrée » qu'on te donne. Ne cherche pas l'exhaustivité : un livre de vie n'épuise aucune période, et une phase qui ne se termine jamais empêche le livre d'avancer.
 
 # MATIÈRE POUR UN CHAPITRE (\`chapter_material\`)
 L'Écrivain ne doit écrire que s'il y a quelque chose à raconter. Évalue ce que le narrateur (lignes « User: ») a réellement apporté de NOUVEAU dans cet appel :
@@ -360,10 +361,20 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
  */
 export const MAX_CALLS_IN_PHASE: Record<Phase, number> = { 1: 3, 2: 6, 3: 8, 4: 4 };
 
+/**
+ * Nombre d'appels en dessous duquel une phase ne se termine pas. Sans ce
+ * plancher, la phase 2 se bouclait en un appel dès que l'enfance avait été
+ * survolée en phase 1, et un livre simulé arrivait en phase 4 au septième
+ * appel avec 7 000 mots.
+ */
+export const MIN_CALLS_IN_PHASE: Record<Phase, number> = { 1: 1, 2: 3, 3: 4, 4: 2 };
+
 /** La progression retenue : jamais en recul dans une phase, et bornée en nombre d'appels. */
 export function resolveProgress(p: { phase: Phase; estimated: number; previous: number; callsInPhase: number }): number {
     if (p.callsInPhase >= MAX_CALLS_IN_PHASE[p.phase]) return 100;
-    return Math.max(p.estimated, clamp(p.previous, 0, 100));
+    const progress = Math.max(p.estimated, clamp(p.previous, 0, 100));
+    // Pas de phase expédiée : avant le nombre d'appels minimal, on reste à 95.
+    return p.callsInPhase < MIN_CALLS_IN_PHASE[p.phase] ? Math.min(progress, 95) : progress;
 }
 
 export function shouldCompleteProject(result: DirectorResult): boolean {
