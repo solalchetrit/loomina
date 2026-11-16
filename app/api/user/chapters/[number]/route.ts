@@ -1,12 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
 import { countWords } from '@/lib/loomina/writer';
 import { DEMO_DATA } from '@/lib/loomina/demo';
+import { carryIntoBook } from '@/lib/loomina/book-edition';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// La correction est ensuite reportée dans le livre composé (after()).
+export const maxDuration = 300;
 
 const MAX_CHARS = 30_000;
 
@@ -37,7 +40,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
         const { data: rows, error: readErr } = await db()
             .from('chapters')
-            .select('id, version')
+            .select('id, version, content_markdown')
             .eq('project_id', projectId)
             .eq('chapter_number', number)
             .neq('status', 'archived')
@@ -65,6 +68,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             });
             const { error: ctxErr } = await db().from('projects').update({ context: next }).eq('id', projectId);
             if (ctxErr) throw new Error(ctxErr.message);
+        }
+
+        // Le livre composé suit : même correction, dans les seuls chapitres
+        // tirés de ce récit, tout le reste à l'identique.
+        const before = (chapter.content_markdown as string | null) ?? '';
+        if (before.trim() !== content) {
+            const origin = request.nextUrl.origin;
+            after(() => carryIntoBook({ projectId, source: number, before, after: content, correction, origin }));
         }
 
         return NextResponse.json({ saved: true });

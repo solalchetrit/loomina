@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
-import { readEditions, startEdition, kickEdition, publicEdition } from '@/lib/loomina/book-edition';
+import { readEditions, startEdition, kickEdition, publicEdition, autoCompose } from '@/lib/loomina/book-edition';
 import { DEMO_DATA } from '@/lib/loomina/demo';
 
 export const runtime = 'nodejs';
@@ -30,9 +30,19 @@ export async function GET(request: NextRequest) {
             const origin = request.nextUrl.origin;
             after(() => kickEdition(running.id, origin));
         }
+        // Livre commencé avant la composition automatique : on le compose
+        // à la première visite, sans attendre le prochain appel.
+        let starting = false;
+        // Et un livre en retard sur ses appels (recomposition manquée) est rattrapé.
+        if (!running && !failed && (count ?? 0) >= 2 && (!ready || (count ?? 0) > ready.source_count)) {
+            const origin = request.nextUrl.origin;
+            const projectId = author.project.id;
+            after(() => autoCompose(projectId, origin));
+            starting = true;
+        }
         return NextResponse.json({
             edition: ready ? publicEdition(ready) : null,
-            running: running ? { done: running.chapters.length, total: running.plan.length, status: running.status } : null,
+            running: running ? { done: running.chapters.length, total: running.plan.length, status: running.status } : starting ? { done: 0, total: 0, status: 'planning' } : null,
             failed: Boolean(failed),
             sourceCount: count ?? 0,
         });

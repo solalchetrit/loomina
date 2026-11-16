@@ -11,7 +11,7 @@
 import { db } from './db';
 import type { Profile, Project } from './db';
 import { normalizeContext } from './context';
-import { planBook, writeBookChapter } from './book';
+import { planBook, writeBookChapter, carryCorrection } from './book';
 import type { PlannedChapter, BookChapter, Source } from './book';
 import { countWords } from './writer';
 import { SITE } from '../../config/site';
@@ -171,6 +171,54 @@ export async function autoCompose(projectId: string, origin: string = SITE.url):
     } catch (err) {
         // Moins de deux récits, base indisponible… : le bouton de l'espace auteur reste là.
         console.info('[livre] pas de recomposition automatique :', err instanceof Error ? err.message : String(err));
+    }
+}
+
+/**
+ * L'auteur a corrigé un récit d'appel : la correction est reportée dans le
+ * livre composé, dans les seuls chapitres tirés de ce récit. Tout le reste
+ * du livre est recopié tel quel dans une nouvelle édition.
+ *
+ * Une composition en cours est relancée (elle a pu lire le récit avant la
+ * correction). Sans livre composé, on en lance un. Ne lève jamais.
+ */
+export async function carryIntoBook(params: {
+    projectId: string;
+    source: number;
+    before: string;
+    after: string;
+    correction?: string | null;
+    origin?: string;
+}): Promise<void> {
+    try {
+        const { ready, running } = await readEditions(params.projectId);
+        if (running || !ready) {
+            await autoCompose(params.projectId, params.origin);
+            return;
+        }
+        const chapters: BookChapter[] = [];
+        let touched = 0;
+        for (const c of ready.chapters) {
+            if (!c.sources.includes(params.source)) {
+                chapters.push(c);
+                continue;
+            }
+            const content = await carryCorrection({ chapter: c.content, before: params.before, after: params.after, correction: params.correction });
+            if (content !== c.content) touched += 1;
+            chapters.push({ ...c, content, word_count: countWords(content) });
+        }
+        const { error } = await db().from('book_editions').insert({
+            project_id: params.projectId,
+            status: 'ready',
+            plan: ready.plan,
+            chapters,
+            source_count: ready.source_count,
+            source_words: ready.source_words,
+        });
+        if (error) throw new Error(error.message);
+        console.info(`[livre] correction du récit ${params.source} reportée dans ${touched} chapitre(s)`);
+    } catch (err) {
+        console.error('[livre] correction non reportée dans le livre :', err instanceof Error ? err.message : String(err));
     }
 }
 

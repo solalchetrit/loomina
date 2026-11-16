@@ -128,23 +128,22 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
           </p>
         ) : (
           <div className="mt-5 flex flex-wrap items-center gap-4">
-            {canCompose ? (
+            {data?.failed && canCompose && (
               <Button onClick={compose} loading={starting}>
-                {edition ? "Recomposer mon livre" : "Composer mon livre"}
+                Réessayer
               </Button>
-            ) : (
-              <p className="t-small">Le livre pourra être composé à partir de deux appels racontés.</p>
             )}
+            {!canCompose && <p className="t-small">Votre livre sera composé à partir de deux appels racontés.</p>}
             {edition && (
               <p className="t-small">
                 Composé le {formatDate(edition.at)} à partir de {edition.sourceCount} appels
-                {newCalls > 0 ? ` · ${newCalls === 1 ? "un nouvel appel n’y figure" : `${newCalls} nouveaux appels n’y figurent`} pas encore` : ""}.
+                {newCalls > 0 ? ` · ${newCalls === 1 ? "le dernier appel y sera ajouté" : `les ${newCalls} derniers appels y seront ajoutés`} dans quelques minutes` : ""}.
               </p>
             )}
           </div>
         )}
         {data?.failed && !running && (
-          <p className="mt-4 text-[15px] font-semibold text-[var(--danger)]">La dernière composition n’a pas abouti. Vous pouvez la relancer.</p>
+          <p className="mt-4 text-[15px] font-semibold text-[var(--danger)]">La dernière mise à jour du livre n’a pas abouti. Vous pouvez la relancer.</p>
         )}
         {error && (
           <p role="alert" className="mt-4 text-[15px] font-semibold text-[var(--danger)]">
@@ -152,7 +151,7 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
           </p>
         )}
         {edition && (
-          <p className="t-small mt-4">Pour corriger un passage, corrigez-le dans « Appel par appel », puis recomposez le livre.</p>
+          <p className="t-small mt-4">Pour corriger un passage, corrigez-le dans « Appel par appel » : la correction est reportée dans le livre, le reste ne change pas.</p>
         )}
       </div>
 
