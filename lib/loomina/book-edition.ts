@@ -145,6 +145,35 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
     }
 }
 
+/**
+ * Après chaque appel raconté : le livre se recompose tout seul, en
+ * arrière-plan. L'auteur n'a pas à savoir qu'il faut cliquer (Solal,
+ * 16/11/2026). Une composition en cours est remplacée : elle ne contenait
+ * pas le récit qui vient d'arriver.
+ *
+ * Ne lève jamais : un livre non recomposé ne doit pas faire échouer le
+ * traitement d'un appel. `LOOMINA_AUTO_BOOK=off` coupe ce comportement
+ * (batterie de tests, poste local).
+ */
+export async function autoCompose(projectId: string, origin: string = SITE.url): Promise<void> {
+    if (process.env.LOOMINA_AUTO_BOOK === 'off') return;
+    try {
+        const { running } = await readEditions(projectId);
+        if (running) {
+            await db()
+                .from('book_editions')
+                .update({ status: 'failed', error: 'Remplacée : un nouvel appel est arrivé pendant la composition.', claimed_at: null, updated_at: new Date().toISOString() })
+                .eq('id', running.id);
+        }
+        const edition = await startEdition(projectId);
+        await kickEdition(edition.id, origin);
+        console.info(`[livre] recomposition lancée pour le projet ${projectId}`);
+    } catch (err) {
+        // Moins de deux récits, base indisponible… : le bouton de l'espace auteur reste là.
+        console.info('[livre] pas de recomposition automatique :', err instanceof Error ? err.message : String(err));
+    }
+}
+
 /** Le secret des appels internes : le même que celui du webhook, déjà posé partout. */
 export const internalSecret = () => process.env.VAPI_WEBHOOK_SECRET?.trim() ?? '';
 

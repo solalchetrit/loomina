@@ -115,7 +115,8 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
         <p className="t-eyebrow">Votre livre</p>
         <p className="t-body mt-3">
           Ici, les chapitres ne suivent pas vos appels. Loomina relit tout ce que vous avez raconté, range vos souvenirs dans l’ordre de
-          votre vie et ne garde qu’une fois ce qui a été dit plusieurs fois. Rien n’est ajouté.
+          votre vie et ne garde qu’une fois ce qui a été dit plusieurs fois. Rien n’est ajouté. Le livre se met à jour tout seul après
+          chaque appel.
         </p>
 
         {running ? (
