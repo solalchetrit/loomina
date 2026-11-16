@@ -22,7 +22,7 @@ const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
     icon: "pen",
     title: "L’écriture",
     items: [
-      "Un chapitre écrit après chaque appel, dans vos mots",
+      "Le récit de chaque appel, écrit dans vos mots",
       "Vos corrections, autant que nécessaire",
       "Chaque page relue par une personne de l’équipe avant l’impression",
     ],
@@ -46,7 +46,7 @@ const FAQ = [
   },
   {
     q: "Puis-je modifier le texte ?",
-    a: "Oui, autant de fois que vous le souhaitez. Vous relisez chaque chapitre dans votre espace auteur et vous dites à Loomina, au prochain appel, ce qu’il faut changer.",
+    a: "Oui, autant de fois que vous le souhaitez. Vous relisez le récit de chaque appel dans votre espace auteur et vous dites à Loomina, au prochain appel, ce qu’il faut changer.",
   },
   {
     q: "Puis-je l’offrir ?",

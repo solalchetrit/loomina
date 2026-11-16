@@ -227,7 +227,7 @@ export default function Settings({
             </p>
           </fieldset>
           <fieldset>
-            <legend className="field-label">Prévenir quand un chapitre est prêt</legend>
+            <legend className="field-label">Prévenir quand le récit d’un appel est prêt</legend>
             <div className="flex gap-2">
               {[true, false].map((v) => (
                 <button
@@ -243,7 +243,7 @@ export default function Settings({
                 </button>
               ))}
             </div>
-            <p className="t-small mt-2">Un SMS arrive quelques minutes après l’appel, avec le lien vers le nouveau chapitre.</p>
+            <p className="t-small mt-2">Un SMS arrive quelques minutes après l’appel, avec le lien vers le récit de l’appel.</p>
           </fieldset>
         </div>
       </section>

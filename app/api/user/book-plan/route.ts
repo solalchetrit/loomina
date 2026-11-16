@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
             .order('chapter_number', { ascending: true });
         if (error) throw new Error(error.message);
         if (!chapters || chapters.length < 2) {
-            return NextResponse.json({ error: 'Il faut au moins deux chapitres pour les ranger.' }, { status: 409 });
+            return NextResponse.json({ error: 'Il faut au moins deux récits pour les ranger.' }, { status: 409 });
         }
 
         const plan = await buildBookPlan({ chapters, context: normalizeContext(project.context) });

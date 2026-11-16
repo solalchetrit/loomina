@@ -24,8 +24,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = (await request.json().catch(() => ({}))) as { content?: unknown; correction?: unknown };
     const content = typeof body.content === 'string' ? body.content.trim() : '';
     const correction = typeof body.correction === 'string' ? body.correction.trim().slice(0, 300) : '';
-    if (!content) return NextResponse.json({ error: 'Le chapitre ne peut pas être vide.' }, { status: 400 });
-    if (content.length > MAX_CHARS) return NextResponse.json({ error: 'Le chapitre est trop long.' }, { status: 400 });
+    if (!content) return NextResponse.json({ error: 'Le récit ne peut pas être vide.' }, { status: 400 });
+    if (content.length > MAX_CHARS) return NextResponse.json({ error: 'Le récit est trop long.' }, { status: 400 });
 
     if (DEMO_DATA) return NextResponse.json({ saved: true, demo: true });
 
