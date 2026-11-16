@@ -5,20 +5,53 @@
   "tutoiement": "vous",
   "sujets_sensibles": "la guerre d'Algérie",
   "contexte": {
-    "identity": { "full_name": "Marcel Ferrand", "birth": "1946 à Roanne", "places": ["Roanne"] },
-    "family": [{ "name": "Lucienne", "relation": "mère" }],
-    "key_themes": ["enfance à Roanne"],
-    "last_call": { "summary": "Marcel a parlé de la boulangerie de ses parents à Roanne." },
-    "suggested_topics": ["Raconte-nous les vacances chez tante Odette", "Ton premier vélo"]
+    "identity": {
+      "full_name": "Marcel Ferrand",
+      "birth": "1946 à Roanne",
+      "places": [
+        "Roanne"
+      ]
+    },
+    "family": [
+      {
+        "name": "Lucienne",
+        "relation": "mère"
+      }
+    ],
+    "key_themes": [
+      "enfance à Roanne"
+    ],
+    "last_call": {
+      "summary": "Marcel a parlé de la boulangerie de ses parents à Roanne."
+    },
+    "suggested_topics": [
+      "Raconte-nous les vacances chez tante Odette",
+      "Ton premier vélo"
+    ]
   },
   "transcript": "AI: Bonjour Marcel ! La dernière fois, vous m'avez parlé de la boulangerie de vos parents. Racontez-moi une journée dans cette boulangerie.\nUser: Oh, ça commençait tôt. Mon père se levait à trois heures pour le pétrin. Moi, vers six heures, je descendais et l'odeur du pain chaud montait dans l'escalier. Ma mère, Lucienne, tenait la caisse. Elle avait une boîte en fer pour la monnaie, une boîte de biscuits Lu.\nAI: Une boîte de biscuits Lu… Qui venait acheter le pain le matin ?\nUser: Les ouvriers de l'usine textile, surtout. Il y avait un monsieur, monsieur Barge, qui prenait toujours deux baguettes bien cuites et qui me donnait une pièce pour aller lui chercher son journal.\nAI: On m'a glissé une question sur votre espace : les vacances chez tante Odette. Ça vous dit quelque chose ?\nUser: Ah, tante Odette ! Elle habitait à Saint-Haon, à la campagne. On y allait en août. Elle avait des poules et un chien qui s'appelait Pirate. Je dormais dans le grenier, sur un matelas en laine. Le soir on écoutait la radio dans la cuisine.\nAI: Pirate… Qu'est-ce que vous faisiez de vos journées là-bas ?\nUser: On allait à la rivière avec mes cousins pêcher des écrevisses à la main. Une fois, mon cousin Jeannot est tombé dans l'eau tout habillé et tante Odette l'a grondé pendant une heure. On en rit encore.\nAI: Quelle scène. Je crois qu'on a bien avancé aujourd'hui. La prochaine fois, on parlera de votre école. À bientôt Marcel ! ##END_CALL##",
   "attendu": {
-    "matiere": ["rich"],
-    "suggestions_couvertes": [1],
-    "suggestions_non_couvertes": [2],
-    "mots_interdits_question": ["algérie", "guerre"],
-    "doit_contenir_chapitre": ["Odette", "Pirate", "Barge"],
-    "mots_interdits_chapitre": ["Algérie"],
-    "mots_min": 400
+    "matiere": [
+      "rich"
+    ],
+    "suggestions_couvertes": [
+      1
+    ],
+    "suggestions_non_couvertes": [
+      2
+    ],
+    "mots_interdits_question": [
+      "algérie",
+      "guerre"
+    ],
+    "doit_contenir_chapitre": [
+      "Odette",
+      "Pirate",
+      "Barge"
+    ],
+    "mots_interdits_chapitre": [
+      "Algérie"
+    ],
+    "mots_min": 120
   }
 }

@@ -455,3 +455,69 @@ export function buildUnknownCallerAssistant(serverUrl: string) {
         },
     };
 }
+
+/** Durée maximale d'un entretien de secours. */
+export const RECOVERY_MAX_SECONDS = 1200;
+
+/**
+ * Réponse quand la base ne répond pas : on ne sait pas si l'appelant est
+ * un client. Plutôt que la démonstration (qui promet que rien n'est
+ * conservé, et coupe au bout de cinq minutes), un entretien libre sur un
+ * souvenir, de vingt minutes au plus.
+ *
+ * Le rapport de fin d'appel est bien envoyé : sans `project_id` dans les
+ * métadonnées, le webhook retrouve le projet par le numéro appelant
+ * (resolveCaller), et le souvenir rejoint le livre. Si le numéro n'est
+ * celui d'aucun client, l'événement est simplement classé « no_project ».
+ */
+export function buildRecoveryAssistant(serverUrl: string) {
+    const systemPrompt = `Tu es Loomina, un biographe masculin, chaleureux, patient et curieux. Tu mènes un entretien au téléphone pour un livre de souvenirs.
+
+Ce jour-là, tu n'as pas accès au dossier de la personne. Ne parle jamais de problème technique, de base de données ou de dossier introuvable au-delà de ta première phrase.
+
+# PRONONCIATION (ce que tu écris est lu à voix haute, jamais affiché)
+- Écris toujours la marque « Loumina », jamais « Loomina ».
+
+# DÉROULÉ
+1. Après ta première phrase, attends sa réponse.
+2. Si la personne dit qu'elle découvre le service ou qu'elle n'est pas cliente : explique en deux phrases que Loumina l'aide à raconter sa vie au fil d'appels, qu'un livre relié est ensuite imprimé, que tout est expliqué sur loomina point e u, remercie-la et termine par ##END_CALL##.
+3. Sinon, demande-lui de quoi elle aimerait parler aujourd'hui. Si elle ne sait pas, propose : « Racontez-moi la maison où vous avez grandi. »
+4. Creuse ce souvenir, une question à la fois : les lieux, les personnes, ce qu'on se disait, ce qu'elle ressentait. Réagis à ce qu'elle dit avant de poser la question suivante.
+5. Après une vingtaine de minutes, ou si elle souhaite s'arrêter, remercie-la, dis que ce souvenir rejoindra son livre, et termine par ##END_CALL##.
+
+# RÈGLES
+- Une seule question à la fois. Une à deux phrases par intervention.
+- Vouvoie toujours, sauf si la personne te demande de la tutoyer.
+- Ne demande ni adresse, ni e-mail, ni coordonnées bancaires.
+- N'invente rien sur sa vie : tu ne connais que ce qu'elle te dit pendant cet appel.`;
+
+    return {
+        assistant: {
+            name: 'Loomina-Secours',
+            transcriber: TRANSCRIBER,
+            voice: VOICE,
+            backgroundDenoisingEnabled: true,
+            backgroundSound: 'off',
+            startSpeakingPlan: { waitSeconds: 1.5 },
+            stopSpeakingPlan: { numWords: 0, voiceSeconds: 0, backoffSeconds: 3 },
+            silenceTimeoutSeconds: 60,
+            firstMessageMode: 'assistant-speaks-first',
+            firstMessage:
+                "Bonjour, ici Loumina, votre biographe. " +
+                "Je n'ai pas votre carnet de notes sous la main aujourd'hui, mais nous pouvons quand même avancer : " +
+                "racontez-moi un souvenir, et il rejoindra votre livre.",
+            endCallPhrases: ['##END_CALL##'],
+            model: {
+                provider: 'openai',
+                model: 'gpt-4o',
+                temperature: 0.7,
+                messages: [{ role: 'system', content: systemPrompt }],
+                tools: [{ type: 'endCall', messages: [{ type: 'request-start', content: 'À bientôt !' }] }],
+            },
+            server: { url: serverUrl, timeoutSeconds: 20 },
+            serverMessages: [...SERVER_MESSAGES],
+            metadata: { recovery: true },
+            maxDurationSeconds: RECOVERY_MAX_SECONDS,
+        },
+    };
+}

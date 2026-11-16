@@ -10,7 +10,8 @@ const NAV_LINKS = [
   { href: "/experience", label: "Comment ça marche" },
   { href: "/offre", label: "Le livre et le prix" },
   { href: "/faq", label: "Questions" },
-  { href: "/about", label: "Notre histoire" },
+  // « Notre histoire » (/about) masquée du menu à la demande de Solal (12/11/2026) ; la page existe toujours.
+  // { href: "/about", label: "Notre histoire" },
 ];
 
 /** Menu flottant : une barre blanche arrondie, posée au-dessus de la page. */

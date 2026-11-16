@@ -16,7 +16,6 @@ import { narratorSays } from './narrateur';
 import type { Persona, Line } from './narrateur';
 
 const require = createRequire(path.join(ROOT, 'voice', 'package.json'));
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const WebSocket = require('ws') as typeof import('ws').WebSocket;
 
 /** Signature Twilio : HMAC-SHA1 de l'URL suivie des paramètres triés. */
