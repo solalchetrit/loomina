@@ -188,7 +188,7 @@ ${PHASE_AXES[phase].map((a) => `- ${a.key} : ${a.label}`).join('\n')}
 ${AXIS_RULE[phase]}
 Renvoie dans \`covered_axes\` les clés de TOUS les sujets couverts à ce jour, en tenant compte de la mémoire et de cet appel. Les sujets déjà cochés (donnés plus bas) le restent. Sois juste : un sujet coché trop tôt donne un livre creux, un sujet jamais coché empêche le livre d'avancer.
 
-Si un sujet ne concerne pas cette personne (pas de frères et sœurs, jamais mariée, pas d'enfants), mets sa clé dans \`axes_not_applicable\` : seulement si elle l'a dit, jamais par supposition.
+Toutes les vies ne se ressemblent pas : certaines personnes n'ont jamais travaillé, jamais vécu en couple, pas eu d'enfants, pas connu leurs parents. Si le narrateur a dit qu'un sujet ne le concerne pas, ou qu'il ne souhaite pas en parler, mets sa clé dans \`axes_not_applicable\` : seulement s'il l'a dit, jamais par supposition. Un sujet vécu sous une autre forme (une compagne sans mariage, le foyer plutôt qu'un emploi) n'est pas sans objet : il est couvert dès qu'il est raconté. N'écris jamais \`next_question\` en supposant un mari, une épouse, des enfants ou un métier que le narrateur n'a pas mentionnés.
 
 # SUJETS PROPRES À CETTE PERSONNE (\`topics\`)
 La liste ci-dessus est la même pour tout le monde ; chaque vie a aussi ses sujets à elle. Tu tiens cette seconde liste, donnée plus bas avec un numéro par sujet.

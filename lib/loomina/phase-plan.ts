@@ -29,20 +29,20 @@ export interface Axis {
 export const PHASE_AXES: Record<Phase, Axis[]> = {
     1: [
         { key: 'identite', label: 'Le nom et la naissance (année ou date, lieu)' },
-        { key: 'famille', label: 'Les parents et la fratrie, au moins nommés' },
+        { key: 'famille', label: "Les personnes qui l'ont élevé et la fratrie s'il y en a une, au moins nommées" },
         { key: 'lieux', label: 'Les lieux où la personne a vécu' },
-        { key: 'etapes', label: 'Les grandes étapes de la vie adulte, au moins nommées : métier, vie de famille' },
+        { key: 'etapes', label: "Les grandes lignes de la vie adulte, au moins nommées : ce qui a occupé ses journées, les personnes avec qui elle a partagé sa vie" },
     ],
     2: [
         { key: 'maison', label: "La maison et les lieux de l'enfance" },
-        { key: 'proches', label: 'Les parents, grands-parents, frères et sœurs : un geste, une phrase, une habitude' },
+        { key: 'proches', label: "Les personnes de la maison (parents ou ceux qui l'ont élevé, grands-parents, frères et sœurs) : un geste, une phrase, une habitude" },
         { key: 'ecole', label: "L'école, les jeux, les fêtes, les premières fois" },
         { key: 'figures', label: 'Les personnes qui ont compté dans la jeunesse (un instituteur, un voisin, un ami)' },
         { key: 'depart', label: "L'adolescence et le moment où l'on quitte la maison" },
     ],
     3: [
-        { key: 'metier', label: 'Le métier' },
-        { key: 'couple', label: 'La rencontre, le couple, les enfants' },
+        { key: 'metier', label: "Ce qui a occupé ses journées : un métier, plusieurs, le foyer, un engagement, autre chose" },
+        { key: 'couple', label: "La vie affective et familiale : les personnes aimées, la vie à deux quelle qu'en soit la forme, les enfants s'il y en a eu" },
         { key: 'lieux_adulte', label: 'Les lieux de vie adulte, les maisons, les déménagements' },
         { key: 'passions', label: 'Les passions, les voyages' },
         { key: 'epreuves', label: "Les épreuves traversées (couvert aussi si la personne a dit ne pas vouloir en parler, ou qu'il n'y en a pas eu)" },
@@ -165,6 +165,11 @@ export function mergeTopics(existing: Topic[], update: unknown): Topic[] {
         topics.push({ id: nextId++, phase: a.phase, label, status: 'open' });
     }
     return topics;
+}
+
+/** Sujets du socle commun ni racontés ni écartés : à aborder, en demandant d'abord s'ils concernent la personne. */
+export function pendingAxes(state: PhaseState): Axis[] {
+    return PHASE_AXES[state.phase].filter((a) => !state.covered.includes(a.key) && !state.skipped.includes(a.key));
 }
 
 export const openTopics = (topics: Topic[], phase: Phase): Topic[] => topics.filter((t) => t.phase === phase && t.status === 'open');

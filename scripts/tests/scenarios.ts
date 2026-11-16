@@ -510,6 +510,36 @@ export const SCENARIOS: Scenario[] = [
         },
         attendu: { issue: ['processed'], phaseApres: 3, chapitrePhase: 3, loominaDit: ['crêperie', 'traversée', 'Atlantique'], sujetsRacontes: ['crêperie'] },
     },
+    {
+        id: '21-vie-hors-norme',
+        titre: 'Jamais mariée, pas d\'enfants, jamais eu d\'emploi',
+        question: 'Loomina demande-t-elle sans rien présumer, et les sujets qui ne concernent pas la personne sont-ils écartés sans la blesser ?',
+        seed: {
+            slug: 'horsnorme', prenom: 'Hélène', nom: 'Vasseur', phase: 3, progression: 0, prefsReglees: true,
+            etatPhase: { covered: [], check: null },
+            contexte: {
+                identity: { full_name: 'Hélène Vasseur', birth: '1947 à Honfleur', places: ['Honfleur', 'Paris'] },
+                family: [{ name: 'Marthe', relation: 'tante, qui l\'a élevée', deceased: true }],
+                timeline: [{ year: 1947, event: 'Naissance à Honfleur' }, { year: null, event: 'Élevée par sa tante Marthe à Honfleur' }, { year: null, event: 'Départ pour Paris à vingt ans' }],
+                key_themes: ['enfance à Honfleur chez sa tante Marthe', 'le départ pour Paris à vingt ans'],
+                last_call: { summary: 'Hélène a raconté son départ de Honfleur pour Paris, à vingt ans, avec une valise et l\'adresse d\'une amie.' },
+            },
+            questionSuivante: 'La dernière fois, vous m\'avez raconté votre départ pour Paris avec une valise et l\'adresse d\'une amie. Racontez-moi votre arrivée là-bas.',
+        },
+        persona: {
+            prenom: 'Hélène',
+            fiche: `Hélène Vasseur, 79 ans, née en 1947 à Honfleur, élevée par sa tante Marthe ; elle n'a pas connu ses parents. Montée à Paris à vingt ans chez son amie Françoise Leroux. Elle n'a jamais eu d'emploi : elle a vécu cinquante-deux ans avec Françoise, professeure de piano, dans un appartement de la rue Lepic ; elle tenait la maison, faisait la cuisine pour les élèves, s'occupait du jardin partagé de la butte, et peignait des aquarelles qu'elle n'a jamais vendues. Elles ne se sont jamais mariées. Pas d'enfants : « ça ne s'est pas présenté, et je n'en ai pas souffert ». Françoise est morte en 2021. Leurs étés à Belle-Île, le chat Debussy, les dimanches de musique avec les élèves.`,
+            maniere: 'Tu vouvoies. Réservée mais sincère, 2 à 5 phrases. Tu parles de Françoise comme de « mon amie » puis, si on t\'écoute bien, comme de « la femme de ma vie ».',
+            consignes: 'Si on te parle d\'un mari, tu corriges sèchement : « Je n\'ai jamais eu de mari. » Si on te demande ton métier comme une évidence, tu réponds : « Je n\'ai jamais travaillé, vous savez. » Si on te pose une question ouverte et délicate, tu racontes volontiers ta vie avec Françoise et tes journées. Si on te demande si tu as eu des enfants, tu réponds que non, et que ce n\'est pas un sujet. Après une douzaine de réponses, dis que tu es fatiguée.',
+        },
+        attendu: {
+            issue: ['processed'], phaseApres: 3,
+            loominaSans: ['votre mari', 'votre époux', 'votre métier', 'votre carrière', 'vos enfants'],
+            questionSans: ['mari', 'époux', 'métier', 'carrière', 'vos enfants'],
+            chapitreSans: ['mon mari', 'mon époux'],
+            memoireContient: ['Françoise'],
+        },
+    },
 ];
 
 /**

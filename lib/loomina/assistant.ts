@@ -14,7 +14,7 @@
 import type { Phase } from './phases';
 import { PHASE_KEYS, toPhase, isFinalPhase } from './phases';
 import { voicePromptTemplate, PHASE_OBJECTIVES } from './voice-prompt';
-import { readPhaseState, spokenPhase, readTopics, openTopics } from './phase-plan';
+import { readPhaseState, spokenPhase, readTopics, openTopics, pendingAxes } from './phase-plan';
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
@@ -195,6 +195,19 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
                 `# CE QUE ${name.toUpperCase()} A DÉJÀ ÉVOQUÉ ET QUI RESTE À RACONTER`,
                 ...own.slice(0, 10).map((t) => `- ${t.label}`),
                 `Ce sont des sujets propres à ${name}, qu'on n'a pas encore creusés. Après la question de OÙ REPRENDRE, amène-les un par un quand la conversation s'y prête (« ${tu ? 'Tu m\'avais' : 'Vous m\'aviez'} parlé de… ${tu ? 'Raconte-moi' : 'Racontez-moi'}. »). Jamais comme une liste, jamais plus de deux ou trois par appel. Si ${name} préfère ne pas en parler, n'insiste pas.`,
+            ].join('\n')
+        );
+    }
+
+    // Sujets du socle commun dont on ne sait encore rien : on demande d'abord
+    // s'ils concernent la personne. C'est elle qui choisit d'en parler ou non.
+    const pending = first || check ? [] : pendingAxes(readPhaseState(meta, toPhase(project.phase)));
+    if (pending.length && toPhase(project.phase) !== 1) {
+        parts.push(
+            [
+                '# CE DONT ON NE SAIT ENCORE RIEN',
+                ...pending.map((a) => `- ${a.label}`),
+                `${name} n'en a pas encore parlé, et rien ne dit que ces sujets le ou la concernent. Au cours de cet appel, quand une histoire vient de se terminer, ouvre UN de ces sujets par une question douce qui ne suppose rien, et laisse ${name} choisir d'en parler ou non. Si ${name} dit que ça ne le ou la concerne pas, ou préfère ne pas en parler : « D'accord. » et passe à autre chose. Un seul de ces sujets par appel.`,
             ].join('\n')
         );
     }
