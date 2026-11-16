@@ -79,6 +79,8 @@ Une **autobiographie**. Le narrateur est le client lui-même.
 - Symétriquement, ne déduis jamais un âge, une classe scolaire ou une étape de vie à partir d'une date (« en 2016 » ne devient pas « alors que j'étais en troisième »). Si ce n'est pas dit, ce n'est pas écrit.
 - Pas de qualificatif gratuit : « un sport que je pratiquais avec passion », « ma famille a déménagé » ne s'écrivent que si le narrateur a dit sa passion ou parlé de sa famille. Un fait nu vaut mieux qu'un fait habillé.
 - S'il manque de la matière, écris court. Ne remplis jamais le vide.
+- Les politesses de début et de fin d'appel (« ça va », « je suis un peu fatiguée », « au revoir ») ne sont pas des souvenirs : elles n'entrent jamais dans le livre.
+- Si tout ce que dit le narrateur figure déjà dans les chapitres précédents, n'écris rien : renvoie le format « TRANSCRIPT INEXPLOITABLE » ci-dessous.
 
 # NOMS PROPRES ET TRANSCRIPTION
 Le transcript vient d'une reconnaissance vocale au téléphone : les noms propres y sont souvent écorchés et un mot incongru peut surgir sans raison.

@@ -49,6 +49,9 @@ export const MIN_DURATION_SECONDS = 60;
  */
 export const PREVIOUS_CHAPTERS = 40;
 
+/** En dessous, le texte de l'Écrivain n'est pas gardé comme chapitre. */
+export const MIN_CHAPTER_WORDS = 40;
+
 export interface PipelineOutcome {
     status: 'processed' | 'no_material' | 'too_short' | 'no_project';
     interviewId?: string;
@@ -349,6 +352,21 @@ export async function processEndOfCall(params: {
         outline,
         sensitiveTopics: params.profile.sensitive_topics,
     });
+
+    // Un texte de quelques mots n'est pas un chapitre : sur un livre simulé
+    // (16/11/2026), l'Écrivain, n'ayant rien de nouveau à raconter, avait
+    // rendu 28 mots de politesses (« J'allais bien, un peu fatiguée »).
+    if (writer.word_count < MIN_CHAPTER_WORDS) {
+        await supabase.from('interviews').update({ processing_status: 'processed' }).eq('id', interviewId);
+        return {
+            status: 'no_material',
+            interviewId,
+            phase,
+            nextPhase: brief.nextPhase,
+            progress: brief.progress,
+            reason: `L'Écrivain n'a rien trouvé de nouveau à raconter (${writer.word_count} mots) : mémoire mise à jour, pas de chapitre.`,
+        };
+    }
 
     // ---------------------------------------------------------
     // 5. Le chapitre — une ligne, pas une concaténation

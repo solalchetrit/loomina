@@ -151,6 +151,7 @@ export function dbChecks(params: {
 
     const newChapters = after.chapters.filter((c) => !before.chapters.some((b) => b.id === c.id));
     const expectedChapters = issue === 'processed' ? 1 : 0;
+    if (newChapters[0]) B(newChapters[0].word_count >= 40, `le chapitre n'est pas un texte de quelques mots (${newChapters[0].word_count})`, 'important', 'chapitre');
     B(newChapters.length === expectedChapters, `${newChapters.length} chapitre écrit (attendu ${expectedChapters})`);
     const numbers = after.chapters.map((c) => c.chapter_number);
     B(numbers.every((n, i) => n === i + 1), `chapitres numérotés sans trou ni doublon (${numbers.join(', ') || 'aucun'})`);
