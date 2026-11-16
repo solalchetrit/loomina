@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Button from "@/components/ui/Button";
 
 interface BookChapter {
   number: number;
@@ -127,9 +128,9 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
         ) : (
           <div className="mt-5 flex flex-wrap items-center gap-4">
             {canCompose ? (
-              <button type="button" onClick={compose} disabled={starting} className="btn btn-primary">
-                {starting ? "Un instant…" : edition ? "Recomposer mon livre" : "Composer mon livre"}
-              </button>
+              <Button onClick={compose} loading={starting}>
+                {edition ? "Recomposer mon livre" : "Composer mon livre"}
+              </Button>
             ) : (
               <p className="t-small">Le livre pourra être composé à partir de deux appels racontés.</p>
             )}

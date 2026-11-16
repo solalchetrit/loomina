@@ -149,19 +149,21 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
 export const internalSecret = () => process.env.VAPI_WEBHOOK_SECRET?.trim() ?? '';
 
 /**
- * Demande l'étape suivante à une autre fonction du site, sans attendre
- * qu'elle finisse (elle a ses propres 300 s).
+ * Demande l'étape suivante à une autre fonction du site. Celle-ci répond
+ * aussitôt et travaille ensuite, avec ses propres 300 s.
  */
 export async function kickEdition(id: string, origin: string = SITE.url): Promise<void> {
     try {
-        await fetch(`${origin.replace(/\/$/, '')}/api/jobs/book`, {
+        const res = await fetch(`${origin.replace(/\/$/, '')}/api/jobs/book`, {
             method: 'POST',
             headers: { 'content-type': 'application/json', 'x-loomina-internal': internalSecret() },
             body: JSON.stringify({ id }),
-            signal: AbortSignal.timeout(2500),
+            signal: AbortSignal.timeout(15_000),
         });
-    } catch {
-        // Délai dépassé : c'est attendu, l'étape tourne de son côté.
+        if (!res.ok) console.error(`[livre] étape suivante refusée (${res.status}) pour l'édition ${id}`);
+    } catch (err) {
+        // La lecture de l'espace auteur relancera une composition restée sans nouvelle.
+        console.error(`[livre] étape suivante injoignable pour l'édition ${id} :`, err instanceof Error ? err.message : err);
     }
 }
 

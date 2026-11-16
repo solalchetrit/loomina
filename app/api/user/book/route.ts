@@ -25,7 +25,8 @@ export async function GET(request: NextRequest) {
         const { count } = await db().from('chapters').select('id', { count: 'exact', head: true }).eq('project_id', author.project.id).neq('status', 'archived');
 
         // La chaîne d'étapes a pu casser (déploiement, fonction tuée) : on la relance.
-        if (running && !running.claimed_at && Date.now() - new Date(running.updated_at).getTime() > STALE_MS) {
+        // Une étape encore au travail refusera simplement la relance (verrou).
+        if (running && Date.now() - new Date(running.updated_at).getTime() > STALE_MS) {
             const origin = request.nextUrl.origin;
             after(() => kickEdition(running.id, origin));
         }

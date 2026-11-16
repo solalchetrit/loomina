@@ -21,16 +21,18 @@ export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => ({}))) as { id?: string };
     if (!body.id) return NextResponse.json({ error: 'id manquant' }, { status: 400 });
 
-    try {
-        const edition = await advanceEdition(body.id);
-        if (!edition) return NextResponse.json({ ok: true, busy: true });
-        if (edition.status === 'planning' || edition.status === 'writing') {
-            const origin = request.nextUrl.origin;
-            after(() => kickEdition(edition.id, origin));
+    // On répond tout de suite et on travaille ensuite : l'appelant n'attend
+    // pas (une étape dure jusqu'à deux minutes), et couper la connexion ne
+    // coupe pas l'écriture du chapitre.
+    const id = body.id;
+    const origin = request.nextUrl.origin;
+    after(async () => {
+        try {
+            const edition = await advanceEdition(id);
+            if (edition && (edition.status === 'planning' || edition.status === 'writing')) await kickEdition(id, origin);
+        } catch (err) {
+            console.error('[jobs/book]', err);
         }
-        return NextResponse.json({ ok: true, status: edition.status, done: edition.chapters.length, total: edition.plan.length });
-    } catch (err) {
-        console.error('[jobs/book]', err);
-        return NextResponse.json({ error: 'internal' }, { status: 500 });
-    }
+    });
+    return NextResponse.json({ ok: true });
 }
