@@ -168,7 +168,12 @@ async function simulateVoice() {
             ...(VOICE_MODEL.startsWith('gpt-4') ? { temperature: 0.7 } : { reasoning_effort: 'none' as const }),
             messages: [{ role: 'system', content: system }, ...history],
         });
-        history.push({ role: 'assistant', content: reply.choices[0]?.message?.content ?? '' });
+        // Comme le serveur vocal (voice/src/session.ts) : la réplique est
+        // coupée après sa première question, sauf le marqueur de fin d'appel.
+        const raw = reply.choices[0]?.message?.content ?? '';
+        const q = raw.indexOf('?');
+        const cut = q >= 0 ? raw.slice(0, q + 1) + (raw.includes('##END_CALL##') ? ' ##END_CALL##' : '') : raw;
+        history.push({ role: 'assistant', content: cut });
     }
 
     const replies = history.filter((m) => m.role === 'assistant').slice(1).map((m) => m.content.replace('##END_CALL##', '').trim());

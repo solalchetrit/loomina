@@ -1,0 +1,166 @@
+/**
+ * Rapport de fin d'appel.
+ *
+ * Il reprend la forme du `end-of-call-report` de Vapi, parce que tout
+ * l'aval (webhook Next.js, `call_events`, Directeur, Écrivain, vue
+ * `call_metrics`) la lit déjà. Changer de fournisseur de voix ne doit
+ * rien changer à la fabrication des chapitres.
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { config } from './config.ts';
+
+/**
+ * Dossier d'attente des rapports. Un rapport y est écrit AVANT tout envoi
+ * et n'en sort qu'une fois accepté par le site : une coupure réseau, un
+ * site en erreur ou un redémarrage du serveur ne perdent plus l'entretien.
+ */
+export const SPOOL_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'spool');
+
+export interface TurnRecord {
+    role: 'bot' | 'user';
+    message: string;
+    time: number;
+}
+
+export interface CallReportInput {
+    callSid: string;
+    from: string;
+    to: string;
+    direction: string;
+    startedAt: Date;
+    endedAt: Date;
+    endedReason: string;
+    turns: TurnRecord[];
+    metadata: Record<string, unknown>;
+    modelLatenciesMs: number[];
+    promptTokens: number;
+    completionTokens: number;
+    interruptions: number;
+}
+
+function average(values: number[]): number | null {
+    if (!values.length) return null;
+    return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+}
+
+/** Même mise en forme que le transcript Vapi : « AI: … » / « User: … ». */
+export function renderTranscript(turns: TurnRecord[]): string {
+    return turns
+        .filter((t) => t.message.trim())
+        .map((t) => `${t.role === 'bot' ? 'AI' : 'User'}: ${t.message.trim()}`)
+        .join('\n');
+}
+
+export function buildEndOfCallReport(input: CallReportInput) {
+    const durationSeconds = Math.round((input.endedAt.getTime() - input.startedAt.getTime()) / 1000);
+    const customerNumber = input.direction.startsWith('outbound') ? input.to : input.from;
+
+    return {
+        message: {
+            type: 'end-of-call-report',
+            endedReason: input.endedReason,
+            startedAt: input.startedAt.toISOString(),
+            endedAt: input.endedAt.toISOString(),
+            durationSeconds,
+            transcript: renderTranscript(input.turns),
+            customer: { number: customerNumber },
+            call: {
+                id: input.callSid,
+                customer: { number: customerNumber },
+                metadata: input.metadata,
+                provider: 'twilio-conversationrelay',
+            },
+            artifact: {
+                transcript: renderTranscript(input.turns),
+                messages: input.turns.map((t) => ({
+                    role: t.role,
+                    message: t.message,
+                    time: t.time,
+                })),
+                performanceMetrics: {
+                    modelLatencyAverage: average(input.modelLatenciesMs),
+                    numAssistantInterrupted: input.interruptions,
+                },
+            },
+            // Coût Twilio/ElevenLabs/Deepgram non connu ici ; le modèle seul.
+            costBreakdown: {
+                llmPromptTokens: input.promptTokens,
+                llmCompletionTokens: input.completionTokens,
+            },
+        },
+    };
+}
+
+type Report = ReturnType<typeof buildEndOfCallReport>;
+
+/**
+ * Livre un rapport : copie sur disque, puis jusqu'à 5 essais espacés
+ * (2, 4, 8, 16 s). En cas d'échec il reste sur disque et `flushSpool`
+ * le renverra plus tard. Le site déduplique sur l'identifiant d'appel :
+ * renvoyer deux fois est sans risque.
+ */
+/** Fichiers en cours d'envoi par `deliverReport` : `flushSpool` les laisse. */
+const inFlight = new Set<string>();
+
+export async function deliverReport(callSid: string, report: Report): Promise<boolean> {
+    fs.mkdirSync(SPOOL_DIR, { recursive: true });
+    const file = path.join(SPOOL_DIR, `${callSid.replace(/[^A-Za-z0-9_-]/g, '')}.json`);
+    fs.writeFileSync(file, JSON.stringify(report));
+    inFlight.add(file);
+    try {
+        return await sendWithRetries(callSid, file, report);
+    } finally {
+        inFlight.delete(file);
+    }
+}
+
+async function sendWithRetries(callSid: string, file: string, report: Report): Promise<boolean> {
+    for (let attempt = 1; attempt <= 5; attempt++) {
+        try {
+            await postEndOfCallReport(report);
+            fs.rmSync(file, { force: true });
+            return true;
+        } catch (err) {
+            console.warn(`[${callSid}] envoi du rapport, essai ${attempt}/5 :`, err instanceof Error ? err.message : err);
+            if (attempt < 5) await new Promise((r) => setTimeout(r, 2000 * 2 ** (attempt - 1)));
+        }
+    }
+    return false;
+}
+
+/** Renvoie les rapports restés en attente. Appelé au démarrage puis chaque minute. */
+export async function flushSpool(): Promise<void> {
+    if (!fs.existsSync(SPOOL_DIR)) return;
+    for (const name of fs.readdirSync(SPOOL_DIR).filter((n) => n.endsWith('.json'))) {
+        const file = path.join(SPOOL_DIR, name);
+        if (inFlight.has(file)) continue;
+        try {
+            await postEndOfCallReport(JSON.parse(fs.readFileSync(file, 'utf8')));
+            fs.rmSync(file, { force: true });
+            console.info(`[spool] rapport ${name} livré`);
+        } catch (err) {
+            console.warn(`[spool] ${name} toujours en attente :`, err instanceof Error ? err.message : err);
+        }
+    }
+}
+
+/** Envoie le rapport au site, exactement comme Vapi le faisait. */
+export async function postEndOfCallReport(report: Report): Promise<void> {
+    const url = `${config.nextBaseUrl}/api/vapi/webhook`;
+    const response = await fetch(url, {
+        signal: AbortSignal.timeout(20_000),
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+            'x-vapi-secret': config.webhookSecret,
+        },
+        body: JSON.stringify(report),
+    });
+    if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new Error(`Rapport refusé par ${url} : ${response.status} ${detail.slice(0, 200)}`);
+    }
+}
