@@ -18,6 +18,10 @@ export interface Check {
     domaine: 'direct' | 'chapitre' | 'base' | 'memoire' | 'livre' | 'technique';
 }
 
+// Limites de mots qui tiennent compte des accents (« êtes » ne contient pas « tes »).
+const TU = /(?<!\p{L})(tu|toi|ton|ta|tes)(?!\p{L})|(?<!\p{L})t['’]/iu;
+const VOUS = /(?<!\p{L})(vous|votre|vos)(?!\p{L})/iu;
+
 const words = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
 const has = (text: string, w: string) => text.toLowerCase().includes(w.toLowerCase());
 const pct = (n: number, d: number) => (d ? Math.round((100 * n) / d) : 0);
@@ -94,8 +98,8 @@ export function liveChecks(call: CallResult, attendu: Expectation, tutoiement: '
     }
 
     if (tutoiement && replies.length >= 3) {
-        const tu = /\b(tu|toi|ton|ta|tes)\b|\bt['’]/i;
-        const vous = /\b(vous|votre|vos)\b/i;
+        const tu = TU;
+        const vous = VOUS;
         // Après le moment où la préférence est connue : les trois premières répliques sont exclues si elle se décide pendant l'appel.
         const scope = attendu.profilTu ? replies.slice(3) : replies;
         const wrong = scope.filter((r) => (tutoiement === 'tu' ? vous.test(r.text) && !tu.test(r.text) : tu.test(r.text) && !vous.test(r.text))).length;
@@ -177,7 +181,7 @@ export function dbChecks(params: {
     B((q.match(/\?/g) ?? []).length <= 1, `la question suivante est une seule question — « ${q.slice(0, 220)} »`, 'important', 'memoire');
     for (const w of attendu.questionSans ?? []) B(!has(q, w), `la question suivante évite « ${w} »`, 'bloquant', 'memoire');
     const tu = after.profile.politeness_preference === 'tu';
-    B(tu ? !/\b(vous|votre|vos)\b/i.test(q) : !/\b(tu|toi|ton|ta|tes)\b|\bt['’]/i.test(q), `la question suivante ${tu ? 'tutoie' : 'vouvoie'}`, 'important', 'memoire');
+    B(tu ? !VOUS.test(q) : !TU.test(q), `la question suivante ${tu ? 'tutoie' : 'vouvoie'}`, 'important', 'memoire');
 
     // Mémoire.
     const ctxBefore = normalizeContext(before.project.context);
