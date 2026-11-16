@@ -3,6 +3,9 @@ FROM node:24-slim
 WORKDIR /app
 COPY voice/package.json voice/package-lock.json* ./voice/
 RUN cd voice && npm install --omit=dev
+# lib/loomina importe @supabase/supabase-js, openai… : Node les cherche en
+# remontant depuis /app/lib, jamais dans /app/voice. Ce lien les rend visibles.
+RUN ln -s /app/voice/node_modules /app/node_modules
 COPY lib ./lib
 COPY voice ./voice
 WORKDIR /app/voice
