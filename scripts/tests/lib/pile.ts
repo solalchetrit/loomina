@@ -108,6 +108,11 @@ export async function startStack(logDir: string): Promise<void> {
     });
     await new Promise<void>((resolve) => site!.listen(SITE_PORT, resolve));
 
+    // Rapports d'appels simulés restés en attente d'une série interrompue :
+    // leurs profils n'existent plus, le serveur vocal les renverrait sans fin.
+    const spool = path.join(ROOT, 'voice', 'spool');
+    if (fs.existsSync(spool)) for (const f of fs.readdirSync(spool)) if (f.startsWith('CAbanc')) fs.rmSync(path.join(spool, f), { force: true });
+
     const log = fs.createWriteStream(path.join(logDir, 'serveur-vocal.log'));
     voice = spawn(path.join(ROOT, 'voice', 'node_modules', '.bin', 'tsx'), ['src/server.ts'], {
         cwd: path.join(ROOT, 'voice'),

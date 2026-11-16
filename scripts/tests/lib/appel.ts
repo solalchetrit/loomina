@@ -38,7 +38,7 @@ async function postForm(pathname: string, params: Record<string, string>): Promi
 const unescapeXml = (s: string) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Temps de parole simulé : ~60 ms par caractère, accéléré. */
-const speakMs = (text: string) => Math.round((text.length * 60) / SPEED);
+const speakMs = (text: string, speed = SPEED) => Math.round((text.length * 60) / speed);
 
 export interface Behaviour {
     /** Le narrateur raccroche sans prévenir après ce nombre de répliques. */
@@ -47,6 +47,8 @@ export interface Behaviour {
     interromptAux?: number[];
     /** À cette réplique, le narrateur se tait : on attend la relance puis la fin. */
     silenceA?: number;
+    /** Accélération de la parole pour cet appel (les appels de peu de répliques doivent durer plus d'une minute). */
+    vitesse?: number;
     /** Nombre maximal de répliques du narrateur (sécurité). */
     maxRepliques?: number;
 }
@@ -131,7 +133,7 @@ export async function simulateCall(params: {
 
     let endedBy: CallResult['endedBy'] = 'narrateur';
     // Le temps que Twilio lise la salutation.
-    await sleep(speakMs(greeting));
+    await sleep(speakMs(greeting, b.vitesse));
 
     for (let n = 1; n <= max; n++) {
         flushUnprompted();
@@ -164,7 +166,7 @@ export async function simulateCall(params: {
         }
         if (!said.text) continue;
 
-        await sleep(speakMs(said.text));
+        await sleep(speakMs(said.text, b.vitesse));
         turns.push({ role: 'narrateur', text: said.text });
         params.log?.(`  ${params.persona.prenom} : ${said.text.slice(0, 90)}`);
 
@@ -194,7 +196,7 @@ export async function simulateCall(params: {
         if (text) {
             turns.push({ role: 'loomina', text, firstTokenMs: firstAt ? firstAt - sentAt : undefined, totalMs: doneAt - sentAt });
             params.log?.(`  Loomina : ${text.slice(0, 90)}`);
-            await sleep(speakMs(text));
+            await sleep(speakMs(text, b.vitesse));
         }
 
         if (b.coupureApres === n) { endedBy = 'coupure'; break; }
