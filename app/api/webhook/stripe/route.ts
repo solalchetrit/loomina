@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { formatToE164 } from '@/lib/phone';
 import { db, findProfileByPhone } from '@/lib/loomina/db';
 import { stripe } from '@/lib/stripe';
+import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 
 /**
  * Provisionnement d'un client après paiement.
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest) {
             current_topic_id: 1,
             stripe_session_id: session.id,   // la garantie d'idempotence
             // L'acheteur peut être différent du narrateur (cadeau).
-            project_metadata: { is_gift: isGift, buyer_email: email },
+            project_metadata: { is_gift: isGift, buyer_email: email, call_minutes: normalizeCallMinutes(meta.callMinutes) },
         });
 
         if (projetErr) {

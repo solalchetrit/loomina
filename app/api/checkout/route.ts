@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OFFER } from "@/config/offer";
 import { stripe } from "@/lib/stripe";
+import { normalizeCallMinutes } from "@/lib/loomina/call-length";
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { firstName, lastName, phone, email, isGift } = body;
+        const { firstName, lastName, phone, email, isGift, callMinutes } = body;
 
         // Validation simple
         if (!email || !firstName || !lastName) {
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
                 phone,
                 email,
                 isGift: isGift ? "true" : "false",
+                callMinutes: String(normalizeCallMinutes(callMinutes)),
                 // On pourrait ajouter un userId ici si l'utilisateur était authentifié via Supabase Auth
                 // userId: user.id
             },

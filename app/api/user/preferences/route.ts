@@ -3,6 +3,7 @@ import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { DEMO_DATA, demoSavePrefs } from '@/lib/loomina/demo';
 import { normalizeSchedule } from '@/lib/loomina/schedule';
+import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,10 @@ export async function PATCH(request: NextRequest) {
         }
         if (body.callSchedule !== undefined) {
             meta.call_schedule = normalizeSchedule(body.callSchedule);
+            metaChanged = true;
+        }
+        if (body.callMinutes !== undefined) {
+            meta.call_minutes = normalizeCallMinutes(body.callMinutes);
             metaChanged = true;
         }
         if (metaChanged) projectUpdates.project_metadata = meta;

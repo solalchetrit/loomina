@@ -14,6 +14,7 @@ import { config } from './config.ts';
 import type { CallPlan } from './plan.ts';
 import { buildEndOfCallReport, deliverReport } from './report.ts';
 import type { TurnRecord } from './report.ts';
+import { timeNote } from '../../lib/loomina/call-length';
 
 const END_MARKER = '##END_CALL##';
 
@@ -327,7 +328,14 @@ export class CallSession {
             role: t.role === 'bot' ? 'assistant' : 'user',
             content: t.message,
         }));
-        return [{ role: 'system', content: this.plan.systemPrompt }, ...history];
+        const messages: ChatMessage[] = [{ role: 'system', content: this.plan.systemPrompt }, ...history];
+        // Le modèle ne voit pas l'heure. La note va en dernier : le début de
+        // la conversation reste identique d'une réplique à l'autre (cache).
+        if (this.plan.targetMinutes) {
+            const elapsed = (Date.now() - this.startedAt.getTime()) / 1000;
+            messages.push({ role: 'system', content: timeNote(elapsed, this.plan.targetMinutes) });
+        }
+        return messages;
     }
 
     /**

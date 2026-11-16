@@ -18,6 +18,7 @@ import { readPhaseState, spokenPhase, readTopics, openTopics, pendingAxes } from
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
+import { normalizeCallMinutes } from './call-length';
 
 /**
  * LE réglage qui change tout côté coût.
@@ -377,6 +378,8 @@ export function buildAssistant({
                 user_id: profile.id,
                 project_id: project.id,
                 phase,
+                // Durée souhaitée : le serveur vocal la donne au modèle à chaque réplique.
+                call_minutes: normalizeCallMinutes(meta.call_minutes),
             },
         },
     };
