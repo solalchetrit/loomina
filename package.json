@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "check": "tsc --noEmit && eslint",
-    "bench": "npx -y tsx@4.19.2 --tsconfig tsconfig.json scripts/bench/run.ts"
+    "bench": "npx -y tsx@4.19.2 --tsconfig tsconfig.json scripts/bench/run.ts",
+    "test:appels": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/run.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.87.1",

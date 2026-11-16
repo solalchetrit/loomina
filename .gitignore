@@ -46,3 +46,4 @@ yarn-error.log*
 # skills design : fichiers de travail
 .taste-skill/
 scripts/bench/rapports/
+scripts/tests/rapports/
