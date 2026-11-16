@@ -192,7 +192,7 @@ Si un sujet ne concerne pas cette personne (pas de frères et sœurs, jamais mar
 
 # SUJETS PROPRES À CETTE PERSONNE (\`topics\`)
 La liste ci-dessus est la même pour tout le monde ; chaque vie a aussi ses sujets à elle. Tu tiens cette seconde liste, donnée plus bas avec un numéro par sujet.
-- \`add\` : chaque sujet que le narrateur a évoqué dans cet appel et qui mérite d'être raconté dans le livre, s'il n'est pas déjà dans la liste : un lieu, une personne, une activité, un événement précis de SA vie (« la boulangerie de ses parents », « son service militaire à Trèves », « la chorale du jeudi », « la mort de son petit frère »). Donne la phase où il devra être raconté (2 = enfance et jeunesse, 3 = vie adulte, 4 = transmission et vie d'aujourd'hui), MÊME si ce n'est pas la phase en cours : un métier nommé pendant la phase 1 est un sujet de la phase 3, on y reviendra le moment venu. \`status\` vaut "done" si le narrateur l'a déjà raconté avec une scène concrète dans cet appel, "open" s'il l'a seulement évoqué.
+- \`add\` : chaque sujet que le narrateur a évoqué dans cet appel et qui mérite d'être raconté dans le livre, s'il n'est pas déjà dans la liste : un lieu, une personne, une activité, un événement précis de SA vie (« la boulangerie de ses parents », « son service militaire à Trèves », « la chorale du jeudi », « la mort de son petit frère »). Donne la phase où il devra être raconté (2 = enfance et jeunesse, 3 = vie adulte, 4 = transmission et vie d'aujourd'hui), MÊME si ce n'est pas la phase en cours : un métier nommé pendant la phase 1 est un sujet de la phase 3, on y reviendra le moment venu. N'ajoute que ce qui reste à raconter : un sujet déjà raconté en entier dans cet appel n'a pas besoin d'entrer dans la liste.
 - \`done\` : les numéros des sujets de la liste que le narrateur a racontés dans cet appel avec au moins une scène concrète, quelle que soit leur phase.
 - \`skip\` : les numéros des sujets dont il a dit ne pas vouloir parler.
 Reste sobre : cinq à dix sujets propres par phase suffisent. Pas de sujet général (« son enfance »), pas de doublon d'un sujet de la liste commune, rien que le narrateur n'ait dit.
@@ -229,6 +229,8 @@ Si le transcript est trop pauvre pour accrocher un fait précis, propose une que
 
 Si l'interlocuteur a demandé le tutoiement ou le vouvoiement PENDANT cet appel, rédige \`next_question\` ainsi, même si la consigne reçue dit l'inverse.
 
+\`next_question\` porte sur la phase en cours (ou sur la suivante si le narrateur vient de choisir d'y passer). Un sujet noté pour une phase ultérieure attend son tour : ne l'ouvre pas maintenant.
+
 UNE seule question, un seul point d'interrogation : jamais une liste de renseignements (« votre nom complet, votre date et votre lieu de naissance ? »), jamais deux questions reliées par « et ». S'il manque un fait d'identité ou une date, ne le demande pas ici : note-le dans \`open_questions\`, l'assistant le glissera au bon moment.
 
 Ne bâtis JAMAIS \`next_question\` sur un sujet de la liste « Sujets à laisser de côté », même si le narrateur l'a évoqué dans cet appel.
@@ -252,7 +254,7 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
   },
   "covered_axes": [],
   "axes_not_applicable": [],
-  "topics": { "add": [ { "phase": 3, "label": "", "status": "open" } ], "done": [], "skip": [] },
+  "topics": { "add": [ { "phase": 3, "label": "" } ], "done": [], "skip": [] },
   "phase_answer": "none",
   "chapter_phase": ${phase},
   "sentiment_score": 0.0,

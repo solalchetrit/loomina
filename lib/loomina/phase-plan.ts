@@ -162,7 +162,7 @@ export function mergeTopics(existing: Topic[], update: unknown): Topic[] {
         if (!label || !isPhase(a.phase) || a.phase === 1 || topics.length >= MAX_TOPICS) continue;
         const key = norm(label);
         if (topics.some((t) => t.phase === a.phase && (norm(t.label) === key || norm(t.label).includes(key) || key.includes(norm(t.label))))) continue;
-        topics.push({ id: nextId++, phase: a.phase, label, status: a.status === 'done' ? 'done' : 'open' });
+        topics.push({ id: nextId++, phase: a.phase, label, status: 'open' });
     }
     return topics;
 }
