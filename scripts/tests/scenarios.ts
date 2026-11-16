@@ -41,6 +41,12 @@ export interface Expectation {
     /** État de la question « on ajoute ou on passe à la suite ? » après l'appel. */
     questionDePassage?: 'to_ask' | 'wait';
     livreTermine?: boolean;
+    /** Sujets propres à la personne que le système doit avoir relevés, avec la phase où ils seront racontés. */
+    sujetsAjoutes?: Array<{ mot: string; phase: 2 | 3 | 4 }>;
+    /** Sujets propres (mot du libellé) qui doivent être marqués comme racontés. */
+    sujetsRacontes?: string[];
+    /** Sujets de base reconnus sans objet pour cette personne. */
+    axesSansObjet?: string[];
     /** Mots que Loomina doit prononcer (au moins un). */
     loominaDit?: string[];
     /** Le narrateur est-il resté dans le rôle : mots que Loomina ne doit pas écrire. */
@@ -461,6 +467,48 @@ export const SCENARIOS: Scenario[] = [
             consignes: 'Dès ta première vraie réponse, dis que tu voudrais d\'abord revenir sur quelque chose de ton enfance qui t\'est revenu cette semaine : la ganterie de ton père. Tu ne parles QUE de ce souvenir d\'enfance pendant tout l\'appel, en détail, même si le biographe te ramène à ta femme : « on verra ça la prochaine fois ». Après une dizaine de réponses, dis que tu vas te reposer.',
         },
         attendu: { issue: ['processed'], phaseApres: 3, chapitrePhase: 2, chapitreContient: ['gant'] },
+    },
+    {
+        id: '18-sujets-en-avance',
+        titre: 'Au premier appel, elle évoque déjà sa vie d\'adulte',
+        question: 'Ce qu\'elle évoque trop tôt est-il noté comme sujet à raconter dans la bonne phase, sans être perdu ?',
+        seed: { slug: 'avance', prenom: 'Monique', nom: 'Delorme', prefsReglees: true },
+        persona: {
+            prenom: 'Monique',
+            fiche: `Monique Delorme, 77 ans, née en 1949 à Saint-Malo. Père Yvon, terre-neuvas, absent six mois par an ; mère Jeanne, employée à la criée. Deux sœurs. A tenu pendant trente ans une crêperie à Cancale, « La Houle », ouverte en 1978 avec son mari Hervé. A traversé l'Atlantique à la voile en 1995 avec Hervé, sur leur voilier « Jeanne ». Chante dans une chorale de chants de marins. Veuve depuis 2018.`,
+            maniere: VOUS_BAVARD + ' Tu donnes facilement les grandes lignes de ta vie.',
+            consignes: 'Au fil de l\'appel, en répondant aux questions sur ton enfance, tu glisses en passant, sans les raconter : que tu as tenu une crêperie à Cancale pendant trente ans, et que tu as traversé l\'Atlantique à la voile avec ton mari (« mais ça, c\'est une autre histoire »). Après une douzaine de réponses, dis que tu as rendez-vous.',
+        },
+        attendu: { issue: ['processed'], phaseApres: 1, sujetsAjoutes: [{ mot: 'crêperie', phase: 3 }, { mot: 'Atlantique', phase: 3 }] },
+    },
+    {
+        id: '19-sujets-repris',
+        titre: 'En phase 3, Loomina revient sur ce qui avait été évoqué',
+        question: 'Les sujets propres à la personne sont-ils amenés par Loomina, puis cochés, et un sujet sans objet est-il écarté ?',
+        seed: {
+            slug: 'repris', prenom: 'Monique', nom: 'Delorme', phase: 3, progression: 14, prefsReglees: true,
+            etatPhase: { covered: ['lieux_adulte'], check: null },
+            sujets: [
+                { id: 1, phase: 3, label: 'La crêperie « La Houle » à Cancale, tenue pendant trente ans', status: 'open' },
+                { id: 2, phase: 3, label: 'La traversée de l\'Atlantique à la voile', status: 'open' },
+                { id: 3, phase: 2, label: 'Le père terre-neuvas, absent six mois par an', status: 'done' },
+            ],
+            contexte: {
+                identity: { full_name: 'Monique Delorme', birth: '1949 à Saint-Malo', places: ['Saint-Malo', 'Cancale'] },
+                family: [{ name: 'Yvon', relation: 'père', deceased: true, note: 'terre-neuvas' }, { name: 'Jeanne', relation: 'mère', deceased: true }],
+                timeline: [{ year: 1949, event: 'Naissance à Saint-Malo' }, { year: null, event: 'Installation à Cancale' }],
+                key_themes: ['enfance à Saint-Malo', 'le père terre-neuvas', 'l\'installation à Cancale'],
+                last_call: { summary: 'Monique a raconté son installation à Cancale, la petite maison sur le port.' },
+            },
+            questionSuivante: 'La dernière fois, vous m\'avez parlé de la petite maison sur le port de Cancale. Racontez-moi vos premiers mois là-bas.',
+        },
+        persona: {
+            prenom: 'Monique',
+            fiche: `Monique Delorme, 77 ans, née en 1949 à Saint-Malo. N'a jamais été mariée et n'a pas eu d'enfants : « je n'ai jamais voulu, j'étais trop bien toute seule ». A tenu seule pendant trente ans une crêperie à Cancale, « La Houle », ouverte en 1978 : le premier soir, la pâte ratée, les pêcheurs qui venaient à cinq heures du matin, le billig hérité de sa tante. A traversé l'Atlantique à la voile en 1995 comme équipière sur le voilier d'un ami, Loïc : dix-neuf jours, une tempête au large des Açores, l'arrivée en Martinique au lever du jour.`,
+            maniere: VOUS_BAVARD,
+            consignes: 'Tu ne parles de la crêperie et de la traversée que si le biographe t\'en parle ; alors tu racontes volontiers, avec des scènes précises. Si on te demande ton mari ou tes enfants, tu réponds que tu ne t\'es jamais mariée et que tu n\'as pas eu d\'enfants, par choix. Après une douzaine de réponses, dis que tu vas te reposer.',
+        },
+        attendu: { issue: ['processed'], phaseApres: 3, chapitrePhase: 3, loominaDit: ['crêperie', 'traversée', 'Atlantique'], sujetsRacontes: ['crêperie'] },
     },
 ];
 

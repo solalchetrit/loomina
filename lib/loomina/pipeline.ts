@@ -23,8 +23,8 @@
 import { db, findActiveProject, getRecentChapters, getNextChapterNumber, getChapterOutline } from './db';
 import type { Profile, Project } from './db';
 import { toPhase } from './phases';
-import { readPhaseState } from './phase-plan';
-import type { PhaseState } from './phase-plan';
+import { readPhaseState, readTopics } from './phase-plan';
+import type { PhaseState, Topic } from './phase-plan';
 import type { Phase } from './phases';
 import { normalizeContext, contextFromLegacy, isEmptyContext, remainingSuggestions } from './context';
 import type { LoominaContext } from './context';
@@ -114,6 +114,7 @@ interface AnalysisLog {
     chapter_title_hint?: string | null;
     chapter_phase?: number;
     phase_state?: PhaseState;
+    book_topics?: Topic[];
     next_topic_id?: number | null;
     project_update?: Record<string, unknown> & { context?: unknown };
     family_members?: DirectorResult['family_members'];
@@ -235,7 +236,8 @@ export async function processEndOfCall(params: {
                     log.project_update,
                     log.suggestions_shown ?? [],
                     log.covered_suggestions ?? [],
-                    log.phase_state
+                    log.phase_state,
+                    log.book_topics
                 )
             );
         }
@@ -265,6 +267,7 @@ export async function processEndOfCall(params: {
 
         const director = await runDirector({
             phaseState: readPhaseState(project.project_metadata, phase),
+            topics: readTopics(project.project_metadata),
             transcript: data.transcript,
             context: currentContext,
             phase,
@@ -442,6 +445,7 @@ async function persistDirectorResult(params: {
                 covered_axes: director.covered_axes,
                 phase_answer: director.phase_answer,
                 phase_state: director.phase_state,
+                book_topics: director.book_topics,
                 next_topic_id: director.next_topic_id,
                 project_update: projectUpdate,
                 family_members: director.family_members,
@@ -462,7 +466,8 @@ async function persistDirectorResult(params: {
             projectUpdate,
             director.context.suggested_topics ?? [],
             director.covered_suggestions,
-            director.phase_state
+            director.phase_state,
+            director.book_topics
         )
     );
 
@@ -484,7 +489,8 @@ async function withLatestSuggestions(
     update: Record<string, unknown> & { context?: unknown },
     shown: string[],
     covered: number[],
-    phaseState?: PhaseState
+    phaseState?: PhaseState,
+    topics?: Topic[]
 ): Promise<Record<string, unknown>> {
     const { data, error } = await db().from('projects').select('context, project_metadata').eq('id', projectId).single();
     if (error) throw new Error(`Lecture projects impossible : ${error.message}`);
@@ -495,7 +501,7 @@ async function withLatestSuggestions(
         ...update,
         // Les réglages de l'espace auteur (rendez-vous, SMS…) sont relus et
         // gardés ; seul l'état de la phase est remplacé.
-        ...(phaseState ? { project_metadata: { ...((data?.project_metadata ?? {}) as Record<string, unknown>), phase_state: phaseState } } : {}),
+        ...(phaseState ? { project_metadata: { ...((data?.project_metadata ?? {}) as Record<string, unknown>), phase_state: phaseState, ...(topics ? { book_topics: topics } : {}) } } : {}),
         context: {
             ...context,
             suggested_topics: remainingSuggestions(shown, covered, latest),

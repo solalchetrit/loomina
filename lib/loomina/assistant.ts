@@ -14,7 +14,7 @@
 import type { Phase } from './phases';
 import { PHASE_KEYS, toPhase, isFinalPhase } from './phases';
 import { voicePromptTemplate, PHASE_OBJECTIVES } from './voice-prompt';
-import { readPhaseState, spokenPhase } from './phase-plan';
+import { readPhaseState, spokenPhase, readTopics, openTopics } from './phase-plan';
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
@@ -185,6 +185,19 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
 
     const check = phaseCheck(project, vars);
     if (check) parts.push(check.block);
+
+    // Sujets propres à cette personne pour la partie en cours : évoqués un
+    // jour (parfois des appels plus tôt), pas encore racontés.
+    const own = first ? [] : openTopics(readTopics(meta), toPhase(project.phase));
+    if (own.length && !check) {
+        parts.push(
+            [
+                `# CE QUE ${name.toUpperCase()} A DÉJÀ ÉVOQUÉ ET QUI RESTE À RACONTER`,
+                ...own.slice(0, 10).map((t) => `- ${t.label}`),
+                `Ce sont des sujets propres à ${name}, qu'on n'a pas encore creusés. Après la question de OÙ REPRENDRE, amène-les un par un quand la conversation s'y prête (« ${tu ? 'Tu m\'avais' : 'Vous m\'aviez'} parlé de… ${tu ? 'Raconte-moi' : 'Racontez-moi'}. »). Jamais comme une liste, jamais plus de deux ou trois par appel. Si ${name} préfère ne pas en parler, n'insiste pas.`,
+            ].join('\n')
+        );
+    }
 
     const suggestions = ctx.suggested_topics ?? [];
     if (suggestions.length) {

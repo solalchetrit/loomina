@@ -21,8 +21,8 @@
 import OpenAI from 'openai';
 import type { Phase } from './phases';
 import { PHASE_GOALS, PHASE_LABELS, isFinalPhase, toPhase } from './phases';
-import { PHASE_AXES, AXIS_RULE, stepPhase } from './phase-plan';
-import type { PhaseState, PhaseAnswer } from './phase-plan';
+import { PHASE_AXES, AXIS_RULE, stepPhase, mergeTopics } from './phase-plan';
+import type { PhaseState, PhaseAnswer, Topic } from './phase-plan';
 import type { LoominaContext } from './context';
 import { normalizeContext, renderContext } from './context';
 
@@ -102,6 +102,8 @@ export interface DirectorResult {
     phase_answer: PhaseAnswer;
     /** État de phase à enregistrer dans `project_metadata.phase_state`. */
     phase_state: PhaseState;
+    /** Sujets propres à la personne, à enregistrer dans `project_metadata.book_topics`. */
+    book_topics: Topic[];
     /** La personne a confirmé que le livre est complet. */
     project_completed: boolean;
     /** Période de vie à laquelle appartient ce que le narrateur a raconté : le chapitre y est rangé. */
@@ -186,6 +188,15 @@ ${PHASE_AXES[phase].map((a) => `- ${a.key} : ${a.label}`).join('\n')}
 ${AXIS_RULE[phase]}
 Renvoie dans \`covered_axes\` les clés de TOUS les sujets couverts à ce jour, en tenant compte de la mémoire et de cet appel. Les sujets déjà cochés (donnés plus bas) le restent. Sois juste : un sujet coché trop tôt donne un livre creux, un sujet jamais coché empêche le livre d'avancer.
 
+Si un sujet ne concerne pas cette personne (pas de frères et sœurs, jamais mariée, pas d'enfants), mets sa clé dans \`axes_not_applicable\` : seulement si elle l'a dit, jamais par supposition.
+
+# SUJETS PROPRES À CETTE PERSONNE (\`topics\`)
+La liste ci-dessus est la même pour tout le monde ; chaque vie a aussi ses sujets à elle. Tu tiens cette seconde liste, donnée plus bas avec un numéro par sujet.
+- \`add\` : chaque sujet que le narrateur a évoqué dans cet appel et qui mérite d'être raconté dans le livre, s'il n'est pas déjà dans la liste : un lieu, une personne, une activité, un événement précis de SA vie (« la boulangerie de ses parents », « son service militaire à Trèves », « la chorale du jeudi », « la mort de son petit frère »). Donne la phase où il devra être raconté (2 = enfance et jeunesse, 3 = vie adulte, 4 = transmission et vie d'aujourd'hui), MÊME si ce n'est pas la phase en cours : un métier nommé pendant la phase 1 est un sujet de la phase 3, on y reviendra le moment venu. \`status\` vaut "done" si le narrateur l'a déjà raconté avec une scène concrète dans cet appel, "open" s'il l'a seulement évoqué.
+- \`done\` : les numéros des sujets de la liste que le narrateur a racontés dans cet appel avec au moins une scène concrète, quelle que soit leur phase.
+- \`skip\` : les numéros des sujets dont il a dit ne pas vouloir parler.
+Reste sobre : cinq à dix sujets propres par phase suffisent. Pas de sujet général (« son enfance »), pas de doublon d'un sujet de la liste commune, rien que le narrateur n'ait dit.
+
 # LE POINT SUR LA PHASE (\`phase_answer\`)
 Quand tous les sujets sont couverts, l'assistant demande au narrateur, au début de l'appel, s'il veut ajouter quelque chose ou passer à la suite (pour la phase 4 : si le livre est complet). On te dit plus bas si cette question devait être posée dans cet appel.
 - "advance" : la question a été posée et le narrateur a choisi de passer à la suite (ou a dit qu'il n'avait rien à ajouter).
@@ -240,6 +251,8 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
     "last_call":      { "date": "", "summary": "", "topics": [] }
   },
   "covered_axes": [],
+  "axes_not_applicable": [],
+  "topics": { "add": [ { "phase": 3, "label": "", "status": "open" } ], "done": [], "skip": [] },
   "phase_answer": "none",
   "chapter_phase": ${phase},
   "sentiment_score": 0.0,
@@ -276,6 +289,8 @@ interface DirectorInput {
     sensitiveTopics?: string | null;
     /** État de la phase avant cet appel (`project_metadata.phase_state`). */
     phaseState?: PhaseState;
+    /** Sujets propres à la personne, toutes phases (`project_metadata.book_topics`). */
+    topics?: Topic[];
     /** Banc d'essai : forcer un modèle. */
     model?: string;
 }
@@ -298,6 +313,14 @@ Durée de l'appel : ${params.durationSeconds ?? 'inconnue'} secondes
 
 # OÙ EN EST LA PHASE
 Sujets déjà cochés : ${params.phaseState?.covered.length ? params.phaseState.covered.join(', ') : 'aucun'}
+Sujets sans objet pour cette personne : ${params.phaseState?.skipped.length ? params.phaseState.skipped.join(', ') : 'aucun'}
+
+# SUJETS PROPRES À CETTE PERSONNE, À CE JOUR
+${
+    params.topics?.length
+        ? params.topics.map((t) => `${t.id}. [phase ${t.phase}] ${t.label} — ${t.status === 'open' ? 'à raconter' : t.status === 'done' ? 'raconté' : 'ne souhaite pas en parler'}`).join('\n')
+        : 'Aucun pour l\'instant'
+}
 Question « on ajoute quelque chose ou on passe à la suite ? » à poser dans cet appel : ${params.phaseState?.check === 'to_ask' ? 'OUI' : 'non'}
 
 # TRANSCRIPT DE L'APPEL
@@ -322,12 +345,13 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     const parsed = JSON.parse(raw) as Record<string, unknown>;
 
     const phase = params.phase;
-    const before: PhaseState = params.phaseState ?? { phase, covered: [], check: null };
+    const before: PhaseState = params.phaseState ?? { phase, covered: [], skipped: [], check: null };
+    const topics = mergeTopics(params.topics ?? [], parsed.topics);
     const answer: PhaseAnswer =
         before.check === 'to_ask' && (parsed.phase_answer === 'advance' || parsed.phase_answer === 'stay') ? parsed.phase_answer : 'none';
     // Le passage de phase est décidé par le CODE (phase-plan.ts), à partir
     // des sujets couverts et de la réponse de la personne.
-    const step = stepPhase(before, parsed.covered_axes, answer);
+    const step = stepPhase(before, { covered: parsed.covered_axes, skipped: parsed.axes_not_applicable }, answer, topics);
 
     const suggestions = params.context.suggested_topics ?? [];
     // Les suggestions ne passent jamais par la plume du modèle : on garde
@@ -345,6 +369,7 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
         covered_axes: step.nextPhase === phase ? step.state.covered : PHASE_AXES[phase].map((a) => a.key),
         phase_answer: answer,
         phase_state: step.state,
+        book_topics: topics,
         project_completed: step.completed,
         chapter_phase: toPhase(parsed.chapter_phase, phase),
         sentiment_score: clamp(Number(parsed.sentiment_score) || 0, -1, 1),

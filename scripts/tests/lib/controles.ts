@@ -9,7 +9,7 @@ import type { Processed } from './pile';
 import type { Expectation } from '../scenarios';
 import { normalizeContext, renderContext } from '../../../lib/loomina/context';
 import { countWords } from '../../../lib/loomina/writer';
-import { readPhaseState, PHASE_AXES } from '../../../lib/loomina/phase-plan';
+import { readPhaseState, readTopics, openTopics, coverage, PHASE_AXES } from '../../../lib/loomina/phase-plan';
 import { toPhase } from '../../../lib/loomina/phases';
 
 export type Gravite = 'bloquant' | 'important' | 'mineur';
@@ -96,7 +96,7 @@ export function liveChecks(call: CallResult, attendu: Expectation, tutoiement: '
     }
     if (attendu.loominaDit?.length) {
         const said = attendu.loominaDit.filter((w) => all.some((t) => has(t, w)));
-        checks.push({ ok: said.length > 0, gravite: 'important', domaine: 'direct', label: `Loomina fait le point avant de passer à la suite (mots attendus : ${attendu.loominaDit.join(', ')} ; entendus : ${said.join(', ') || 'aucun'})` });
+        checks.push({ ok: said.length > 0, gravite: 'important', domaine: 'direct', label: `Loomina amène le sujet attendu (mots attendus : ${attendu.loominaDit.join(', ')} ; entendus : ${said.join(', ') || 'aucun'})` });
     }
     for (const w of attendu.loominaSans ?? []) {
         const offender = all.find((t) => has(t, w));
@@ -182,9 +182,21 @@ export function dbChecks(params: {
     const stateBefore = readPhaseState(before.project.project_metadata, pb);
     const stateAfter = readPhaseState(after.project.project_metadata, pa);
     B(pa === pb || (pa === pb + 1 && stateBefore.check === 'to_ask' && log.phase_answer === 'advance'), `phase ${pb} → ${pa} (question « on passe à la suite ? » ${stateBefore.check === 'to_ask' ? 'à poser' : 'pas à poser'}, réponse lue : ${log.phase_answer})`);
-    B(after.project.phase_progress === Math.round((100 * stateAfter.covered.length) / PHASE_AXES[pa].length), `progression = sujets couverts (${stateAfter.covered.length} sur ${PHASE_AXES[pa].length} : ${stateAfter.covered.join(', ') || 'aucun'})`, 'important');
+    const topics = readTopics(after.project.project_metadata);
+    const topicsBefore = readTopics(before.project.project_metadata);
+    B(after.project.phase_progress === coverage(pa, stateAfter, topics), `progression = sujets traités (${after.project.phase_progress} % ; de base : ${stateAfter.covered.join(', ') || 'aucun'}${stateAfter.skipped.length ? ` ; sans objet : ${stateAfter.skipped.join(', ')}` : ''} ; propres à la personne encore ouverts dans cette phase : ${openTopics(topics, pa).length})`, 'important');
     if (pa === pb) B(stateBefore.covered.every((k) => stateAfter.covered.includes(k)), 'un sujet coché reste coché');
-    B(pa !== pb || stateAfter.check !== 'to_ask' || stateAfter.covered.length === PHASE_AXES[pa].length, 'la question « on passe à la suite ? » n\'est prévue que si tous les sujets sont couverts');
+    B(topicsBefore.every((t) => topics.some((x) => x.id === t.id && (t.status === 'open' || x.status === t.status))), 'les sujets propres à la personne sont conservés, et un sujet raconté le reste');
+    B(stateAfter.check !== 'to_ask' || (PHASE_AXES[pa].every((a) => stateAfter.covered.includes(a.key) || stateAfter.skipped.includes(a.key)) && openTopics(topics, pa).length === 0), 'la question « on passe à la suite ? » n\'est prévue que si tous les sujets sont traités');
+    for (const s of attendu.sujetsAjoutes ?? []) {
+        const hit = topics.find((t) => has(t.label, s.mot));
+        B(Boolean(hit) && hit!.phase === s.phase, `sujet propre relevé : « ${s.mot} » rangé en phase ${s.phase}${hit ? ` (trouvé : « ${hit.label} », phase ${hit.phase}, ${hit.status})` : ' (absent)'}`, 'important', 'memoire');
+    }
+    for (const w of attendu.sujetsRacontes ?? []) {
+        const hit = topics.find((t) => has(t.label, w));
+        B(hit?.status === 'done', `sujet propre « ${w} » marqué comme raconté (${hit?.status ?? 'absent'})`, 'important', 'memoire');
+    }
+    for (const k of attendu.axesSansObjet ?? []) B(stateAfter.skipped.includes(k), `sujet « ${k} » reconnu sans objet pour cette personne`, 'important', 'memoire');
     if (attendu.phaseApres) B(pa === attendu.phaseApres, `phase après l'appel : ${pa} (attendu ${attendu.phaseApres})`, 'important');
     if (attendu.questionDePassage) B(stateAfter.check === attendu.questionDePassage, `question de passage après l'appel : « ${stateAfter.check} » (attendu « ${attendu.questionDePassage} »)`, 'important');
     if (attendu.livreTermine !== undefined) B((after.project.status === 'completed') === attendu.livreTermine, `livre ${after.project.status === 'completed' ? 'terminé' : 'en cours'} (attendu ${attendu.livreTermine ? 'terminé' : 'en cours'})`, 'important');
