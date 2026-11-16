@@ -191,6 +191,7 @@ Quand tous les sujets sont couverts, l'assistant demande au narrateur, au début
 - "advance" : la question a été posée et le narrateur a choisi de passer à la suite (ou a dit qu'il n'avait rien à ajouter).
 - "stay" : la question a été posée et le narrateur a voulu ajouter quelque chose, ou a continué sur la phase en cours.
 - "none" : la question ne devait pas être posée, n'a pas été posée, ou n'a pas reçu de réponse claire.
+N'écris jamais toi-même cette question dans \`next_question\` : c'est le code qui la fait poser. \`next_question\` reste une question de souvenir.
 Si la réponse est "advance", \`next_question\` ouvre la phase suivante${isFinalPhase(phase) ? ' (ici, le livre est complet : une question ouverte et douce suffit)' : ` : ${PHASE_GOALS[(phase + 1) as Phase]}`}
 
 # PÉRIODE RACONTÉE (\`chapter_phase\`)
