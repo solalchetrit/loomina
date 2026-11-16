@@ -3,10 +3,10 @@
  * d'une fiche de vie et d'une manière de parler.
  */
 
-import './env';
+import { track } from './env';
 import OpenAI from 'openai';
 
-export const NARRATOR_MODEL = process.env.BANC_NARRATEUR_MODEL ?? 'gpt-4.1';
+export const NARRATOR_MODEL = process.env.BANC_NARRATEUR_MODEL ?? 'gpt-4.1-mini';
 export const HANGUP = '[RACCROCHE]';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 3, timeout: 60_000 });
@@ -54,6 +54,7 @@ export async function narratorSays(p: Persona, history: Line[], callNumber: numb
             ...history.map((l) => ({ role: l.role === 'loomina' ? ('user' as const) : ('assistant' as const), content: l.text })),
         ],
     });
+    track(NARRATOR_MODEL, res.usage);
     const raw = (res.choices[0]?.message?.content ?? '').trim();
     const hangup = raw.includes(HANGUP);
     return { text: raw.replace(HANGUP, '').trim(), hangup };

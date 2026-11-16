@@ -17,7 +17,8 @@
 import './lib/env';
 import fs from 'node:fs';
 import path from 'node:path';
-import { SITE_URL, SPEED } from './lib/env';
+import { SITE_URL, SPEED, DEDICATED_KEY, usage } from './lib/env';
+import OpenAI from 'openai';
 import { startStack, stopStack, waitProcessed } from './lib/pile';
 import type { Processed } from './lib/pile';
 import { createAccount, snapshot, cleanup, unknownPhone } from './lib/profils';
@@ -201,6 +202,7 @@ async function runScenario(sc: Scenario): Promise<ScenarioResult> {
             record.processed = processed;
             const after = await snapshot(account);
             record.after = after;
+            if (processed?.error?.includes('no credits') || processed?.error?.includes('insufficient_quota')) throw new Error(`Crédits OpenAI épuisés : ${processed.error}`);
             record.checks.push(...dbChecks({ before: before!, after, processed, call, attendu: sc.attendu }));
 
             const interview = after.interviews.find((i) => i.call_event_id === processed?.eventId);
@@ -389,6 +391,17 @@ async function main() {
     const selected = candidates.filter((s) => !only.length || only.some((o) => s.id.startsWith(o)));
     if (!selected.length) { console.error('Aucun scénario ne correspond.'); process.exit(2); }
 
+    // Avant de créer quoi que ce soit : la clé a-t-elle encore des crédits ?
+    try {
+        await new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 0 }).chat.completions.create({ model: 'gpt-4.1-mini', max_tokens: 1, messages: [{ role: 'user', content: 'ok' }] });
+    } catch (err) {
+        console.error(`OpenAI refuse la clé : ${err instanceof Error ? err.message : err}`);
+        process.exit(2);
+    }
+    const calls = selected.reduce((a, s) => a + (s.appels ?? 1), 0);
+    console.log(`${calls} appels simulés prévus. Chaque appel coûte un entretien (voix), un Directeur, un Écrivain, et trois juges.`);
+    if (!DEDICATED_KEY) console.log('ATTENTION : la batterie utilise la clé OpenAI de la production (BANC_OPENAI_API_KEY absente de .env.local).');
+
     fs.mkdirSync(DIR, { recursive: true });
     const stale = await cleanup();
     if (stale) console.log(`${stale} profil(s) de test d'une série précédente effacé(s).`);
@@ -409,6 +422,7 @@ async function main() {
     if (flag('garder')) console.log('\nProfils de test gardés en base (--nettoyer pour les effacer).');
     else console.log(`\n${await cleanup()} profil(s) de test effacé(s).`);
 
+    for (const [model, u] of Object.entries(usage)) console.log(`Banc (narrateur, juges) — ${model} : ${u.calls} requêtes, ${u.input} jetons lus, ${u.output} écrits.`);
     const checks = results.flatMap(allChecks);
     const ko = checks.filter((c) => !c.ok);
     console.log(`${checks.length - ko.length} / ${checks.length} contrôles réussis — ${ko.filter((c) => c.gravite === 'bloquant').length} bloquant(s), ${ko.filter((c) => c.gravite === 'important').length} important(s), ${ko.filter((c) => c.gravite === 'mineur').length} mineur(s).`);

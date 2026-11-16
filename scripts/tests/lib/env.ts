@@ -25,6 +25,21 @@ if (fs.existsSync(file)) {
     }
 }
 
+// Une clé OpenAI réservée aux tests (avec son propre plafond de dépense)
+// met la production à l'abri : le 16/11/2026, une série a vidé les crédits
+// de la clé partagée avec le serveur vocal.
+if (process.env.BANC_OPENAI_API_KEY) process.env.OPENAI_API_KEY = process.env.BANC_OPENAI_API_KEY;
+export const DEDICATED_KEY = Boolean(process.env.BANC_OPENAI_API_KEY);
+
+/** Jetons consommés par le banc lui-même (narrateur et juges), par modèle. */
+export const usage: Record<string, { calls: number; input: number; output: number }> = {};
+export function track(model: string, u?: { prompt_tokens?: number; completion_tokens?: number } | null): void {
+    const row = (usage[model] ??= { calls: 0, input: 0, output: 0 });
+    row.calls += 1;
+    row.input += u?.prompt_tokens ?? 0;
+    row.output += u?.completion_tokens ?? 0;
+}
+
 /** Le vrai numéro Loomina, seulement comme « To » des appels simulés. */
 export const LOOMINA_NUMBER = process.env.TWILIO_PHONE_NUMBER || '+33159169357';
 

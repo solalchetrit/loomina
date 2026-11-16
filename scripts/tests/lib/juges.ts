@@ -4,20 +4,21 @@
  * Chaque juge rend un JSON ; aucun n'écrit en base.
  */
 
-import './env';
+import { track } from './env';
 import OpenAI from 'openai';
 
-export const JUDGE_MODEL = process.env.BANC_JUGE_MODEL ?? 'gpt-5.5';
+export const JUDGE_MODEL = process.env.BANC_JUGE_MODEL ?? 'gpt-4.1';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 2, timeout: 180_000 });
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 async function judge(system: string, user: string): Promise<any> {
     const res = await openai.chat.completions.create({
         model: JUDGE_MODEL,
-        reasoning_effort: 'low',
+        ...(/^(gpt-5|o\d)/.test(JUDGE_MODEL) ? { reasoning_effort: 'low' as const } : { temperature: 0 }),
         response_format: { type: 'json_object' },
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
     });
+    track(JUDGE_MODEL, res.usage);
     try {
         return JSON.parse(res.choices[0]?.message?.content ?? '{}');
     } catch {
