@@ -128,6 +128,14 @@ export interface DirectorResult {
     };
 }
 
+/** Ce qui suffit pour tenir une phase pour faite. */
+const PHASE_DONE: Record<Phase, string> = {
+    1: "La phase 1 est une vue d'ensemble, pas un récit : elle est faite dès que la mémoire contient l'identité (nom, naissance), les parents et la fratrie, et les grandes étapes de la vie au moins nommées (métier, vie de famille, lieux). Elle n'a pas besoin d'anecdotes. Deux ou trois appels suffisent.",
+    2: "La phase 2 est faite quand l'enfance et la jeunesse ont donné plusieurs scènes concrètes : la maison et les lieux, les parents et la fratrie, l'école ou les jeux, et le moment où l'on quitte la maison.",
+    3: "La phase 3 est faite quand la vie adulte a donné plusieurs scènes concrètes : le métier, la vie de couple et de famille, les lieux de vie, et au moins une passion ou une épreuve.",
+    4: "La phase 4 est faite quand la personne a dit ce qu'elle veut transmettre, a parlé de sa vie d'aujourd'hui et a dit comment elle aimerait que le livre se termine.",
+};
+
 function systemPrompt(phase: Phase): string {
     return `Tu es **le Directeur de biographie** de Loomina.
 
@@ -164,15 +172,17 @@ Tu reçois le contexte accumulé et le nouveau transcript.
 Tu renvoies le contexte **complet, fusionné et mis à jour** — pas un ajout.
 Cela veut dire : fusionner les doublons, préciser ce qui était vague, retirer une question qui a trouvé sa réponse.
 Reste sous 1 500 tokens. Si tu dois couper, garde ce qui sert à écrire le livre.
+\`open_questions\` : huit au plus, seulement ce qui compte pour le livre (identité, dates des grandes étapes, proches principaux, un récit resté inachevé). Pas le nom de famille d'un personnage secondaire, pas le nom officiel d'un lieu.
 
 # CALIBRAGE DE LA PROGRESSION (\`progress_percentage\`)
-Évalue la couverture de la phase ${phase}, pas de la vie entière.
-- 0-25   : un seul sujet effleuré, rien d'exploitable en profondeur
-- 26-50  : plusieurs sujets abordés, mais sans anecdote ni détail sensoriel
-- 51-80  : sujets couverts avec des anecdotes concrètes et datées
-- 81-99  : phase quasi complète, quelques zones d'ombre subsistent
-- 100    : tous les axes de la phase ont été traités en profondeur
-N'atteins 100 que si la phase est réellement épuisée. Une phase clôturée trop tôt produit un livre creux.
+Évalue la couverture de la phase ${phase}, pas de la vie entière, en tenant compte de TOUT ce que contient déjà la mémoire, pas seulement de cet appel.
+${PHASE_DONE[phase]}
+- 0-25   : un seul sujet effleuré
+- 26-50  : plusieurs sujets abordés, encore peu de matière
+- 51-80  : l'essentiel de la phase est là, il reste un ou deux axes à ouvrir
+- 81-99  : il ne manque qu'un point précis, que tu nommes dans \`next_question\`
+- 100    : la phase a donné ce qu'on attend d'elle pour le livre
+La progression ne recule jamais : elle vaut au moins la « progression enregistrée » qu'on te donne. Ne cherche pas l'exhaustivité : un livre de vie n'épuise aucune période, et une phase qui ne se termine jamais empêche le livre d'avancer. Si le narrateur raconte déjà, en détail, des périodes qui relèvent des phases suivantes, la phase en cours est faite : mets 100.
 
 # MATIÈRE POUR UN CHAPITRE (\`chapter_material\`)
 L'Écrivain ne doit écrire que s'il y a quelque chose à raconter. Évalue ce que le narrateur (lignes « User: ») a réellement apporté de NOUVEAU dans cet appel :
@@ -192,6 +202,8 @@ MAUVAIS : "Explorer l'enfance au Maroc."
 BON : "La dernière fois, vous m'avez parlé des étés à Casablanca chez votre grand-mère. Racontez-moi : à quoi ressemblait sa maison ?"
 
 Si le transcript est trop pauvre pour accrocher un fait précis, propose une question d'ouverture douce sur la phase en cours.
+
+UNE seule question, un seul point d'interrogation : jamais une liste de renseignements (« votre nom complet, votre date et votre lieu de naissance ? »), jamais deux questions reliées par « et ». S'il manque un fait d'identité ou une date, ne le demande pas ici : note-le dans \`open_questions\`, l'assistant le glissera au bon moment.
 
 Ne bâtis JAMAIS \`next_question\` sur un sujet de la liste « Sujets à laisser de côté », même si le narrateur l'a évoqué dans cet appel.
 Si un récit est resté inachevé à la fin de l'appel, reprends-le : c'est presque toujours la meilleure question. Sinon, et si un sujet suggéré depuis le site attend, tu peux ouvrir sur lui.
@@ -233,7 +245,7 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
 
 Pour \`profile_updates\` : ne renseigne un champ que si l'interlocuteur l'a EXPRIMÉ pendant cet appel. Sinon laisse \`null\` ou un tableau vide.
 - \`politeness_preference\` vaut EXACTEMENT "tu" ou "vous" (rien d'autre) : "tu" s'il a demandé le tutoiement, "vous" s'il a demandé le vouvoiement.
-- \`sensitive_topics\` ne contient que les sujets nouvellement identifiés comme douloureux ou à éviter, formulés en quelques mots chacun (ex. "son père", "le divorce de 1998").`;
+- \`sensitive_topics\` ne contient que les sujets que l'interlocuteur a DEMANDÉ de laisser de côté dans cet appel (« je préfère ne pas en parler », « je ne veux pas que ce soit dans le livre »), en quelques mots chacun (ex. "son père", "le divorce de 1998"). Un souvenir douloureux qu'il raconte de lui-même, ou dont il dit qu'on peut lui parler, n'en fait PAS partie : un deuil raconté est souvent une des pages les plus importantes du livre. N'écris nulle part ailleurs dans le contexte qu'un sujet est « à laisser de côté ».`;
 }
 
 interface DirectorInput {
@@ -245,6 +257,10 @@ interface DirectorInput {
     durationSeconds: number | null;
     /** `profiles.sensitive_topics` : réglés sur le site ou dits au téléphone. */
     sensitiveTopics?: string | null;
+    /** `projects.phase_progress` avant cet appel : la progression ne recule pas. */
+    previousProgress?: number | null;
+    /** Appels déjà analysés dans cette phase, celui-ci compris. */
+    callsInPhase?: number;
     /** Banc d'essai : forcer un modèle. */
     model?: string;
 }
@@ -264,6 +280,10 @@ ${suggestions.length ? suggestions.map((t, i) => `${i + 1}. ${t}`).join('\n') : 
 Prénom : ${params.firstName}
 Tutoiement/vouvoiement : ${params.politeness === 'tu' ? 'tu — rédige `next_question` en tutoyant' : 'vous — rédige `next_question` en vouvoyant'}
 Durée de l'appel : ${params.durationSeconds ?? 'inconnue'} secondes
+
+# OÙ EN EST LA PHASE
+Progression enregistrée avant cet appel : ${Math.round(params.previousProgress ?? 0)} %
+Appels dans cette phase, celui-ci compris : ${params.callsInPhase ?? 1}
 
 # TRANSCRIPT DE L'APPEL
 ${params.transcript}`;
@@ -286,8 +306,13 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     }
     const parsed = JSON.parse(raw) as Record<string, unknown>;
 
-    const progress = clamp(Number(parsed.progress_percentage) || 0, 0, 100);
     const phase = params.phase;
+    const progress = resolveProgress({
+        phase,
+        estimated: clamp(Number(parsed.progress_percentage) || 0, 0, 100),
+        previous: params.previousProgress ?? 0,
+        callsInPhase: params.callsInPhase ?? 1,
+    });
 
     const suggestions = params.context.suggested_topics ?? [];
     // Les suggestions ne passent jamais par la plume du modèle : on garde
@@ -322,6 +347,21 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
             next_phase: nextPhase(phase, progress),
         },
     };
+}
+
+/**
+ * Nombre d'appels au bout duquel une phase est tenue pour faite, quoi qu'en
+ * dise le modèle. Sans ce plafond, la progression oscillait entre 60 et
+ * 92 % d'un appel à l'autre sans jamais atteindre 100 : sur un livre simulé
+ * de huit appels (16/11/2026), le projet n'a jamais quitté la phase 1 alors
+ * que la narratrice en était à ses premiers postes d'institutrice.
+ */
+export const MAX_CALLS_IN_PHASE: Record<Phase, number> = { 1: 3, 2: 6, 3: 8, 4: 4 };
+
+/** La progression retenue : jamais en recul dans une phase, et bornée en nombre d'appels. */
+export function resolveProgress(p: { phase: Phase; estimated: number; previous: number; callsInPhase: number }): number {
+    if (p.callsInPhase >= MAX_CALLS_IN_PHASE[p.phase]) return 100;
+    return Math.max(p.estimated, clamp(p.previous, 0, 100));
 }
 
 export function shouldCompleteProject(result: DirectorResult): boolean {

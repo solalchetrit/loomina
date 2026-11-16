@@ -91,6 +91,7 @@ C'est la règle la plus importante. Un beau paragraphe inventé détruit la conf
 # NE TE RÉPÈTE PAS
 Les chapitres précédents te sont fournis. Tu ne dois PAS reraconter ce qui y figure déjà.
 Tu peux y faire référence brièvement pour assurer la continuité (« Comme je l'ai raconté, … »), puis passer à la matière nouvelle.
+Cela vaut aussi pour les décors et les portraits : une odeur, une pièce, un trait de caractère déjà décrits ne se redécrivent pas, même si le narrateur les redit. Quelques mots d'allusion suffisent.
 
 # LONGUEUR, ADAPTÉE À LA DENSITÉ
 - Transcript riche : chapitre complet de 900 à 1 800 mots.
@@ -130,14 +131,19 @@ export function renderPreviousChapters(chapters: ChapterSummary[]): string {
     if (!chapters.length) {
         return "(Aucun chapitre écrit à ce jour — c'est le premier.)";
     }
-    const last = chapters[chapters.length - 1];
-    const earlier = chapters.slice(0, -1);
-
-    const parts = [
-        ...earlier.map((c) => summarizeChapter(c, 700)),
-        summarizeChapter(last, 2500),
-    ];
-    return parts.join('\n\n');
+    // Tous les chapitres, en entier tant que le budget le permet : c'est le
+    // seul moyen pour l'Écrivain de savoir ce qui est déjà raconté. Au-delà
+    // du budget, les plus anciens sont raccourcis.
+    const BUDGET = 90_000;
+    const sizes = chapters.map((c) => (c.content_markdown ?? '').length);
+    let total = sizes.reduce((a, b) => a + b, 0);
+    const limits = sizes.map(() => 12_000);
+    for (let i = 0; i < chapters.length - 1 && total > BUDGET; i++) {
+        const cut = Math.min(sizes[i], 1500);
+        total -= sizes[i] - cut;
+        limits[i] = cut;
+    }
+    return chapters.map((c, i) => summarizeChapter(c, limits[i])).join('\n\n');
 }
 
 /** Le sommaire, utile seulement quand il dépasse les chapitres fournis en entier. */

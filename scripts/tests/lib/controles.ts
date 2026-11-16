@@ -172,7 +172,7 @@ export function dbChecks(params: {
     const pb = before.project.phase;
     const pa = after.project.phase;
     B(pa === pb || (pa === pb + 1 && log.progress >= 100), `phase ${pb} → ${pa}, progression ${before.project.phase_progress} % → ${log.progress} %`);
-    B(after.project.phase_progress === log.progress, 'la progression en base est celle de l\'analyse', 'mineur');
+    B(after.project.phase_progress === (pa === pb ? log.progress : 0), 'la progression en base est celle de l\'analyse (remise à zéro quand la phase change)', 'mineur');
     if (pa === pb) B(log.progress >= (before.project.phase_progress ?? 0) - 15, `la progression ne recule pas franchement (${before.project.phase_progress} % → ${log.progress} %)`, 'important');
 
     // Question suivante.

@@ -224,6 +224,19 @@ export function spokenForm(text: string): string {
 }
 
 /**
+ * Placé en toute fin de prompt : sur les appels simulés du 16/11/2026, 28 %
+ * des répliques posaient deux questions malgré la règle de « COMMENT TU
+ * PARLES ». Le modèle suit mieux une règle répétée en dernier, avec le
+ * mauvais exemple à côté du bon.
+ */
+export const ONE_QUESTION_REMINDER = `# AVANT CHAQUE RÉPLIQUE
+Relis-la : elle contient UN SEUL point d'interrogation, à la fin.
+- Mauvais : « Vous le regardiez travailler, parfois ? Racontez-moi un moment précis. Qu'est-ce qu'il vous disait ? »
+- Bon : « Racontez-moi un moment où vous le regardiez travailler. »
+- Mauvais : « Où était-ce, et à quoi ressemblait la maison ? » Bon : « À quoi ressemblait la maison ? »
+Si deux questions te viennent, garde la plus ouverte et jette l'autre : tu la poseras plus tard.`;
+
+/**
  * Construit la charge utile complète attendue par Vapi.
  */
 export function buildAssistant({
@@ -243,7 +256,7 @@ export function buildAssistant({
         politenessAlreadySet: Boolean(meta.prefs_set_at),
         topicsAlreadyKnown: Boolean(profile.sensitive_topics?.trim()),
     });
-    const systemPrompt = [fillTemplate(template, vars), session, pronunciationBlock(vars)]
+    const systemPrompt = [fillTemplate(template, vars), session, pronunciationBlock(vars), ONE_QUESTION_REMINDER]
         .filter((part) => part.trim())
         .join('\n\n');
 

@@ -41,6 +41,12 @@ import { notifyChapterReady } from './sms';
 export const MIN_TRANSCRIPT_CHARS = 200;
 export const MIN_DURATION_SECONDS = 60;
 
+/**
+ * Chapitres déjà écrits que l'Écrivain relit. Avec trois, le livre simulé
+ * du 16/11/2026 redécrivait le même décor dans quatre chapitres.
+ */
+export const PREVIOUS_CHAPTERS = 40;
+
 export interface PipelineOutcome {
     status: 'processed' | 'no_material' | 'too_short' | 'no_project';
     interviewId?: string;
@@ -249,7 +255,18 @@ export async function processEndOfCall(params: {
             ? contextFromLegacy(project.global_context)
             : normalizeContext(project.context);
 
+        // Combien d'appels cette phase a-t-elle déjà reçus ? (celui-ci compris)
+        const { count: earlier, error: countError } = await supabase
+            .from('interviews')
+            .select('id', { count: 'exact', head: true })
+            .eq('project_id', project.id)
+            .eq('phase', phase)
+            .eq('processing_status', 'processed');
+        if (countError) throw new Error(`Lecture interviews impossible : ${countError.message}`);
+
         const director = await runDirector({
+            previousProgress: project.phase_progress,
+            callsInPhase: (earlier ?? 0) + 1,
             transcript: data.transcript,
             context: currentContext,
             phase,
@@ -315,7 +332,7 @@ export async function processEndOfCall(params: {
     }
 
     const [previousChapters, outline] = await Promise.all([
-        getRecentChapters(project.id, 3),
+        getRecentChapters(project.id, PREVIOUS_CHAPTERS),
         getChapterOutline(project.id),
     ]);
 
@@ -395,7 +412,9 @@ async function persistDirectorResult(params: {
 
     const projectUpdate = {
         phase: director.resolved.next_phase,
-        phase_progress: director.progress_percentage,
+        // Une phase qui commence repart de zéro : la progression ne recule
+        // jamais à l'intérieur d'une phase, elle resterait sinon à 100.
+        phase_progress: director.resolved.next_phase !== director.resolved.phase ? 0 : director.progress_percentage,
         current_topic_id: director.next_topic_id,
         context: director.context,
         next_question_strategy: director.next_question,
