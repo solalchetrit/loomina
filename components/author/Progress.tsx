@@ -26,7 +26,7 @@ export default function Progress({ project }: { project: ProjectOverview }) {
         </div>
         <dl className="flex gap-6">
           {[
-            { value: project.chapters, label: project.chapters > 1 ? "chapitres" : "chapitre" },
+            { value: project.chapters, label: project.chapters > 1 ? "appels racontés" : "appel raconté" },
             { value: project.words.toLocaleString("fr-FR"), label: "mots" },
             { value: `≈ ${pages}`, label: "pages" },
           ].map((s) => (

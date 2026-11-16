@@ -32,6 +32,7 @@ import { runDirector } from './director';
 import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
+import { autoCompose } from './book-edition';
 
 /**
  * Seuils du garde-fou.
@@ -406,6 +407,9 @@ export async function processEndOfCall(params: {
         projectMetadata: project.project_metadata,
         title: writer.chapter_title,
     });
+
+    // Le livre se recompose avec ce nouveau récit, sans attendre ici.
+    await autoCompose(project.id);
 
     return {
         status: 'processed',

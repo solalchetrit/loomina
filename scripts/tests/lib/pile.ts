@@ -94,7 +94,7 @@ async function handleWebhook(req: http.IncomingMessage, res: http.ServerResponse
 let site: http.Server | null = null;
 let voice: ChildProcess | null = null;
 
-export async function startStack(logDir: string): Promise<void> {
+export async function startStack(logDir: string, voiceEnv: Record<string, string> = {}): Promise<void> {
     site = http.createServer((req, res) => {
         if (req.method === 'POST' && req.url?.startsWith('/api/vapi/webhook')) {
             handleWebhook(req, res).catch((err) => {
@@ -128,6 +128,7 @@ export async function startStack(logDir: string): Promise<void> {
             TWILIO_PHONE_NUMBER: LOOMINA_NUMBER,
             VOICE_SILENCE_SECONDS: String(SILENCE_SECONDS),
             VAPI_WEBHOOK_SECRET: process.env.VAPI_WEBHOOK_SECRET || 'banc',
+            ...voiceEnv,
         },
         stdio: ['ignore', 'pipe', 'pipe'],
     });

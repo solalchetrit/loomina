@@ -45,6 +45,8 @@ export const LOOMINA_NUMBER = process.env.TWILIO_PHONE_NUMBER || '+33159169357';
 
 // Aucun SMS ne peut partir de ce processus : sans identifiant de compte,
 // `sendSms` s'arrête avant tout appel réseau.
+// La batterie ne déclenche pas la recomposition du livre sur le site en ligne.
+process.env.LOOMINA_AUTO_BOOK = 'off';
 process.env.TWILIO_ACCOUNT_SID = '';
 process.env.TWILIO_AUTH_TOKEN = '';
 

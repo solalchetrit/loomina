@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { SITE } from "@/config/site";
 import ChapterEditor from "@/components/author/ChapterEditor";
+import ComposedBook from "@/components/author/ComposedBook";
 
 interface BookPlan {
   parts: { title: string; chapters: number[] }[];
@@ -42,6 +43,8 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
   const [state, setState] = useState<State>({ kind: "loading" });
   const [plan, setPlan] = useState<BookPlan | null>(null);
   const [byPeriod, setByPeriod] = useState(false);
+  // « Le livre » : composé à part des appels. « Appel par appel » : la matière, telle qu’elle a été recueillie.
+  const [view, setView] = useState<"livre" | "appels">("appels");
   const [planStatus, setPlanStatus] = useState<"idle" | "working" | "error">("idle");
   const [planError, setPlanError] = useState<string | null>(null);
 
@@ -101,7 +104,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
         const book = { id: rows[0].book_id, title: rows[0].book_title };
         const chapters = rows
           .filter((r) => r.story_id !== null)
-          .map((r) => ({ number: r.story_id as number, title: r.story_title ?? `Chapitre ${r.story_id}`, content: r.story_content ?? "", date: r.story_date ?? "" }));
+          .map((r) => ({ number: r.story_id as number, title: r.story_title ?? `Appel ${r.story_id}`, content: r.story_content ?? "", date: r.story_date ?? "" }));
         setState({ kind: "ready", book, chapters });
       } catch (err) {
         if (!cancelled) setState({ kind: "error", message: err instanceof Error ? err.message : "Erreur de chargement." });
@@ -138,7 +141,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
       : [{ title: null as string | null, chapters }];
   const placed = new Set(sections.flatMap((s) => s.chapters.map((c) => c.number)));
   const unplaced = chapters.filter((c) => !placed.has(c.number));
-  if (unplaced.length) sections.push({ title: "Nouveaux chapitres", chapters: unplaced });
+  if (unplaced.length) sections.push({ title: "Nouveaux récits", chapters: unplaced });
   const stale = plan && plan.chapter_count !== chapters.length;
 
   if (!book || chapters.length === 0) {
@@ -147,27 +150,53 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
         <p className="t-eyebrow">Votre livre</p>
         <h2 className="t-title mt-3">{book?.title ?? "Votre histoire"}</h2>
         <p className="t-lead mt-5">
-          Aucun chapitre pour le moment. Tout commence par un appel : composez le{" "}
+          Aucun récit pour le moment. Tout commence par un appel : composez le{" "}
           <a href={`tel:${SITE.phone}`} className="link whitespace-nowrap font-semibold">
             {SITE.phoneDisplay}
           </a>{" "}
           depuis ce numéro, et Loomina vous accueillera par votre prénom.
         </p>
         <p className="t-body mt-4">
-          Le premier chapitre apparaîtra ici quelques minutes après l’appel. Parlez de ce que vous voulez, Loomina vous guidera.
+          Le récit de votre premier appel apparaîtra ici quelques minutes après. Parlez de ce que vous voulez, Loomina vous guidera.
         </p>
+      </div>
+    );
+  }
+
+  const tabs = (
+    <div className="mb-4 flex gap-1 rounded-full bg-[var(--surface-2)] p-1" role="group" aria-label="Façon de lire votre histoire">
+      {(["appels", "livre"] as const).map((v) => (
+        <button
+          key={v}
+          type="button"
+          aria-pressed={view === v}
+          onClick={() => setView(v)}
+          className={`press min-h-11 flex-1 rounded-full px-4 text-[15px] font-bold ${view === v ? "bg-[var(--ink)] text-white" : ""}`}
+        >
+          {v === "appels" ? "Appel par appel" : "Le livre"}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (view === "livre") {
+    return (
+      <div className="max-w-3xl">
+        {tabs}
+        <ComposedBook onUnauthorized={onUnauthorized} />
       </div>
     );
   }
 
   return (
     <div className="max-w-3xl">
+      {tabs}
       <div className="card p-7 md:p-10">
-        <p className="t-eyebrow">Votre livre</p>
+        <p className="t-eyebrow">Vos récits, appel par appel</p>
         <h2 className="t-title mt-3">{book.title}</h2>
         <p className="t-body mt-4">
-          {chapters.length === 1 ? "Un chapitre" : `${chapters.length} chapitres`} pour l’instant. Pour corriger un passage, utilisez
-          « Corriger ce chapitre » sous le chapitre, ou dites-le à Loomina au prochain appel.
+          {chapters.length === 1 ? "Un récit" : `${chapters.length} récits`} pour l’instant, un par appel : c’est la matière de votre livre. Pour corriger un passage, utilisez
+          « Corriger ce récit » sous le récit, ou dites-le à Loomina au prochain appel.
         </p>
         {chapters.length >= 2 && (
           <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -191,19 +220,19 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
             </div>
             {plan && (stale || byPeriod) && (
               <button type="button" onClick={arrange} disabled={planStatus === "working"} className="link text-[15px]">
-                {planStatus === "working" ? "Rangement en cours…" : stale ? "Ranger aussi les nouveaux chapitres" : "Ranger à nouveau"}
+                {planStatus === "working" ? "Rangement en cours…" : stale ? "Ranger aussi les nouveaux récits" : "Ranger à nouveau"}
               </button>
             )}
             {!plan && planStatus === "working" && (
               <p className="t-small flex items-center gap-2" role="status">
-                <span className="spinner" aria-hidden="true" /> Loomina range vos chapitres…
+                <span className="spinner" aria-hidden="true" /> Loomina range vos récits…
               </p>
             )}
             {planStatus === "error" && <p className="text-[15px] font-semibold text-[var(--danger)]">{planError}</p>}
           </div>
         )}
         {byPeriod && (
-          <p className="t-small mt-3">Le texte des chapitres ne change pas : seul l’ordre suit votre vie. C’est l’ordre proposé pour l’impression.</p>
+          <p className="t-small mt-3">Le texte des récits ne change pas : seul l’ordre suit votre vie.</p>
         )}
       </div>
 
@@ -238,7 +267,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
             : []),
           ...section.chapters.map((c) => (
           <article key={c.number} id={`chapitre-${c.number}`} className="card scroll-mt-32 px-6 py-12 sm:px-12 md:py-16">
-            <p className="text-center text-[14px] font-bold text-[var(--amber-ink)]">Chapitre {c.number}</p>
+            <p className="text-center text-[14px] font-bold text-[var(--amber-ink)]">Appel {c.number}</p>
             <h3 className="mt-2 text-center font-serif text-[clamp(1.6rem,3vw,2.2rem)] font-normal italic leading-tight tracking-normal text-[var(--ink)]">{c.title}</h3>
             <div className="book-text mx-auto mt-8 max-w-[38rem]" lang="fr">
               {paragraphs(c.content).map((p, i) => (

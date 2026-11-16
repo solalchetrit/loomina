@@ -17,6 +17,9 @@ import type { TurnRecord } from './report.ts';
 
 const END_MARKER = '##END_CALL##';
 
+/** Délai sans premier mot au bout duquel la question est reposée à OpenAI, une fois. */
+const FIRST_WORD_TIMEOUT_MS = 3000;
+
 type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string };
 
 export interface SessionInit {
@@ -203,75 +206,102 @@ export class CallSession {
         // Le délai du client OpenAI ne couvre que l'arrivée de la réponse :
         // un flux qui s'arrête en route n'était jamais coupé. Sans nouveau
         // morceau pendant 8 s, on abandonne et on s'excuse.
+        //
+        // Premier essai : si aucun mot n'est arrivé au bout de 3 s, on repose
+        // la question à OpenAI une fois, sans rien dire. Avant, une requête
+        // qui calait (environ une sur cent) laissait 8 s de blanc au
+        // téléphone, puis « je n'ai pas bien entendu ».
         let stalled = false;
         let idle: NodeJS.Timeout | null = null;
+        let attempt = 0;
+        let attemptCtl = new AbortController();
+        const onAbort = () => attemptCtl.abort();
+        controller.signal.addEventListener('abort', onAbort);
         const watch = () => {
             if (idle) clearTimeout(idle);
-            idle = setTimeout(() => { stalled = true; controller.abort(); }, 8000);
+            const ms = attempt === 0 && firstTokenAt === null ? FIRST_WORD_TIMEOUT_MS : 8000;
+            idle = setTimeout(() => { stalled = true; attemptCtl.abort(); }, ms);
         };
-        watch();
 
         try {
-            const stream = await this.openai.chat.completions.create(
-                {
-                    model: config.openai.model,
-                    // Famille gpt-5 : modèles à raisonnement. Au téléphone on
-                    // coupe le raisonnement (latence) et la température n'est
-                    // pas acceptée.
-                    ...(config.openai.model.startsWith('gpt-5')
-                        ? { reasoning_effort: 'none' as const, max_completion_tokens: 300 }
-                        : { temperature: 0.6, max_tokens: 300 }),
-                    stream: true,
-                    stream_options: { include_usage: true },
-                    messages: this.chatMessages(),
-                },
-                { signal: controller.signal }
-            );
-
-            for await (const chunk of stream) {
+            for (;;) {
+                stalled = false;
+                attemptCtl = new AbortController();
                 watch();
-                if (controller.signal.aborted) break;
-                if (chunk.usage) {
-                    this.promptTokens += chunk.usage.prompt_tokens ?? 0;
-                    this.completionTokens += chunk.usage.completion_tokens ?? 0;
-                }
-                const delta = chunk.choices?.[0]?.delta?.content ?? '';
-                if (!delta) continue;
-                if (firstTokenAt === null) {
-                    firstTokenAt = Date.now();
-                    this.modelLatenciesMs.push(firstTokenAt - t0);
-                }
-                pending += delta;
+                try {
+                    const stream = await this.openai.chat.completions.create(
+                        {
+                            model: config.openai.model,
+                            // Famille gpt-5 : modèles à raisonnement. Au téléphone on
+                            // coupe le raisonnement (latence) et la température n'est
+                            // pas acceptée.
+                            ...(config.openai.model.startsWith('gpt-5')
+                                ? { reasoning_effort: 'none' as const, max_completion_tokens: 300 }
+                                : { temperature: 0.6, max_tokens: 300 }),
+                            stream: true,
+                            stream_options: { include_usage: true },
+                            messages: this.chatMessages(),
+                        },
+                        { signal: attemptCtl.signal }
+                    );
 
-                // Le marqueur de fin peut arriver en plusieurs morceaux :
-                // on ne lit à voix haute que ce qui précède.
-                const idx = pending.indexOf(END_MARKER);
-                if (idx >= 0) {
-                    this.endRequested = true;
-                    const before = pending.slice(0, idx);
-                    say(before);
-                    pending = '';
-                    break;
+                    for await (const chunk of stream) {
+                        watch();
+                        if (attemptCtl.signal.aborted) break;
+                        if (chunk.usage) {
+                            this.promptTokens += chunk.usage.prompt_tokens ?? 0;
+                            this.completionTokens += chunk.usage.completion_tokens ?? 0;
+                        }
+                        const delta = chunk.choices?.[0]?.delta?.content ?? '';
+                        if (!delta) continue;
+                        if (firstTokenAt === null) {
+                            firstTokenAt = Date.now();
+                            this.modelLatenciesMs.push(firstTokenAt - t0);
+                        }
+                        pending += delta;
+
+                        // Le marqueur de fin peut arriver en plusieurs morceaux :
+                        // on ne lit à voix haute que ce qui précède.
+                        const idx = pending.indexOf(END_MARKER);
+                        if (idx >= 0) {
+                            this.endRequested = true;
+                            const before = pending.slice(0, idx);
+                            say(before);
+                            pending = '';
+                            break;
+                        }
+                        // Garder un éventuel début de marqueur ("##END") en attente.
+                        const keep = partialMarkerLength(pending);
+                        const emit = pending.slice(0, pending.length - keep);
+                        say(emit);
+                        pending = pending.slice(pending.length - keep);
+                    }
+                    if (!stalled) break;
+                } catch (err) {
+                    if (!stalled) throw err;
                 }
-                // Garder un éventuel début de marqueur ("##END") en attente.
-                const keep = partialMarkerLength(pending);
-                const emit = pending.slice(0, pending.length - keep);
-                say(emit);
-                pending = pending.slice(pending.length - keep);
+                // Calé. Le narrateur a-t-il coupé entre-temps ?
+                if (controller.signal.aborted) return;
+                if (attempt === 0 && firstTokenAt === null) {
+                    attempt = 1;
+                    console.warn(`[${this.callSid}] OpenAI muet depuis ${FIRST_WORD_TIMEOUT_MS} ms, nouvel essai`);
+                    continue;
+                }
+                throw new Error('flux OpenAI muet depuis 8 s');
             }
 
-            if (controller.signal.aborted && !stalled) return;
-            if (stalled) throw new Error('flux OpenAI muet depuis 8 s');
+            if (controller.signal.aborted) return;
             if (pending && !pending.includes('#')) say(pending);
             this.sendText('', true);
         } catch (err) {
-            if (controller.signal.aborted && !stalled) return;
+            if (controller.signal.aborted) return;
             console.error(`[${this.callSid}] erreur modèle :`, err instanceof Error ? err.message : err);
             const fallback = "Pardon, je n'ai pas bien entendu. Pouvez-vous répéter ?";
             this.sendText(spoken ? ` ${fallback}` : fallback, true);
             spoken = spoken ? `${spoken} ${fallback}` : fallback;
         } finally {
             if (idle) clearTimeout(idle);
+            controller.signal.removeEventListener('abort', onAbort);
             if (this.generation === controller) {
                 this.generation = null;
                 this.spokenSoFar = '';

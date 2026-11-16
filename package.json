@@ -11,7 +11,10 @@
     "check": "tsc --noEmit && eslint",
     "bench": "npx -y tsx@4.19.2 --tsconfig tsconfig.json scripts/bench/run.ts",
     "test:appels": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/run.ts",
-    "test:unitaires": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json --test scripts/tests/unitaires.test.ts"
+    "test:unitaires": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json --test scripts/tests/unitaires.test.ts",
+    "test:relance": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/relance.ts",
+    "test:livre": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/livre.ts",
+    "test:semer": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/semer-livre.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.87.1",

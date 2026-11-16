@@ -23,7 +23,7 @@ export default function CGVPage() {
       <p>Loomina propose la création d’un livre de vie à partir d’entretiens téléphoniques. Le prix comprend :</p>
       <ul>
         <li>des entretiens téléphoniques, en nombre libre, menés par une intelligence artificielle ;</li>
-        <li>l’écriture d’un chapitre après chaque entretien, à partir des seules paroles du Client ;</li>
+        <li>l’écriture du récit de chaque entretien, à partir des seules paroles du Client, puis la composition du livre à partir de ces récits ;</li>
         <li>la relecture de l’ensemble par une personne de l’équipe avant l’impression ;</li>
         <li>l’intégration des photographies fournies par le Client ;</li>
         <li>la mise en page et l’impression d’un exemplaire relié ({OFFER.format}) ;</li>

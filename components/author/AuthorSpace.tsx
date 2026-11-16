@@ -175,7 +175,7 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
                 <div className="card p-7">
                   <p className="text-[17px] font-bold">Corriger un passage</p>
                   <p className="t-body mt-2">
-                    Sous chaque chapitre, « Corriger ce chapitre » : décrivez l’erreur, Loomina propose le texte corrigé, vous le relisez. La correction vaudra aussi pour la suite du livre.
+                    Dans « Appel par appel », sous chaque récit, « Corriger ce récit » : décrivez l’erreur, Loomina propose le texte corrigé, vous le relisez. La correction vaudra aussi pour la suite du livre.
                   </p>
                 </div>
                 <Photos onUnauthorized={onUnauthorized} />
