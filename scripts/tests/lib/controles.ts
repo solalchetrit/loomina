@@ -187,10 +187,12 @@ export function dbChecks(params: {
     const ctxBefore = normalizeContext(before.project.context);
     const ctx = normalizeContext(after.project.context);
     const memory = renderContext(ctx);
+    // Sans les corrections de l'auteur, qui citent par nature la graphie fautive.
+    const facts = renderContext({ ...ctx, author_corrections: [] });
     B(Boolean(ctx.last_call?.summary), 'la mémoire contient le résumé du dernier appel', 'important', 'memoire');
     B(memory.length < 9000, `la mémoire reste d'une taille raisonnable (${memory.length} caractères)`, 'mineur', 'memoire');
     for (const w of attendu.memoireContient ?? []) B(has(memory, w), `la mémoire contient « ${w} »`, 'important', 'memoire');
-    for (const w of attendu.memoireSans ?? []) B(!has(memory, w), `la mémoire ne contient pas « ${w} »`, 'important', 'memoire');
+    for (const w of attendu.memoireSans ?? []) B(!has(facts, w), `la mémoire ne contient pas « ${w} »`, 'important', 'memoire');
     for (const y of attendu.anneesInterdites ?? []) B(!ctx.timeline.some((t) => t.year === y), `pas d'année ${y} devinée dans la chronologie`, 'important', 'memoire');
     for (const t of ctxBefore.timeline.filter((t) => t.year)) {
         if (!ctx.timeline.some((x) => x.year === t.year) && !memory.includes(String(t.year))) B(false, `repère perdu : ${t.year} (${t.event.slice(0, 60)})`, 'important', 'memoire');

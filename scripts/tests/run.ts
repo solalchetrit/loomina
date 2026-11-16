@@ -218,9 +218,10 @@ async function runScenario(sc: Scenario): Promise<ScenarioResult> {
                           style: after.profile.writing_style ?? 'Naturel',
                       }).catch(() => null)
                     : Promise.resolve(null),
-                processed?.outcome && processed.outcome.status !== 'too_short'
+                processed?.outcome && processed.outcome.status !== 'too_short' && interview
                     ? judgeMemory({
-                          transcripts: after.interviews.map((i, k) => `## Entretien ${k + 1}\n${i.transcript}`).join('\n\n').slice(-60000),
+                          transcript: interview?.transcript ?? '',
+                          memoryBefore,
                           memory: renderContext(normalizeContext(after.project.context)),
                           nextQuestion: after.project.next_question_strategy ?? '',
                           sensibles: after.profile.sensitive_topics ?? '',

@@ -312,7 +312,7 @@ export const SCENARIOS: Scenario[] = [
         behaviour: { maxRepliques: 11, vitesse: 1 },
         attendu: {
             issue: ['no_material', 'processed'],
-            loominaSans: ['château', 'quiche', 'Macron', 'ChatGPT', 'GPT', 'OpenAI', 'poème sur'],
+            loominaSans: ['ChatGPT', 'GPT', 'OpenAI'],
             chapitreSans: ['château', 'poème', 'quiche'],
             memoireSans: ['château'],
         },

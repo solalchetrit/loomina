@@ -168,28 +168,34 @@ export interface MemoryVerdict {
 
 /** La mémoire et la question suivante : justes, et utiles pour le prochain appel ? */
 export async function judgeMemory(params: {
-    transcripts: string;
+    transcript: string;
+    memoryBefore: string;
     memory: string;
     nextQuestion: string;
     sensibles: string;
     phase: number;
 }): Promise<MemoryVerdict> {
     const out = await judge(
-        `Tu vérifies la mémoire qu'un système garde d'une personne après un ou plusieurs entretiens téléphoniques, et la question prévue pour ouvrir le prochain appel. SEULES les lignes « User: » sont des faits.
+        `Tu vérifies la mémoire qu'un système garde d'une personne après un entretien téléphonique, et la question prévue pour ouvrir le prochain appel.
+
+Tu reçois la mémoire AVANT l'appel (tenue pour acquise : ne la remets pas en cause), le transcript de l'appel (SEULES les lignes « User: » sont des faits) et la mémoire APRÈS l'appel.
 
 Rends en JSON :
-- "erreurs" : chaque fait de la mémoire qui est faux, déformé, attribué à la mauvaise personne, ou jamais dit par le narrateur (y compris une année calculée ou devinée). Cite-le.
-- "oublis" : les faits importants pour un livre de vie (identité, proches, lieux, grandes étapes, scènes fortes) dits par le narrateur et absents de la mémoire. Au plus 6.
+- "erreurs" : chaque fait de la mémoire APRÈS qui ne vient ni de la mémoire AVANT ni des lignes « User: » : fait faux, déformé, attribué à la mauvaise personne, année calculée ou devinée, sujet déclaré « à éviter » alors que la personne ne l'a pas demandé. Compte aussi un fait important de la mémoire AVANT qui a disparu ou a été altéré sans raison. Cite-le. Les « questions encore ouvertes » ne sont pas des faits.
+- "oublis" : les faits de CET appel sans lesquels le livre serait amputé (identité, proches, lieux, grandes étapes) et absents de la mémoire APRÈS. Les scènes et détails n'ont pas à y figurer : le chapitre les garde. Au plus 4, liste vide si l'essentiel y est.
 - "question_suivante" : note de 1 à 5 et une phrase. 5 = une seule question, ouverte, prononçable telle quelle, accrochée à un fait concret raconté, qui donne envie de raconter. Baisse la note si elle ressemble à un formulaire, contient plusieurs questions, redemande un fait déjà connu, ou touche un sujet sensible.
 
 {"erreurs":[],"oublis":[],"question_suivante":{"note":0,"detail":""}}`,
         `# PHASE EN COURS : ${params.phase} sur 4
 # SUJETS SENSIBLES : ${params.sensibles || 'aucun'}
 
-# TRANSCRIPTS DES ENTRETIENS (du plus ancien au plus récent)
-${params.transcripts}
+# MÉMOIRE AVANT L'APPEL
+${params.memoryBefore}
 
-# MÉMOIRE GARDÉE PAR LE SYSTÈME
+# TRANSCRIPT DE L'APPEL
+${params.transcript}
+
+# MÉMOIRE APRÈS L'APPEL
 ${params.memory}
 
 # QUESTION PRÉVUE POUR LE PROCHAIN APPEL
