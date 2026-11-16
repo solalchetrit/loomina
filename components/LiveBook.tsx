@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { SITE } from "@/config/site";
 import ChapterEditor from "@/components/author/ChapterEditor";
+import ComposedBook from "@/components/author/ComposedBook";
 
 interface BookPlan {
   parts: { title: string; chapters: number[] }[];
@@ -42,6 +43,8 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
   const [state, setState] = useState<State>({ kind: "loading" });
   const [plan, setPlan] = useState<BookPlan | null>(null);
   const [byPeriod, setByPeriod] = useState(false);
+  // « Le livre » : composé à part des appels. « Appel par appel » : la matière, telle qu’elle a été recueillie.
+  const [view, setView] = useState<"livre" | "appels">("appels");
   const [planStatus, setPlanStatus] = useState<"idle" | "working" | "error">("idle");
   const [planError, setPlanError] = useState<string | null>(null);
 
@@ -160,13 +163,39 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
     );
   }
 
+  const tabs = (
+    <div className="mb-4 flex gap-1 rounded-full bg-[var(--surface-2)] p-1" role="group" aria-label="Façon de lire votre histoire">
+      {(["appels", "livre"] as const).map((v) => (
+        <button
+          key={v}
+          type="button"
+          aria-pressed={view === v}
+          onClick={() => setView(v)}
+          className={`press min-h-11 flex-1 rounded-full px-4 text-[15px] font-bold ${view === v ? "bg-[var(--ink)] text-white" : ""}`}
+        >
+          {v === "appels" ? "Appel par appel" : "Le livre"}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (view === "livre") {
+    return (
+      <div className="max-w-3xl">
+        {tabs}
+        <ComposedBook onUnauthorized={onUnauthorized} />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl">
+      {tabs}
       <div className="card p-7 md:p-10">
-        <p className="t-eyebrow">Votre livre</p>
+        <p className="t-eyebrow">Vos récits, appel par appel</p>
         <h2 className="t-title mt-3">{book.title}</h2>
         <p className="t-body mt-4">
-          {chapters.length === 1 ? "Un chapitre" : `${chapters.length} chapitres`} pour l’instant. Pour corriger un passage, utilisez
+          {chapters.length === 1 ? "Un récit" : `${chapters.length} récits`} pour l’instant, un par appel : c’est la matière de votre livre. Pour corriger un passage, utilisez
           « Corriger ce chapitre » sous le chapitre, ou dites-le à Loomina au prochain appel.
         </p>
         {chapters.length >= 2 && (
