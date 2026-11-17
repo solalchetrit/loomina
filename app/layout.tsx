@@ -80,7 +80,8 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "44ASdkaUR_-lBJ6kChxSvQ",
+    // Deux comptes Google valident la Search Console (l'ancien et celui de Google Analytics).
+    google: ["44ASdkaUR_-lBJ6kChxSvQ", "AELDeTK2I5PvRzbm2tmzJE10S82QCWl6bvq4F8fUX3Q"],
   },
 };
 
