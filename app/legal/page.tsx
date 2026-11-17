@@ -43,7 +43,7 @@ export default function LegalMentionsPage() {
         Le détail est dans la <Link href="/privacy">politique de confidentialité</Link>.
       </p>
 
-      <h2>5. Cookies</h2>
+      <h2 id="cookies">5. Cookies</h2>
       <p>Le site utilise deux types de cookies :</p>
       <ul>
         <li>
@@ -51,10 +51,15 @@ export default function LegalMentionsPage() {
           auteur ;
         </li>
         <li>
-          <strong>des cookies de mesure d’audience</strong> (Google Analytics), qui nous indiquent quelles pages sont consultées.
+          <strong>des cookies de mesure d’audience</strong> (Google Analytics), qui nous indiquent quelles pages sont consultées et combien de
+          visiteurs essaient la démo ou commandent. Ils ne sont déposés qu’après votre accord, donné dans le bandeau affiché à
+          votre première visite, et durent au plus 13 mois.
         </li>
       </ul>
-      <p>Vous pouvez désactiver les cookies dans les réglages de votre navigateur ; l’espace auteur ne fonctionnera alors plus.</p>
+      <p>
+        Vous pouvez changer d’avis à tout moment avec le lien « Cookies » en bas de chaque page. Vous pouvez aussi désactiver les
+        cookies dans les réglages de votre navigateur ; l’espace auteur ne fonctionnera alors plus.
+      </p>
 
       <h2>6. Responsabilité</h2>
       <p>

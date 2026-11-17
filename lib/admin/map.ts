@@ -111,7 +111,7 @@ export const MAP_GROUPS: MapGroup[] = [
             { id: 'd-msg', label: 'Message enregistré', col: 1, from: 'd-contact', kind: 'end', d: 'Table contact_messages. Visible dans l’admin, Vue d’ensemble.' },
             { id: 'd-sms', label: 'E-mail et SMS à l’équipe', col: 1, from: 'd-msg', status: 'partial', d: 'Chaque message part par e-mail à contact@loomina.eu et par SMS au numéro d’alerte (LOOMINA_ALERT_PHONE). Les e-mails partent de la boîte contact@loomina.eu, une fois son mot de passe posé sur Vercel (SMTP_PASS).' },
             { id: 'd-ga', label: 'Mesure d’audience', col: 1, from: null, d: 'Google Analytics et Search Console.' },
-            { id: 'd-cookies', label: 'Bandeau cookies', col: 1, from: 'd-ga', status: 'todo', d: 'Pas encore en ligne (travail en cours dans une autre demande de fusion).' },
+            { id: 'd-cookies', label: 'Bandeau cookies', col: 1, from: 'd-ga', d: 'Au premier passage, un bandeau demande l’accord pour la mesure d’audience. Google Analytics ne se charge qu’après « Accepter ». Le choix se change par le lien « Cookies » en bas du site.', code: 'components/Analytics.tsx' },
         ],
     },
     {

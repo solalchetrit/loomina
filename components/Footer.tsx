@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SITE } from "@/config/site";
+import CookieLink from "@/components/CookieLink";
 
 const COLUMNS = [
   {
@@ -81,6 +82,11 @@ export default function Footer() {
                       </Link>
                     </li>
                   ))}
+                  {col.title === "Légal" && (
+                    <li>
+                      <CookieLink className="text-[16px] text-[var(--ink-2)] hover:text-[var(--ink)] hover:underline hover:underline-offset-4" />
+                    </li>
+                  )}
                 </ul>
               </div>
             ))}

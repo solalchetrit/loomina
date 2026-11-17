@@ -6,6 +6,8 @@ import AuthorSpace from "@/components/author/AuthorSpace";
 import FamilySpace from "@/components/author/FamilySpace";
 import Button from "@/components/ui/Button";
 import { SITE } from "@/config/site";
+import { OFFER } from "@/config/offer";
+import { trackWhenReady } from "@/lib/analytics";
 import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
 // Vide en ligne ; dans la copie hébergée sur Claude, ouvre l'espace auteur sur le livre d'exemple.
 import "@/lib/loomina/artifact-hook";
@@ -55,7 +57,17 @@ export default function DashboardPage() {
         setIsLoggedIn(true);
       })
       .catch(() => {});
-    if (new URLSearchParams(window.location.search).has("session_id")) setJustOrdered(true);
+    const sessionId = new URLSearchParams(window.location.search).get("session_id");
+    if (sessionId) {
+      setJustOrdered(true);
+      // Retour du paiement Stripe. transaction_id évite de compter deux fois une commande si la page est rechargée.
+      trackWhenReady("purchase", {
+        transaction_id: sessionId,
+        currency: "EUR",
+        value: OFFER.price,
+        items: [{ item_id: "livre", item_name: OFFER.name, price: OFFER.price, quantity: 1 }],
+      });
+    }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
