@@ -9,7 +9,7 @@ import type { Profile, Project } from '@/lib/loomina/db';
 import { readEditions } from '@/lib/loomina/book-edition';
 import type { Edition } from '@/lib/loomina/book-edition';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
-import { normalizeSchedule } from '@/lib/loomina/schedule';
+import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
 import { readGiver } from '@/lib/loomina/giver';
 import type { Giver } from '@/lib/loomina/giver';
 
@@ -261,4 +261,151 @@ export async function voiceHealth(): Promise<{ ok: boolean; detail: string }> {
     } catch (err) {
         return { ok: false, detail: err instanceof Error ? err.message : String(err) };
     }
+}
+
+// ------------------------------------------------------------------
+// Suivi client
+// ------------------------------------------------------------------
+
+export type CrmStage = 'commande' | 'onboarde' | 'recit' | 'avance' | 'termine';
+export type CrmHealth = 'attente' | 'relancer' | 'actif' | 'inactif' | 'termine';
+
+export interface CrmClient {
+    id: string;
+    name: string;
+    phone: string | null;
+    orderedAt: string;
+    isGift: boolean;
+    paid: boolean;
+    phase: number | null;
+    progress: number;
+    realCalls: number;
+    shortCalls: number;
+    minutes: number;
+    chapters: number;
+    words: number;
+    firstCallAt: string | null;
+    lastCallAt: string | null;
+    daysSinceOrder: number;
+    daysSinceLastCall: number | null;
+    daysToFirstCall: number | null;
+    schedule: string | null;
+    stage: CrmStage;
+    health: CrmHealth;
+    failedEvents: number;
+}
+
+export interface Crm {
+    clients: CrmClient[];
+    weeks: Array<{ label: string; calls: number; minutes: number }>;
+    months: Array<{ label: string; orders: number }>;
+}
+
+/** Sans premier vrai appel au bout de ce délai, le client est « à relancer ». */
+export const RELANCE_AFTER_DAYS = 3;
+/** Sans appel depuis ce délai, un livre en cours est « inactif ». */
+export const INACTIVE_AFTER_DAYS = 14;
+
+const DAY = 24 * 3600 * 1000;
+
+export async function getCrm(now = Date.now()): Promise<Crm> {
+    const supabase = db();
+    const [profiles, projects, interviews, chapters, events] = await Promise.all([
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(1000),
+        supabase.from('projects').select('*').order('created_at', { ascending: false }).limit(1000),
+        supabase.from('interviews').select('project_id, created_at, duration_seconds, processing_status').limit(10000),
+        supabase.from('chapters').select('project_id, word_count, status').limit(10000),
+        supabase.from('call_events').select('project_id').eq('status', 'failed').limit(1000),
+    ]);
+    const P = must(profiles, 'profils') as ClientSummary['profile'][];
+    const J = must(projects, 'projets') as NonNullable<ClientSummary['project']>[];
+    const I = must(interviews, 'entretiens') as Row[];
+    const C = (must(chapters, 'chapitres') as Row[]).filter((c) => c.status !== 'archived');
+    const E = must(events, 'événements') as Row[];
+
+    const clients: CrmClient[] = P.map((profile) => {
+        const project = J.find((j) => j.user_id === profile.id) ?? null;
+        const mine = project ? I.filter((i) => i.project_id === project.id) : [];
+        const real = mine.filter((i) => i.processing_status !== 'too_short').sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+        const chaps = project ? C.filter((c) => c.project_id === project.id) : [];
+        const meta = (project?.project_metadata ?? {}) as Row;
+        const orderedAt = String(project?.created_at ?? profile.created_at);
+        const firstCallAt = real[0] ? String(real[0].created_at) : null;
+        const lastCallAt = real.length ? String(real[real.length - 1].created_at) : null;
+        const daysSinceOrder = Math.floor((now - new Date(orderedAt).getTime()) / DAY);
+        const daysSinceLastCall = lastCallAt ? Math.floor((now - new Date(lastCallAt).getTime()) / DAY) : null;
+        const phase = project ? Number(project.phase) : null;
+        const completed = project?.status === 'completed';
+
+        const stage: CrmStage = completed ? 'termine' : (phase ?? 1) >= 2 ? 'avance' : chaps.length > 0 ? 'recit' : real.length > 0 ? 'onboarde' : 'commande';
+        const health: CrmHealth = completed
+            ? 'termine'
+            : real.length === 0
+              ? daysSinceOrder > RELANCE_AFTER_DAYS
+                  ? 'relancer'
+                  : 'attente'
+              : (daysSinceLastCall ?? 0) > INACTIVE_AFTER_DAYS
+                ? 'inactif'
+                : 'actif';
+
+        return {
+            id: profile.id,
+            name: `${profile.first_name ?? ''} ${profile.last_name ?? ''}`.trim() || profile.full_name || 'Sans nom',
+            phone: profile.phone_number,
+            orderedAt,
+            isGift: meta.is_gift === true,
+            paid: Boolean(project?.stripe_session_id),
+            phase,
+            progress: Number(project?.phase_progress ?? 0),
+            realCalls: real.length,
+            shortCalls: mine.length - real.length,
+            minutes: Math.round(real.reduce((s, i) => s + (Number(i.duration_seconds) || 0), 0) / 60),
+            chapters: chaps.length,
+            words: chaps.reduce((s, c) => s + (Number(c.word_count) || 0), 0),
+            firstCallAt,
+            lastCallAt,
+            daysSinceOrder,
+            daysSinceLastCall,
+            daysToFirstCall: firstCallAt ? Math.max(0, Math.floor((new Date(firstCallAt).getTime() - new Date(orderedAt).getTime()) / DAY)) : null,
+            schedule: describeSchedule(normalizeSchedule(meta.call_schedule)),
+            stage,
+            health,
+            failedEvents: project ? E.filter((e) => e.project_id === project.id).length : 0,
+        };
+    });
+
+    // Huit dernières semaines d'appels (lundi → dimanche, heure de Paris approchée par UTC).
+    const weeks: Crm['weeks'] = [];
+    const monday = new Date(now);
+    monday.setUTCHours(0, 0, 0, 0);
+    monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
+    for (let w = 7; w >= 0; w--) {
+        const start = monday.getTime() - w * 7 * DAY;
+        const inWeek = I.filter((i) => {
+            const t = new Date(String(i.created_at)).getTime();
+            return t >= start && t < start + 7 * DAY && i.processing_status !== 'too_short';
+        });
+        weeks.push({
+            label: new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(start)),
+            calls: inWeek.length,
+            minutes: Math.round(inWeek.reduce((s, i) => s + (Number(i.duration_seconds) || 0), 0) / 60),
+        });
+    }
+
+    // Six derniers mois de commandes.
+    const months: Crm['months'] = [];
+    const d = new Date(now);
+    for (let m = 5; m >= 0; m--) {
+        const start = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - m, 1));
+        const end = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - m + 1, 1));
+        months.push({
+            label: new Intl.DateTimeFormat('fr-FR', { month: 'short', timeZone: 'UTC' }).format(start),
+            orders: J.filter((j) => {
+                const t = new Date(j.created_at).getTime();
+                return t >= start.getTime() && t < end.getTime();
+            }).length,
+        });
+    }
+
+    return { clients, weeks, months };
 }

@@ -33,18 +33,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Logo />
           {admin && (
             <>
-              <div className="order-3 w-full min-w-0 lg:order-2 lg:w-auto"><AdminNav /></div>
-              <form action="/api/admin/logout" method="post" className="order-2 lg:order-3">
-                <button aria-label="Se déconnecter" className="press inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-[14px] px-3 text-[15px] font-bold text-[var(--ink)] hover:bg-[var(--surface-2)] lg:px-4">
+              <div className="order-3 w-full min-w-0 xl:order-2 xl:w-auto"><AdminNav /></div>
+              <form action="/api/admin/logout" method="post" className="order-2 xl:order-3">
+                <button aria-label="Se déconnecter" className="press inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-[14px] px-3 text-[15px] font-bold text-[var(--ink)] hover:bg-[var(--surface-2)] xl:px-4">
                   <AIcon name="logout" size={18} />
-                  <span className="hidden lg:inline">Se déconnecter</span>
+                  <span className="hidden xl:inline">Se déconnecter</span>
                 </button>
               </form>
             </>
           )}
         </div>
       </header>
-      <main className={`mx-auto w-full max-w-[1240px] px-5 pb-20 sm:px-6 ${admin ? "pt-[10.5rem] lg:pt-[8.5rem]" : "pt-[7rem]"}`}>{children}</main>
+      <main className={`mx-auto w-full max-w-[1240px] px-5 pb-20 sm:px-6 ${admin ? "pt-[10.5rem] xl:pt-[8.5rem]" : "pt-[7rem]"}`}>{children}</main>
     </div>
   );
 }
