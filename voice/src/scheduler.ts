@@ -104,9 +104,9 @@ async function placeScheduledCalls(isBusy: (phone: string) => boolean): Promise<
 }
 
 async function catchUp(): Promise<void> {
-    if (!config.cronSecret) return;
+    // Même secret que pour le rapport de fin d'appel : rien d'autre à configurer.
     const res = await fetch(`${config.nextBaseUrl}/api/jobs/process`, {
-        headers: { Authorization: `Bearer ${config.cronSecret}` },
+        headers: { 'x-vapi-secret': config.webhookSecret },
     });
     if (!res.ok) {
         console.warn(`[rattrapage] le site répond ${res.status}`);
@@ -123,12 +123,8 @@ export function startTimers(isBusy: (phone: string) => boolean): void {
         }, 60_000);
         console.info('[rendez-vous] actif (chaque minute, heure de Paris)');
     }
-    if (config.cronSecret) {
-        setInterval(() => {
-            catchUp().catch((err) => console.error('[rattrapage]', err instanceof Error ? err.message : err));
-        }, 5 * 60_000);
-        console.info('[rattrapage] actif (toutes les 5 min)');
-    } else {
-        console.info('[rattrapage] CRON_SECRET absente : seul le cron quotidien du site rattrape les appels');
-    }
+    setInterval(() => {
+        catchUp().catch((err) => console.error('[rattrapage]', err instanceof Error ? err.message : err));
+    }, 5 * 60_000);
+    console.info('[rattrapage] actif (toutes les 5 min)');
 }

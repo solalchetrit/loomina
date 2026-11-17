@@ -49,7 +49,7 @@ On ne déploie donc jamais à la main : on pousse une branche, on vérifie l'ape
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | base de données (serveur uniquement) |
 | `OPENAI_API_KEY` | Directeur et Écrivain |
-| `VAPI_WEBHOOK_SECRET`, `VAPI_SERVER_URL`, `VAPI_API_KEY`, `VAPI_PHONE_NUMBER_ID` | appels entrants et sortants |
+| `VAPI_WEBHOOK_SECRET` | secret partagé entre le site et le serveur vocal (rapports d’appel, rattrapage). Le nom est hérité de Vapi, qui n’est plus utilisé. |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | paiement |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_VERIFY_SERVICE_SID` | code SMS de connexion |
 | `CONTACT_SMS_FROM`, `CONTACT_NOTIFY_PHONE` | alerte SMS du formulaire de contact |
