@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import { CheckList } from "@/components/ui/Section";
 import Photo from "@/components/ui/Photo";
 import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
+import { track } from "@/lib/analytics";
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
 
@@ -71,6 +72,13 @@ export default function OrderPage() {
     setSubmitError(null);
 
     const phone = formatToE164(form.phone);
+    track("begin_checkout", {
+      currency: "EUR",
+      value: OFFER.price,
+      pour: isGift ? "offrir" : "soi",
+      items: [{ item_id: "livre", item_name: OFFER.name, price: OFFER.price, quantity: 1 }],
+      transport_type: "beacon",
+    });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

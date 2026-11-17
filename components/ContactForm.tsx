@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Input, Textarea } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
+import { track } from "@/lib/analytics";
 
 const SUBJECTS = [
   { value: "question", label: "Une question avant de commander" },
@@ -46,6 +47,7 @@ export default function ContactForm() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || "Le message n’a pas pu partir.");
       setStatus("sent");
+      track("generate_lead", { formulaire: "contact" });
     } catch (err) {
       setStatus("error");
       setServerError(err instanceof Error ? err.message : "Le message n’a pas pu partir.");
