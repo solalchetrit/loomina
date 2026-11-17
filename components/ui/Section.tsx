@@ -60,20 +60,22 @@ export function PageHeader({
   title: ReactNode;
   text?: ReactNode;
   /** Photo d'illustration, à droite du titre sur grand écran, dessous sur téléphone. */
-  photo?: { name: string; alt: string; focus?: string };
+  photo?: { name: string; alt: string; focus?: string; /** Bandeau bas : la section suivante reste visible sans défiler. */ compact?: boolean };
   children?: ReactNode;
 }) {
   return (
-    <section className="w-full pb-8 pt-32 md:pb-12 md:pt-40">
+    <section className={`w-full pt-32 md:pt-40 ${photo?.compact ? "pb-0" : "pb-8 md:pb-12"}`}>
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
         <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise !max-w-4xl" />
         {photo && (
           <Photo
-            {...photo}
+            name={photo.name}
+            alt={photo.alt}
+            focus={photo.focus}
             priority
-            ratio="aspect-[4/3] sm:aspect-[5/2]"
+            ratio={photo.compact ? "h-[clamp(150px,22vh,240px)]" : "aspect-[4/3] sm:aspect-[5/2]"}
             sizes="(min-width: 1240px) 1200px, 100vw"
-            className="rise mt-10 md:mt-12"
+            className={`rise ${photo.compact ? "mt-8" : "mt-10 md:mt-12"}`}
           />
         )}
         {children}

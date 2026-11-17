@@ -117,7 +117,7 @@ export default function ExperiencePage() {
       <PageHeader
         title="Un téléphone, des conversations, un livre"
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
-        photo={{ name: "homme-casquette-telephone", alt: "Assis sur un banc, un homme âgé parle au téléphone.", focus: "50% 36%" }}
+        photo={{ name: "mains-telephone", alt: "Les mains d’une personne âgée tiennent un téléphone.", focus: "50% 45%", compact: true }}
       />
 
       {PHASES.map((p, idx) => {
