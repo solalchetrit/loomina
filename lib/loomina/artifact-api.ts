@@ -4,7 +4,7 @@
  * avec le livre d'exemple de Jeanne (lib/loomina/demo.ts). L'espace auteur
  * s'ouvre directement, sans SMS. Ce fichier n'est chargé que dans cette copie.
  */
-import { demoAddQuestion, demoOverview, demoSavePrefs, demoStories } from './demo';
+import { demoAddPerson, demoAddQuestion, demoEdition, demoOverview, demoSavePrefs, demoStories } from './demo';
 
 type Body = Record<string, unknown>;
 
@@ -35,10 +35,15 @@ function answer(path: string, method: string, init?: RequestInit): Promise<Respo
         if (!q) return reply({ error: 'Question trop courte' }, 400);
         return reply({ openQuestions: demoAddQuestion(q.slice(0, 280)) });
     }
+    if (path === '/api/user/people') {
+        const b = bodyOf(init);
+        const name = String(b.name ?? '').trim().slice(0, 60);
+        const relation = String(b.relation ?? '').trim().slice(0, 80);
+        if (name.length < 2 || relation.length < 2) return reply({ error: 'Indiquez un prénom et qui est cette personne pour vous.' }, 400);
+        return reply(demoAddPerson(name, relation));
+    }
     if (path === '/api/user/book') {
-        return method === 'POST'
-            ? reply({ error: 'La composition n’est pas disponible en démonstration.' }, 409)
-            : reply({ edition: null, running: null, failed: false, sourceCount: 0 });
+        return method === 'POST' ? reply({ error: 'La composition n’est pas disponible en démonstration.' }, 409) : reply(demoEdition());
     }
     if (path === '/api/user/book-plan') return method === 'POST' ? reply({ error: 'Indisponible en démonstration.' }, 409) : reply({ plan: null });
     if (path === '/api/user/photos') return method === 'POST' ? reply({ error: 'Indisponible en démonstration.' }, 501) : reply({ photos: [] });

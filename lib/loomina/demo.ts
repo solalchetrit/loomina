@@ -108,6 +108,15 @@ const state = {
         giverFirstName: null as string | null,
         shareWithGiver: false,
     },
+    family: [
+        { name: 'Pierre', relation: 'son mari', deceased: true },
+        { name: 'Claire', relation: 'sa fille, médecin' },
+        { name: 'Thomas', relation: 'son fils, architecte' },
+        { name: 'Marie', relation: 'sa grand-mère maternelle', deceased: true },
+        { name: 'Yves', relation: 'son père, cheminot', deceased: true },
+        { name: 'Anne', relation: 'son amie depuis 1964' },
+        { name: 'Léa', relation: 'sa petite-fille' },
+    ] as { name: string; relation: string; deceased?: boolean }[],
     openQuestions: [
         'Raconte-nous ta rencontre avec papa à la poste',
         'Comment as-tu vécu Mai 68 à Paris ?',
@@ -155,18 +164,11 @@ export function demoOverview() {
                 { year: 2008, event: 'Départ à la retraite' },
                 { year: 2019, event: 'Décès de Pierre' },
             ],
-            family: [
-                { name: 'Pierre', relation: 'son mari', deceased: true },
-                { name: 'Claire', relation: 'sa fille, médecin' },
-                { name: 'Thomas', relation: 'son fils, architecte' },
-                { name: 'Marie', relation: 'sa grand-mère maternelle', deceased: true },
-                { name: 'Yves', relation: 'son père, cheminot', deceased: true },
-                { name: 'Anne', relation: 'son amie depuis 1964' },
-                { name: 'Léa', relation: 'sa petite-fille' },
-            ],
+            family: state.family,
             themes: ['L’enfance', 'Les premiers emplois', 'Les premiers amours', 'La famille', 'La carrière', 'Les voyages', 'Les études'],
             openQuestions: state.openQuestions,
-            calls: CALLS,
+            // CALLS va du plus récent au plus ancien, CHAPTERS dans l’autre sens.
+            calls: CALLS.map((c, i) => ({ ...c, title: CHAPTERS[CHAPTERS.length - 1 - i]?.title ?? null })),
         },
     };
 }
@@ -190,4 +192,27 @@ export function demoSavePrefs(patch: Partial<typeof state.prefs>) {
 export function demoAddQuestion(question: string) {
     state.openQuestions = [question, ...state.openQuestions.filter((q) => q !== question)].slice(0, 15);
     return state.openQuestions;
+}
+
+export function demoAddPerson(name: string, relation: string) {
+    state.family = [...state.family, { name, relation }];
+    state.openQuestions = [personTopic(name, relation), ...state.openQuestions].slice(0, 15);
+    return { family: state.family, openQuestions: state.openQuestions };
+}
+
+/** Le sujet que Loomina garde en tête pour une personne ajoutée depuis l'espace auteur. */
+export function personTopic(name: string, relation: string) {
+    return `Parler de ${name} (${relation}) : qui est cette personne, et quels souvenirs vous lient ?`;
+}
+
+/** Le livre composé de l'exemple : les récits rangés par périodes de vie. */
+export function demoEdition() {
+    const parts = ['L’enfance', 'L’enfance', 'L’enfance', 'La jeunesse', 'La jeunesse', 'La vie de famille', 'La vie de famille', 'Le travail', 'Les voyages'];
+    const chapters = CHAPTERS.map((c, i) => ({ number: i + 1, title: c.title, part: parts[i] ?? 'Souvenirs', content: c.content, sources: [i + 1] }));
+    return {
+        edition: { id: 'demo', status: 'ready', chapters, done: chapters.length, total: chapters.length, sourceCount: CHAPTERS.length, at: CHAPTERS[CHAPTERS.length - 1].date },
+        running: null,
+        failed: false,
+        sourceCount: CHAPTERS.length,
+    };
 }

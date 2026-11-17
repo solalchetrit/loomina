@@ -123,15 +123,6 @@ export default function Settings({
               ))}
             </div>
           </fieldset>
-          <Input
-            label="Prononciation de votre prénom"
-            name="phonetic"
-            maxLength={80}
-            value={form.firstNamePhonetic ?? ""}
-            onChange={(e) => update({ firstNamePhonetic: e.target.value })}
-            placeholder={firstName ?? "Votre prénom"}
-            hint="Si la voix l’écorche, écrivez-le comme il se prononce (par exemple « Solale »)."
-          />
           <div>
             <label htmlFor="sujet-evite" className="field-label">
               Sujets à ne pas aborder
@@ -173,6 +164,15 @@ export default function Settings({
             )}
             <p className="t-small mt-2">Loomina ne les abordera pas. Vous restez libre d’en parler vous-même.</p>
           </div>
+          <Input
+            label="Prononciation de votre prénom"
+            name="phonetic"
+            maxLength={80}
+            value={form.firstNamePhonetic ?? ""}
+            onChange={(e) => update({ firstNamePhonetic: e.target.value })}
+            placeholder={firstName ?? "Votre prénom"}
+            hint="Si la voix l’écorche, écrivez-le comme il se prononce (par exemple « Solale »)."
+          />
         </div>
       </section>
 

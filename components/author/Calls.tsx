@@ -28,7 +28,10 @@ export default function Calls({ project }: { project: ProjectOverview }) {
                   {i === 0 ? " · le plus récent" : ""}
                 </span>
               </span>
-              <span className="text-[16px] leading-relaxed text-[var(--ink-2)]">{c.summary ?? "Appel enregistré."}</span>
+              <span>
+                {c.title && <b className="block text-[17px] leading-snug text-[var(--ink)]">{c.title}</b>}
+                <span className={`block text-[16px] leading-relaxed text-[var(--ink-2)] ${c.title ? "mt-1" : ""}`}>{c.summary ?? "Appel enregistré."}</span>
+              </span>
             </li>
           ))}
         </ol>

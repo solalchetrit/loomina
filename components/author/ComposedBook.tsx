@@ -153,12 +153,10 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
         {edition && (
           <p className="t-small mt-4">Pour corriger un passage, corrigez-le dans « Appel par appel » : la correction est reportée dans le livre, le reste ne change pas.</p>
         )}
-      </div>
 
-      {edition && (
-        <>
-          <nav aria-label="Sommaire du livre" className="card mt-4 px-5 py-4 md:px-7">
-            <p className="pt-2 text-[15px] font-bold text-[var(--ink-3)]">Sommaire</p>
+        {edition && (
+          <nav aria-label="Sommaire du livre" className="mt-8 border-t border-[var(--line-soft)] pt-6">
+            <p className="text-[15px] font-bold text-[var(--ink-3)]">Sommaire</p>
             {parts.map((part) => (
               <div key={part.title}>
                 <p className="mt-4 text-[15px] font-bold text-[var(--amber-ink)]">{part.title}</p>
@@ -175,7 +173,11 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
               </div>
             ))}
           </nav>
+        )}
+      </div>
 
+      {edition && (
+        <>
           <div className="mt-4 space-y-4">
             {parts.flatMap((part) => [
               <h3 key={`partie-${part.title}`} className="pt-6 text-center font-serif text-[clamp(1.4rem,2.6vw,1.9rem)] italic text-[var(--ink-2)]">

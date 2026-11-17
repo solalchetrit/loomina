@@ -171,7 +171,8 @@ export default function AuthorSpace({
               {lastCall && (
                 <button type="button" onClick={() => setTab("appels")} className="card lift press p-6 text-left md:p-8">
                   <span className="text-[15px] font-bold text-[var(--ink-3)]">Dernier appel · {formatDate(lastCall.date, false)}</span>
-                  <span className="mt-2 block text-[17px] leading-relaxed">{lastCall.summary ?? "Appel enregistré."}</span>
+                  {lastCall.title && <span className="mt-2 block text-[19px] font-bold leading-snug">{lastCall.title}</span>}
+                  <span className={`block text-[17px] leading-relaxed ${lastCall.title ? "mt-1 text-[var(--ink-2)]" : "mt-2"}`}>{lastCall.summary ?? "Appel enregistré."}</span>
                   <span className="link mt-3 inline-block text-[15px]">Tous vos appels</span>
                 </button>
               )}
@@ -182,18 +183,19 @@ export default function AuthorSpace({
             <div className="grid gap-4 lg:grid-cols-[1.9fr_1fr]">
               <LiveBook onUnauthorized={onUnauthorized} />
               <aside className="flex flex-col gap-4 lg:sticky lg:top-32 lg:self-start">
-                <div className="card p-7">
-                  <p className="text-[17px] font-bold">Corriger un passage</p>
-                  <p className="t-body mt-2">
-                    Dans « Appel par appel », sous chaque récit, « Corriger ce récit » : décrivez l’erreur, Loomina propose le texte corrigé, vous le relisez. La correction vaudra aussi pour la suite du livre.
-                  </p>
-                </div>
                 <Photos onUnauthorized={onUnauthorized} />
               </aside>
             </div>
           )}
 
-          {data && tab === "vie" && (project ? <LifeStory project={project} /> : null)}
+          {data && tab === "vie" &&
+            (project ? (
+              <LifeStory
+                project={project}
+                onPersonAdded={(family, openQuestions) => setData((d) => (d?.project ? { ...d, project: { ...d.project, family, openQuestions } } : d))}
+                onUnauthorized={onUnauthorized}
+              />
+            ) : null)}
           {data && tab === "appels" && (project ? <Calls project={project} /> : null)}
           {data && tab === "reglages" && (
             <Settings

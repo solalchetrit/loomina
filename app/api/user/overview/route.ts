@@ -38,10 +38,10 @@ export async function GET(request: NextRequest) {
         }
 
         const [chapters, interviews] = await Promise.all([
-            db().from('chapters').select('word_count').eq('project_id', project.id).neq('status', 'archived'),
+            db().from('chapters').select('word_count, title, latest_interview_id').eq('project_id', project.id).neq('status', 'archived'),
             db()
                 .from('interviews')
-                .select('created_at, duration_seconds, topics_summary')
+                .select('id, created_at, duration_seconds, topics_summary')
                 .eq('project_id', project.id)
                 .eq('processing_status', 'processed')
                 .order('created_at', { ascending: false })
@@ -51,6 +51,8 @@ export async function GET(request: NextRequest) {
         if (interviews.error) throw new Error(interviews.error.message);
 
         const context = normalizeContext(project.context);
+        // Le titre du récit écrit après chaque appel sert de titre à l'appel.
+        const titleOf = new Map(chapters.data.filter((c) => c.latest_interview_id).map((c) => [c.latest_interview_id as string, (c.title as string | null) ?? null]));
         const phase = toPhase(project.phase);
 
         return NextResponse.json({
@@ -72,6 +74,7 @@ export async function GET(request: NextRequest) {
                 calls: interviews.data.map((i) => ({
                     date: i.created_at as string,
                     minutes: i.duration_seconds ? Math.max(1, Math.round((i.duration_seconds as number) / 60)) : null,
+                    title: titleOf.get(i.id as string) ?? null,
                     summary: (i.topics_summary as string | null) ?? null,
                 })),
             },
