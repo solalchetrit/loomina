@@ -117,7 +117,7 @@ export function aiCatalog(): Ai[] {
                 ...phases.map((p) => {
                     const ex = sampleVoicePrompt(p, p === 1);
                     return {
-                        title: `Exemple rempli : phase ${p} (${PHASE_LABELS[p]})${p === 1 ? ', premier appel' : ''}, pour une narratrice fictive`,
+                        title: `Exemple rempli, phase ${p} (${PHASE_LABELS[p]})${p === 1 ? ', premier appel' : ''}, pour Jeanne`,
                         text: `PREMIÈRE PHRASE DITE : « ${ex.firstMessage} »\n\n${ex.system}`,
                     };
                 }),
