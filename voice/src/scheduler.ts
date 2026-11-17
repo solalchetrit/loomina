@@ -8,6 +8,10 @@
  *    créneau : le créneau est noté AVANT l'appel (`last_scheduled_slot`), si
  *    bien qu'un redémarrage ou deux serveurs ne rappellent jamais deux fois.
  *
+ * 1 bis. RAPPEL — une demi-heure avant un rendez-vous, un SMS prévient le
+ *    narrateur que Loomina va l'appeler (demande de Solal, 17/11/2026).
+ *    Désactivable : `project_metadata.sms_reminder === false`.
+ *
  * 2. RATTRAPAGE — toutes les 5 minutes, demande au site de retraiter les
  *    appels dont le traitement (Directeur, Écrivain) a échoué. Sur Vercel
  *    Hobby, le cron du site ne passe qu'une fois par jour, à 3 h.
@@ -16,6 +20,7 @@
 import twilio from 'twilio';
 import { db } from '../../lib/loomina/db';
 import { normalizeSchedule } from '../../lib/loomina/schedule';
+import { sendSms } from '../../lib/loomina/sms';
 import { config } from './config.ts';
 
 /** Fenêtre après l'heure prévue pendant laquelle l'appel part encore (serveur redémarré…). */
@@ -51,6 +56,63 @@ export function dueSlot(schedule: unknown, now = new Date()): string | null {
     const start = h * 60 + m;
     if (p.minutes < start || p.minutes >= start + WINDOW_MINUTES) return null;
     return `${p.ymd} ${s.time}`;
+}
+
+/** Le SMS de rappel part entre 30 et 20 minutes avant l'heure prévue. */
+const REMINDER_MINUTES = 30;
+
+/** Le créneau dont le rappel est dû maintenant, ou null. */
+export function dueReminder(schedule: unknown, now = new Date()): string | null {
+    const s = normalizeSchedule(schedule);
+    if (!s.active) return null;
+    const p = parisNow(now);
+    if (!s.days.includes(p.day)) return null;
+    const [h, m] = s.time.split(':').map(Number);
+    const start = h * 60 + m;
+    if (p.minutes < start - REMINDER_MINUTES || p.minutes >= start - REMINDER_MINUTES + WINDOW_MINUTES) return null;
+    return `${p.ymd} ${s.time}`;
+}
+
+export function reminderText(firstName: string | null, tu: boolean, time: string): string {
+    const [h, m] = time.split(':');
+    const at = `${Number(h)} h${m === '00' ? '' : ` ${m}`}`;
+    const hello = firstName ? `Bonjour ${firstName}` : 'Bonjour';
+    return tu
+        ? `${hello}, c'est Loomina. Je t'appelle tout à l'heure, à ${at}, pour continuer ton livre. Si ce n'est pas le bon moment, ne décroche pas : tu pourras me rappeler quand tu veux.`
+        : `${hello}, c'est Loomina. Je vous appelle tout à l'heure, à ${at}, pour continuer votre livre. Si ce n'est pas le bon moment, ne décrochez pas : vous pourrez me rappeler quand vous voulez.`;
+}
+
+async function sendReminders(): Promise<void> {
+    const { data, error } = await db()
+        .from('projects')
+        .select('id, user_id, status, project_metadata')
+        .eq('project_metadata->call_schedule->>active', 'true')
+        .neq('status', 'completed')
+        .limit(500);
+    if (error) throw new Error(`lecture des rendez-vous (rappels) : ${error.message}`);
+
+    for (const project of data ?? []) {
+        const meta = (project.project_metadata ?? {}) as Record<string, unknown>;
+        if (meta.sms_reminder === false) continue;
+        const slot = dueReminder(meta.call_schedule);
+        if (!slot || meta.last_reminder_slot === slot) continue;
+
+        const { data: profile } = await db().from('profiles').select('phone_number, first_name, politeness_preference').eq('id', project.user_id).single();
+        const phone = (profile?.phone_number as string | null) ?? null;
+        if (!phone) continue;
+
+        // Réservé d'abord, comme pour l'appel : jamais deux rappels pour un créneau.
+        const { data: claimed, error: claimErr } = await db()
+            .from('projects')
+            .update({ project_metadata: { ...meta, last_reminder_slot: slot } })
+            .eq('id', project.id)
+            .or(`project_metadata->>last_reminder_slot.is.null,project_metadata->>last_reminder_slot.neq."${slot}"`)
+            .select('id');
+        if (claimErr || !claimed?.length) continue;
+
+        const sent = await sendSms(phone, reminderText((profile?.first_name as string | null) ?? null, profile?.politeness_preference === 'tu', normalizeSchedule(meta.call_schedule).time));
+        if (sent) console.info(`[rappel] SMS envoyé pour le créneau ${slot}`);
+    }
 }
 
 async function placeScheduledCalls(isBusy: (phone: string) => boolean): Promise<void> {
@@ -120,6 +182,7 @@ export function startTimers(isBusy: (phone: string) => boolean): void {
     if (config.schedulerEnabled) {
         setInterval(() => {
             placeScheduledCalls(isBusy).catch((err) => console.error('[rendez-vous]', err instanceof Error ? err.message : err));
+            sendReminders().catch((err) => console.error('[rappel]', err instanceof Error ? err.message : err));
         }, 60_000);
         console.info('[rendez-vous] actif (chaque minute, heure de Paris)');
     }

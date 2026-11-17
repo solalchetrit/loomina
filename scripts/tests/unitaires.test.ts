@@ -217,3 +217,26 @@ test('durée souhaitée : le plafond est de 1 h 30, quelle que soit la durée so
     assert.equal(hardLimitSeconds(20, 2700), 90 * 60);
     assert.equal(hardLimitSeconds(45, 5400), 90 * 60);
 });
+
+// ---- Prévenir : bienvenue, famille ----
+import { welcomeTexts, familyNewsText } from '../../lib/loomina/notify';
+
+test('bienvenue : pour soi, le SMS part au narrateur et donne le numéro à appeler', () => {
+    const w = welcomeTexts({ buyerEmail: 'a@b.fr', narratorFirstName: 'Jeanne', narratorPhone: '+33611111111', isGift: false, giver: null });
+    assert.equal(w.smsTo, '+33611111111');
+    assert.match(w.sms, /01 59 16 93 57/);
+    assert.match(w.email, /Bonjour Jeanne,/);
+});
+
+test('bienvenue : livre offert, le SMS part à celui qui offre, jamais au narrateur', () => {
+    const w = welcomeTexts({ buyerEmail: 'a@b.fr', narratorFirstName: 'Jeanne', narratorPhone: '+33611111111', isGift: true, giver: { first_name: 'Paul', phone: '+33622222222' } });
+    assert.equal(w.smsTo, '+33622222222');
+    assert.match(w.email, /Bonjour Paul,/);
+    assert.match(w.email, /offrir à Jeanne/);
+});
+
+test('famille : les nouvelles ne contiennent jamais le texte du récit', () => {
+    assert.match(familyNewsText('first_call', 'Jeanne').text, /premier appel/);
+    assert.match(familyNewsText('new_story', 'Jeanne', 'La maison de Lyon').text, /« La maison de Lyon »/);
+    assert.match(familyNewsText('book_complete', 'Jeanne').subject, /terminé/);
+});
