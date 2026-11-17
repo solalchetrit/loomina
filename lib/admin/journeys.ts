@@ -1,11 +1,16 @@
 /**
  * Les deux arbres de parcours de l'admin, décrits à partir du code.
- * Chaque nœud : qui agit, ce qu'il fait, ce que ça produit, et le fichier.
+ *
+ * Format demandé par Solal (17/11/2026) : un organigramme du haut vers le
+ * bas, étape par étape. Chaque arbre est une liste d'étapes ; chaque étape
+ * est une case de départ et ses suites. `branch: true` = des suites
+ * possibles, côte à côte ; sinon, les cases se suivent l'une sous l'autre.
+ * Le texte d'une case reste court : le reste (detail, effects) s'affiche au clic.
  *
  * À tenir à jour quand le parcours change (commande, appel, traitement).
  */
 
-import type { TreeNode } from '@/components/admin/Tree';
+import type { TreeNode } from '@/components/admin/tree-types';
 import { OFFER } from '@/config/offer';
 import { SITE } from '@/config/site';
 import { CALL_MINUTES_OPTIONS, DEFAULT_CALL_MINUTES } from '@/lib/loomina/call-length';
@@ -22,125 +27,179 @@ const minutes = CALL_MINUTES_OPTIONS.join(', ');
 export const ORDER_TREE: TreeNode[] = [
     {
         who: 'client',
-        label: 'Arrive sur le site',
-        detail: 'Accueil, Offre, Expérience, FAQ, À propos. Deux portes : essayer gratuitement, ou commander.',
+        label: 'Découvre Loomina',
+        detail: 'Il arrive sur le site : accueil, Comment ça marche, Le livre et le prix, Questions. Deux portes.',
+        branch: true,
         children: [
             {
                 who: 'client',
-                label: `Essaie gratuitement : appelle le ${SITE.phoneDisplay}`,
-                detail: 'Son numéro n’est celui d’aucun client.',
-                effects: [
-                    `Twilio décroche et passe l’appel au serveur vocal, qui ne reconnaît pas le numéro.`,
-                    `Démonstration de ${Math.round(DEMO_MAX_SECONDS / 60)} min au plus : un souvenir, quatre questions, puis Loomina explique comment commander.`,
-                    'Rien n’est enregistré : pas de transcript, pas de compte, rien en base.',
+                label: 'Essaie la démo par téléphone',
+                detail: `Il appelle le ${SITE.phoneDisplay}. Son numéro n’est celui d’aucun client.`,
+                children: [
+                    {
+                        who: 'voix',
+                        label: 'Démonstration de 5 minutes',
+                        effects: [
+                            'Twilio décroche et passe l’appel au serveur vocal, qui ne reconnaît pas le numéro.',
+                            `Un souvenir, quatre questions, ${Math.round(DEMO_MAX_SECONDS / 60)} min au plus, puis Loomina explique comment commander.`,
+                        ],
+                        code: 'voice/src/plan.ts · lib/loomina/assistant.ts (DEMO_SYSTEM)',
+                        children: [
+                            {
+                                who: 'base',
+                                label: 'Rien n’est enregistré',
+                                effects: ['Pas de transcript, pas de compte, rien en base.'],
+                            },
+                        ],
+                    },
                 ],
-                code: 'voice/src/plan.ts · lib/loomina/assistant.ts (DEMO_SYSTEM)',
-                closed: true,
             },
             {
                 who: 'client',
-                label: '« Commencer mon livre » ou « Offrir le livre »',
-                effects: ['Ouvre /order, avec le choix déjà fait (#pour-moi ou #pour-offrir).'],
+                label: 'Clique « Commencer mon livre » ou « Offrir le livre »',
+                effects: ['Ouvre la page de commande avec le choix déjà fait (#pour-moi ou #pour-offrir).'],
                 code: 'app/order/page.tsx',
+                children: [{ who: 'site', label: 'Page de commande', detail: 'Voir l’étape 2, « Remplit la commande ».' }],
+            },
+        ],
+    },
+    {
+        who: 'client',
+        label: 'Remplit la commande',
+        code: 'app/order/page.tsx',
+        children: [
+            {
+                who: 'client',
+                label: '1 · Pour qui ?',
+                branch: true,
                 children: [
                     {
                         who: 'client',
-                        label: 'Étape 1 · Pour qui ?',
-                        detail: '« C’est pour moi » ou « C’est pour offrir ».',
-                        effects: ['Le formulaire de l’étape 2 s’adapte : « Votre prénom » ou « Son prénom ».'],
+                        label: 'C’est pour moi',
+                        children: [
+                            {
+                                who: 'client',
+                                label: '2 · Ses coordonnées',
+                                detail: 'Prénom, nom, téléphone, e-mail.',
+                                effects: ['Le téléphone est celui depuis lequel il appellera : c’est ce qui le fera reconnaître.'],
+                            },
+                        ],
                     },
                     {
-                        who: 'client',
-                        label: 'Étape 2 · Coordonnées du narrateur',
-                        detail: 'Prénom, nom, téléphone, e-mail. Le téléphone est celui depuis lequel le narrateur appellera : c’est lui qui le fera reconnaître.',
-                        effects: [
-                            'Vérifié dans le navigateur : prénom et nom remplis, numéro français ou international plausible, e-mail avec un @ et un point.',
-                            `Durée souhaitée de chaque appel : ${minutes} min (${DEFAULT_CALL_MINUTES} par défaut). Modifiable plus tard dans l’espace auteur.`,
-                        ],
+                        who: 'offreur',
+                        label: 'C’est pour offrir',
                         children: [
                             {
                                 who: 'offreur',
-                                label: 'Si c’est un cadeau : « Et vous ? »',
-                                detail: 'Le prénom et le portable de la personne qui offre. Le numéro doit être différent de celui du narrateur.',
-                                effects: ['Ce numéro ouvrira l’espace famille : suivre l’avancement, souffler des souvenirs.'],
+                                label: '2 · Les coordonnées du narrateur',
+                                detail: 'Prénom, nom, téléphone, e-mail de la personne qui racontera.',
+                            },
+                            {
+                                who: 'offreur',
+                                label: '« Et vous ? » : son prénom et son portable',
+                                effects: [
+                                    'Un numéro différent de celui du narrateur.',
+                                    'Il ouvrira l’espace famille : suivre l’avancement, souffler des souvenirs.',
+                                ],
                             },
                         ],
                     },
+                ],
+            },
+            {
+                who: 'client',
+                label: 'Choisit la durée des appels',
+                effects: [`${minutes} min (${DEFAULT_CALL_MINUTES} par défaut). Modifiable plus tard dans l’espace auteur.`],
+            },
+            {
+                who: 'site',
+                label: 'Vérifie le formulaire',
+                effects: ['Prénom et nom remplis, numéro plausible, e-mail avec un @ et un point. Sinon, un message sous le champ.'],
+            },
+            {
+                who: 'client',
+                label: '3 · Clique « Payer »',
+                effects: [
+                    `Le site crée une page de paiement Stripe : ${OFFER.price} €, carte bancaire, codes promo acceptés.`,
+                    'Les coordonnées voyagent avec le paiement : rien n’est encore écrit chez Loomina.',
+                ],
+                code: 'app/api/checkout/route.ts',
+            },
+        ],
+    },
+    {
+        who: 'client',
+        label: 'Sur la page de paiement Stripe',
+        branch: true,
+        children: [
+            {
+                who: 'client',
+                label: 'Abandonne',
+                children: [{ who: 'site', label: 'Retour sur la page de commande', effects: ['Aucun compte, aucun livre.'] }],
+            },
+            {
+                who: 'client',
+                label: 'Paie',
+                children: [
                     {
-                        who: 'client',
-                        label: 'Étape 3 · « Payer »',
-                        effects: [
-                            `Le site crée une page de paiement Stripe : ${OFFER.price} €, carte bancaire, codes promo acceptés.`,
-                            'Toutes les coordonnées voyagent avec le paiement (métadonnées Stripe) : rien n’est encore écrit chez Loomina.',
-                            'Le navigateur part sur la page Stripe. Si Stripe ne répond pas : message d’erreur sur la page, rien n’est créé.',
-                        ],
-                        code: 'app/api/checkout/route.ts',
+                        who: 'site',
+                        label: 'Le client voit « commande reçue »',
+                        effects: ['Stripe le renvoie sur son espace auteur.'],
+                    },
+                    {
+                        who: 'stripe',
+                        label: 'Stripe prévient le site',
+                        detail: 'En même temps, Stripe envoie « paiement réussi » au site. C’est l’étape 4 qui crée tout.',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        who: 'stripe',
+        label: 'Le site crée le compte et le livre',
+        detail: 'À la réception du « paiement réussi » de Stripe.',
+        code: 'app/api/webhook/stripe/route.ts',
+        children: [
+            {
+                who: 'site',
+                label: 'Le message vient-il de Stripe ?',
+                branch: true,
+                children: [
+                    { who: 'site', label: 'Non : refusé', effects: ['Rien n’est créé.'] },
+                    {
+                        who: 'site',
+                        label: 'Oui : déjà traité ?',
+                        branch: true,
                         children: [
+                            { who: 'site', label: 'Déjà traité : ignoré', effects: ['Stripe renvoie parfois deux fois le même message : un seul livre par paiement.'] },
                             {
-                                who: 'client',
-                                label: 'Abandonne sur Stripe',
-                                effects: ['Retour sur /order. Aucun compte, aucun livre.'],
-                            },
-                            {
-                                who: 'client',
-                                label: 'Paie',
-                                effects: ['Stripe renvoie le client sur /dashboard avec un message « commande reçue ».'],
+                                who: 'site',
+                                label: 'Nouveau : on continue',
                                 children: [
                                     {
-                                        who: 'stripe',
-                                        label: 'Prévient le site : « paiement réussi »',
-                                        detail: 'En parallèle du retour du client, Stripe appelle /api/webhook/stripe. C’est cette étape qui crée tout.',
-                                        code: 'app/api/webhook/stripe/route.ts',
-                                        children: [
-                                            {
-                                                who: 'site',
-                                                label: 'Vérifie que le message vient bien de Stripe',
-                                                effects: ['Signature fausse : refusé, rien n’est créé.'],
-                                            },
-                                            {
-                                                who: 'site',
-                                                label: 'Ce paiement a-t-il déjà été traité ?',
-                                                effects: ['Stripe renvoie parfois deux fois le même message : le second est ignoré (un seul livre par paiement).'],
-                                            },
-                                            {
-                                                who: 'site',
-                                                label: 'Trouve ou crée le compte du narrateur',
-                                                effects: [
-                                                    'Un client existe déjà avec ce téléphone : c’est lui, son compte est repris (nouvelle commande).',
-                                                    'Sinon : compte créé avec l’e-mail saisi.',
-                                                    'E-mail déjà pris par un autre narrateur (deux cadeaux par la même personne) : compte distinct « e-mail+numéro », qui arrive dans la même boîte.',
-                                                ],
-                                            },
-                                            {
-                                                who: 'base',
-                                                label: 'Écrit le profil (profiles)',
-                                                effects: [
-                                                    'Prénom, nom, téléphone au format international (+33…), e-mail.',
-                                                    'Par défaut, seulement s’ils sont vides : vouvoiement, style « Naturel ».',
-                                                ],
-                                            },
-                                            {
-                                                who: 'base',
-                                                label: 'Crée le livre (projects)',
-                                                effects: [
-                                                    '« Biographie de [prénom] », en cours, phase 1 (Vue d’ensemble), 0 %.',
-                                                    'Gardés avec : cadeau oui/non, e-mail de l’acheteur, durée d’appel, l’offreur s’il y en a un, la référence du paiement.',
-                                                ],
-                                            },
-                                            {
-                                                who: 'site',
-                                                label: 'En cas d’erreur',
-                                                effects: ['Le site répond « échec » à Stripe, qui réessaie plus tard. Un client ne repart jamais sans compte en silence.'],
-                                            },
+                                        who: 'site',
+                                        label: 'Trouve ou crée le compte',
+                                        effects: [
+                                            'Un client existe déjà avec ce téléphone : son compte est repris (nouvelle commande).',
+                                            'Sinon : compte créé avec l’e-mail saisi.',
+                                            'E-mail déjà pris par un autre narrateur : compte distinct « e-mail+numéro », dans la même boîte.',
                                         ],
                                     },
                                     {
-                                        who: 'loomina',
-                                        label: 'Ce qui n’est pas automatique aujourd’hui',
+                                        who: 'base',
+                                        label: 'Écrit le profil',
+                                        effects: ['Prénom, nom, téléphone (+33…), e-mail. Par défaut : vouvoiement, style « Naturel ».'],
+                                        code: 'table profiles',
+                                    },
+                                    {
+                                        who: 'base',
+                                        label: 'Crée le livre',
                                         effects: [
-                                            'Aucun e-mail ni SMS de bienvenue envoyé par Loomina (seul le reçu Stripe, s’il est activé chez Stripe).',
-                                            'Personne n’est prévenu chez Loomina d’une nouvelle commande : elle apparaît dans l’admin, onglet Clients.',
+                                            '« Biographie de [prénom] », en cours, phase 1 (Vue d’ensemble), 0 %.',
+                                            'Avec : cadeau oui/non, e-mail de l’acheteur, durée d’appel, l’offreur, la référence du paiement.',
                                         ],
+                                        code: 'table projects',
                                     },
                                 ],
                             },
@@ -152,32 +211,42 @@ export const ORDER_TREE: TreeNode[] = [
     },
     {
         who: 'client',
-        label: 'Après la commande : premiers pas',
+        label: 'Les premiers pas',
+        detail: 'Rien n’est envoyé automatiquement par Loomina après la commande (pas d’e-mail ni de SMS de bienvenue). La commande apparaît dans l’admin, onglet Clients.',
+        branch: true,
         children: [
             {
                 who: 'client',
-                label: 'Ouvre son espace auteur (/dashboard)',
-                detail: 'Il tape son numéro de téléphone.',
-                effects: [
-                    'Numéro inconnu : « Avez-vous déjà passé commande ? ».',
-                    'Numéro connu : Twilio envoie un code par SMS ; le bon code ouvre une session de 7 jours.',
+                label: 'Ouvre son espace auteur',
+                children: [
+                    { who: 'client', label: 'Tape son numéro' },
+                    {
+                        who: 'twilio',
+                        label: 'Reçoit un code par SMS',
+                        effects: ['Numéro inconnu : « Avez-vous déjà passé commande ? ».', 'Le bon code ouvre une session de 7 jours.'],
+                        code: 'app/api/auth/verify/route.ts',
+                    },
                 ],
-                code: 'app/api/auth/verify/route.ts',
             },
             {
                 who: 'offreur',
-                label: 'Ouvre l’espace famille, avec son propre numéro',
-                effects: [
-                    'Même écran de connexion : son numéro est reconnu comme celui d’un offreur.',
-                    'Il voit l’avancement et les titres des récits. Le texte seulement si le narrateur l’a permis dans ses réglages.',
-                    'Il peut souffler un souvenir ou une question : Loomina l’abordera au prochain appel.',
+                label: 'Ouvre l’espace famille',
+                children: [
+                    {
+                        who: 'offreur',
+                        label: 'Avec son propre numéro',
+                        effects: [
+                            'Il voit l’avancement et les titres des récits ; le texte seulement si le narrateur l’a permis.',
+                            'Il peut souffler un souvenir : Loomina l’abordera au prochain appel.',
+                        ],
+                        code: 'app/api/famille/*',
+                    },
                 ],
-                code: 'app/api/famille/*',
             },
             {
                 who: 'client',
-                label: 'Premier appel : il appelle, ou Loomina l’appelle à l’heure choisie',
-                effects: ['Voir l’arbre 2, « Le livre s’écrit ».'],
+                label: 'Fait son premier appel',
+                children: [{ who: 'voix', label: 'Voir l’arbre « Le livre s’écrit »' }],
             },
         ],
     },
@@ -190,305 +259,319 @@ export const ORDER_TREE: TreeNode[] = [
 export const AUTHOR_TREE: TreeNode[] = [
     {
         who: 'client',
-        label: 'Avant un appel, dans l’espace auteur',
-        detail: 'Tout est facultatif : on peut écrire un livre entier sans jamais ouvrir l’espace.',
-        closed: true,
+        label: 'Prépare ses appels (facultatif)',
+        detail: 'Tout se fait dans l’espace auteur. On peut écrire un livre entier sans jamais l’ouvrir.',
+        branch: true,
         children: [
             {
                 who: 'client',
                 label: 'Règle ses préférences',
                 effects: [
-                    'Tu ou vous : Loomina ne posera plus la question au premier appel.',
-                    'Sujets à éviter : Loomina ne les aborde jamais, l’Écrivain ne les écrit pas.',
-                    'Style d’écriture, durée des appels, SMS « récit prêt » oui/non, partage des récits avec l’offreur.',
+                    'Tu ou vous : Loomina ne posera plus la question.',
+                    'Sujets à éviter : jamais abordés, jamais écrits.',
+                    'Style, durée des appels, SMS « récit prêt », partage avec l’offreur.',
                 ],
-                code: 'app/api/user/preferences/route.ts',
+                code: 'app/api/user/preferences',
             },
             {
                 who: 'client',
-                label: 'Choisit des rendez-vous (jours et heure)',
-                effects: ['Le serveur vocal regarde chaque minute et appelle à l’heure de Paris dite. Jamais entre 21 h et 9 h. Un seul essai par créneau.'],
+                label: 'Choisit des rendez-vous',
+                effects: ['Des jours et une heure : Loomina l’appellera à l’heure de Paris dite, jamais entre 21 h et 9 h.'],
                 code: 'voice/src/scheduler.ts',
             },
             {
                 who: 'client',
-                label: 'Suggère un sujet (ou l’offreur en souffle un)',
-                effects: ['Rejoint la liste des sujets suggérés : Loomina l’aborde au prochain appel, deux au plus par appel, sans dire qui l’a écrit.'],
-                code: 'app/api/user/questions · app/api/famille/questions',
+                label: 'Suggère un sujet',
+                effects: ['Loomina l’abordera au prochain appel, deux au plus par appel, sans dire qui l’a écrit.'],
+                code: 'app/api/user/questions',
             },
             {
                 who: 'client',
                 label: 'Envoie une photo',
-                effects: [
-                    'Une IA de vision la décrit et prépare une question ouverte sur le souvenir derrière la photo.',
-                    'Cette question rejoint les sujets suggérés du prochain appel.',
-                ],
-                code: 'app/api/user/photos · lib/loomina/photos.ts',
-            },
-        ],
-    },
-    {
-        who: 'client',
-        label: 'Un appel commence',
-        children: [
-            {
-                who: 'client',
-                label: `Il appelle le ${SITE.phoneDisplay} depuis son numéro`,
-                effects: ['Twilio décroche et prévient le serveur vocal.'],
-            },
-            {
-                who: 'voix',
-                label: 'Ou c’est l’heure d’un rendez-vous : Loomina appelle',
-                effects: [
-                    'Personne ne décroche : rien, prochain créneau.',
-                    'Répondeur : un message court (« je vous rappellerai au prochain créneau »), puis Loomina raccroche.',
-                    'Déjà en ligne : le créneau est sauté.',
-                ],
-                code: 'voice/src/scheduler.ts · voice/src/server.ts',
-            },
-            {
-                who: 'voix',
-                label: 'Reconnaît l’appelant par son numéro',
-                code: 'voice/src/plan.ts',
                 children: [
-                    { who: 'voix', label: 'Numéro inconnu, ou client sans livre en cours', effects: ['Démonstration (voir arbre 1).'] },
-                    { who: 'voix', label: 'Base injoignable', effects: ['« Un problème technique m’empêche de vous répondre, rappelez dans quelques minutes », puis raccroche.'] },
                     {
-                        who: 'voix',
-                        label: 'Client reconnu : prépare l’entretien',
-                        detail: 'Le prompt est assemblé à chaque appel (onglet Structure et IA pour le texte complet).',
-                        effects: [
-                            'Le gabarit commun, avec l’objectif de la phase en cours.',
-                            'La mémoire du livre et « où reprendre » (préparés par le Directeur à l’appel précédent).',
-                            'Les sujets suggérés, les sujets propres à la personne, le point de fin de phase s’il est dû.',
-                            'Les préférences (tu/vous, sujets à éviter), la prononciation du prénom.',
-                        ],
+                        who: 'ia',
+                        label: 'L’IA la décrit',
+                        effects: ['Elle prépare une question ouverte sur le souvenir derrière la photo, ajoutée aux sujets du prochain appel.'],
+                        code: 'lib/loomina/photos.ts',
                     },
                 ],
             },
             {
-                who: 'voix',
-                label: 'Dit bonjour',
-                effects: [
-                    'Premier appel : « Bonjour Jeanne, c’est Loumina, votre biographe. Je suis ravi de faire votre connaissance ! »',
-                    'Appels suivants : « Je suis heureux de vous retrouver », puis rappel en une phrase de là où on en était.',
-                    'Ce bonjour ne peut pas être coupé.',
-                ],
+                who: 'offreur',
+                label: 'Souffle un souvenir',
+                effects: ['Même file que les sujets suggérés.'],
+                code: 'app/api/famille/questions',
             },
         ],
     },
     {
-        who: 'client',
-        label: 'Pendant l’appel : il raconte',
+        who: 'twilio',
+        label: 'Un appel commence',
+        branch: true,
         children: [
             {
-                who: 'voix',
-                label: 'Au premier appel seulement',
-                effects: [
-                    'Tu ou vous ? (sauf si déjà réglé dans l’espace)',
-                    'Des sujets à laisser de côté ? (sauf si déjà réglés)',
-                    '« Je vais surtout vous écouter », puis : « Racontez-moi où vous avez grandi. »',
-                ],
-            },
-            {
-                who: 'twilio',
-                label: 'Chaque phrase du narrateur est transcrite (Deepgram) et envoyée au serveur vocal',
-            },
-            {
-                who: 'voix',
-                label: 'Loomina prépare sa réponse (GPT, en flux) et la dit (voix ElevenLabs)',
-                effects: [
-                    'Elle attend 0,8 s après la fin de la phrase (rien si c’est une question) : si le narrateur reprend, sa réponse préparée est jetée.',
-                    'Une seule question par réplique : une deuxième question est coupée avant d’être dite.',
-                    'Le narrateur peut lui couper la parole.',
-                    'À chaque réplique, elle reçoit le temps écoulé : avant la durée souhaitée elle ne propose jamais d’arrêter.',
-                ],
-                code: 'voice/src/session.ts · lib/loomina/call-length.ts',
-            },
-            {
                 who: 'client',
-                label: 'Se tait longtemps',
-                effects: ['Au bout de 60 s, Loomina relance une fois. Encore 60 s : « Je vous laisse, rappelez-moi quand vous voulez », et raccroche.'],
+                label: `Il appelle le ${SITE.phoneDisplay}`,
+                detail: 'Depuis le numéro donné à la commande.',
             },
             {
                 who: 'voix',
-                label: 'La phase est finie : Loomina fait le point',
-                detail: 'Quand tous les sujets de la phase sont couverts, le Directeur l’a noté à l’appel précédent.',
-                effects: [
-                    '« On a bien fait le tour de votre enfance. Vous voulez y ajouter quelque chose, ou on passe à la suite ? »',
-                    'La personne décide : on reste, ou on enchaîne dans le même appel sur la phase suivante.',
+                label: 'Loomina l’appelle (rendez-vous)',
+                branch: true,
+                code: 'voice/src/scheduler.ts',
+                children: [
+                    { who: 'voix', label: 'Pas de réponse', effects: ['Rien. Prochain créneau.'] },
+                    { who: 'voix', label: 'Répondeur', effects: ['Un message court, puis Loomina raccroche.'] },
+                    { who: 'client', label: 'Il décroche' },
                 ],
-            },
-        ],
-    },
-    {
-        who: 'client',
-        label: 'L’appel se termine',
-        children: [
-            {
-                who: 'voix',
-                label: 'Loomina propose d’arrêter',
-                effects: [
-                    'Seulement une fois la durée souhaitée atteinte et le souvenir en cours épuisé, ou si la personne est fatiguée ou le demande.',
-                    'Elle reprend un souvenir précis de l’appel, annonce le sujet de la prochaine fois, dit au revoir et raccroche.',
-                ],
-            },
-            {
-                who: 'client',
-                label: 'Ou il raccroche lui-même, à n’importe quel moment',
-                effects: ['Même suite : tout ce qui a été dit est gardé.'],
-            },
-            {
-                who: 'voix',
-                label: 'Ou la durée maximale est atteinte',
-                effects: ['Durée souhaitée + 20 min (45 min au moins) : l’appel est coupé.'],
             },
         ],
     },
     {
         who: 'voix',
-        label: 'Après le raccroché : le récit s’écrit',
-        detail: 'Tout se fait sans personne, en une à trois minutes.',
+        label: 'Loomina reconnaît l’appelant',
+        detail: 'Par son numéro de téléphone.',
+        code: 'voice/src/plan.ts',
+        branch: true,
         children: [
             {
                 who: 'voix',
-                label: 'Fabrique le rapport d’appel et l’envoie au site',
-                effects: [
-                    'Transcript complet, durée, mesures (latence, interruptions, mots de chaque côté).',
-                    'Écrit d’abord sur disque : si le site ne répond pas, renvoyé chaque minute.',
+                label: 'Numéro inconnu',
+                children: [{ who: 'voix', label: 'Démonstration', effects: ['5 minutes, rien n’est gardé.'] }],
+            },
+            {
+                who: 'voix',
+                label: 'Base injoignable',
+                children: [{ who: 'voix', label: '« Rappelez dans quelques minutes »', effects: ['Puis Loomina raccroche.'] }],
+            },
+            {
+                who: 'voix',
+                label: 'Client reconnu',
+                children: [
+                    {
+                        who: 'voix',
+                        label: 'Prépare l’entretien',
+                        effects: [
+                            'Le prompt de la phase en cours.',
+                            'La mémoire du livre et « où reprendre » (préparés après l’appel précédent).',
+                            'Les sujets suggérés, les préférences, la prononciation du prénom.',
+                        ],
+                    },
+                    {
+                        who: 'voix',
+                        label: 'Premier appel ?',
+                        branch: true,
+                        children: [
+                            {
+                                who: 'voix',
+                                label: 'Oui : « Ravi de faire votre connaissance »',
+                                children: [
+                                    {
+                                        who: 'voix',
+                                        label: 'Fait connaissance',
+                                        effects: ['Tu ou vous ? Des sujets à éviter ? (sauf si déjà réglés)', '« Racontez-moi où vous avez grandi. »'],
+                                    },
+                                ],
+                            },
+                            {
+                                who: 'voix',
+                                label: 'Non : « Heureux de vous retrouver »',
+                                children: [{ who: 'voix', label: 'Rappelle où on en était', effects: ['Puis pose la question préparée.'] }],
+                            },
+                        ],
+                    },
                 ],
+            },
+        ],
+    },
+    {
+        who: 'client',
+        label: 'Il raconte',
+        code: 'voice/src/session.ts',
+        children: [
+            { who: 'twilio', label: 'Sa voix est transcrite', effects: ['Deepgram, phrase par phrase, vers le serveur vocal.'] },
+            {
+                who: 'voix',
+                label: 'Loomina prépare sa réponse',
+                effects: [
+                    'Elle attend 0,8 s après la phrase (rien après une question) : s’il reprend, la réponse est jetée.',
+                    'Une seule question par réplique : une deuxième est coupée.',
+                ],
+            },
+            { who: 'twilio', label: 'Elle la dit', effects: ['Voix ElevenLabs. Le narrateur peut lui couper la parole.'] },
+            {
+                who: 'voix',
+                label: 'Que se passe-t-il ?',
+                branch: true,
+                children: [
+                    { who: 'client', label: 'Il continue', effects: ['On recommence : il parle, elle relance sur un détail.'] },
+                    {
+                        who: 'client',
+                        label: 'Il se tait',
+                        children: [
+                            { who: 'voix', label: '60 s : elle relance' },
+                            { who: 'voix', label: '60 s de plus : « Je vous laisse »', effects: ['Puis elle raccroche.'] },
+                        ],
+                    },
+                    {
+                        who: 'voix',
+                        label: 'La phase est finie',
+                        children: [
+                            {
+                                who: 'voix',
+                                label: 'Elle fait le point',
+                                effects: ['« On a bien fait le tour. Vous voulez ajouter quelque chose, ou on passe à la suite ? » La personne décide.'],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        who: 'voix',
+        label: 'L’appel se termine',
+        branch: true,
+        children: [
+            {
+                who: 'voix',
+                label: 'Loomina propose d’arrêter',
+                effects: [
+                    'Seulement une fois la durée souhaitée atteinte et le souvenir épuisé, ou si la personne est fatiguée.',
+                    'Elle reprend un souvenir de l’appel, annonce la suite, dit au revoir.',
+                ],
+            },
+            { who: 'client', label: 'Il raccroche lui-même', effects: ['Tout ce qui a été dit est gardé.'] },
+            { who: 'voix', label: 'Durée maximale atteinte', effects: ['Durée souhaitée + 20 min (45 min au moins).'] },
+        ],
+    },
+    {
+        who: 'voix',
+        label: 'Après le raccroché',
+        detail: 'Tout se fait seul, en une à trois minutes.',
+        effects: [
+            `Si une étape échoue : reprise toutes les 5 min (serveur vocal) et chaque nuit à 3 h (site), ${MAX_ATTEMPTS} essais au plus.`,
+            'La reprise repart d’où elle s’était arrêtée : jamais deux récits pour un appel. Un échec définitif s’affiche dans l’admin.',
+        ],
+        children: [
+            {
+                who: 'voix',
+                label: 'Envoie le rapport d’appel au site',
+                effects: ['Transcript, durée, mesures. Gardé sur disque et renvoyé chaque minute si le site ne répond pas.'],
                 code: 'voice/src/report.ts',
             },
             {
                 who: 'site',
-                label: 'Archive le rapport, puis le traite en arrière-plan',
-                effects: ['Rangé dans call_events. Un rapport reçu deux fois n’est traité qu’une fois.'],
-                code: 'app/api/vapi/webhook/route.ts · lib/loomina/events.ts',
+                label: 'L’archive',
+                effects: ['Table call_events. Un rapport reçu deux fois n’est traité qu’une fois.'],
+                code: 'app/api/vapi/webhook · lib/loomina/events.ts',
             },
             {
                 who: 'site',
-                label: `Garde-fou : moins de ${MIN_DURATION_SECONDS} s ou de ${MIN_TRANSCRIPT_CHARS} caractères ?`,
-                effects: ['Oui : l’appel est noté « trop court » et rien d’autre ne se passe (aucune IA, aucun coût).'],
-            },
-            {
-                who: 'ia',
-                label: 'Le Directeur analyse l’appel',
-                effects: [
-                    'Résume l’appel et réécrit la mémoire du livre (identité, lieux, frise, proches, thèmes).',
-                    'Coche les sujets de la phase qui ont été racontés, note les sujets propres à la personne.',
-                    'Décide de la phase : on change selon la quantité d’information reçue, jamais selon un nombre d’appels, et toujours avec l’accord de la personne.',
-                    'Prépare la question du prochain appel (« où reprendre »).',
-                    'Relève ce que la personne a demandé : tu/vous, style, sujets à éviter. Repère les proches.',
-                    'Juge la matière : rien, mince ou riche. Et la période racontée (un souvenir d’enfance dit en phase 3 va dans l’enfance).',
+                label: 'Appel assez long ?',
+                branch: true,
+                children: [
+                    {
+                        who: 'site',
+                        label: 'Trop court',
+                        effects: [`Moins de ${MIN_DURATION_SECONDS} s ou de ${MIN_TRANSCRIPT_CHARS} caractères : noté « trop court », rien d’autre (aucun coût d’IA).`],
+                    },
+                    {
+                        who: 'site',
+                        label: 'Assez long',
+                        children: [
+                            {
+                                who: 'ia',
+                                label: 'Le Directeur analyse',
+                                effects: [
+                                    'Résume l’appel, réécrit la mémoire du livre.',
+                                    'Coche les sujets racontés, décide de la phase (avec l’accord de la personne).',
+                                    'Prépare la question du prochain appel.',
+                                    'Relève tu/vous, style, sujets à éviter, proches.',
+                                ],
+                                code: 'lib/loomina/director.ts',
+                            },
+                            {
+                                who: 'base',
+                                label: 'Enregistre l’analyse',
+                                effects: ['Avant l’écriture : si l’écriture échoue, l’analyse est gardée.'],
+                                code: 'lib/loomina/pipeline.ts',
+                            },
+                            {
+                                who: 'ia',
+                                label: 'Quelque chose à raconter ?',
+                                branch: true,
+                                children: [
+                                    { who: 'site', label: 'Rien', effects: ['Pas de récit. La mémoire est à jour pour le prochain appel.'] },
+                                    {
+                                        who: 'ia',
+                                        label: 'Oui',
+                                        children: [
+                                            {
+                                                who: 'ia',
+                                                label: 'L’Écrivain écrit le récit',
+                                                effects: [
+                                                    'À la première personne, à partir du seul transcript.',
+                                                    `Il relit les ${PREVIOUS_CHAPTERS} derniers récits pour ne rien redire. Moins de ${MIN_CHAPTER_WORDS} mots : rien n’est gardé.`,
+                                                ],
+                                                code: 'lib/loomina/writer.ts',
+                                            },
+                                            { who: 'base', label: 'Range le récit', effects: ['Numéroté, dans sa période de vie.'], code: 'table chapters' },
+                                            { who: 'sms', label: '« Votre récit est prêt »', effects: ['Sauf si coupé dans les réglages.'], code: 'lib/loomina/sms.ts' },
+                                            {
+                                                who: 'ia',
+                                                label: 'Le livre se recompose',
+                                                effects: ['Dès deux récits : nouveau plan, puis les chapitres un par un.'],
+                                                code: 'lib/loomina/book-edition.ts',
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
                 ],
-                code: 'lib/loomina/director.ts',
-            },
-            {
-                who: 'base',
-                label: 'L’analyse est enregistrée avant l’écriture',
-                effects: ['interviews, projects (phase, %, mémoire, prochaine question), profiles, family_members. Si l’écriture échoue ensuite, l’analyse n’est pas perdue.'],
-                code: 'lib/loomina/pipeline.ts',
-            },
-            {
-                who: 'site',
-                label: 'Rien de racontable ?',
-                effects: ['Pas de récit pour cet appel. La mémoire est quand même à jour pour le prochain.'],
-            },
-            {
-                who: 'ia',
-                label: 'L’Écrivain écrit le récit de l’appel',
-                effects: [
-                    'À la première personne, à partir du seul transcript, dans le style demandé.',
-                    `Il relit les ${PREVIOUS_CHAPTERS} derniers récits pour ne rien redire.`,
-                    `Moins de ${MIN_CHAPTER_WORDS} mots : rien n’est gardé.`,
-                ],
-                code: 'lib/loomina/writer.ts',
-            },
-            {
-                who: 'base',
-                label: 'Le récit est rangé dans le livre (chapters)',
-                effects: ['Numéroté, rangé dans sa période de vie, version 1.'],
-            },
-            {
-                who: 'sms',
-                label: '« Le récit de votre appel est prêt »',
-                effects: ['Envoyé au numéro du narrateur, sauf s’il l’a coupé dans ses réglages.'],
-                code: 'lib/loomina/sms.ts',
-            },
-            {
-                who: 'ia',
-                label: 'Le livre se recompose tout seul',
-                effects: [
-                    'Dès deux récits : l’Éditeur refait le plan (ordre de la vie, sans redites), puis écrit les chapitres un par un.',
-                    'Une composition en cours est remplacée si un nouvel appel arrive.',
-                ],
-                code: 'lib/loomina/book-edition.ts · lib/loomina/book.ts',
-            },
-            {
-                who: 'voix',
-                label: 'Une étape a échoué ?',
-                effects: [
-                    `Le serveur vocal redemande le traitement toutes les 5 minutes, et le site une fois par nuit à 3 h. ${MAX_ATTEMPTS} essais au plus.`,
-                    'Chaque reprise repart d’où elle s’était arrêtée : jamais deux récits pour un appel.',
-                    'Un échec définitif apparaît dans l’admin (Vue d’ensemble, « À surveiller »).',
-                ],
-                code: 'app/api/jobs/process · voice/src/scheduler.ts',
             },
         ],
     },
     {
         who: 'client',
         label: 'Entre deux appels',
-        closed: true,
+        branch: true,
         children: [
-            {
-                who: 'client',
-                label: 'Lit le récit de son appel',
-                effects: ['Dans l’espace auteur, avec la progression de la phase.'],
-            },
+            { who: 'client', label: 'Lit son récit', effects: ['Dans l’espace auteur, avec la progression de la phase.'] },
             {
                 who: 'client',
                 label: 'Corrige un récit',
-                effects: [
-                    'Directement dans le texte, ou en décrivant la correction : une IA propose le texte corrigé, il relit et enregistre.',
-                    'Nouvelle version du récit. La correction est mémorisée : le Directeur et l’Écrivain la respectent pour tout le reste du livre.',
-                    'Elle est reportée dans le livre composé, dans les seuls chapitres concernés, mot pour mot.',
+                children: [
+                    { who: 'ia', label: 'L’IA propose la correction', effects: ['Il relit et enregistre.'] },
+                    {
+                        who: 'base',
+                        label: 'Nouvelle version gardée',
+                        effects: ['La correction est mémorisée pour tout le livre, et reportée mot pour mot dans le livre composé.'],
+                    },
                 ],
                 code: 'app/api/user/chapters/[number]/*',
             },
-            {
-                who: 'client',
-                label: 'Lit son livre composé',
-                effects: ['Le livre recomposé à partir de tous ses récits, par parties et chapitres.'],
-            },
-            {
-                who: 'offreur',
-                label: 'Suit l’avancement dans l’espace famille',
-            },
+            { who: 'client', label: 'Lit son livre composé' },
+            { who: 'offreur', label: 'Suit l’avancement', effects: ['Dans l’espace famille.'] },
         ],
     },
     {
-        who: 'client',
-        label: 'Les quatre phases du livre',
-        closed: true,
+        who: 'voix',
+        label: 'Les quatre phases',
+        detail: 'On change de phase selon ce qui a été raconté, jamais selon un nombre d’appels, et toujours avec l’accord de la personne.',
         children: [
-            { who: 'voix', label: '1 · Vue d’ensemble', detail: 'Faire connaissance : nom, naissance, lieux de vie, proches, grandes lignes de la vie.' },
-            { who: 'voix', label: '2 · Construction', detail: 'L’enfance, les racines, la maison, l’école, la jeunesse.' },
-            { who: 'voix', label: '3 · Accomplissements', detail: 'La vie adulte : travail, vie affective, lieux, passions, épreuves.' },
+            { who: 'voix', label: '1 · Vue d’ensemble', effects: ['Nom, naissance, lieux de vie, proches, grandes lignes.'] },
+            { who: 'voix', label: '2 · Construction', effects: ['L’enfance, les racines, la maison, l’école, la jeunesse.'] },
+            { who: 'voix', label: '3 · Accomplissements', effects: ['Le travail, la vie affective, les passions, les épreuves.'] },
+            { who: 'voix', label: '4 · Messages', effects: ['Ce qu’on veut transmettre, les messages aux proches, la fin du livre.'] },
             {
-                who: 'voix',
-                label: '4 · Messages',
-                detail: 'Ce qu’on veut transmettre, les messages aux proches, la vie d’aujourd’hui, comment finir le livre.',
-                effects: ['Quand la personne dit que le livre est complet : le livre passe « terminé ». Un appel reste possible pour ajouter un souvenir.'],
+                who: 'loomina',
+                label: 'Le livre est terminé',
+                effects: ['Pas encore automatisé : relecture humaine, mise en page, impression, envoi du livre relié et de la version numérique.'],
             },
-        ],
-    },
-    {
-        who: 'loomina',
-        label: 'Le livre est terminé',
-        effects: [
-            'Pas encore automatisé : relecture humaine, mise en page, impression, envoi du livre relié et de la version numérique.',
-            'Dans l’admin, le livre apparaît « Terminé » dans la liste des clients.',
         ],
     },
 ];

@@ -122,11 +122,11 @@ export default async function AdminStructure() {
         </div>
         <div className="grid gap-4">
           {ais.map((ai) => (
-            <article key={ai.key} id={ai.key} className="scroll-mt-24 rounded-[20px] border border-[var(--line)] bg-[#fcfbf8] p-4 sm:p-6">
+            <article key={ai.key} id={ai.key} className="scroll-mt-40 rounded-[24px] bg-[var(--canvas)] p-5 sm:p-7">
               <div className="flex flex-wrap items-start gap-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-[var(--ink)] text-[var(--amber)]"><AIcon name={AI_ICONS[ai.key] ?? "spark"} size={20} /></span>
+                <span className="chip-icon"><AIcon name={AI_ICONS[ai.key] ?? "spark"} size={20} /></span>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-[20px] font-extrabold tracking-[-0.015em]">{ai.name}</h3>
+                  <h3 className="t-heading">{ai.name}</h3>
                   <p className="mt-1 max-w-[75ch] text-[15.5px] leading-relaxed text-[var(--ink-2)]">{ai.role}</p>
                 </div>
               </div>
