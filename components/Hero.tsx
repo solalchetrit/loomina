@@ -15,12 +15,12 @@ const REASSURANCE: { text: string; href?: string }[] = [
 export default function Hero() {
   return (
     <section className="w-full">
-      <div className="mx-auto w-full max-w-[1240px] px-5 pb-16 pt-32 sm:px-6 md:pt-40 lg:pb-24">
+      <div className="mx-auto w-full max-w-[1240px] px-5 pb-12 pt-28 sm:px-6 md:pt-36 lg:pb-14">
         <h1 className="rise t-hero max-w-[16ch]" style={{ "--i": 0 } as CSSProperties}>
           Votre livre, sans avoir à écrire
         </h1>
 
-        <div className="mt-10 grid items-start gap-12 lg:mt-14 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
+        <div className="mt-8 grid items-start gap-10 lg:mt-10 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
           <div className="min-w-0 lg:pt-4">
             <p className="rise max-w-[30rem] text-[clamp(1.25rem,1.9vw,1.6rem)] font-medium leading-[1.45] tracking-[-0.015em] text-[var(--ink)]" style={{ "--i": 1 } as CSSProperties}>
               Vous racontez au téléphone, Loomina écrit le récit de chaque appel et en compose votre livre. Vous le relisez dans votre espace auteur, et le livre arrive chez vous.

@@ -48,7 +48,11 @@ export function SectionHead({
   );
 }
 
-/** En-tête de page, sous le menu flottant. */
+/**
+ * En-tête de page, sous le menu flottant.
+ * Avec une photo : le titre à gauche, la photo entière à droite, dans son format d'origine.
+ * L'ensemble reste assez bas pour que la section suivante se devine sans défiler.
+ */
 export function PageHeader({
   eyebrow,
   title,
@@ -59,24 +63,28 @@ export function PageHeader({
   eyebrow?: string;
   title: ReactNode;
   text?: ReactNode;
-  /** Photo d'illustration, à droite du titre sur grand écran, dessous sur téléphone. */
-  photo?: { name: string; alt: string; focus?: string; /** Bandeau bas : la section suivante reste visible sans défiler. */ compact?: boolean };
+  /** `ratio` : le format de la photo elle-même, pour ne pas la recadrer (par défaut 3/2). */
+  photo?: { name: string; alt: string; focus?: string; ratio?: string };
   children?: ReactNode;
 }) {
   return (
-    <section className={`w-full pt-32 md:pt-40 ${photo?.compact ? "pb-0" : "pb-8 md:pb-12"}`}>
+    <section className="w-full pb-8 pt-28 md:pb-10 md:pt-36">
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
-        <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise !max-w-4xl" />
-        {photo && (
-          <Photo
-            name={photo.name}
-            alt={photo.alt}
-            focus={photo.focus}
-            priority
-            ratio={photo.compact ? "h-[clamp(150px,22vh,240px)]" : "aspect-[4/3] sm:aspect-[5/2]"}
-            sizes="(min-width: 1240px) 1200px, 100vw"
-            className={`rise ${photo.compact ? "mt-8" : "mt-10 md:mt-12"}`}
-          />
+        {photo ? (
+          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-14">
+            <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise text-balance" />
+            <Photo
+              name={photo.name}
+              alt={photo.alt}
+              focus={photo.focus}
+              priority
+              ratio={photo.ratio ?? "aspect-[3/2]"}
+              sizes="(min-width: 1024px) 460px, 100vw"
+              className="rise w-full"
+            />
+          </div>
+        ) : (
+          <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise !max-w-4xl" />
         )}
         {children}
       </div>

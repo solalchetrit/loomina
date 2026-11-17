@@ -41,12 +41,12 @@ export default function Home() {
       <Hero />
 
       {/* Une respiration sous le haut de page : ce que le livre fait vivre en famille. */}
-      <div className="mx-auto w-full max-w-[1240px] px-5 pb-16 sm:px-6 lg:pb-24" data-reveal>
+      <div className="mx-auto w-full max-w-[1240px] px-5 pb-12 sm:px-6 lg:pb-16" data-reveal>
         <Photo
           name="famille-album"
           alt="Trois générations d’une même famille regardent ensemble un album de photos."
-          ratio="aspect-[4/3] sm:aspect-[2/1]"
-          focus="50% 60%"
+          ratio="aspect-[3/2] sm:aspect-[3/1]"
+          focus="50% 22%"
           sizes="(min-width: 1240px) 1200px, 100vw"
         />
       </div>
