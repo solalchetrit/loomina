@@ -7,6 +7,7 @@ import type { Tone } from "@/lib/admin/format";
 import { PHASE_LABELS, toPhase } from "@/lib/loomina/phases";
 import { OFFER } from "@/config/offer";
 import { realRevenue } from "@/lib/admin/revenue";
+import { getAudience, audienceConfigured, type Audience } from "@/lib/admin/audience";
 import { fmtEur } from "@/lib/admin/costs";
 import { Badge, Panel, Stat, Empty, PageHeader, Avatar, Progress } from "@/components/admin/ui";
 
@@ -87,6 +88,16 @@ export default async function AdminCrm({ searchParams }: { searchParams: Promise
   const followUp = clients.filter((c) => c.health === "relancer" || c.health === "inactif" || c.failedEvents > 0);
   const paid = clients.filter((c) => c.paid).length;
   // Le montant réellement encaissé, lu dans Stripe (null si Stripe ne répond pas).
+  // L'audience du site, lue dans Google Analytics (rien si la clé n'est pas posée).
+  let audience: Audience | null = null;
+  let audienceError: string | null = null;
+  if (audienceConfigured()) {
+    try {
+      audience = await getAudience(28);
+    } catch (err) {
+      audienceError = `Google Analytics ne répond pas : ${err instanceof Error ? err.message : String(err)}`;
+    }
+  }
   const revenue = await realRevenue(clients.map((c) => c.stripeSessionId).filter((s): s is string => !!s));
   const gifts = clients.filter((c) => c.isGift).length;
   const pct = (n: number) => (total ? Math.round((100 * n) / total) : 0);
@@ -112,6 +123,45 @@ export default async function AdminCrm({ searchParams }: { searchParams: Promise
         <Stat icon="clock" tone={waiting.length ? "red" : "neutral"} label="Attendent leur premier appel" value={waiting.length} hint={`dont ${clients.filter((c) => c.health === "relancer").length} depuis plus de ${RELANCE_AFTER_DAYS} jours`} />
         <Stat icon="book" tone="green" label="Livres terminés" value={done.length} hint={`${active.length} client(s) actif(s) sur ${INACTIVE_AFTER_DAYS} jours`} />
       </div>
+
+      <Panel icon="spark" title="Audience du site, 28 derniers jours">
+        {audience ? (
+          <div className="grid gap-5">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {([["Visites", audience.sessions], ["Visiteurs", audience.users], ["Pages vues", audience.pageViews], ["Clics sur la démo", audience.events.demo]] as const).map(([l, v]) => (
+                <div key={l} className="rounded-[18px] bg-[var(--canvas)] p-4">
+                  <p className="text-[28px] font-extrabold leading-none tracking-[-0.03em] tabular-nums">{fmtNumber(v)}</p>
+                  <p className="mt-2 text-[14.5px] font-semibold text-[var(--ink-2)]">{l}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[15px] text-[var(--ink-2)]">
+              Du visiteur à la vente : {fmtNumber(audience.sessions)} visite(s), {fmtNumber(audience.events.demo)} clic(s) sur la démo, {fmtNumber(audience.events.checkout)} commande(s) commencée(s), {fmtNumber(audience.events.purchase)} achat(s), {fmtNumber(audience.events.contact)} message(s) de contact.
+            </p>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div>
+                <p className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--ink-3)]">Pages les plus vues</p>
+                <ul className="mt-2 divide-y divide-[var(--line-soft)] text-[15px]">
+                  {audience.pages.map((pg) => (
+                    <li key={pg.path} className="flex justify-between gap-3 py-2"><span className="min-w-0 truncate">{pg.path}</span><b className="tabular-nums">{fmtNumber(pg.views)}</b></li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--ink-3)]">D’où viennent les visiteurs</p>
+                <ul className="mt-2 divide-y divide-[var(--line-soft)] text-[15px]">
+                  {audience.sources.map((s) => (
+                    <li key={s.source} className="flex justify-between gap-3 py-2"><span className="min-w-0 truncate">{s.source === "(direct)" ? "Accès direct" : s.source}</span><b className="tabular-nums">{fmtNumber(s.sessions)}</b></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p className="t-small">Chiffres de Google Analytics. Depuis le bandeau cookies, seuls les visiteurs qui acceptent la mesure sont comptés.</p>
+          </div>
+        ) : (
+          <Empty>{audienceError ?? "Google Analytics n’est pas encore branché à l’admin (variable GA_SERVICE_ACCOUNT_KEY à poser sur Vercel)."}</Empty>
+        )}
+      </Panel>
 
       <Panel icon="route" title="Le parcours de vos clients">
         <ol className="grid gap-3">
@@ -247,7 +297,6 @@ export default async function AdminCrm({ searchParams }: { searchParams: Promise
 
       <p className="t-small">
         Embarqué : le client a fait au moins un appel de plus d’une minute. À relancer : pas de vrai appel {RELANCE_AFTER_DAYS} jours après la commande. Inactif : pas d’appel depuis {INACTIVE_AFTER_DAYS} jours.
-        L’audience du site (visites, pages vues) reste dans Google Analytics.
       </p>
     </div>
   );
