@@ -21,6 +21,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sweepPending } from '@/lib/loomina/events';
 import { sweepCorrections } from '@/lib/loomina/corrections';
+import { sweepReviews, sweepRelanceAlerts } from '@/lib/admin/watch';
 import { checkSharedSecret } from '@/lib/loomina/secret';
 
 export const runtime = 'nodejs';
@@ -63,11 +64,17 @@ async function handle(request: NextRequest) {
         const corrections = await sweepCorrections();
         if (corrections.applied || corrections.failed) console.info('[jobs] remarques d’auteur :', corrections);
 
+        // La veille de l'admin : clients à relancer signalés, avis de l'IA sur
+        // un livre qui vient d'être terminé.
+        const watch = { relances: await sweepRelanceAlerts(), reviews: await sweepReviews() };
+        if (watch.relances || watch.reviews) console.info('[jobs] veille :', watch);
+
         return NextResponse.json({
             ok: true,
             picked,
             results,
             corrections,
+            watch,
             durationMs: Date.now() - startedAt,
         });
     } catch (err) {

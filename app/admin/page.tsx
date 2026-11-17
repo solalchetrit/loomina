@@ -30,6 +30,21 @@ export default async function AdminHome() {
         <Stat icon="server" tone={voice.ok ? "green" : "red"} label="Serveur vocal" value={voice.ok ? "En ligne" : "Coupé"} hint={voice.detail} />
       </div>
 
+      {o.newOrders.length > 0 && (
+        <Panel icon="card" title={`Nouvelles commandes, 7 derniers jours (${o.newOrders.length})`}>
+          <ul className="grid grid-cols-1 gap-2">
+            {o.newOrders.map((n, i) => (
+              <li key={n.profileId ?? i} className="flex flex-wrap items-center gap-3 rounded-[14px] bg-[var(--success-soft)]/60 px-4 py-3 text-[15px]">
+                <Badge tone="ok">Nouvelle commande</Badge>
+                <span className="min-w-0 flex-1 font-semibold">{n.client ?? "Client sans nom"}{n.isGift ? " (livre offert)" : ""}</span>
+                <span className="text-[14px] tabular-nums text-[var(--ink-3)]">{fmtDate(n.at)}</span>
+                {n.profileId && <Link className="font-semibold underline" href={`/admin/clients/${n.profileId}`}>Voir la fiche</Link>}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
+
       {o.toReview.length > 0 && (
         <Panel icon="book" title={`Livres à relire (${o.toReview.length})`}>
           <ul className="grid grid-cols-1 gap-2">
