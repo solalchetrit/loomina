@@ -22,7 +22,7 @@ test('une phase incomplète ne propose pas de passer à la suite', () => {
     const s = stepPhase(empty(2), { covered: ['maison', 'ecole'] }, 'none');
     assert.equal(s.nextPhase, 2);
     assert.equal(s.state.check, null);
-    assert.equal(s.progress, 40);
+    assert.equal(s.progress, 33); // 2 sujets sur 6
 });
 
 test('un sujet coché le reste, même si le modèle ne le renvoie plus', () => {
