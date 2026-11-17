@@ -171,7 +171,7 @@ export default function Settings({
             value={form.firstNamePhonetic ?? ""}
             onChange={(e) => update({ firstNamePhonetic: e.target.value })}
             placeholder={firstName ?? "Votre prénom"}
-            hint="Si la voix l’écorche, écrivez-le comme il se prononce (par exemple « Solale »)."
+            hint="Si la voix l’écorche, écrivez-le comme il se prononce : par exemple « Létissia » pour Laetitia."
           />
         </div>
       </section>

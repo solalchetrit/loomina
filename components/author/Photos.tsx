@@ -7,7 +7,24 @@ interface Photo {
   id: string;
   caption: string | null;
   question: string;
+  chapter?: string | null;
   url: string | null;
+}
+
+/**
+ * Les chapitres proposés pour placer une photo : ceux du livre composé s'il
+ * existe, sinon les récits d'appel. Liste vide : le choix n'apparaît pas.
+ */
+async function chapterTitles(): Promise<string[]> {
+  try {
+    const book = await fetch("/api/user/book").then((r) => (r.ok ? r.json() : null));
+    const fromBook: string[] = (book?.edition?.chapters ?? []).map((c: { title: string }) => c.title);
+    if (fromBook.length) return fromBook;
+    const stories = await fetch("/api/user/stories").then((r) => (r.ok ? r.json() : []));
+    return (stories as { story_title: string | null }[]).map((s) => s.story_title).filter((t): t is string => !!t);
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -42,6 +59,8 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
+  const [chapter, setChapter] = useState("");
+  const [chapters, setChapters] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const input = useRef<HTMLInputElement>(null);
@@ -54,6 +73,9 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
         if (!cancelled && d?.photos) setPhotos(d.photos);
       })
       .catch(() => {});
+    chapterTitles().then((t) => {
+      if (!cancelled) setChapters([...new Set(t)]);
+    });
     return () => {
       cancelled = true;
     };
@@ -68,6 +90,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
       const body = new FormData();
       body.append("photo", await shrink(file), "photo.jpg");
       if (caption.trim()) body.append("caption", caption.trim());
+      if (chapter) body.append("chapter", chapter);
       const res = await fetch("/api/user/photos", { method: "POST", body });
       if (res.status === 401) return onUnauthorized();
       const data = await res.json().catch(() => ({}));
@@ -75,6 +98,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
       setPhotos(data.photos);
       setFile(null);
       setCaption("");
+      setChapter("");
       if (input.current) input.current.value = "";
       setStatus("sent");
     } catch (err) {
@@ -116,6 +140,21 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
           onChange={(e) => setCaption(e.target.value)}
           placeholder="Par exemple : mariage de mes parents, 1952"
         />
+        {chapters.length > 0 && (
+          <>
+            <label htmlFor="photo-chapitre" className="field-label">
+              Pour quel chapitre ? (facultatif)
+            </label>
+            <select id="photo-chapitre" className="field" value={chapter} onChange={(e) => setChapter(e.target.value)}>
+              <option value="">Je ne sais pas, à vous de voir</option>
+              {chapters.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
         <Button type="submit" loading={status === "sending"} disabled={!file}>
           Envoyer la photo
         </Button>
@@ -136,6 +175,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
                 <div className="aspect-square w-full rounded-[12px] bg-[var(--surface-2)]" />
               )}
               <p className="t-small mt-1 line-clamp-2">{p.caption ?? p.question}</p>
+              {p.chapter && <p className="mt-0.5 line-clamp-1 text-[13px] font-semibold text-[var(--amber-ink)]">{p.chapter}</p>}
             </li>
           ))}
         </ul>

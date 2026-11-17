@@ -25,6 +25,8 @@ export interface PhotoEntry {
     description: string;
     question: string;
     at: string;
+    /** Le chapitre où l'auteur aimerait la voir (facultatif), par son titre. */
+    chapter?: string | null;
 }
 
 const VISION_MODEL = 'gpt-5.5';
@@ -69,9 +71,10 @@ Réponds en JSON : { "description": "…", "question": "…" }`,
 }
 
 /** Le texte ajouté aux sujets suggérés (lu par l'assistant vocal). */
-export function photoTopic(p: Pick<PhotoEntry, 'caption' | 'description' | 'question'>): string {
+export function photoTopic(p: Pick<PhotoEntry, 'caption' | 'description' | 'question' | 'chapter'>): string {
     const caption = p.caption ? ` (légende : « ${p.caption.slice(0, 60)} »)` : '';
-    return `Photo envoyée sur l'espace${caption}. On y voit : ${p.description.slice(0, 140)} Question : ${p.question}`.slice(0, 300);
+    const chapter = p.chapter ? ` Pour le chapitre « ${p.chapter.slice(0, 60)} ».` : '';
+    return `Photo envoyée sur l'espace${caption}.${chapter} On y voit : ${p.description.slice(0, 140)} Question : ${p.question}`.slice(0, 300);
 }
 
 /** Liens temporaires (1 h) pour afficher les photos dans l'espace auteur. */

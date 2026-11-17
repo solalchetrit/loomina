@@ -4,9 +4,36 @@
  * avec le livre d'exemple de Jeanne (lib/loomina/demo.ts). L'espace auteur
  * s'ouvre directement, sans SMS. Ce fichier n'est chargé que dans cette copie.
  */
-import { demoAddPerson, demoAddQuestion, demoEdition, demoOverview, demoSavePrefs, demoStories } from './demo';
+import { demoAddPerson, demoAddQuestion, demoEdition, demoOverview, demoPlan, demoSavePrefs, demoStories } from './demo';
 
 type Body = Record<string, unknown>;
+
+/** Photos envoyées pendant la visite : gardées dans la page, perdues au rechargement. */
+const photos: { id: string; caption: string | null; question: string; chapter: string | null; url: string }[] = [];
+
+function dataUrl(file: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result));
+        r.onerror = () => reject(r.error);
+        r.readAsDataURL(file);
+    });
+}
+
+async function addPhoto(init?: RequestInit): Promise<Response> {
+    const form = init?.body instanceof FormData ? init.body : null;
+    const file = form?.get('photo');
+    if (!(file instanceof Blob)) return reply({ error: 'Aucune photo reçue.' }, 400);
+    const text = (k: string) => (typeof form?.get(k) === 'string' ? (form!.get(k) as string).trim() || null : null);
+    photos.push({
+        id: String(photos.length + 1),
+        caption: text('caption'),
+        chapter: text('chapter'),
+        question: 'Qui est sur cette photo, et où a-t-elle été prise ?',
+        url: await dataUrl(file),
+    });
+    return reply({ photos });
+}
 
 function reply(data: unknown, status = 200) {
     return Promise.resolve(new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } }));
@@ -45,8 +72,8 @@ function answer(path: string, method: string, init?: RequestInit): Promise<Respo
     if (path === '/api/user/book') {
         return method === 'POST' ? reply({ error: 'La composition n’est pas disponible en démonstration.' }, 409) : reply(demoEdition());
     }
-    if (path === '/api/user/book-plan') return method === 'POST' ? reply({ error: 'Indisponible en démonstration.' }, 409) : reply({ plan: null });
-    if (path === '/api/user/photos') return method === 'POST' ? reply({ error: 'Indisponible en démonstration.' }, 501) : reply({ photos: [] });
+    if (path === '/api/user/book-plan') return method === 'POST' ? reply({ plan: demoPlan() }) : reply({ plan: null });
+    if (path === '/api/user/photos') return method === 'POST' ? addPhoto(init) : reply({ photos });
     if (/^\/api\/user\/chapters\/\d+\/correction$/.test(path)) return reply({ content: String(bodyOf(init).content ?? ''), demo: true });
     if (/^\/api\/user\/chapters\/\d+$/.test(path)) return reply({ saved: true, demo: true });
     if (path.startsWith('/api/famille/')) return reply({ error: 'Aucun livre offert' }, 404);

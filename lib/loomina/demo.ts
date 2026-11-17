@@ -206,13 +206,26 @@ export function personTopic(name: string, relation: string) {
 }
 
 /** Le livre composé de l'exemple : les récits rangés par périodes de vie. */
+const PARTS = ['L’enfance', 'L’enfance', 'L’enfance', 'La jeunesse', 'La jeunesse', 'La vie de famille', 'La vie de famille', 'Le travail', 'Les voyages'];
+
 export function demoEdition() {
-    const parts = ['L’enfance', 'L’enfance', 'L’enfance', 'La jeunesse', 'La jeunesse', 'La vie de famille', 'La vie de famille', 'Le travail', 'Les voyages'];
-    const chapters = CHAPTERS.map((c, i) => ({ number: i + 1, title: c.title, part: parts[i] ?? 'Souvenirs', content: c.content, sources: [i + 1] }));
+    const chapters = CHAPTERS.map((c, i) => ({ number: i + 1, title: c.title, part: PARTS[i] ?? 'Souvenirs', content: c.content, sources: [i + 1] }));
     return {
         edition: { id: 'demo', status: 'ready', chapters, done: chapters.length, total: chapters.length, sourceCount: CHAPTERS.length, at: CHAPTERS[CHAPTERS.length - 1].date },
         running: null,
         failed: false,
         sourceCount: CHAPTERS.length,
     };
+}
+
+/** Les récits rangés par périodes de vie, pour « Par périodes de vie ». */
+export function demoPlan() {
+    const parts: { title: string; chapters: number[] }[] = [];
+    CHAPTERS.forEach((_, i) => {
+        const title = PARTS[i] ?? 'Souvenirs';
+        const last = parts[parts.length - 1];
+        if (last?.title === title) last.chapters.push(i + 1);
+        else parts.push({ title, chapters: [i + 1] });
+    });
+    return { parts, chapter_count: CHAPTERS.length, at: new Date().toISOString() };
 }
