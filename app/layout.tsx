@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import ScrollTop from "@/components/ScrollTop";
 import Script from "next/script";
 import Footer from "@/components/Footer";
 import MobileCta from "@/components/MobileCta";
@@ -90,10 +91,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="fr" className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
         className={`${plusJakartaSans.variable} ${newsreader.variable} min-h-screen bg-[var(--canvas)] font-sans text-[var(--ink)] antialiased`}
       >
+        <ScrollTop />
         <Header />
         <main>{children}</main>
         <Footer />
