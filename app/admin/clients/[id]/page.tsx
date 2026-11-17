@@ -236,7 +236,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
         )}
       </Panel>
 
-      <Panel icon="layers" title="Livre composé">
+      <Panel icon="layers" title="Livre composé" action={c.editions.ready ? <Link href={`/admin/clients/${id}/livre`} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Relire le livre et demander l’avis de l’IA <AIcon name="arrow" size={14} /></Link> : undefined}>
         {!edition ? (
           <Empty>Pas encore composé (il faut au moins deux récits).</Empty>
         ) : (

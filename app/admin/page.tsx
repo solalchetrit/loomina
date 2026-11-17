@@ -30,6 +30,20 @@ export default async function AdminHome() {
         <Stat icon="server" tone={voice.ok ? "green" : "red"} label="Serveur vocal" value={voice.ok ? "En ligne" : "Coupé"} hint={voice.detail} />
       </div>
 
+      {o.toReview.length > 0 && (
+        <Panel icon="book" title={`Livres à relire (${o.toReview.length})`}>
+          <ul className="grid grid-cols-1 gap-2">
+            {o.toReview.map((b, n) => (
+              <li key={b.profileId ?? n} className="flex flex-wrap items-center gap-3 rounded-[14px] bg-[var(--canvas)] px-4 py-3 text-[15px]">
+                <Badge tone="wait">Terminé par l’auteur</Badge>
+                <span className="min-w-0 flex-1 font-semibold">{b.client ?? "Client inconnu"}</span>
+                {b.profileId && <Link className="font-semibold underline" href={`/admin/clients/${b.profileId}/livre`}>Relire le livre</Link>}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
+
       {alerts > 0 && (
         <Panel icon="alert" title="À surveiller">
           <ul className="grid grid-cols-1 gap-2">
