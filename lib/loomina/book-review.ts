@@ -8,6 +8,7 @@
  * L'avis est gardé dans `projects.project_metadata.ai_review`.
  */
 
+import { promptText, refreshPrompts } from './prompt-store';
 import OpenAI from 'openai';
 import { db } from './db';
 import { readEditions } from './book-edition';
@@ -85,6 +86,7 @@ export async function beginReview(projectId: string): Promise<{ ok: true; editio
 
 /** L'appel au modèle (plusieurs minutes pour un livre entier). Ne lève pas : l'échec est noté dans l'avis. */
 export async function runReview(projectId: string, editionId: string, chapters: BookChapter[], narrator: string): Promise<void> {
+    await refreshPrompts();
     const started_at = new Date().toISOString();
     try {
         const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 1, timeout: 280_000 });
@@ -93,7 +95,7 @@ export async function runReview(projectId: string, editionId: string, chapters: 
             reasoning_effort: 'medium',
             max_completion_tokens: 16000,
             messages: [
-                { role: 'system', content: REVIEW_SYSTEM },
+                { role: 'system', content: promptText('avis', REVIEW_SYSTEM) },
                 { role: 'user', content: `Manuscrit de l'autobiographie de ${narrator || 'l’auteur'} (${chapters.length} chapitres).\n\n${renderBook(chapters)}` },
             ],
         });

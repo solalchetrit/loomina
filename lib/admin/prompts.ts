@@ -1,20 +1,23 @@
 /**
  * Les IA de Loomina et leurs prompts, tels qu'ils sont dans le code.
  *
- * Rien n'est recopié ici : chaque prompt est importé de son fichier, donc
- * la page admin montre toujours la version en ligne.
+ * Rien n'est recopié ici : chaque prompt est importé de son fichier, et
+ * passe par `promptText` : la page admin montre la version en vigueur, y
+ * compris quand elle a été réécrite dans l'admin.
  */
 
 import type { Phase } from '@/lib/loomina/phases';
 import { PHASE_LABELS } from '@/lib/loomina/phases';
 import type { Profile, Project } from '@/lib/loomina/db';
 import { buildAssistant, DEMO_SYSTEM, RECOVERY_SYSTEM, ONE_QUESTION_REMINDER } from '@/lib/loomina/assistant';
-import { voicePromptTemplate } from '@/lib/loomina/voice-prompt';
+import { voicePromptTemplate, VOICE_INTRO, VOICE_SPEAK, PHASE_OBJECTIVES } from '@/lib/loomina/voice-prompt';
+import { REVIEW_SYSTEM } from '@/lib/loomina/book-review';
 import { directorSystemPrompt, DIRECTOR_MODEL, DIRECTOR_FALLBACK_MODEL } from '@/lib/loomina/director';
 import { WRITER_SYSTEM, WRITER_MODEL, CORRECTION_SYSTEM } from '@/lib/loomina/writer';
 import { PLAN_SYSTEM, WRITE_SYSTEM, CARRY_SYSTEM, BOOK_MODEL } from '@/lib/loomina/book';
 import { BOOK_PLAN_SYSTEM, BOOK_PLAN_MODEL } from '@/lib/loomina/book-plan';
 import { timeNote } from '@/lib/loomina/call-length';
+import { promptText } from '@/lib/loomina/prompt-store';
 import { photoSystemPrompt, VISION_MODEL } from '@/lib/loomina/photos';
 
 export interface PromptPart {
@@ -121,7 +124,7 @@ export function aiCatalog(): Ai[] {
                         text: `PREMIÈRE PHRASE DITE : « ${ex.firstMessage} »\n\n${ex.system}`,
                     };
                 }),
-                { title: 'Rappel placé en toute fin du prompt', text: ONE_QUESTION_REMINDER },
+                { title: 'Rappel placé en toute fin du prompt', text: promptText('voix.rappel', ONE_QUESTION_REMINDER) },
                 {
                     title: 'Note de temps ajoutée à chaque réplique (exemples à 5 et 22 min sur 20 souhaitées)',
                     text: `${timeNote(5 * 60, 20)}\n\n---\n\n${timeNote(22 * 60, 20)}`,
@@ -138,7 +141,7 @@ export function aiCatalog(): Ai[] {
             reads: 'Rien.',
             writes: 'Rien : pas de rapport, pas de transcript.',
             file: 'lib/loomina/assistant.ts (DEMO_SYSTEM)',
-            prompts: [{ title: 'Prompt de la démonstration', text: DEMO_SYSTEM }],
+            prompts: [{ title: 'Prompt de la démonstration', text: promptText('demo', DEMO_SYSTEM) }],
         },
         {
             key: 'directeur',
@@ -163,8 +166,8 @@ export function aiCatalog(): Ai[] {
             writes: 'chapters (un récit par appel), puis SMS « votre récit est prêt » et recomposition du livre.',
             file: 'lib/loomina/writer.ts',
             prompts: [
-                { title: 'Prompt système', text: WRITER_SYSTEM },
-                { title: "Correction demandée par l'auteur sur un récit (proposée, l'auteur valide)", text: CORRECTION_SYSTEM },
+                { title: 'Prompt système', text: promptText('ecrivain', WRITER_SYSTEM) },
+                { title: "Correction demandée par l'auteur sur un récit (proposée, l'auteur valide)", text: promptText('correction', CORRECTION_SYSTEM) },
             ],
         },
         {
@@ -178,9 +181,9 @@ export function aiCatalog(): Ai[] {
             writes: 'book_editions (plan, chapitres, état).',
             file: 'lib/loomina/book.ts, lib/loomina/book-edition.ts',
             prompts: [
-                { title: 'Le plan du livre', text: PLAN_SYSTEM },
-                { title: "L'écriture d'un chapitre du livre", text: WRITE_SYSTEM },
-                { title: "Report d'une correction de l'auteur dans le livre composé", text: CARRY_SYSTEM },
+                { title: 'Le plan du livre', text: promptText('livre.plan', PLAN_SYSTEM) },
+                { title: "L'écriture d'un chapitre du livre", text: promptText('livre.ecriture', WRITE_SYSTEM) },
+                { title: "Report d'une correction de l'auteur dans le livre composé", text: promptText('livre.report', CARRY_SYSTEM) },
             ],
         },
         {
@@ -193,7 +196,7 @@ export function aiCatalog(): Ai[] {
             reads: 'Titres et débuts des récits, mémoire du livre.',
             writes: 'projects.project_metadata (plan par périodes).',
             file: 'lib/loomina/book-plan.ts',
-            prompts: [{ title: 'Prompt système', text: BOOK_PLAN_SYSTEM }],
+            prompts: [{ title: 'Prompt système', text: promptText('rangement', BOOK_PLAN_SYSTEM) }],
         },
         {
             key: 'photos',
@@ -217,7 +220,39 @@ export function aiCatalog(): Ai[] {
             reads: 'Rien.',
             writes: 'Un rapport d’appel normal.',
             file: 'lib/loomina/assistant.ts (RECOVERY_SYSTEM)',
-            prompts: [{ title: 'Prompt de secours', text: RECOVERY_SYSTEM }],
+            prompts: [{ title: 'Prompt de secours', text: promptText('secours', RECOVERY_SYSTEM) }],
         },
+    ];
+}
+
+// ------------------------------------------------------------------
+// Les prompts que l'admin peut réécrire (lib/loomina/prompt-store.ts)
+// ------------------------------------------------------------------
+
+export interface EditablePrompt {
+    /** Clé dans `prompt_overrides`. */
+    key: string;
+    /** L'IA à laquelle il appartient (clé de `aiCatalog`). */
+    ai: string;
+    title: string;
+    original: string;
+}
+
+export function editablePrompts(): EditablePrompt[] {
+    const phases: Phase[] = [1, 2, 3, 4];
+    return [
+        { key: 'voix.intro', ai: 'voix', title: 'Ouverture : qui est Loomina, ce qu’est un bon appel, les préférences', original: VOICE_INTRO },
+        ...phases.map((p) => ({ key: `voix.objectif.${p}`, ai: 'voix', title: `Objectif de la phase ${p} (${PHASE_LABELS[p]})`, original: PHASE_OBJECTIVES[p] })),
+        { key: 'voix.parler', ai: 'voix', title: 'Comment tu parles, et la fin d’appel', original: VOICE_SPEAK },
+        { key: 'voix.rappel', ai: 'voix', title: 'Rappel placé en toute fin du prompt', original: ONE_QUESTION_REMINDER },
+        { key: 'demo', ai: 'demo', title: 'Prompt de la démonstration', original: DEMO_SYSTEM },
+        { key: 'ecrivain', ai: 'ecrivain', title: 'Prompt système de l’Écrivain', original: WRITER_SYSTEM },
+        { key: 'correction', ai: 'ecrivain', title: 'Correction demandée par l’auteur sur un récit', original: CORRECTION_SYSTEM },
+        { key: 'livre.plan', ai: 'editeur', title: 'Le plan du livre', original: PLAN_SYSTEM },
+        { key: 'livre.ecriture', ai: 'editeur', title: 'L’écriture d’un chapitre du livre', original: WRITE_SYSTEM },
+        { key: 'livre.report', ai: 'editeur', title: 'Report d’une correction de l’auteur dans le livre composé', original: CARRY_SYSTEM },
+        { key: 'avis', ai: 'editeur', title: 'L’avis de lecture sur le livre entier', original: REVIEW_SYSTEM },
+        { key: 'rangement', ai: 'periodes', title: 'Le rangement par périodes', original: BOOK_PLAN_SYSTEM },
+        { key: 'secours', ai: 'secours', title: 'Prompt de l’entretien de secours', original: RECOVERY_SYSTEM },
     ];
 }

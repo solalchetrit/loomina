@@ -287,7 +287,7 @@ export const MAP_GROUPS: MapGroup[] = [
             { id: 'm-relance', label: 'Relancer un client', col: 2, from: 'm-relancer', d: 'Bouton « Relancer » dans Suivi client et sur la fiche : un SMS et un e-mail rappellent le numéro à appeler. Livre offert sans aucun appel : la relance va à celui qui l’a offert.' },
             { id: 'm-argent', label: 'Montants réels et coûts', col: 2, from: 'm-activite', status: 'partial', d: 'Le coût de chaque appel et le total par client sont sur la fiche du client. Reste à faire : le chiffre d’affaires réel (codes promo et remboursements sont dans Stripe) et la marge par client dans Suivi client.' },
             { id: 'm-audience', label: 'Audience du site', col: 2, from: 'm-chiffres', status: 'todo', d: 'Les visites et les pages vues restent dans Google Analytics.' },
-            { id: 'm-modifier', label: 'Modifier un prompt', col: 2, from: 'm-prompts', status: 'todo', d: 'Les prompts se lisent dans l’admin mais se changent dans le code.' },
+            { id: 'm-modifier', label: 'Modifier un prompt', col: 2, from: 'm-prompts', d: 'Dans « Les IA », sous chaque IA : « Modifier ». On réécrit le prompt en entier, il est pris en compte dans la minute. Si une variable obligatoire manque, l’enregistrement est refusé. « Revenir au texte d’origine » annule tout. Pas encore modifiables : le Directeur et le regard sur les photos.', code: 'lib/loomina/prompt-store.ts' },
             { id: 'm-comptes', label: 'Plusieurs comptes admin', col: 2, from: 'm-refus', status: 'todo', d: 'Un seul mot de passe partagé : pas de compte par personne, pas d’historique de qui a consulté quoi.' },
         ],
     },

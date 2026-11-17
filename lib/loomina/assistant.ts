@@ -13,7 +13,8 @@
 
 import type { Phase } from './phases';
 import { PHASE_KEYS, toPhase, isFinalPhase } from './phases';
-import { voicePromptTemplate, PHASE_OBJECTIVES } from './voice-prompt';
+import { voicePromptTemplate, phaseObjective } from './voice-prompt';
+import { promptText } from './prompt-store';
 import { readPhaseState, spokenPhase, readTopics, openTopics, pendingAxes, PHASE_AXES } from './phase-plan';
 import { OFFER } from '../../config/offer';
 import type { Profile, Project, SystemPrompt } from './db';
@@ -272,7 +273,7 @@ export function phaseCheck(project: Project, vars: Record<string, string>): { as
         `- Si ${name} veut ajouter quelque chose : écoute, creuse comme d'habitude, et reste sur ${here} pour cet appel.`,
         final
             ? `- Si ${name} dit que le livre est complet : remercie chaleureusement, dis que le livre va maintenant être préparé et qu'un appel reste possible à tout moment pour ajouter un souvenir, puis termine l'appel.`
-            : `- Si ${name} veut passer à la suite : enchaîne dans ce même appel sur ${spokenPhase((phase + 1) as Phase, tu)}, avec une première question ouverte tirée de ces pistes.\n${fillTemplate(PHASE_OBJECTIVES[(phase + 1) as Phase], vars)}`,
+            : `- Si ${name} veut passer à la suite : enchaîne dans ce même appel sur ${spokenPhase((phase + 1) as Phase, tu)}, avec une première question ouverte tirée de ces pistes.\n${fillTemplate(phaseObjective((phase + 1) as Phase), vars)}`,
         `- Ne parle jamais de « phase » ni de numéro : ${name} ne connaît pas ces mots.`,
     ].join('\n');
     return { ask, block };
@@ -328,7 +329,7 @@ export function buildAssistant({
         politenessAlreadySet: Boolean(meta.prefs_set_at),
         topicsAlreadyKnown: Boolean(profile.sensitive_topics?.trim()),
     });
-    const systemPrompt = [fillTemplate(template, vars), session, pronunciationBlock(vars), ONE_QUESTION_REMINDER]
+    const systemPrompt = [fillTemplate(template, vars), session, pronunciationBlock(vars), promptText('voix.rappel', ONE_QUESTION_REMINDER)]
         .filter((part) => part.trim())
         .join('\n\n');
 
@@ -411,7 +412,7 @@ export const DEMO_MAX_SECONDS = 300;
  * ignore de toute façon tout appel marqué `demo` dans ses métadonnées.
  */
 export function buildUnknownCallerAssistant(serverUrl: string) {
-    const systemPrompt = DEMO_SYSTEM;
+    const systemPrompt = promptText('demo', DEMO_SYSTEM);
     return buildDemoPayload(serverUrl, systemPrompt);
 }
 
@@ -499,7 +500,7 @@ export const RECOVERY_MAX_SECONDS = 1200;
  * celui d'aucun client, l'événement est simplement classé « no_project ».
  */
 export function buildRecoveryAssistant(serverUrl: string) {
-    const systemPrompt = RECOVERY_SYSTEM;
+    const systemPrompt = promptText('secours', RECOVERY_SYSTEM);
     return buildRecoveryPayload(serverUrl, systemPrompt);
 }
 

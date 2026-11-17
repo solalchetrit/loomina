@@ -21,6 +21,7 @@
  * restent la matière première, et la source de vérité.
  */
 
+import { promptText, refreshPrompts } from './prompt-store';
 import OpenAI from 'openai';
 import type { LoominaContext } from './context';
 import { renderContext } from './context';
@@ -157,13 +158,14 @@ function renderWritten(written: Array<{ title: string; content: string }>): stri
 
 /** Premier temps : le plan du livre. */
 export async function planBook(sources: Source[], context: LoominaContext, sensitiveTopics?: string | null): Promise<PlannedChapter[]> {
+    await refreshPrompts();
     const known = new Set(sources.map((s) => s.number));
     // Le plan ne voit que les récits : la mémoire du projet contient des faits
     // que la personne a dits sans les raconter, et le plan en faisait des titres.
     void context;
     const total = sources.reduce((a, s) => a + countWords(s.content), 0);
     const avoid = sensitiveTopics?.trim() ? `# SUJETS QUE LA PERSONNE PRÉFÈRE ÉVITER\n${sensitiveTopics.trim()}\n\n` : '';
-    const parsed = await json(PLAN_SYSTEM, `${avoid}# LES RÉCITS (${sources.length} récits, ${total} mots au total)\n${renderSources(sources)}`, 'medium');
+    const parsed = await json(promptText('livre.plan', PLAN_SYSTEM), `${avoid}# LES RÉCITS (${sources.length} récits, ${total} mots au total)\n${renderSources(sources)}`, 'medium');
     const out: PlannedChapter[] = [];
     for (const item of Array.isArray(parsed.chapters) ? parsed.chapters : []) {
         const c = (item ?? {}) as Record<string, unknown>;
@@ -225,7 +227,7 @@ ${renderWritten(params.written ?? [])}
 
 # LES RÉCITS OÙ SE TROUVE LA MATIÈRE
 ${renderSources(params.sources.filter((s) => needed.has(s.number)))}`;
-    const parsed = await json(WRITE_SYSTEM, user, 'medium');
+    const parsed = await json(promptText('livre.ecriture', WRITE_SYSTEM), user, 'medium');
     const content = typeof parsed.content === 'string' ? parsed.content.trim() : '';
     if (!content) throw new Error(`Livre : chapitre « ${params.chapter.title} » vide`);
     return { title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim().slice(0, 120) : params.chapter.title, content };
@@ -240,6 +242,7 @@ export async function composeBook(params: {
     /** Appelé après chaque chapitre écrit (suivi de l'avancement). */
     onChapter?: (done: number, total: number) => void;
 }): Promise<BookEdition> {
+    await refreshPrompts();
     const sources = params.sources.filter((s) => s.content.trim());
     if (!sources.length) throw new Error('Livre : aucun récit à composer');
     const plan = await planBook(sources, params.context, params.sensitiveTopics);
@@ -307,8 +310,9 @@ export async function carryCorrection(params: {
     after: string;
     correction?: string | null;
 }): Promise<string> {
+    await refreshPrompts();
     const parsed = await json(
-        CARRY_SYSTEM,
+        promptText('livre.report', CARRY_SYSTEM),
         `${params.correction?.trim() ? `# CE QUE L'AUTEUR A DEMANDÉ\n${params.correction.trim()}\n\n` : ''}# LE RÉCIT AVANT CORRECTION
 ${params.before}
 

@@ -23,6 +23,7 @@
  *                           ceinture en plus des bretelles.
  */
 
+import { refreshPrompts } from '@/lib/loomina/prompt-store';
 import { NextRequest, NextResponse, after } from 'next/server';
 
 import { findProfileByPhone, findActiveProject, getSystemPrompt, db, maskPhone } from '@/lib/loomina/db';
@@ -70,6 +71,7 @@ function isAuthorized(request: NextRequest): boolean {
 
 export async function POST(request: NextRequest) {
     const startedAt = Date.now();
+    await refreshPrompts();
 
     if (!isAuthorized(request)) {
         console.error('[vapi] Requête rejetée : secret invalide');
