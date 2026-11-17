@@ -138,6 +138,7 @@ export default function FAQPage() {
             , une personne vous répond.
           </>
         }
+        photo={{ name: "grand-pere-petite-fille", alt: "Un grand-père tient sa petite-fille dans ses bras, ils se sourient.", focus: "50% 25%" }}
       />
 
       <Section size="sm">

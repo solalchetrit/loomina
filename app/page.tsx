@@ -13,6 +13,7 @@ import Closing from "@/components/Closing";
 import Accordion from "@/components/ui/Accordion";
 import { Section, SectionHead } from "@/components/ui/Section";
 import { GUARANTEE } from "@/config/offer";
+import Photo from "@/components/ui/Photo";
 
 const QUESTIONS = [
   {
@@ -38,6 +39,18 @@ export default function Home() {
   return (
     <>
       <Hero />
+
+      {/* Une respiration sous le haut de page : ce que le livre fait vivre en famille. */}
+      <div className="mx-auto w-full max-w-[1240px] px-5 pb-16 sm:px-6 lg:pb-24" data-reveal>
+        <Photo
+          name="famille-album"
+          alt="Trois générations d’une même famille regardent ensemble un album de photos."
+          ratio="aspect-[4/3] sm:aspect-[2/1]"
+          focus="50% 60%"
+          sizes="(min-width: 1240px) 1200px, 100vw"
+        />
+      </div>
+
       <Facts />
       <HowItWorks />
       <AuthorShowcase className="bg-white" />
@@ -57,7 +70,14 @@ export default function Home() {
 
       {/* Le mot du fondateur, à la place d'avis clients que nous n'avons pas encore. */}
       <Section size="sm">
-        <figure className="card mx-auto max-w-4xl p-8 md:p-12">
+        <figure className="card mx-auto grid max-w-5xl items-center gap-8 p-5 md:grid-cols-[1fr_1.5fr] md:gap-12 md:p-6">
+          <Photo
+            name="album-photo"
+            alt="Un album de famille ouvert sur de vieilles photos en noir et blanc."
+            ratio="aspect-[4/3] md:aspect-[4/5]"
+            sizes="(min-width: 768px) 380px, 100vw"
+          />
+          <div className="px-3 pb-4 md:px-0 md:py-6 md:pr-8">
           <blockquote className="text-[clamp(1.3rem,2.4vw,1.75rem)] font-semibold leading-[1.45] tracking-[-0.015em] text-[var(--ink)]">
             « Ma grand-mère avait une vie passionnante, que je ne connaissais qu’en partie. Écrire lui demandait trop, alors nous l’avons
             laissée parler. Son livre est aujourd’hui dans notre salon, et c’est pour que d’autres familles aient le leur que Loomina
@@ -71,11 +91,13 @@ export default function Home() {
               Notre histoire
             </Link>
           </figcaption>
+          </div>
         </figure>
       </Section>
 
       <Section id="questions">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+          <div>
           <SectionHead
             title="Vos questions"
             text={
@@ -92,6 +114,15 @@ export default function Home() {
               </>
             }
           />
+          <Photo
+            name="petit-dejeuner"
+            alt="Une grand-mère et sa petite-fille discutent en souriant au petit-déjeuner."
+            ratio="aspect-[4/3]"
+            focus="50% 40%"
+            sizes="(min-width: 1024px) 440px, 100vw"
+            className="mt-10 hidden lg:block"
+          />
+          </div>
           <Accordion items={QUESTIONS} />
         </div>
       </Section>

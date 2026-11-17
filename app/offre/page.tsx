@@ -64,6 +64,7 @@ export default function OffrePage() {
       <PageHeader
         title="Un prix, tout compris"
         text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus."
+        photo={{ name: "lecture", alt: "Une mère lit un livre à sa fille, assises sur un lit.", focus: "45% 50%" }}
       >
         <div className="mt-12">
           <OfferCard showDetailLink={false} />

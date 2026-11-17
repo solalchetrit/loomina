@@ -4,6 +4,7 @@ import { type IconName } from "@/components/ui/Icon";
 import { BookPage } from "@/components/VoiceToPage";
 import { BookCover } from "@/components/home/WhatYouGet";
 import { Contents } from "@/components/home/Themes";
+import Photo from "@/components/ui/Photo";
 import Closing from "@/components/Closing";
 import AuthorShowcase from "@/components/AuthorShowcase";
 import { SITE } from "@/config/site";
@@ -117,6 +118,7 @@ export default function ExperiencePage() {
       <PageHeader
         title="Un téléphone, des conversations, un livre"
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
+        photo={{ name: "homme-casquette-telephone", alt: "Assis sur un banc, un homme âgé parle au téléphone.", focus: "50% 22%" }}
       />
 
       {PHASES.map((p, idx) => {
@@ -182,10 +184,13 @@ export default function ExperiencePage() {
       </Section>
 
       <Section id="chapitres">
-        <SectionHead
-          title="Des points de départ, pas un questionnaire"
-          text="Loomina propose ces thèmes au fil des appels. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
-        />
+        <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+          <SectionHead
+            title="Des points de départ, pas un questionnaire"
+            text="Loomina propose ces thèmes au fil des appels. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
+          />
+          <Photo name="panier-de-photos" alt="Un panier rempli de vieilles photos de famille." ratio="aspect-[16/10]" />
+        </div>
         <Contents className="mt-10" />
       </Section>
 

@@ -1,14 +1,16 @@
 import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { Section, SectionHead } from "@/components/ui/Section";
+import Photo from "@/components/ui/Photo";
 
-const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]; cta: string; dark?: boolean }[] = [
+const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]; cta: string; dark?: boolean; photo: { name: string; alt: string; focus?: string } }[] = [
   {
     icon: "user",
     title: "Pour raconter votre vie",
     text: "Vous avez des souvenirs à transmettre, mais pas l’envie ni le temps d’écrire. Vous parlez, Loomina écrit.",
     points: ["Vous appelez quand vous voulez", "Vous relisez le récit de chaque appel", "Vous gardez tous les droits sur votre récit"],
     cta: "Commencer mon livre",
+    photo: { name: "homme-au-telephone", alt: "Un homme âgé raconte un souvenir au téléphone.", focus: "50% 25%" },
   },
   {
     icon: "gift",
@@ -16,6 +18,7 @@ const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]
     text: "Le cadeau d’un livre qui reste : votre mère, votre grand-père raconte, et toute la famille reçoit son histoire.",
     points: ["Vous indiquez son numéro à la commande", "Il appelle à son rythme, sans ordinateur", "Version PDF et EPUB à partager"],
     cta: "Offrir le livre",
+    photo: { name: "grand-mere-calin", alt: "Une petite fille serre sa grand-mère dans ses bras.", focus: "50% 35%" },
     dark: true,
   },
 ];
@@ -28,8 +31,10 @@ export default function Audiences() {
         {AUDIENCES.map((a) => (
           <div
             key={a.title}
-            className={`flex flex-col rounded-[var(--radius-card)] p-7 md:p-10 ${a.dark ? "bg-[var(--ink)] text-white" : "card"}`}
+            className={`flex flex-col rounded-[var(--radius-card)] p-3 ${a.dark ? "bg-[var(--ink)] text-white" : "card"}`}
           >
+            <Photo {...a.photo} ratio="aspect-[16/10]" className="!rounded-[20px]" />
+            <div className="flex flex-1 flex-col p-4 pt-7 md:p-7 md:pt-8">
             <span className={`chip-icon ${a.dark ? "!bg-[var(--amber)] !text-[var(--ink)]" : ""}`}>
               <Icon name={a.icon} />
             </span>
@@ -47,6 +52,7 @@ export default function Audiences() {
               <Button href="/order" size="lg" variant={a.dark ? "accent" : "primary"}>
                 {a.cta}
               </Button>
+            </div>
             </div>
           </div>
         ))}

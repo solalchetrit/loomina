@@ -32,6 +32,7 @@ export default function AboutPage() {
       <PageHeader
         title="Tout a commencé avec ma grand-mère"
         text="Loomina est née d’une histoire de famille : une vie qui méritait un livre, et une personne pour qui écrire était devenu trop difficile."
+        photo={{ name: "photos-de-famille", alt: "Une main tient deux vieilles photos de famille." }}
       />
 
       <Section size="sm">

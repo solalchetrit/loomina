@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Icon, { type IconName } from "@/components/ui/Icon";
+import Photo from "@/components/ui/Photo";
 
 /** Conteneur de section : largeur, gouttières et rythme vertical communs. */
 export function Section({
@@ -52,17 +53,27 @@ export function PageHeader({
   eyebrow,
   title,
   text,
+  photo,
   children,
 }: {
   eyebrow?: string;
   title: ReactNode;
   text?: ReactNode;
+  /** Photo d'illustration, à droite du titre sur grand écran, dessous sur téléphone. */
+  photo?: { name: string; alt: string; focus?: string };
   children?: ReactNode;
 }) {
   return (
     <section className="w-full pb-8 pt-32 md:pb-12 md:pt-40">
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
-        <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise" />
+        {photo ? (
+          <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+            <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise" />
+            <Photo {...photo} priority ratio="aspect-[4/3]" className="rise" />
+          </div>
+        ) : (
+          <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise" />
+        )}
         {children}
       </div>
     </section>
