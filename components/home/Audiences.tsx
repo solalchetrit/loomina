@@ -3,13 +3,14 @@ import Icon, { type IconName } from "@/components/ui/Icon";
 import { Section, SectionHead } from "@/components/ui/Section";
 import Photo from "@/components/ui/Photo";
 
-const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]; cta: string; dark?: boolean; photo: { name: string; alt: string; focus?: string } }[] = [
+const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]; cta: string; href: string; dark?: boolean; photo: { name: string; alt: string; focus?: string } }[] = [
   {
     icon: "user",
     title: "Pour raconter votre vie",
     text: "Vous avez des souvenirs à transmettre, mais pas l’envie ni le temps d’écrire. Vous parlez, Loomina écrit.",
     points: ["Vous appelez quand vous voulez", "Vous relisez le récit de chaque appel", "Vous gardez tous les droits sur votre récit"],
     cta: "Commencer mon livre",
+    href: "/order#pour-moi",
     photo: { name: "homme-au-telephone", alt: "Un homme âgé raconte un souvenir au téléphone.", focus: "50% 36%" },
   },
   {
@@ -18,6 +19,7 @@ const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]
     text: "Le cadeau d’un livre qui reste : votre proche raconte, et toute la famille reçoit son histoire.",
     points: ["Vous indiquez son numéro à la commande", "Il appelle à son rythme, sans ordinateur", "Vous suivez son livre au fil des appels, dans l’espace auteur"],
     cta: "Offrir le livre",
+    href: "/order#pour-offrir",
     photo: { name: "grand-mere-calin", alt: "Une petite fille serre sa grand-mère dans ses bras.", focus: "50% 35%" },
     dark: true,
   },
@@ -49,7 +51,7 @@ export default function Audiences() {
               ))}
             </ul>
             <div className="mt-auto pt-8">
-              <Button href="/order" size="lg" variant={a.dark ? "accent" : "primary"}>
+              <Button href={a.href} size="lg" variant={a.dark ? "accent" : "primary"}>
                 {a.cta}
               </Button>
             </div>

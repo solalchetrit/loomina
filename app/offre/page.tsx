@@ -130,7 +130,7 @@ export default function OffrePage() {
         ]}
       />
 
-      <Section>
+      <Section id="detail">
         <SectionHead title="Ce que couvre le prix, en détail" />
         <div className="head-gap grid gap-4 md:grid-cols-3">
           {DETAILS.map((g) => (

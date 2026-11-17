@@ -264,7 +264,9 @@
 }
 
 .prose-loomina h2 {
-  font-size: 1.45rem;
+  font-size: clamp(1.3rem, 1.8vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
   line-height: 1.25;
   margin-top: 2.2em;
   margin-bottom: 0.6em;

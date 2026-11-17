@@ -121,7 +121,7 @@ export default function Compare() {
         <Button href="/order" size="lg">
           Commander mon livre
         </Button>
-        <Button href="/offre" variant="secondary" size="lg">
+        <Button href="/offre#detail" variant="secondary" size="lg">
           Ce que couvre le prix
         </Button>
       </div>

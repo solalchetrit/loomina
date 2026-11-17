@@ -2,7 +2,7 @@ import Button from "@/components/ui/Button";
 
 export default function NotFound() {
   return (
-    <section className="flex min-h-[70svh] w-full items-center px-5 pb-20 pt-32 sm:px-6">
+    <section className="page-top section-b flex min-h-[70svh] w-full items-center px-5 sm:px-6">
       <div className="rise mx-auto w-full max-w-[1240px]">
         <p className="t-eyebrow">Erreur 404</p>
         <h1 className="t-display mt-3 max-w-2xl">Cette page manque au récit</h1>

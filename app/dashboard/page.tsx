@@ -147,7 +147,7 @@ export default function DashboardPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="w-full px-5 pb-20 pt-32 sm:px-6 md:pt-40">
+      <div className="page-top section-b w-full px-5 sm:px-6">
         <div className="mx-auto grid w-full max-w-[1240px] items-start gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <div className="rise">
             <p className="t-eyebrow">Espace auteur</p>
