@@ -303,7 +303,8 @@ export const SCENARIOS: Scenario[] = [
             consignes: 'Vers ta quatrième réponse, demande combien ça coûte.',
         },
         behaviour: { maxRepliques: 10 },
-        attendu: { fin: ['loomina'], loominaSans: ['€', 'euro'] },
+        // Depuis le 17/11/2026, la démonstration répond sur le prix (demande de Solal).
+        attendu: { fin: ['loomina'], loominaDit: ['449'] },
     },
     {
         id: '11-hors-role',
