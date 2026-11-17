@@ -378,6 +378,7 @@ export function buildAssistant({
                 user_id: profile.id,
                 project_id: project.id,
                 phase,
+                politeness: vars.politeness_preference,
                 // Durée souhaitée : le serveur vocal la donne au modèle à chaque réplique.
                 call_minutes: normalizeCallMinutes(meta.call_minutes),
             },

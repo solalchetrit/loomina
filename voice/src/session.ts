@@ -18,6 +18,15 @@ import { timeNote } from '../../lib/loomina/call-length';
 
 const END_MARKER = '##END_CALL##';
 
+/**
+ * Temps d'attente après la fin d'une phrase du narrateur avant que Loomina
+ * réponde. La transcription déclare une phrase finie dès une petite pause :
+ * au premier vrai appel (16/11/2026), Loomina a repris la parole 12 fois
+ * alors que le narrateur n'avait pas fini. S'il reprend pendant ce délai,
+ * sa suite est ajoutée à la même réplique et l'attente recommence.
+ */
+const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 1200);
+
 /** Délai sans premier mot au bout duquel la question est reposée à OpenAI, une fois. */
 const FIRST_WORD_TIMEOUT_MS = 3000;
 
@@ -52,6 +61,7 @@ export class CallSession {
     private generation: AbortController | null = null;
     private silenceTimer: NodeJS.Timeout | null = null;
     private maxTimer: NodeJS.Timeout | null = null;
+    private replyTimer: NodeJS.Timeout | null = null;
     private silenceNudged = false;
     private finished = false;
     private endRequested = false;
@@ -94,8 +104,15 @@ export class CallSession {
 
     async onPrompt(text: string, last: boolean): Promise<void> {
         if (this.finished) return;
-        // Le narrateur parle encore : ce n'est pas un silence.
-        if (!last) return this.armSilenceTimer();
+        // Le narrateur parle encore : ce n'est pas un silence, et la
+        // réponse prévue attend qu'il ait fini.
+        if (!last) {
+            this.cancelPendingReply();
+            // Réponse en préparation mais encore muette : on la laisse tomber,
+            // elle sera refaite avec la suite de ce qu'il dit.
+            if (this.generation && !this.spokenSoFar.trim()) this.abortGeneration();
+            return this.armSilenceTimer();
+        }
         const clean = text.trim();
         if (!clean) return;
 
@@ -103,8 +120,24 @@ export class CallSession {
         // D'abord clore la réponse en cours (gardée telle que dite), puis
         // la phrase du narrateur : l'historique reste dans l'ordre.
         this.abortGeneration();
-        this.turns.push({ role: 'user', message: clean, time: Date.now() });
-        await this.generate();
+        const previous = this.turns[this.turns.length - 1];
+        if (previous?.role === 'user') {
+            // Loomina n'a encore rien dit : c'est la suite de la même réplique.
+            previous.message = `${previous.message} ${clean}`;
+            previous.time = Date.now();
+        } else {
+            this.turns.push({ role: 'user', message: clean, time: Date.now() });
+        }
+        this.cancelPendingReply();
+        this.replyTimer = setTimeout(() => {
+            this.replyTimer = null;
+            void this.generate();
+        }, REPLY_DELAY_MS);
+    }
+
+    private cancelPendingReply(): void {
+        if (this.replyTimer) clearTimeout(this.replyTimer);
+        this.replyTimer = null;
     }
 
     onInterrupt(utteranceUntilInterrupt: string): void {
@@ -133,6 +166,7 @@ export class CallSession {
         setTimeout(() => this.ws?.terminate(), 3000);
         if (this.silenceTimer) clearTimeout(this.silenceTimer);
         if (this.maxTimer) clearTimeout(this.maxTimer);
+        this.cancelPendingReply();
 
         const endedAt = new Date();
         const seconds = Math.round((endedAt.getTime() - this.startedAt.getTime()) / 1000);
@@ -367,7 +401,7 @@ export class CallSession {
         if (this.finished) return;
         if (!this.silenceNudged) {
             this.silenceNudged = true;
-            const nudge = 'Je suis toujours là. Prenez votre temps.';
+            const nudge = this.plan.metadata.politeness === 'tu' ? 'Je suis toujours là. Prends ton temps.' : 'Je suis toujours là. Prenez votre temps.';
             this.sendText(nudge, true);
             this.turns.push({ role: 'bot', message: nudge, time: Date.now() });
             this.silenceTimer = setTimeout(() => void this.onSilence(), config.limits.silenceSeconds * 1000);

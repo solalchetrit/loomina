@@ -112,7 +112,7 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
         const context = normalizeContext((project as Project).context);
 
         if (edition.status === 'planning') {
-            const plan = await planBook(sources, context);
+            const plan = await planBook(sources, context, (profile as Profile | null)?.sensitive_topics);
             return await save({ status: 'writing', plan, chapters: [] });
         }
 
