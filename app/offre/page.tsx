@@ -7,8 +7,9 @@ import Icon, { type IconName } from "@/components/ui/Icon";
 import Button from "@/components/ui/Button";
 import WhatYouGet from "@/components/home/WhatYouGet";
 import Compare from "@/components/home/Compare";
+import Plans from "@/components/Plans";
 import Closing from "@/components/Closing";
-import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
+import { OFFER, GUARANTEE } from "@/config/offer";
 
 const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
   {
@@ -63,25 +64,27 @@ const FAQ = [
 export default function OffrePage() {
   return (
     <>
-      {/* Haut de page : une grande carte sombre, le prix à gauche, les livres à droite. */}
+      {/* Haut de page : une grande carte sombre, le titre à gauche, les livres à droite. Les prix sont dans le tableau, dessous. */}
       <section className="w-full pb-10 pt-28 md:pb-14 md:pt-32">
         <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
           <div className="rise grid grid-cols-1 overflow-hidden rounded-[32px] bg-[var(--ink)] text-white lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
             <div className="flex min-w-0 flex-col justify-center p-7 sm:p-10 lg:p-12">
-              <h1 className="text-balance text-[clamp(2.3rem,4vw,3.4rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-white">
-                Un prix, tout compris
+              <p className="text-[15px] font-bold text-[var(--amber)]">Le livre et le prix</p>
+              <h1 className="mt-3 text-balance text-[clamp(2.6rem,4.6vw,4rem)] font-extrabold leading-[1] tracking-[-0.04em] text-white">
+                Votre livre, tout compris
               </h1>
-              <p className="mt-5 max-w-md text-[18px] leading-relaxed text-[#cfcfc8]">
+              <p className="mt-6 max-w-md text-[18px] leading-relaxed text-[#cfcfc8]">
                 Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus.
               </p>
-              <p className="mt-8 text-[76px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[92px]">
-                {OFFER.price}
-                <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
+              <p className="mt-6 text-[20px] font-bold text-white">
+                À partir de{" "}
+                <span className="text-[var(--amber)]">
+                  {OFFER.price} {OFFER.currencySymbol}
+                </span>
               </p>
-              <p className="mt-4 text-[16px] text-[#cfcfc8]">Paiement unique. {OFFER.delivery}.</p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Button href="/order" variant="accent" size="lg">
-                  Commander
+              <div className="mt-8 flex flex-col items-start gap-4">
+                <Button href="#formules" variant="accent" size="lg">
+                  Comparer les formules
                 </Button>
                 <Button href={`tel:${SITE.phone}`} variant="ghost" className="!text-white !decoration-white/40 hover:!decoration-white">
                   Essayer d’abord gratuitement
@@ -101,39 +104,21 @@ export default function OffrePage() {
             </div>
             <div className="min-w-0 self-center p-4 pt-0 sm:p-5 sm:pt-0 lg:p-6 lg:pl-0">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[22px]">
-              <Image
-                src="/photos/collection-de-livres.jpg"
-                alt="Quatre livres Loomina reliés, aux couvertures en toile beige, bleue, verte et bordeaux."
-                fill
-                priority
-                sizes="(min-width: 1024px) 640px, 100vw"
-                className="object-cover"
-              />
+                <Image
+                  src="/photos/collection-de-livres.jpg"
+                  alt="Quatre livres Loomina reliés, aux couvertures en toile beige, bleue, verte et bordeaux."
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 640px, 100vw"
+                  className="object-cover"
+                />
               </div>
             </div>
           </div>
-
-        <div className="card mt-4 p-6 md:p-9" data-reveal>
-          <p className="text-[16px] font-bold">Ce qui est compris</p>
-          <ul className="mt-5 grid gap-x-10 gap-y-5 md:grid-cols-2">
-            {INCLUDED.map((it) => (
-              <li key={it.title} className="flex gap-3 text-[16px] leading-snug">
-                <Icon name="check" size={20} className="mt-0.5 shrink-0 text-[var(--amber-ink)]" />
-                <span>
-                  <b>{it.title}</b>, {it.detail}
-                </span>
-              </li>
-            ))}
-            <li className="flex gap-3 text-[16px] leading-snug">
-              <Icon name="gift" size={20} className="mt-0.5 shrink-0 text-[var(--amber-ink)]" />
-              <span>
-                <b>Pour l’offrir</b>, votre proche reçoit le numéro et appelle quand il le souhaite
-              </span>
-            </li>
-          </ul>
-        </div>
         </div>
       </section>
+
+      <Plans />
 
       <WhatYouGet showDetailLink={false} photo="mains" />
 
