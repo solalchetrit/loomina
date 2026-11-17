@@ -31,7 +31,8 @@ export interface ProjectOverview {
   family: { name: string; relation: string; deceased?: boolean }[];
   themes: string[];
   openQuestions: string[];
-  calls: { date: string; minutes: number | null; summary: string | null }[];
+  /** `title` : le titre du récit tiré de l'appel, pour s'y retrouver d'un coup d'œil. */
+  calls: { date: string; minutes: number | null; title: string | null; summary: string | null }[];
 }
 
 export interface Overview {

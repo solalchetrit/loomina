@@ -234,10 +234,9 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
         {byPeriod && (
           <p className="t-small mt-3">Le texte des récits ne change pas : seul l’ordre suit votre vie.</p>
         )}
-      </div>
 
-      <nav aria-label="Sommaire" className="card mt-4 px-5 py-4 md:px-7">
-        <p className="pt-2 text-[15px] font-bold text-[var(--ink-3)]">Sommaire</p>
+      <nav aria-label="Sommaire" className="mt-8 border-t border-[var(--line-soft)] pt-6">
+        <p className="text-[15px] font-bold text-[var(--ink-3)]">Sommaire</p>
         {sections.map((section) => (
         <div key={section.title ?? "tous"}>
         {section.title && <p className="mt-4 text-[15px] font-bold text-[var(--amber-ink)]">{section.title}</p>}
@@ -255,6 +254,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
         </div>
         ))}
       </nav>
+      </div>
 
       <div className="mt-4 space-y-4">
         {sections.flatMap((section) => [

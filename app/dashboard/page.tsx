@@ -7,6 +7,8 @@ import FamilySpace from "@/components/author/FamilySpace";
 import Button from "@/components/ui/Button";
 import { SITE } from "@/config/site";
 import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
+// Vide en ligne ; dans la copie hébergée sur Claude, ouvre l'espace auteur sur le livre d'exemple.
+import "@/lib/loomina/artifact-hook";
 
 type LoginStep = "phone" | "otp";
 
