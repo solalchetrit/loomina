@@ -9,6 +9,8 @@ export interface Prefs {
   smsChapter: boolean;
   /** Rendez-vous d'appel réguliers (1 = lundi … 7 = dimanche, heure de Paris). */
   callSchedule: { active: boolean; days: number[]; time: string };
+  /** Durée d'appel souhaitée, en minutes (15, 20, 30 ou 45). */
+  callMinutes: number;
 }
 
 export interface ProjectOverview {

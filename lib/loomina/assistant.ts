@@ -18,6 +18,7 @@ import { readPhaseState, spokenPhase, readTopics, openTopics, pendingAxes } from
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
+import { normalizeCallMinutes } from './call-length';
 
 /**
  * LE réglage qui change tout côté coût.
@@ -292,7 +293,10 @@ Relis-la : elle contient UN SEUL point d'interrogation, à la fin.
 - Mauvais : « Vous le regardiez travailler, parfois ? Racontez-moi un moment précis. Qu'est-ce qu'il vous disait ? »
 - Bon : « Racontez-moi un moment où vous le regardiez travailler. »
 - Mauvais : « Où était-ce, et à quoi ressemblait la maison ? » Bon : « À quoi ressemblait la maison ? »
-Si deux questions te viennent, garde la plus ouverte et jette l'autre : tu la poseras plus tard.`;
+Si deux questions te viennent, garde la plus ouverte et jette l'autre : tu la poseras plus tard.
+Relis aussi tes répliques précédentes : si l'une des deux dernières commençait par « Vous vous souvenez » ou « Vous vous rappelez » (ou « Tu te souviens »), n'emploie pas ces mots. Demande plutôt directement :
+- « À quoi ressemblait la cour ? » plutôt que « Vous vous souvenez de la cour ? »
+- « Qui était là ce soir-là ? », « Qu'est-ce qu'elle vous a dit ? », « Racontez-moi la suite. »`;
 
 /**
  * Construit la charge utile complète attendue par Vapi.
@@ -377,6 +381,9 @@ export function buildAssistant({
                 user_id: profile.id,
                 project_id: project.id,
                 phase,
+                politeness: vars.politeness_preference,
+                // Durée souhaitée : le serveur vocal la donne au modèle à chaque réplique.
+                call_minutes: normalizeCallMinutes(meta.call_minutes),
             },
         },
     };

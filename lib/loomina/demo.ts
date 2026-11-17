@@ -104,6 +104,7 @@ const state = {
         sensitiveTopics: ['La maladie de Pierre'],
         smsChapter: true,
         callSchedule: { active: true, days: [2], time: '15:00' } as { active: boolean; days: number[]; time: string },
+        callMinutes: 30,
     },
     openQuestions: [
         'Raconte-nous ta rencontre avec papa à la poste',

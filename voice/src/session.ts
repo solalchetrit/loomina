@@ -14,8 +14,28 @@ import { config } from './config.ts';
 import type { CallPlan } from './plan.ts';
 import { buildEndOfCallReport, deliverReport } from './report.ts';
 import type { TurnRecord } from './report.ts';
+import { timeNote } from '../../lib/loomina/call-length';
 
 const END_MARKER = '##END_CALL##';
+
+/**
+ * Temps d'attente après la fin d'une phrase du narrateur avant que Loomina
+ * réponde. La transcription déclare une phrase finie dès une petite pause :
+ * au premier vrai appel (16/11/2026), Loomina a repris la parole 12 fois
+ * alors que le narrateur n'avait pas fini. S'il reprend pendant ce délai,
+ * sa suite est ajoutée à la même réplique et l'attente recommence.
+ */
+const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 800);
+/**
+ * Le modèle est interrogé tout de suite : l'attente ci-dessus et le temps
+ * de réflexion du modèle (environ 1 s) se chevauchent au lieu de
+ * s'additionner. Rien n'est dit avant la fin de l'attente ; si le
+ * narrateur reprend entre-temps, la réponse préparée est jetée.
+ * Une question (« Ça va, et toi ? ») attend une réponse : pas d'attente.
+ */
+function holdFor(text: string): number {
+    return /\?\s*$/.test(text) ? 0 : REPLY_DELAY_MS;
+}
 
 /** Délai sans premier mot au bout duquel la question est reposée à OpenAI, une fois. */
 const FIRST_WORD_TIMEOUT_MS = 3000;
@@ -51,6 +71,10 @@ export class CallSession {
     private generation: AbortController | null = null;
     private silenceTimer: NodeJS.Timeout | null = null;
     private maxTimer: NodeJS.Timeout | null = null;
+    private replyTimer: NodeJS.Timeout | null = null;
+    /** Moment où la dernière phrase du narrateur a été reçue (mesure du délai). */
+    private heardAt = 0;
+    private readonly replyDelaysMs: number[] = [];
     private silenceNudged = false;
     private finished = false;
     private endRequested = false;
@@ -85,16 +109,44 @@ export class CallSession {
             this.turns.push({ role: 'bot', message: this.plan.firstMessage, time: Date.now() });
         }
         this.armSilenceTimer();
+        this.warmUp();
         this.maxTimer = setTimeout(() => {
             console.info(`[${this.callSid}] durée maximale atteinte`);
             void this.sayAndEnd("Nous avons bien travaillé aujourd'hui. Reprenons la prochaine fois. À bientôt !", 'max-duration');
         }, this.plan.maxSeconds * 1000);
     }
 
+    /**
+     * Pendant que Twilio dit le bonjour, une requête d'un seul mot avec le
+     * même prompt : OpenAI garde ce début en cache, et la première vraie
+     * réponse (« Ça va, et toi ? ») part sans la lenteur d'un premier appel.
+     */
+    private warmUp(): void {
+        if (process.env.VOICE_WARMUP === 'off') return;
+        const t0 = Date.now();
+        this.openai.chat.completions
+            .create({
+                model: config.openai.model,
+                ...(config.openai.model.startsWith('gpt-5')
+                    ? { reasoning_effort: 'none' as const, max_completion_tokens: 1 }
+                    : { max_tokens: 1 }),
+                messages: this.chatMessages(),
+            })
+            .then((r) => console.info(`[${this.callSid}] préchauffage ${Date.now() - t0} ms (${r.usage?.prompt_tokens ?? '?'} jetons)`))
+            .catch(() => {});
+    }
+
     async onPrompt(text: string, last: boolean): Promise<void> {
         if (this.finished) return;
-        // Le narrateur parle encore : ce n'est pas un silence.
-        if (!last) return this.armSilenceTimer();
+        // Le narrateur parle encore : ce n'est pas un silence, et la
+        // réponse prévue attend qu'il ait fini.
+        if (!last) {
+            this.cancelPendingReply();
+            // Réponse en préparation mais encore muette : on la laisse tomber,
+            // elle sera refaite avec la suite de ce qu'il dit.
+            if (this.generation && !this.spokenSoFar.trim()) this.abortGeneration();
+            return this.armSilenceTimer();
+        }
         const clean = text.trim();
         if (!clean) return;
 
@@ -102,8 +154,22 @@ export class CallSession {
         // D'abord clore la réponse en cours (gardée telle que dite), puis
         // la phrase du narrateur : l'historique reste dans l'ordre.
         this.abortGeneration();
-        this.turns.push({ role: 'user', message: clean, time: Date.now() });
-        await this.generate();
+        const previous = this.turns[this.turns.length - 1];
+        if (previous?.role === 'user') {
+            // Loomina n'a encore rien dit : c'est la suite de la même réplique.
+            previous.message = `${previous.message} ${clean}`;
+            previous.time = Date.now();
+        } else {
+            this.turns.push({ role: 'user', message: clean, time: Date.now() });
+        }
+        this.cancelPendingReply();
+        this.heardAt = Date.now();
+        void this.generate(this.heardAt + holdFor(clean));
+    }
+
+    private cancelPendingReply(): void {
+        if (this.replyTimer) clearTimeout(this.replyTimer);
+        this.replyTimer = null;
     }
 
     onInterrupt(utteranceUntilInterrupt: string): void {
@@ -132,12 +198,14 @@ export class CallSession {
         setTimeout(() => this.ws?.terminate(), 3000);
         if (this.silenceTimer) clearTimeout(this.silenceTimer);
         if (this.maxTimer) clearTimeout(this.maxTimer);
+        this.cancelPendingReply();
 
         const endedAt = new Date();
         const seconds = Math.round((endedAt.getTime() - this.startedAt.getTime()) / 1000);
         console.info(
             `[${this.callSid}] fin (${reason}) — ${seconds}s, ${this.turns.length} tours, ` +
-            `latence modèle moy. ${avg(this.modelLatenciesMs)} ms, ${this.interruptions} interruption(s)`
+            `latence modèle moy. ${avg(this.modelLatenciesMs)} ms, délai de réponse moy. ${avg(this.replyDelaysMs)} ms ` +
+            `(max ${this.replyDelaysMs.length ? Math.max(...this.replyDelaysMs) : 0} ms), ${this.interruptions} interruption(s)`
         );
 
         if (this.plan.demo) {
@@ -177,7 +245,7 @@ export class CallSession {
     // Génération
     // ------------------------------------------------------------
 
-    private async generate(): Promise<void> {
+    private async generate(releaseAt = 0): Promise<void> {
         const controller = new AbortController();
         this.generation = controller;
         const t0 = Date.now();
@@ -203,6 +271,16 @@ export class CallSession {
             this.spokenSoFar = spoken;
         };
         this.spokenSoFar = '';
+        // Ne rien dire avant `releaseAt` (voir holdFor). La lecture du flux
+        // est suspendue pendant ce temps ; les morceaux attendent.
+        let released = releaseAt <= Date.now();
+        const hold = async () => {
+            if (released) return;
+            const wait = releaseAt - Date.now();
+            if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+            released = true;
+            if (this.heardAt) this.replyDelaysMs.push(Date.now() - this.heardAt);
+        };
         // Le délai du client OpenAI ne couvre que l'arrivée de la réponse :
         // un flux qui s'arrête en route n'était jamais coupé. Sans nouveau
         // morceau pendant 8 s, on abandonne et on s'excuse.
@@ -266,6 +344,8 @@ export class CallSession {
                         if (idx >= 0) {
                             this.endRequested = true;
                             const before = pending.slice(0, idx);
+                            await hold();
+                            if (controller.signal.aborted) return;
                             say(before);
                             pending = '';
                             break;
@@ -273,6 +353,10 @@ export class CallSession {
                         // Garder un éventuel début de marqueur ("##END") en attente.
                         const keep = partialMarkerLength(pending);
                         const emit = pending.slice(0, pending.length - keep);
+                        if (emit && !released) {
+                            await hold();
+                            if (controller.signal.aborted) return;
+                        }
                         say(emit);
                         pending = pending.slice(pending.length - keep);
                     }
@@ -290,6 +374,8 @@ export class CallSession {
                 throw new Error('flux OpenAI muet depuis 8 s');
             }
 
+            if (controller.signal.aborted) return;
+            await hold();
             if (controller.signal.aborted) return;
             if (pending && !pending.includes('#')) say(pending);
             this.sendText('', true);
@@ -327,7 +413,14 @@ export class CallSession {
             role: t.role === 'bot' ? 'assistant' : 'user',
             content: t.message,
         }));
-        return [{ role: 'system', content: this.plan.systemPrompt }, ...history];
+        const messages: ChatMessage[] = [{ role: 'system', content: this.plan.systemPrompt }, ...history];
+        // Le modèle ne voit pas l'heure. La note va en dernier : le début de
+        // la conversation reste identique d'une réplique à l'autre (cache).
+        if (this.plan.targetMinutes) {
+            const elapsed = (Date.now() - this.startedAt.getTime()) / 1000;
+            messages.push({ role: 'system', content: timeNote(elapsed, this.plan.targetMinutes) });
+        }
+        return messages;
     }
 
     /**
@@ -359,7 +452,7 @@ export class CallSession {
         if (this.finished) return;
         if (!this.silenceNudged) {
             this.silenceNudged = true;
-            const nudge = 'Je suis toujours là. Prenez votre temps.';
+            const nudge = this.plan.metadata.politeness === 'tu' ? 'Je suis toujours là. Prends ton temps.' : 'Je suis toujours là. Prenez votre temps.';
             this.sendText(nudge, true);
             this.turns.push({ role: 'bot', message: nudge, time: Date.now() });
             this.silenceTimer = setTimeout(() => void this.onSilence(), config.limits.silenceSeconds * 1000);

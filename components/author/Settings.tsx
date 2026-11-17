@@ -4,6 +4,7 @@ import { useState } from "react";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import type { Prefs } from "./types";
+import { CALL_MINUTES_OPTIONS } from "@/lib/loomina/call-length";
 
 const DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 const DAY_LABELS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
@@ -224,6 +225,27 @@ export default function Settings({
               {form.callSchedule.days.length
                 ? "Loomina appellera le numéro de votre commande à ces moments-là. Vous pouvez toujours appeler quand vous voulez."
                 : "Choisissez un ou plusieurs jours. Sans jour choisi, c’est vous qui appelez, quand vous voulez."}
+            </p>
+          </fieldset>
+          <fieldset>
+            <legend className="field-label">Durée souhaitée d’un appel</legend>
+            <div className="flex flex-wrap gap-2">
+              {CALL_MINUTES_OPTIONS.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  aria-pressed={form.callMinutes === m}
+                  onClick={() => update({ callMinutes: m })}
+                  className={`press min-h-12 flex-1 rounded-full px-4 text-[16px] font-bold ${
+                    form.callMinutes === m ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
+                  }`}
+                >
+                  {m} min
+                </button>
+              ))}
+            </div>
+            <p className="t-small mt-2">
+              À peu près : Loomina ne propose pas d’arrêter avant, et une fois ce temps passé, elle laisse finir le souvenir en cours. Vous pouvez toujours arrêter quand vous voulez.
             </p>
           </fieldset>
           <fieldset>
