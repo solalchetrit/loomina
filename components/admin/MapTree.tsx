@@ -203,6 +203,115 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
     return () => el.removeEventListener("wheel", onWheel);
   }, [mode]);
 
+  // ---- Flèches du clavier : passer d'une case à sa voisine ----
+  const dimmedNow = useCallback((p: Placed) => (filter === "todo" ? !p.node.status : filter !== "all" && p.group !== filter), [filter]);
+
+  /** Les cases qu'on peut atteindre (celles que le filtre n'estompe pas), avec leur rectangle. */
+  const reachable = useCallback(() => {
+    const out: Array<{ id: string; x: number; y: number; w: number; h: number }> = [];
+    for (const p of L.placed.values()) if (!dimmedNow(p)) out.push({ id: p.node.id, x: p.x, y: p.y, w: NW, h: NH });
+    for (const r of L.roots) out.push({ id: r.root.id, x: r.x, y: r.y, w: RW, h: NH });
+    return out;
+  }, [L, dimmedNow]);
+
+  const neighbour = useCallback(
+    (id: string, dir: string) => {
+      const all = reachable();
+      const ok = (i: string) => all.find((o) => o.id === i) ?? null;
+      const c = ok(id);
+      if (!c) return null;
+      const rt = L.roots.find((r) => r.root.id === id);
+      const pl = L.placed.get(id);
+      if (rt && dir === "ArrowDown") {
+        // D'un point de départ : son point de départ du dessous, sinon la première case de sa première colonne.
+        const kid = L.roots.find((r) => r.root.from === id);
+        if (kid && ok(kid.root.id)) return ok(kid.root.id);
+        for (const k of rt.root.over) {
+          const first = groups.find((g) => g.key === k)?.nodes.find((n) => ok(n.id));
+          if (first) return ok(first.id);
+        }
+      }
+      if (rt && dir === "ArrowUp" && rt.root.from) return ok(rt.root.from);
+      if (rt && (dir === "ArrowLeft" || dir === "ArrowRight")) {
+        const s = dir === "ArrowRight" ? 1 : -1;
+        const r = L.roots.filter((o) => o.root.row === rt.root.row && (o.x - rt.x) * s > 1).sort((a, b) => (a.x - b.x) * s)[0];
+        if (r) return ok(r.root.id);
+      }
+      if (pl && dir === "ArrowUp" && !all.some((o) => { const q = L.placed.get(o.id); return q && q.group === pl.group && q.y < pl.y; })) {
+        // En haut d'une colonne : on remonte au point de départ qui la coiffe.
+        const r = L.roots.filter((o) => o.root.over.includes(pl.group)).sort((a, b) => b.root.row - a.root.row)[0];
+        if (r) return ok(r.root.id);
+      }
+      // Sinon : la case la plus proche dans la direction, en préférant celles qui sont bien alignées.
+      const cx = c.x + c.w / 2;
+      const cy = c.y + c.h / 2;
+      let best: (typeof all)[number] | null = null;
+      let bs = Infinity;
+      for (const o of all) {
+        if (o.id === id) continue;
+        const dx = o.x + o.w / 2 - cx;
+        const dy = o.y + o.h / 2 - cy;
+        let main: number;
+        let side: number;
+        if (dir === "ArrowDown") { if (dy <= 1) continue; main = dy; side = Math.abs(dx); }
+        else if (dir === "ArrowUp") { if (dy >= -1) continue; main = -dy; side = Math.abs(dx); }
+        else if (dir === "ArrowRight") { if (dx <= 1) continue; main = dx; side = Math.abs(dy); }
+        else { if (dx >= -1) continue; main = -dx; side = Math.abs(dy); }
+        const s = main + side * 3;
+        if (s < bs) { bs = s; best = o; }
+      }
+      return best;
+    },
+    [L, groups, reachable]
+  );
+
+  /** Ramène la case à l'écran (à gauche du détail), et zoome si la carte est trop petite pour lire. */
+  const reveal = useCallback(
+    (id: string) => {
+      const el = frame.current;
+      const o = reachable().find((i) => i.id === id);
+      if (!el || !o) return;
+      const fw = el.clientWidth;
+      const fh = el.clientHeight;
+      const right = fw >= 700 ? fw - 370 : fw - 16;
+      const bottom = fh - 70;
+      setView((v) => {
+        const z = v.z < 0.55 ? 0.8 : v.z;
+        const sx = o.x * z + v.x;
+        const sy = o.y * z + v.y;
+        if (z === v.z && sx >= 16 && sx + o.w * z <= right && sy >= 16 && sy + o.h * z <= bottom) return v;
+        return { z, x: (16 + right) / 2 - (o.x + o.w / 2) * z, y: (16 + bottom) / 2 - (o.y + o.h / 2) * z };
+      });
+    },
+    [reachable]
+  );
+
+  const go = useCallback(
+    (id: string | null) => {
+      setSelected(id);
+      if (id) reveal(id);
+    },
+    [reveal]
+  );
+
+  useEffect(() => {
+    if (mode !== "schema") return;
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "Escape") return setSelected(null);
+      if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) return;
+      e.preventDefault();
+      const fr = frame.current?.getBoundingClientRect();
+      if (fr && (fr.top < 0 || fr.bottom > window.innerHeight)) frame.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      const next = selected ? neighbour(selected, e.key) : reachable().find((o) => o.id === roots[0]?.id);
+      if (next) go(next.id);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mode, selected, neighbour, reachable, roots, go]);
+
   const sel = selected ? L.placed.get(selected) : null;
   const selRoot = selected ? L.roots.find((r) => r.root.id === selected) : null;
   const linked = new Set<string>();
@@ -429,7 +538,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
                     const other = L.placed.get(l.from === detail.node.id ? l.to : l.from);
                     const og = groups.find((g) => g.key === other?.group);
                     return (
-                      <button key={l.from + l.to} type="button" onClick={() => setSelected(other?.node.id ?? null)} className="mt-3 block w-full rounded-[12px] bg-[var(--amber-soft)] px-3 py-2 text-left text-[14px] font-semibold text-[var(--amber-deep)]">
+                      <button key={l.from + l.to} type="button" onClick={() => go(other?.node.id ?? null)} className="mt-3 block w-full rounded-[12px] bg-[var(--amber-soft)] px-3 py-2 text-left text-[14px] font-semibold text-[var(--amber-deep)]">
                         {l.from === detail.node.id ? "→" : "←"} {og?.label} · {other?.node.label} <span className="font-normal">({l.label})</span>
                       </button>
                     );
@@ -503,7 +612,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
       )}
 
       <p className="t-small mt-4">
-        {counts.total} cases · {counts.todo} à faire · {counts.partial} à surveiller. Faites glisser pour vous déplacer, Ctrl ou ⌘ + molette pour zoomer, cliquez sur une case pour son détail.
+        {counts.total} cases · {counts.todo} à faire · {counts.partial} à surveiller. Faites glisser pour vous déplacer, Ctrl ou ⌘ + molette pour zoomer, cliquez sur une case pour son détail, puis passez à la voisine avec les flèches du clavier.
       </p>
     </div>
   );
