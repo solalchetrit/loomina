@@ -64,25 +64,25 @@ export default function OffrePage() {
   return (
     <>
       {/* Haut de page : une grande carte sombre. Le titre et le prix à gauche, les livres à droite. */}
-      <section className="w-full pb-10 pt-24 md:pb-14 md:pt-28">
-        <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
-          <div className="rise grid grid-cols-1 overflow-hidden rounded-[32px] bg-[var(--ink)] text-white lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-            <div className="flex min-w-0 flex-col justify-center p-7 sm:p-9 lg:px-11 lg:py-9">
+      <section className="flex min-h-[100svh] w-full flex-col pb-5 pt-[88px] md:pb-8 md:pt-28">
+        <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col px-4 sm:px-6">
+          <div className="rise grid flex-1 grid-cols-1 content-center overflow-hidden rounded-[28px] bg-[var(--ink)] text-white md:rounded-[32px] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+            <div className="flex min-w-0 flex-col justify-center p-6 pb-5 sm:p-9 lg:px-12 lg:py-10">
               <p className="text-[14px] font-bold text-[var(--amber)]">Le livre et le prix</p>
-              <h1 className="mt-2 text-[clamp(2.1rem,3.3vw,2.9rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-white">
+              <h1 className="mt-2 text-balance text-[clamp(2rem,3.6vw,3.4rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-white">
                 Votre livre, tout compris
               </h1>
-              <p className="mt-4 max-w-lg text-[16px] leading-relaxed text-[#cfcfc8]">
+              <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-[#cfcfc8] md:mt-5 md:text-[17px]">
                 Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus.
               </p>
-              <div className="mt-6 flex items-end gap-4">
-                <p className="text-[52px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[60px]">
+              <div className="mt-5 flex items-end gap-4 md:mt-7">
+                <p className="text-[48px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[68px]">
                   {OFFER.price}
                   <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
                 </p>
                 <p className="max-w-[13rem] text-[14px] leading-snug text-[#cfcfc8]">Paiement unique. {OFFER.delivery}.</p>
               </div>
-              <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 md:mt-7">
                 <Button href="/order" variant="accent">
                   Commander
                 </Button>
@@ -90,7 +90,7 @@ export default function OffrePage() {
                   Essayer d’abord gratuitement
                 </Button>
               </div>
-              <p className="mt-5 flex items-center gap-3 text-[15px] text-white">
+              <p className="mt-4 flex items-center gap-3 text-[15px] text-white md:mt-6">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
                   <Icon name="check" size={14} />
                 </span>
@@ -102,8 +102,8 @@ export default function OffrePage() {
                 </span>
               </p>
             </div>
-            <div className="min-w-0 self-center p-4 pt-0 sm:p-5 sm:pt-0 lg:p-5 lg:pl-0">
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[20px]">
+            <div className="min-w-0 self-center p-3 pt-0 sm:p-5 sm:pt-0 lg:p-6 lg:pl-0">
+              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[20px] lg:aspect-[4/3]">
                 <Image
                   src="/photos/collection-de-livres.jpg"
                   alt="Quatre livres Loomina reliés, aux couvertures en toile beige, bleue, verte et bordeaux."
