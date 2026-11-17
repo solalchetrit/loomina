@@ -455,7 +455,7 @@ export class CallSession {
             const nudge = this.plan.metadata.politeness === 'tu' ? 'Je suis toujours là. Prends ton temps.' : 'Je suis toujours là. Prenez votre temps.';
             this.sendText(nudge, true);
             this.turns.push({ role: 'bot', message: nudge, time: Date.now() });
-            this.silenceTimer = setTimeout(() => void this.onSilence(), config.limits.silenceSeconds * 1000);
+            this.silenceTimer = setTimeout(() => void this.onSilence(), config.limits.hangupSilenceSeconds * 1000);
             return;
         }
         await this.sayAndEnd('Je vous laisse. Rappelez-moi quand vous voulez, je serai là. À bientôt !', 'silence-timeout');

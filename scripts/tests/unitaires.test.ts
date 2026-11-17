@@ -213,7 +213,7 @@ test('durée souhaitée : une fois le temps atteint, elle attend la fin du sujet
     assert.doesNotMatch(note, /ne propose pas d'arrêter/);
 });
 
-test('durée souhaitée : le plafond laisse le temps de finir le sujet', () => {
-    assert.equal(hardLimitSeconds(20, 2700), 2700);
-    assert.equal(hardLimitSeconds(45, 2700), 65 * 60);
+test('durée souhaitée : le plafond est de 1 h 30, quelle que soit la durée souhaitée', () => {
+    assert.equal(hardLimitSeconds(20, 2700), 90 * 60);
+    assert.equal(hardLimitSeconds(45, 5400), 90 * 60);
 });
