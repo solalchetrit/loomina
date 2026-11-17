@@ -6,6 +6,8 @@ import { fmtDate, fmtNumber } from "@/lib/admin/format";
 import type { Tone } from "@/lib/admin/format";
 import { PHASE_LABELS, toPhase } from "@/lib/loomina/phases";
 import { OFFER } from "@/config/offer";
+import { realRevenue } from "@/lib/admin/revenue";
+import { fmtEur } from "@/lib/admin/costs";
 import { Badge, Panel, Stat, Empty, PageHeader, Avatar, Progress } from "@/components/admin/ui";
 
 export const metadata = { title: "Suivi client" };
@@ -84,6 +86,8 @@ export default async function AdminCrm({ searchParams }: { searchParams: Promise
   const done = clients.filter((c) => c.health === "termine");
   const followUp = clients.filter((c) => c.health === "relancer" || c.health === "inactif" || c.failedEvents > 0);
   const paid = clients.filter((c) => c.paid).length;
+  // Le montant réellement encaissé, lu dans Stripe (null si Stripe ne répond pas).
+  const revenue = await realRevenue(clients.map((c) => c.stripeSessionId).filter((s): s is string => !!s));
   const gifts = clients.filter((c) => c.isGift).length;
   const pct = (n: number) => (total ? Math.round((100 * n) / total) : 0);
 
@@ -166,7 +170,9 @@ export default async function AdminCrm({ searchParams }: { searchParams: Promise
         <Panel icon="card" title="Commandes par mois">
           <Bars unit="commandes" data={months.map((m) => ({ label: m.label, value: m.orders }))} />
           <p className="t-small mt-4">
-            {paid} commande(s) payée(s) par Stripe, soit environ {fmtNumber(paid * OFFER.price)} € au prix de {OFFER.price} € (avant codes promo et remboursements : le montant exact est dans Stripe).
+            {revenue
+              ? `${revenue.orders} commande(s) payée(s) : ${fmtEur(revenue.collected)} encaissés dans Stripe${revenue.discounts > 0 ? `, après ${fmtEur(revenue.discounts)} de codes promo` : ""}${revenue.refunded > 0 ? `, dont ${fmtEur(revenue.refunded)} remboursés. Reste ${fmtEur(revenue.net)}` : ""}.`
+              : `${paid} commande(s) payée(s) par Stripe, soit environ ${fmtNumber(paid * OFFER.price)} € au prix de ${OFFER.price} € (Stripe ne répond pas : montant estimé, avant codes promo et remboursements).`}
           </p>
         </Panel>
       </div>

@@ -288,6 +288,8 @@ export interface CrmClient {
     orderedAt: string;
     isGift: boolean;
     paid: boolean;
+    /** Le paiement Stripe lié au livre (pour lire le montant réel). */
+    stripeSessionId: string | null;
     phase: number | null;
     progress: number;
     realCalls: number;
@@ -366,6 +368,7 @@ export async function getCrm(now = Date.now()): Promise<Crm> {
             orderedAt,
             isGift: meta.is_gift === true,
             paid: Boolean(project?.stripe_session_id),
+            stripeSessionId: (project?.stripe_session_id as string | null | undefined) ?? null,
             phase,
             progress: Number(project?.phase_progress ?? 0),
             realCalls: real.length,
