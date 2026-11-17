@@ -134,7 +134,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
 
   const { book, chapters } = state;
   const byNumber = new Map(chapters.map((c) => [c.number, c]));
-  // Vue par thèmes : les parties du plan, dans l’ordre de lecture proposé.
+  // Vue par périodes : les parties du plan, dans l'ordre de la vie.
   const sections =
     byPeriod && plan
       ? plan.parts.map((p) => ({ title: p.title as string | null, chapters: p.chapters.map((n) => byNumber.get(n)).filter((c): c is Chapter => !!c) }))
@@ -215,7 +215,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
                 onClick={() => (plan ? setByPeriod(true) : arrange())}
                 className={`press min-h-11 rounded-full px-4 text-[15px] font-bold ${byPeriod ? "bg-[var(--ink)] text-white" : ""}`}
               >
-                Par thèmes
+                Par périodes de vie
               </button>
             </div>
             {plan && (stale || byPeriod) && (
@@ -232,7 +232,7 @@ export default function LiveBook({ onUnauthorized }: { onUnauthorized: () => voi
           </div>
         )}
         {byPeriod && (
-          <p className="t-small mt-3">Le texte des récits ne change pas : ils sont seulement regroupés par thème.</p>
+          <p className="t-small mt-3">Le texte des récits ne change pas : seul l’ordre suit votre vie.</p>
         )}
       </div>
 
