@@ -25,7 +25,7 @@ export default function Photo({
   priority?: boolean;
   /**
    * Montre la photo entière, sans la recadrer. Donner son format (par exemple "aspect-[4/5]") :
-   * le reste du cadre reprend ses couleurs, floutées, et ses bords s'y fondent sans démarcation.
+   * de chaque côté, le cadre prolonge la colonne de bord de la photo : pas de démarcation.
    */
   contain?: false | string;
   className?: string;
@@ -34,13 +34,15 @@ export default function Photo({
     <div className={`relative overflow-hidden rounded-[28px] bg-[var(--line)] ${ratio} ${className}`}>
       {contain ? (
         <>
-          <Image src={`/photos/${name}.jpg`} alt="" aria-hidden fill sizes="200px" className="scale-[2] object-cover blur-2xl" />
+          {/* Le fond : la première et la dernière colonne de la photo, étirées jusqu'aux bords du cadre. */}
+          <div aria-hidden className="absolute inset-y-0 left-0 w-1/2 overflow-hidden">
+            <Image src={`/photos/${name}.jpg`} alt="" fill sizes="200px" className="!w-[20000%] !max-w-none object-fill" />
+          </div>
+          <div aria-hidden className="absolute inset-y-0 right-0 w-1/2 overflow-hidden">
+            <Image src={`/photos/${name}.jpg`} alt="" fill sizes="200px" className="!left-auto !right-0 !w-[20000%] !max-w-none object-fill" />
+          </div>
           <div
             className={`absolute inset-y-0 left-1/2 -translate-x-1/2 ${contain}`}
-            style={{
-              maskImage: "linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent)",
-              WebkitMaskImage: "linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent)",
-            }}
           >
             <Image src={`/photos/${name}.jpg`} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
           </div>

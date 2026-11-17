@@ -2,11 +2,11 @@ import Link from "next/link";
 import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
 import Accordion from "@/components/ui/Accordion";
 import Icon, { type IconName } from "@/components/ui/Icon";
-import OfferCard from "@/components/OfferCard";
+import Button from "@/components/ui/Button";
 import WhatYouGet from "@/components/home/WhatYouGet";
 import Compare from "@/components/home/Compare";
 import Closing from "@/components/Closing";
-import { OFFER, GUARANTEE } from "@/config/offer";
+import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
 
 const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
   {
@@ -64,10 +64,51 @@ export default function OffrePage() {
       <PageHeader
         title="Un prix, tout compris"
         text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus."
-        photo={{ name: "lecture", alt: "Une mère lit un livre à sa fille, assises sur un lit.", ratio: "aspect-[16/9]" }}
+        photo={{ name: "lecture", alt: "Une mère lit un livre à sa fille, assises sur un lit.", ratio: "aspect-[16/10]" }}
+        badge={
+          <div className="rounded-[18px] bg-white px-5 py-4 shadow-[var(--shadow-bar)]">
+            <p className="flex items-center gap-2.5 text-[16px] font-bold">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                <Icon name="check" size={16} />
+              </span>
+              Satisfait ou remboursé
+            </p>
+            <p className="mt-1 pl-[38px] text-[14px] text-[var(--ink-3)]">sous {OFFER.guaranteeDays} jours après le premier entretien</p>
+          </div>
+        }
+        actions={
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-8">
+            <p className="text-[72px] font-extrabold leading-[0.85] tracking-[-0.05em] md:text-[88px]">
+              {OFFER.price}
+              <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
+            </p>
+            <div>
+              <p className="t-small max-w-[16rem]">Paiement unique. {OFFER.delivery}.</p>
+              <Button href="/order" size="lg" className="mt-3">
+                Commander
+              </Button>
+            </div>
+          </div>
+        }
       >
-        <div className="mt-10 pb-8 md:pb-12">
-          <OfferCard showDetailLink={false} />
+        <div className="card mt-12 p-6 md:mt-14 md:p-9" data-reveal>
+          <p className="text-[16px] font-bold">Ce qui est compris</p>
+          <ul className="mt-5 grid gap-x-10 gap-y-5 md:grid-cols-2">
+            {INCLUDED.map((it) => (
+              <li key={it.title} className="flex gap-3 text-[16px] leading-snug">
+                <Icon name="check" size={20} className="mt-0.5 shrink-0 text-[var(--amber-ink)]" />
+                <span>
+                  <b>{it.title}</b>, {it.detail}
+                </span>
+              </li>
+            ))}
+            <li className="flex gap-3 text-[16px] leading-snug">
+              <Icon name="gift" size={20} className="mt-0.5 shrink-0 text-[var(--amber-ink)]" />
+              <span>
+                <b>Pour l’offrir</b>, votre proche reçoit le numéro et appelle quand il le souhaite
+              </span>
+            </li>
+          </ul>
         </div>
       </PageHeader>
 

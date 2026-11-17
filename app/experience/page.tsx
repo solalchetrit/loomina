@@ -1,9 +1,10 @@
 import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
-import { type IconName } from "@/components/ui/Icon";
+import Icon, { type IconName } from "@/components/ui/Icon";
 import { BookPage } from "@/components/VoiceToPage";
 import { Contents } from "@/components/home/Themes";
 import Photo from "@/components/ui/Photo";
+import { CallPreview } from "@/components/HowItWorks";
 import Closing from "@/components/Closing";
 import AuthorShowcase from "@/components/AuthorShowcase";
 import { SITE } from "@/config/site";
@@ -115,9 +116,44 @@ export default function ExperiencePage() {
   return (
     <>
       <PageHeader
-        title="Un téléphone, des conversations, un livre"
+        title={
+          <>
+            Un téléphone,
+            <br />
+            des conversations,
+            <br />
+            un livre
+          </>
+        }
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
         photo={{ name: "mains-telephone", alt: "Les mains d’une personne âgée tiennent un téléphone." }}
+        badge={
+          <div className="w-[230px]">
+            <CallPreview />
+          </div>
+        }
+        actions={
+          <>
+            <ul className="flex flex-col gap-2.5 text-[17px] text-[var(--ink-2)]">
+              {["Depuis un fixe ou un portable", "À votre rythme, quand vous voulez", `En général ${OFFER.delay} jusqu’au livre validé`].map((t) => (
+                <li key={t} className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                    <Icon name="check" size={16} />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button href={`tel:${SITE.phone}`} size="lg">
+                Essayer {OFFER.demoMinutes} minutes gratuitement
+              </Button>
+              <Button href="#avant" variant="secondary" size="lg">
+                Voir les étapes
+              </Button>
+            </div>
+          </>
+        }
       />
 
       {PHASES.map((p, idx) => {

@@ -58,6 +58,8 @@ export function PageHeader({
   title,
   text,
   photo,
+  actions,
+  badge,
   children,
 }: {
   eyebrow?: string;
@@ -65,23 +67,33 @@ export function PageHeader({
   text?: ReactNode;
   /** `ratio` : le format de la photo elle-même, pour ne pas la recadrer (par défaut 3/2). */
   photo?: { name: string; alt: string; focus?: string; ratio?: string };
+  /** Boutons et repères sous le texte d'introduction. */
+  actions?: ReactNode;
+  /** Vignette posée sur le coin de la photo : elle relie l'image au service. */
+  badge?: ReactNode;
   children?: ReactNode;
 }) {
   return (
     <section className="w-full pb-8 pt-28 md:pb-10 md:pt-36">
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
         {photo ? (
-          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:gap-14">
-            <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise text-balance" />
-            <Photo
-              name={photo.name}
-              alt={photo.alt}
-              focus={photo.focus}
-              priority
-              ratio={photo.ratio ?? "aspect-[3/2]"}
-              sizes="(min-width: 1024px) 460px, 100vw"
-              className="rise w-full"
-            />
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)] lg:gap-16">
+            <div className="min-w-0">
+              <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise text-balance [&_h1]:!text-[clamp(2.5rem,4.3vw,3.7rem)]" />
+              {actions && <div className="rise mt-8">{actions}</div>}
+            </div>
+            <div className="rise relative min-w-0 pb-6 sm:pl-6">
+              <Photo
+                name={photo.name}
+                alt={photo.alt}
+                focus={photo.focus}
+                priority
+                ratio={photo.ratio ?? "aspect-[3/2]"}
+                sizes="(min-width: 1024px) 540px, 100vw"
+                className="w-full"
+              />
+              {badge && <div className="absolute bottom-0 left-3 sm:left-0">{badge}</div>}
+            </div>
           </div>
         ) : (
           <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise !max-w-4xl" />

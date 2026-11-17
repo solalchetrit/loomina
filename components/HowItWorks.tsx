@@ -7,7 +7,7 @@ import Photo from "@/components/ui/Photo";
 import type { IconName } from "@/components/ui/Icon";
 
 /** Aperçu 1 : un appel en cours. */
-function CallPreview() {
+export function CallPreview() {
   const bars = [10, 22, 34, 18, 40, 26, 14, 30, 38, 20, 12, 28, 36, 16, 24];
   return (
     <div className="w-full max-w-[260px] rounded-[18px] bg-white p-4 shadow-[var(--shadow-bar)]">
