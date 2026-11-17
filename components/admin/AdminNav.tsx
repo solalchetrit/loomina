@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 
 const LINKS = [
   { href: "/admin", label: "Vue d’ensemble" },
+  { href: "/admin/suivi", label: "Suivi client" },
   { href: "/admin/clients", label: "Clients" },
-  { href: "/admin/parcours", label: "Parcours" },
-  { href: "/admin/structure", label: "Structure et IA" },
+  { href: "/admin/parcours", label: "La carte" },
+  { href: "/admin/structure", label: "Structure" },
+  { href: "/admin/ia", label: "Les IA" },
 ];
 
 /** Les liens de l'admin, dans le style du menu du site. */
