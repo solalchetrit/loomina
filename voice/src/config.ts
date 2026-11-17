@@ -23,6 +23,11 @@ export const config = {
     /** Site Next.js qui reçoit le rapport de fin d'appel */
     nextBaseUrl: required('NEXT_BASE_URL').replace(/\/$/, ''),
     webhookSecret: required('VAPI_WEBHOOK_SECRET'),
+    /**
+     * Enregistrement audio des entretiens (jamais des démonstrations). Gardé
+     * chez Twilio, écouté depuis l'admin. « off » pour couper.
+     */
+    recordingEnabled: optional('VOICE_RECORDING', 'on') !== 'off',
     /** Rendez-vous d'appel réguliers (voir scheduler.ts). « off » pour couper. */
     schedulerEnabled: optional('CALL_SCHEDULER', 'on') !== 'off',
 

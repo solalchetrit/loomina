@@ -207,7 +207,7 @@ export const MAP_GROUPS: MapGroup[] = [
             { id: 'p-panne', label: 'Base injoignable', col: 1, from: 'p-reconnu', status: 'partial', d: '« Un problème technique m’empêche de vous répondre, rappelez dans quelques minutes », puis elle raccroche. L’entretien de secours n’existe que sur l’ancien chemin Vapi.' },
             { id: 'p-connaissance', label: 'Oui : fait connaissance', col: 1, from: 'p-premier', d: 'Tu ou vous ? Des sujets à éviter ? (sauf si déjà réglés), puis « Racontez-moi où vous avez grandi ».' },
             { id: 'p-tait', label: 'Silence : relance, puis raccroche', col: 1, from: 'p-tts' },
-            { id: 'p-audio', label: 'Enregistrement audio', col: 1, from: 'p-fin', status: 'todo', d: 'Seul le texte est gardé. La voix de la personne n’est pas conservée (elle pourrait accompagner le livre).' },
+            { id: 'p-audio', label: 'Enregistrement audio', col: 1, from: 'p-fin', d: 'Chaque entretien est enregistré (jamais la démonstration). Loomina le dit au premier appel. Le son reste chez Twilio et s’écoute dans l’admin, sur la fiche du client, au-dessus du transcript.', code: 'voice/src/server.ts' },
         ],
     },
     {

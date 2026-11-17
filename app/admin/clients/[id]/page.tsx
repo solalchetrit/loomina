@@ -235,6 +235,10 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
                     )}
                   </div>
                   {i.topics_summary ? <p className="mt-2 text-[15px] text-[var(--ink-2)]">{String(i.topics_summary)}</p> : null}
+                  {cost?.recordingEventId && (
+                    // eslint-disable-next-line jsx-a11y/media-has-caption -- la transcription de l'appel est juste en dessous
+                    <audio controls preload="none" src={`/api/admin/recordings/${cost.recordingEventId}`} className="mt-3 w-full" />
+                  )}
                   <div className="mt-3 grid gap-2">
                     {i.transcript ? <Fold summary="Transcript de l’appel" mono>{String(i.transcript)}</Fold> : null}
                     {i.ai_analysis_log && Object.keys(i.ai_analysis_log as object).length > 0 ? <Fold summary="Analyse du Directeur" mono>{JSON.stringify(i.ai_analysis_log, null, 2)}</Fold> : null}

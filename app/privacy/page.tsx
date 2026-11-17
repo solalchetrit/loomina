@@ -18,8 +18,8 @@ export default function PrivacyPage() {
           carte.
         </li>
         <li>
-          <strong>Pendant les appels :</strong> la transcription de ce que vous dites et de ce que Loomina répond, ainsi que le
-          numéro appelant, la date et la durée de l’appel.
+          <strong>Pendant les appels :</strong> la transcription de ce que vous dites et de ce que Loomina répond, l’enregistrement
+          audio de vos entretiens (jamais celui de la démonstration), ainsi que le numéro appelant, la date et la durée de l’appel.
         </li>
         <li>
           <strong>Pour le livre :</strong> les chapitres écrits, vos corrections, et les photographies que vous nous envoyez.
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
           et des chapitres.
         </li>
         <li>
-          <strong>Twilio</strong> (téléphonie) : acheminement des appels et envoi du code SMS de connexion.
+          <strong>Twilio</strong> (téléphonie) : acheminement des appels, enregistrement audio des entretiens et envoi des SMS.
         </li>
         <li>
           <strong>OpenAI</strong> (intelligence artificielle) : transcription de la voix, conduite de l’entretien et écriture
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
 
       <h2>4. Combien de temps</h2>
       <p>
-        Vos transcriptions et vos chapitres sont conservés tant que votre livre est en cours, puis un an après sa livraison,
+        Vos transcriptions, les enregistrements de vos entretiens et vos chapitres sont conservés tant que votre livre est en cours, puis un an après sa livraison,
         pour permettre une correction ou une réimpression. Vous pouvez demander leur suppression plus tôt à tout moment. Les
         données de facturation sont conservées le temps imposé par la loi.
       </p>
