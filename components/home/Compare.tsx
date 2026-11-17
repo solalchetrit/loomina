@@ -23,7 +23,7 @@ const ROWS: { label: string; alone: Cell; biographer: Cell; loomina: Cell }[] = 
     label: "Relecture",
     alone: { ok: false, text: "À trouver soi-même" },
     biographer: { ok: true, text: "Oui" },
-    loomina: { ok: true, text: "Chaque page, par notre équipe" },
+    loomina: { ok: true, text: "Par notre équipe, avant l’impression" },
   },
   {
     label: "Prix",
@@ -53,8 +53,8 @@ export default function Compare() {
   return (
     <Section id="comparer" className="bg-white">
       <SectionHead
-        title="Entre le cahier et le biographe"
-        text="Écrire seul demande des mois, et beaucoup n’y arrivent pas. Un biographe coûte cher et demande des rendez-vous. Loomina tient entre les deux."
+        title="Écrire seul, un biographe, ou Loomina ?"
+        text="Trois façons d’obtenir le livre d’une vie. Ligne par ligne, voici ce qui change pour vous."
       />
       <ul className="mt-10 space-y-3 md:hidden">
         {ROWS.map((r) => (

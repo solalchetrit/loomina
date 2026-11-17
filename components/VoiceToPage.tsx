@@ -38,8 +38,8 @@ export default function VoiceToPage() {
   return (
     <Section id="exemple" className="bg-white">
       <SectionHead
-        title="Vous parlez comme vous parlez, le livre garde votre voix"
-        text="À gauche, un moment d’appel. À droite, ce qu’il devient dans le livre : mis en forme, sans rien ajouter que vous n’ayez dit."
+        title="De l’appel à la page du livre"
+        text="À gauche, un extrait de conversation. À droite, la page que Loomina en tire : vos souvenirs et vos expressions, mis en forme, sans rien inventer."
       />
 
       <div className="mt-12 grid gap-4 lg:grid-cols-2" data-reveal>

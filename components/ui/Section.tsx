@@ -78,26 +78,30 @@ export function Steps({
   className?: string;
 }) {
   return (
-    <ol className={`grid gap-4 md:grid-cols-3 ${className}`} data-reveal>
+    <ol className={`grid gap-8 md:grid-cols-3 md:gap-4 ${className}`} data-reveal>
       {items.map((it, i) => (
-        <li key={i} className="card flex flex-col p-3">
-          {it.preview && (
-            <div aria-hidden="true" className="flex h-40 items-center justify-center overflow-hidden rounded-[18px] bg-[var(--canvas)] px-5">
-              {it.preview}
-            </div>
-          )}
-          <div className="p-4 pt-5 md:p-5">
-            <div className="flex items-center justify-between">
+        <li key={i} className="flex flex-col">
+          {/* Le numéro d'étape au-dessus de la carte, relié aux suivantes par un trait. */}
+          <div className="mb-4 flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--ink)] text-[18px] font-extrabold text-white">
+              {i + 1}
+            </span>
+            <span className="text-[17px] font-bold text-[var(--ink)]">Étape {i + 1}</span>
+            {i < items.length - 1 && <span aria-hidden="true" className="ml-2 hidden h-[2px] flex-1 rounded bg-[var(--line)] md:block" />}
+          </div>
+          <div className="card flex flex-1 flex-col p-3">
+            {it.preview && (
+              <div aria-hidden="true" className="flex h-40 items-center justify-center overflow-hidden rounded-[18px] bg-[var(--canvas)] px-5">
+                {it.preview}
+              </div>
+            )}
+            <div className="p-4 pt-5 md:p-5">
               <span className="chip-icon">
                 <Icon name={it.icon} />
               </span>
-              <span className="text-[15px] font-bold text-[var(--ink-3)]">
-                <span className="sr-only">Étape </span>
-                {i + 1}
-              </span>
+              <h3 className="t-heading mt-5">{it.title}</h3>
+              <div className="t-body mt-2">{it.text}</div>
             </div>
-            <h3 className="t-heading mt-5">{it.title}</h3>
-            <div className="t-body mt-2">{it.text}</div>
           </div>
         </li>
       ))}
