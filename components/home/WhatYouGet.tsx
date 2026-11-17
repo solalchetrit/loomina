@@ -2,6 +2,7 @@ import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { Section, SectionHead } from "@/components/ui/Section";
 import { OFFER } from "@/config/offer";
+import Photo from "@/components/ui/Photo";
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: "book", title: "Un vrai livre relié", text: `${OFFER.format}, imprimé et livré chez vous.` },
@@ -39,7 +40,13 @@ export default function WhatYouGet({ showDetailLink = true }: { showDetailLink?:
   return (
     <Section id="le-livre" className="bg-white">
       <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.25fr] lg:gap-16">
-        <BookCover />
+        <Photo
+          name="livre-dans-les-mains"
+          alt="Deux mains tiennent un livre Loomina relié, à la couverture en toile beige."
+          ratio="aspect-[4/5]"
+          sizes="(min-width: 1024px) 480px, 100vw"
+          className="mx-auto w-full max-w-[480px]"
+        />
         <div>
           <SectionHead
             title="Votre histoire, en livre et pour longtemps"

@@ -7,6 +7,7 @@ import { formatToE164 } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
 import { CheckList } from "@/components/ui/Section";
+import Photo from "@/components/ui/Photo";
 import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
@@ -221,6 +222,14 @@ export default function OrderPage() {
 
           {/* Récapitulatif */}
           <aside className="card p-6 sm:p-8 lg:sticky lg:top-32 lg:self-start">
+            <Photo
+              name="livre-deux-exemplaires"
+              alt="Deux exemplaires du livre Loomina relié, posés l’un sur l’autre."
+              ratio="aspect-[16/10]"
+              focus="50% 45%"
+              sizes="(min-width: 1024px) 420px, 100vw"
+              className="mb-6 !rounded-[20px]"
+            />
             <p className="text-[15px] font-bold text-[var(--ink-3)]">Votre commande</p>
             <p className="mt-2 text-[20px] font-extrabold leading-tight tracking-[-0.02em]">{OFFER.name}</p>
             <p className="mt-4 text-[56px] font-extrabold leading-none tracking-[-0.05em]">

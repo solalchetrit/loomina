@@ -3,7 +3,7 @@ import { OFFER } from "@/config/offer";
 import { SITE } from "@/config/site";
 import { Section, SectionHead, Steps } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
-import { BookCover } from "@/components/home/WhatYouGet";
+import Photo from "@/components/ui/Photo";
 import type { IconName } from "@/components/ui/Icon";
 
 /** Aperçu 1 : un appel en cours. */
@@ -57,7 +57,16 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
     icon: "book",
     title: "Le livre arrive chez vous",
     text: `Quand votre récit est complet, notre équipe relit le livre, y place vos photos et l’envoie à l’impression. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé.`,
-    preview: <BookCover className="max-w-[96px] !py-0" compact />,
+    preview: (
+      <Photo
+        name="livre-couverture"
+        alt=""
+        ratio="h-40"
+        focus="50% 42%"
+        sizes="400px"
+        className="-mx-5 w-[calc(100%+2.5rem)] max-w-none shrink-0 !rounded-none"
+      />
+    ),
   },
 ];
 

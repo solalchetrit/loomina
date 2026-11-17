@@ -2,7 +2,6 @@ import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import { type IconName } from "@/components/ui/Icon";
 import { BookPage } from "@/components/VoiceToPage";
-import { BookCover } from "@/components/home/WhatYouGet";
 import { Contents } from "@/components/home/Themes";
 import Photo from "@/components/ui/Photo";
 import Closing from "@/components/Closing";
@@ -136,8 +135,8 @@ export default function ExperiencePage() {
               <div>
                 <Timeline steps={p.steps} start={start} />
                 {p.id === "apres" && (
-                  <div className="mt-6 grid items-center gap-6 rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white sm:grid-cols-[130px_1fr] md:p-9">
-                    <BookCover className="max-w-[130px] !py-0" compact />
+                  <div className="mt-6 grid items-center gap-6 rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white sm:grid-cols-[160px_1fr] md:p-9">
+                    <Photo name="livre-debout" alt="Le livre Loomina relié, posé debout." ratio="aspect-[4/5]" sizes="160px" className="w-full max-w-[160px] !rounded-[16px]" />
                     <div>
                       <p className="text-[15px] font-bold text-[var(--amber)]">Ce que vous recevez</p>
                       <p className="mt-2 text-[24px] font-extrabold leading-tight tracking-[-0.02em]">
