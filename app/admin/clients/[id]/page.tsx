@@ -100,6 +100,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
             <Field label="E-mail acheteur">{order.buyerEmail}</Field>
             {order.giver && <Field label="Offert par">{`${order.giver.firstName ?? "?"} · ${order.giver.phone}`}</Field>}
             <Field label="Durée d’appel voulue">{`${order.callMinutes} min`}</Field>
+            <Field label="Adresse de livraison">{order.shipping ? order.shipping.join(", ") : "pas encore demandée (elle l’est quand le livre est terminé)"}</Field>
             <Field label="Paiement Stripe">
               {order.stripeSessionId ? (
                 <a className="underline" target="_blank" rel="noreferrer" href={`https://dashboard.stripe.com/search?query=${encodeURIComponent(order.stripeSessionId)}`}>

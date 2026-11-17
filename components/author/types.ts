@@ -41,6 +41,13 @@ export interface Overview {
   demo?: boolean;
   prefs: Prefs;
   project: ProjectOverview | null;
+  /**
+   * L'accueil du premier passage : ce qu'il reste à demander à l'auteur
+   * (rien si un appel a déjà donné la réponse). Absent : pas d'accueil.
+   */
+  welcome?: { politeness: boolean; topics: boolean } | null;
+  /** L'adresse d'envoi du livre relié, demandée une fois le livre terminé (null : pas encore donnée). */
+  shipping?: { name: string; line1: string; line2: string | null; postalCode: string; city: string } | null;
 }
 
 export const formatDate = (iso: string, withYear = true) =>

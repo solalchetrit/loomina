@@ -20,6 +20,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { sweepPending } from '@/lib/loomina/events';
+import { sweepCorrections } from '@/lib/loomina/corrections';
 import { checkSharedSecret } from '@/lib/loomina/secret';
 
 export const runtime = 'nodejs';
@@ -57,10 +58,16 @@ async function handle(request: NextRequest) {
             console.info(`[jobs] ${picked} événement(s) repris :`, results);
         }
 
+        // Les remarques des auteurs sur leurs récits, appliquées par l'IA
+        // quelques minutes après avoir été écrites.
+        const corrections = await sweepCorrections();
+        if (corrections.applied || corrections.failed) console.info('[jobs] remarques d’auteur :', corrections);
+
         return NextResponse.json({
             ok: true,
             picked,
             results,
+            corrections,
             durationMs: Date.now() - startedAt,
         });
     } catch (err) {

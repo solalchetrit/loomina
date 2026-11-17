@@ -7,6 +7,7 @@ import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
 import { readGiver, sharesWithGiver } from '@/lib/loomina/giver';
+import { readShipping } from '@/lib/loomina/shipping';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -50,6 +51,16 @@ export async function GET(request: NextRequest) {
         if (chapters.error) throw new Error(chapters.error.message);
         if (interviews.error) throw new Error(interviews.error.message);
 
+        // L'accueil du premier passage : seulement tant qu'aucun appel n'a eu
+        // lieu (au premier appel, Loomina demande elle-même tu/vous et les
+        // sujets à éviter) et que l'auteur n'a ni réglé ni remis à plus tard.
+        const pmeta = (project.project_metadata ?? {}) as Record<string, unknown>;
+        const { count: anyCall } = await db().from('interviews').select('id', { count: 'exact', head: true }).eq('project_id', project.id);
+        const welcome =
+            !pmeta.welcome_done_at && !pmeta.prefs_set_at && !anyCall && project.status !== 'completed'
+                ? { politeness: true, topics: !profile.sensitive_topics?.trim() }
+                : null;
+
         const context = normalizeContext(project.context);
         // Le titre du récit écrit après chaque appel sert de titre à l'appel.
         const titleOf = new Map(chapters.data.filter((c) => c.latest_interview_id).map((c) => [c.latest_interview_id as string, (c.title as string | null) ?? null]));
@@ -58,6 +69,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
             firstName: profile.first_name,
             prefs,
+            welcome,
+            shipping: readShipping(pmeta),
             project: {
                 phase,
                 phaseLabel: PHASE_LABELS[phase],

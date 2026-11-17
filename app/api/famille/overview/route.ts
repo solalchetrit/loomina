@@ -61,7 +61,9 @@ export async function GET(request: NextRequest) {
                     })),
                     chapters: (chapters.data ?? []).map((c) => ({
                         number: c.chapter_number as number,
-                        title: (c.title as string | null) ?? null,
+                        // Sans partage, ni le texte ni le titre ne sortent du serveur :
+                        // l'offreur voit seulement que le livre avance (décision du 17/11/2026).
+                        title: shared ? ((c.title as string | null) ?? null) : null,
                         date: c.created_at as string,
                         // Le texte ne sort du serveur que si le narrateur l'a permis.
                         text: shared ? ((c.content_markdown as string | null) ?? null) : null,
