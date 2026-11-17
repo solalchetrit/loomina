@@ -29,6 +29,8 @@
  *    inclut la réflexion, d'où `max_completion_tokens` large.
  */
 
+import { tokenUsage } from './usage';
+import type { TokenUsage } from './usage';
 import OpenAI from 'openai';
 import type { Phase } from './phases';
 import { PHASE_LABELS } from './phases';
@@ -58,6 +60,8 @@ export interface WriterResult {
     chapter_content: string;
     word_count: number;
     notes: string | null;
+    /** Jetons consommés par l'écriture (suivi des coûts). */
+    usage?: TokenUsage;
 }
 
 export const WRITER_SYSTEM = `Tu es **l'Écrivain fantôme** de Loomina.
@@ -234,6 +238,7 @@ ${params.transcript}`;
         chapter_content: content,
         word_count: countWords(content),
         notes: typeof parsed.notes === 'string' && parsed.notes.trim() ? parsed.notes.trim().slice(0, 1000) : null,
+        usage: tokenUsage(WRITER_MODEL, completion.usage),
     };
 }
 
