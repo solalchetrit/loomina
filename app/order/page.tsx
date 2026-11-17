@@ -13,7 +13,7 @@ import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
 
 type Who = "me" | "gift";
-type Errors = Partial<Record<"firstName" | "lastName" | "phone" | "email", string>>;
+type Errors = Partial<Record<"firstName" | "lastName" | "phone" | "email" | "giverFirstName" | "giverPhone", string>>;
 
 function validPhone(raw: string): boolean {
   const e164 = formatToE164(raw);
@@ -26,7 +26,7 @@ export default function OrderPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
-  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "" });
+  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", giverFirstName: "", giverPhone: "" });
   const [callMinutes, setCallMinutes] = useState<number>(DEFAULT_CALL_MINUTES);
 
   // Les boutons « Commencer mon livre » et « Offrir le livre » arrivent ici avec le choix déjà fait.
@@ -53,6 +53,13 @@ export default function OrderPage() {
     if (!form.lastName.trim()) next.lastName = "Indiquez le nom, pour la couverture du livre.";
     if (!validPhone(form.phone)) next.phone = "Vérifiez le numéro : dix chiffres, par exemple 06 12 34 56 78.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) next.email = "Vérifiez l’adresse e-mail : il manque un @ ou un point.";
+    if (isGift) {
+      // Celui qui offre : son prénom et son portable ouvrent son espace famille.
+      if (!form.giverFirstName.trim()) next.giverFirstName = "Indiquez votre prénom : il apparaîtra dans votre espace famille.";
+      if (!validPhone(form.giverPhone)) next.giverPhone = "Vérifiez votre numéro : dix chiffres, par exemple 06 12 34 56 78.";
+      else if (validPhone(form.phone) && formatToE164(form.giverPhone) === formatToE164(form.phone))
+        next.giverPhone = "C’est le même numéro que celui de la personne qui raconte. Indiquez le vôtre.";
+    }
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -68,7 +75,14 @@ export default function OrderPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, phone, isGift, callMinutes }),
+        body: JSON.stringify({
+          ...form,
+          phone,
+          isGift,
+          callMinutes,
+          giverFirstName: isGift ? form.giverFirstName.trim() : "",
+          giverPhone: isGift ? formatToE164(form.giverPhone) : "",
+        }),
       });
       const data = await res.json();
       if (data.url) {
@@ -186,6 +200,29 @@ export default function OrderPage() {
                       required
                     />
                   </div>
+                  {isGift && (
+                    <div className="sm:col-span-2 rounded-[20px] bg-[var(--canvas)] p-5 sm:p-6">
+                      <p className="text-[17px] font-extrabold tracking-[-0.01em]">Et vous ?</p>
+                      <p className="t-small mt-1">
+                        Avec votre numéro, vous ouvrez votre espace famille : vous y suivez l’avancement du livre et vous pouvez souffler des souvenirs à Loomina.
+                      </p>
+                      <div className="mt-5 grid gap-6 sm:grid-cols-2">
+                        <Input label="Votre prénom" name="giverFirstName" autoComplete="given-name" value={form.giverFirstName} onChange={onChange} error={errors.giverFirstName} required />
+                        <Input
+                          label="Votre numéro de portable"
+                          name="giverPhone"
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          value={form.giverPhone}
+                          onChange={onChange}
+                          error={errors.giverPhone}
+                          hint="Un portable : le code de connexion vous arrive par SMS."
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
                   <fieldset className="sm:col-span-2">
                     <legend className="field-label">Durée souhaitée de chaque appel</legend>
                     <div className="flex flex-wrap gap-2">

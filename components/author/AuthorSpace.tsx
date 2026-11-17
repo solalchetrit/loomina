@@ -53,7 +53,16 @@ function NextCall({ topic, schedule }: { topic: string | null; schedule?: string
   );
 }
 
-export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: () => void; onUnauthorized: () => void }) {
+export default function AuthorSpace({
+  onLogout,
+  onUnauthorized,
+  onNotAuthor,
+}: {
+  onLogout: () => void;
+  onUnauthorized: () => void;
+  /** Le numéro connecté n'est celui d'aucun auteur : c'est peut-être celui d'une personne qui a offert un livre. */
+  onNotAuthor: () => void;
+}) {
   const [tab, setTab] = useState<Tab>("apercu");
   const [data, setData] = useState<Overview | null>(null);
   const [failed, setFailed] = useState(false);
@@ -62,13 +71,14 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
     try {
       const res = await fetch("/api/user/overview");
       if (res.status === 401) return onUnauthorized();
+      if (res.status === 404) return onNotAuthor();
       if (!res.ok) throw new Error();
       setData(await res.json());
       setFailed(false);
     } catch {
       setFailed(true);
     }
-  }, [onUnauthorized]);
+  }, [onUnauthorized, onNotAuthor]);
 
   useEffect(() => {
     // Chargement initial depuis l'API : le setState arrive après la réponse réseau.

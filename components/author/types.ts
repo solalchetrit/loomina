@@ -11,6 +11,10 @@ export interface Prefs {
   callSchedule: { active: boolean; days: number[]; time: string };
   /** Durée d'appel souhaitée, en minutes (15, 20, 30 ou 45). */
   callMinutes: number;
+  /** Livre offert : prénom de la personne qui l'a offert ("" si inconnu), null si le livre n'est pas un cadeau suivi. */
+  giverFirstName: string | null;
+  /** L'auteur laisse cette personne lire ses récits dans l'espace famille (non par défaut). */
+  shareWithGiver: boolean;
 }
 
 export interface ProjectOverview {

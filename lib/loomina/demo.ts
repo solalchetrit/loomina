@@ -105,6 +105,8 @@ const state = {
         smsChapter: true,
         callSchedule: { active: true, days: [2], time: '15:00' } as { active: boolean; days: number[]; time: string },
         callMinutes: 30,
+        giverFirstName: null as string | null,
+        shareWithGiver: false,
     },
     openQuestions: [
         'Raconte-nous ta rencontre avec papa à la poste',

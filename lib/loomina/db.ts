@@ -4,7 +4,7 @@
  * Toujours la service role key : ce code tourne exclusivement dans des
  * routes serveur, jamais dans le navigateur. Sans elle, RLS bloque la
  * lecture des profils — c'est exactement ce qui faisait échouer
- * `/api/call` avec « Client profil not found ».
+ * l'ancienne route d'appel sortant avec « Client profil not found ».
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';

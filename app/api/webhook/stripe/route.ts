@@ -66,6 +66,12 @@ export async function POST(request: NextRequest) {
     const lastName = meta.lastName?.trim() || '';
     const isGift = meta.isGift === 'true' || meta.isGift === '1';
     const phone = meta.phone ? formatToE164(meta.phone) : null;
+    // Livre offert : celui qui offre ouvrira l'espace famille avec son propre numéro.
+    const giverPhone = isGift && meta.giverPhone ? formatToE164(meta.giverPhone) : null;
+    const giver =
+        giverPhone && /^\+\d{8,15}$/.test(giverPhone) && giverPhone !== phone
+            ? { first_name: meta.giverFirstName?.trim() || null, phone: giverPhone }
+            : null;
 
     try {
         const supabase = db();
@@ -130,7 +136,12 @@ export async function POST(request: NextRequest) {
             current_topic_id: 1,
             stripe_session_id: session.id,   // la garantie d'idempotence
             // L'acheteur peut être différent du narrateur (cadeau).
-            project_metadata: { is_gift: isGift, buyer_email: email, call_minutes: normalizeCallMinutes(meta.callMinutes) },
+            project_metadata: {
+                is_gift: isGift,
+                buyer_email: email,
+                call_minutes: normalizeCallMinutes(meta.callMinutes),
+                ...(giver ? { giver } : {}),
+            },
         });
 
         if (projetErr) {

@@ -30,8 +30,6 @@ services:
       # Mêmes valeurs que sur Vercel.
       - key: VAPI_WEBHOOK_SECRET
         sync: false
-      - key: CRON_SECRET
-        sync: false
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY

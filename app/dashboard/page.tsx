@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import AuthorSpace from "@/components/author/AuthorSpace";
+import FamilySpace from "@/components/author/FamilySpace";
 import Button from "@/components/ui/Button";
 import { SITE } from "@/config/site";
 import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
@@ -22,6 +23,8 @@ export default function DashboardPage() {
   const [otpCode, setOtpCode] = useState("");
   const [loginStep, setLoginStep] = useState<LoginStep>("phone");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // « auteur » : celui qui raconte. « famille » : celui qui a offert le livre.
+  const [space, setSpace] = useState<"auteur" | "famille">("auteur");
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,12 +69,14 @@ export default function DashboardPage() {
       /* ignore */
     }
     setIsLoggedIn(false);
+    setSpace("auteur");
     setOtpCode("");
     setLoginStep("phone");
     setSessionExpired(expired);
   }, []);
 
   const onUnauthorized = useCallback(() => logout(true), [logout]);
+  const showFamily = useCallback(() => setSpace("famille"), []);
 
 
   const requestOtp = async (e: React.FormEvent) => {
@@ -93,7 +98,7 @@ export default function DashboardPage() {
         signal: controller.signal,
       });
       const data = await res.json().catch(() => ({}));
-      if (res.status === 404) throw new Error("Ce numéro ne correspond à aucune commande. C’est bien le numéro indiqué à la commande ?");
+      if (res.status === 404) throw new Error("Ce numéro ne correspond à aucune commande. Indiquez le numéro donné à la commande : celui de la personne qui raconte, ou le vôtre si vous avez offert le livre.");
       if (!res.ok) throw new Error(data.message || "Le code n’a pas pu être envoyé. Réessayez dans un instant.");
       setLoginStep("otp");
     } catch (err) {
@@ -150,11 +155,11 @@ export default function DashboardPage() {
       <div className="page-top section-b w-full px-5 sm:px-6">
         <div className="mx-auto grid w-full max-w-[1240px] items-start gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <div className="rise">
-            <p className="t-eyebrow">Espace auteur</p>
+            <p className="t-eyebrow">Espace auteur et espace famille</p>
             <h1 className="t-display mt-3">{loginStep === "phone" ? "Retrouvez votre livre" : "Votre code est parti"}</h1>
             <p className="t-lead mt-6 max-w-md">
               {loginStep === "phone"
-                ? "Entrez le numéro de téléphone donné à la commande. Nous vous envoyons un code par SMS, rien d’autre à retenir."
+                ? "Entrez le numéro de téléphone donné à la commande : celui de la personne qui raconte, ou le vôtre si vous avez offert le livre. Nous vous envoyons un code par SMS, rien d’autre à retenir."
                 : `Un SMS avec un code à six chiffres arrive au ${phone}. Entrez-le ci-contre.`}
             </p>
 
@@ -266,5 +271,8 @@ export default function DashboardPage() {
     );
   }
 
-  return <AuthorSpace onLogout={() => logout(false)} onUnauthorized={onUnauthorized} />;
+  if (space === "famille") {
+    return <FamilySpace onLogout={() => logout(false)} onUnauthorized={onUnauthorized} onNotFound={() => logout(false)} />;
+  }
+  return <AuthorSpace onLogout={() => logout(false)} onUnauthorized={onUnauthorized} onNotAuthor={showFamily} />;
 }
