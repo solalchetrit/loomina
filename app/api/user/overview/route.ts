@@ -6,6 +6,8 @@ import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
 import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
+import { readGiver, sharesWithGiver } from '@/lib/loomina/giver';
+import { readShipping } from '@/lib/loomina/shipping';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -27,6 +29,9 @@ export async function GET(request: NextRequest) {
             smsChapter: (project?.project_metadata as Record<string, unknown> | null)?.sms_chapter !== false,
             callSchedule: normalizeSchedule((project?.project_metadata as Record<string, unknown> | null)?.call_schedule),
             callMinutes: normalizeCallMinutes((project?.project_metadata as Record<string, unknown> | null)?.call_minutes),
+            // Livre offert : qui l'a offert, et si l'auteur lui laisse lire ses récits.
+            giverFirstName: readGiver(project?.project_metadata)?.firstName ?? (readGiver(project?.project_metadata) ? '' : null),
+            shareWithGiver: sharesWithGiver(project?.project_metadata),
         };
 
         if (!project) {
@@ -34,10 +39,10 @@ export async function GET(request: NextRequest) {
         }
 
         const [chapters, interviews] = await Promise.all([
-            db().from('chapters').select('word_count').eq('project_id', project.id).neq('status', 'archived'),
+            db().from('chapters').select('word_count, title, latest_interview_id').eq('project_id', project.id).neq('status', 'archived'),
             db()
                 .from('interviews')
-                .select('created_at, duration_seconds, topics_summary')
+                .select('id, created_at, duration_seconds, topics_summary')
                 .eq('project_id', project.id)
                 .eq('processing_status', 'processed')
                 .order('created_at', { ascending: false })
@@ -46,12 +51,26 @@ export async function GET(request: NextRequest) {
         if (chapters.error) throw new Error(chapters.error.message);
         if (interviews.error) throw new Error(interviews.error.message);
 
+        // L'accueil du premier passage : seulement tant qu'aucun appel n'a eu
+        // lieu (au premier appel, Loomina demande elle-même tu/vous et les
+        // sujets à éviter) et que l'auteur n'a ni réglé ni remis à plus tard.
+        const pmeta = (project.project_metadata ?? {}) as Record<string, unknown>;
+        const { count: anyCall } = await db().from('interviews').select('id', { count: 'exact', head: true }).eq('project_id', project.id);
+        const welcome =
+            !pmeta.welcome_done_at && !pmeta.prefs_set_at && !anyCall && project.status !== 'completed'
+                ? { politeness: true, topics: !profile.sensitive_topics?.trim() }
+                : null;
+
         const context = normalizeContext(project.context);
+        // Le titre du récit écrit après chaque appel sert de titre à l'appel.
+        const titleOf = new Map(chapters.data.filter((c) => c.latest_interview_id).map((c) => [c.latest_interview_id as string, (c.title as string | null) ?? null]));
         const phase = toPhase(project.phase);
 
         return NextResponse.json({
             firstName: profile.first_name,
             prefs,
+            welcome,
+            shipping: readShipping(pmeta),
             project: {
                 phase,
                 phaseLabel: PHASE_LABELS[phase],
@@ -68,6 +87,7 @@ export async function GET(request: NextRequest) {
                 calls: interviews.data.map((i) => ({
                     date: i.created_at as string,
                     minutes: i.duration_seconds ? Math.max(1, Math.round((i.duration_seconds as number) / 60)) : null,
+                    title: titleOf.get(i.id as string) ?? null,
                     summary: (i.topics_summary as string | null) ?? null,
                 })),
             },

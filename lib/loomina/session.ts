@@ -18,11 +18,15 @@ function secret(): Uint8Array {
     return new TextEncoder().encode(s);
 }
 
+/** Durée d'une session de l'espace auteur : 30 jours (demande de Solal, 17/11/2026). */
+export const SESSION_DAYS = 30;
+export const SESSION_MAX_AGE_S = SESSION_DAYS * 24 * 60 * 60;
+
 export async function signSession(phone: string): Promise<string> {
     return new SignJWT({ phone, role: 'authenticated' })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
-        .setExpirationTime('7d')
+        .setExpirationTime(`${SESSION_DAYS}d`)
         .sign(secret());
 }
 

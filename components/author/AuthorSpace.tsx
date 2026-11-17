@@ -11,6 +11,8 @@ import LifeStory from "./LifeStory";
 import Calls from "./Calls";
 import Settings from "./Settings";
 import Photos from "./Photos";
+import Welcome from "./Welcome";
+import Shipping from "./Shipping";
 import { formatDate, type Overview } from "./types";
 
 const TABS = [
@@ -53,7 +55,16 @@ function NextCall({ topic, schedule }: { topic: string | null; schedule?: string
   );
 }
 
-export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: () => void; onUnauthorized: () => void }) {
+export default function AuthorSpace({
+  onLogout,
+  onUnauthorized,
+  onNotAuthor,
+}: {
+  onLogout: () => void;
+  onUnauthorized: () => void;
+  /** Le numéro connecté n'est celui d'aucun auteur : c'est peut-être celui d'une personne qui a offert un livre. */
+  onNotAuthor: () => void;
+}) {
   const [tab, setTab] = useState<Tab>("apercu");
   const [data, setData] = useState<Overview | null>(null);
   const [failed, setFailed] = useState(false);
@@ -62,13 +73,14 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
     try {
       const res = await fetch("/api/user/overview");
       if (res.status === 401) return onUnauthorized();
+      if (res.status === 404) return onNotAuthor();
       if (!res.ok) throw new Error();
       setData(await res.json());
       setFailed(false);
     } catch {
       setFailed(true);
     }
-  }, [onUnauthorized]);
+  }, [onUnauthorized, onNotAuthor]);
 
   useEffect(() => {
     // Chargement initial depuis l'API : le setState arrive après la réponse réseau.
@@ -95,8 +107,12 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
 
         {data?.demo && (
           <p className="mt-6 rounded-[14px] bg-[var(--amber-soft)] px-4 py-3 text-[15px] font-semibold text-[var(--amber-deep)]">
-            Mode démo local : livre d’exemple de Jeanne, rien n’est lu ni écrit en base.
+            Démonstration : livre d’exemple de Jeanne, rien n’est lu ni écrit en base.
           </p>
+        )}
+
+        {data?.welcome && tab === "apercu" && (
+          <Welcome ask={data.welcome} prefs={data.prefs} onDone={load} onUnauthorized={onUnauthorized} />
         )}
 
         <nav aria-label="Rubriques de l’espace auteur" className="-mx-5 mt-8 overflow-x-auto px-5 sm:mx-0 sm:px-0">
@@ -137,6 +153,7 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
 
           {data && tab === "apercu" && (
             <div className="flex flex-col gap-4">
+              {project?.completed && <Shipping saved={data.shipping ?? null} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
               {project && <Progress project={project} />}
               <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
                 <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />
@@ -161,7 +178,8 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
               {lastCall && (
                 <button type="button" onClick={() => setTab("appels")} className="card lift press p-6 text-left md:p-8">
                   <span className="text-[15px] font-bold text-[var(--ink-3)]">Dernier appel · {formatDate(lastCall.date, false)}</span>
-                  <span className="mt-2 block text-[17px] leading-relaxed">{lastCall.summary ?? "Appel enregistré."}</span>
+                  {lastCall.title && <span className="mt-2 block text-[19px] font-bold leading-snug">{lastCall.title}</span>}
+                  <span className={`block text-[17px] leading-relaxed ${lastCall.title ? "mt-1 text-[var(--ink-2)]" : "mt-2"}`}>{lastCall.summary ?? "Appel enregistré."}</span>
                   <span className="link mt-3 inline-block text-[15px]">Tous vos appels</span>
                 </button>
               )}
@@ -172,18 +190,19 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
             <div className="grid gap-4 lg:grid-cols-[1.9fr_1fr]">
               <LiveBook onUnauthorized={onUnauthorized} />
               <aside className="flex flex-col gap-4 lg:sticky lg:top-32 lg:self-start">
-                <div className="card p-7">
-                  <p className="text-[17px] font-bold">Corriger un passage</p>
-                  <p className="t-body mt-2">
-                    Dans « Appel par appel », sous chaque récit, « Corriger ce récit » : décrivez l’erreur, Loomina propose le texte corrigé, vous le relisez. La correction vaudra aussi pour la suite du livre.
-                  </p>
-                </div>
                 <Photos onUnauthorized={onUnauthorized} />
               </aside>
             </div>
           )}
 
-          {data && tab === "vie" && (project ? <LifeStory project={project} /> : null)}
+          {data && tab === "vie" &&
+            (project ? (
+              <LifeStory
+                project={project}
+                onPersonAdded={(family, openQuestions) => setData((d) => (d?.project ? { ...d, project: { ...d.project, family, openQuestions } } : d))}
+                onUnauthorized={onUnauthorized}
+              />
+            ) : null)}
           {data && tab === "appels" && (project ? <Calls project={project} /> : null)}
           {data && tab === "reglages" && (
             <Settings

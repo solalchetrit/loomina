@@ -17,6 +17,7 @@ import {
 } from '../../lib/loomina/assistant';
 import { config } from './config.ts';
 import { hardLimitSeconds, normalizeCallMinutes } from '../../lib/loomina/call-length';
+import { refreshPrompts } from '../../lib/loomina/prompt-store';
 
 export interface CallPlan {
     systemPrompt: string;
@@ -48,6 +49,8 @@ export async function planForCaller(customerNumber: string | null): Promise<Call
     // L'URL serveur n'a plus de sens sans Vapi, mais `buildAssistant` la
     // demande : on lui donne le webhook du site, c'est là qu'ira le rapport.
     const serverUrl = `${config.nextBaseUrl}/api/vapi/webhook`;
+    // Les prompts réécrits dans l'admin (relus au plus une fois par minute ; ne lève jamais).
+    await refreshPrompts();
 
     if (!customerNumber) {
         return fromVapiShape(buildUnknownCallerAssistant(serverUrl), DEMO_MAX_SECONDS, true, 'demo');

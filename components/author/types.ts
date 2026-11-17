@@ -11,6 +11,10 @@ export interface Prefs {
   callSchedule: { active: boolean; days: number[]; time: string };
   /** Durée d'appel souhaitée, en minutes (15, 20, 30 ou 45). */
   callMinutes: number;
+  /** Livre offert : prénom de la personne qui l'a offert ("" si inconnu), null si le livre n'est pas un cadeau suivi. */
+  giverFirstName: string | null;
+  /** L'auteur laisse cette personne lire ses récits dans l'espace famille (non par défaut). */
+  shareWithGiver: boolean;
 }
 
 export interface ProjectOverview {
@@ -27,7 +31,8 @@ export interface ProjectOverview {
   family: { name: string; relation: string; deceased?: boolean }[];
   themes: string[];
   openQuestions: string[];
-  calls: { date: string; minutes: number | null; summary: string | null }[];
+  /** `title` : le titre du récit tiré de l'appel, pour s'y retrouver d'un coup d'œil. */
+  calls: { date: string; minutes: number | null; title: string | null; summary: string | null }[];
 }
 
 export interface Overview {
@@ -36,6 +41,13 @@ export interface Overview {
   demo?: boolean;
   prefs: Prefs;
   project: ProjectOverview | null;
+  /**
+   * L'accueil du premier passage : ce qu'il reste à demander à l'auteur
+   * (rien si un appel a déjà donné la réponse). Absent : pas d'accueil.
+   */
+  welcome?: { politeness: boolean; topics: boolean } | null;
+  /** L'adresse d'envoi du livre relié, demandée une fois le livre terminé (null : pas encore donnée). */
+  shipping?: { name: string; line1: string; line2: string | null; postalCode: string; city: string } | null;
 }
 
 export const formatDate = (iso: string, withYear = true) =>

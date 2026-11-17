@@ -18,6 +18,8 @@
  * anti-invention.
  */
 
+import { tokenUsage } from './usage';
+import type { TokenUsage } from './usage';
 import OpenAI from 'openai';
 import type { Phase } from './phases';
 import { PHASE_GOALS, PHASE_LABELS, isFinalPhase, toPhase } from './phases';
@@ -60,7 +62,7 @@ function isReasoningModel(model: string): boolean {
     return /^(gpt-5|o\d)/.test(model);
 }
 
-async function complete(model: string, system: string, user: string, timeoutMs: number): Promise<string> {
+async function complete(model: string, system: string, user: string, timeoutMs: number): Promise<{ raw: string; usage?: TokenUsage }> {
     const messages = [
         { role: 'system' as const, content: system },
         { role: 'user' as const, content: user },
@@ -89,7 +91,7 @@ async function complete(model: string, system: string, user: string, timeoutMs: 
     const raw = completion.choices[0]?.message?.content;
     if (!raw) throw new Error(`Directeur (${model}) : réponse vide du modèle`);
     JSON.parse(raw); // un JSON invalide déclenche le repli
-    return raw;
+    return { raw, usage: tokenUsage(model, completion.usage) };
 }
 
 export interface DirectorResult {
@@ -116,6 +118,8 @@ export interface DirectorResult {
     covered_suggestions: number[];
     /** Modèle qui a réellement produit l'analyse (principal ou repli). */
     model: string;
+    /** Jetons consommés par cette analyse (suivi des coûts). */
+    usage?: TokenUsage;
     next_topic_id: number | null;
     chapter_title_hint: string | null;
     /**
@@ -230,6 +234,7 @@ Si le transcript est trop pauvre pour accrocher un fait précis, propose une que
 Si l'interlocuteur a demandé le tutoiement ou le vouvoiement PENDANT cet appel, rédige \`next_question\` ainsi, même si la consigne reçue dit l'inverse.
 
 \`next_question\` porte sur la phase en cours (ou sur la suivante si le narrateur vient de choisir d'y passer). Un sujet noté pour une phase ultérieure attend son tour : ne l'ouvre pas maintenant.
+Phase 2 (les racines) : tant que le sujet \`heritage\` (le bagage familial) n'est pas couvert, \`next_question\` y va en premier, sauf si un récit est resté inachevé. Pars d'un parent ou d'un grand-parent déjà nommé (« Votre mère venait de Bretagne : comment est-elle arrivée à Paris ? »). Si un parent figure dans les « Sujets à laisser de côté », passe par l'autre parent ou par les grands-parents, sans jamais le nommer.
 
 UNE seule question, un seul point d'interrogation : jamais une liste de renseignements (« votre nom complet, votre date et votre lieu de naissance ? »), jamais deux questions reliées par « et ». S'il manque un fait d'identité ou une date, ne le demande pas ici : note-le dans \`open_questions\`, l'assistant le glissera au bon moment.
 
@@ -334,15 +339,16 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     const user = userPrompt(params);
     let model = params.model ?? DIRECTOR_MODEL;
     let raw: string;
+    let usage: TokenUsage | undefined;
     try {
-        raw = await complete(model, system, user, 60_000);
+        ({ raw, usage } = await complete(model, system, user, 60_000));
     } catch (err) {
         if (model === DIRECTOR_FALLBACK_MODEL) throw err;
         console.warn(
             `[directeur] ${model} en échec (${err instanceof Error ? err.message : String(err)}), repli sur ${DIRECTOR_FALLBACK_MODEL}`
         );
         model = DIRECTOR_FALLBACK_MODEL;
-        raw = await complete(model, system, user, 45_000);
+        ({ raw, usage } = await complete(model, system, user, 45_000));
     }
     const parsed = JSON.parse(raw) as Record<string, unknown>;
 
@@ -366,6 +372,7 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
 
     return {
         model,
+        usage,
         context,
         progress_percentage: step.progress,
         covered_axes: step.nextPhase === phase ? step.state.covered : PHASE_AXES[phase].map((a) => a.key),
@@ -478,3 +485,6 @@ export function politeness(v: unknown): 'tu' | 'vous' | null {
 
 /** Exporté pour les tests locaux : rejouer un transcript sans appeler l'API. */
 export const __testing = { systemPrompt, userPrompt };
+
+/** Le prompt système du Directeur pour une phase (page admin « Structure »). */
+export const directorSystemPrompt = systemPrompt;

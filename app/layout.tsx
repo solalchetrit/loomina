@@ -6,6 +6,7 @@ import ScrollTop from "@/components/ScrollTop";
 import Analytics from "@/components/Analytics";
 import Footer from "@/components/Footer";
 import MobileCta from "@/components/MobileCta";
+import HideOnAdmin from "@/components/HideOnAdmin";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
@@ -56,10 +57,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Livre Loomina - Biographie par téléphone',
+        alt: 'Quatre livres Loomina reliés en toile',
       },
     ],
   },
@@ -67,7 +68,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Loomina : votre vie, racontée au téléphone",
     description: "Racontez votre vie au téléphone, nous en faisons un livre relié.",
-    images: ['/og-image.png'],
+    images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
@@ -97,11 +98,9 @@ export default function RootLayout({
         className={`${plusJakartaSans.variable} ${newsreader.variable} min-h-screen bg-[var(--canvas)] font-sans text-[var(--ink)] antialiased`}
       >
         <ScrollTop />
-        <Header />
+        <HideOnAdmin><Header /></HideOnAdmin>
         <main>{children}</main>
-        <Footer />
-        <MobileCta />
-        <Analytics />
+        <HideOnAdmin><Footer /><MobileCta /><Analytics /></HideOnAdmin>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -123,7 +122,7 @@ export default function RootLayout({
                 {
                   "@type": "Product",
                   "name": OFFER.name,
-                  "image": `${SITE.url}/hero-book-v2.png`,
+                  "image": `${SITE.url}/og-image.jpg`,
                   "description": "Service de création de livre autobiographique par entretiens téléphoniques avec IA.",
                   "brand": {
                     "@type": "Brand",

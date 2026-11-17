@@ -9,16 +9,18 @@
  * Autrement dit : si ce worker ne trouve jamais rien à faire, tout va bien.
  *
  * DÉCLENCHEMENT
- *   · Vercel Pro     → cron toutes les minutes (vercel.json)
- *   · Vercel Hobby   → cron limité à une fois par jour. Acceptable pour
- *                      démarrer, puisque c'est un filet et non le chemin
- *                      principal. Peut aussi être appelé à la main.
+ *   · Serveur vocal  → toutes les 5 minutes (voice/src/scheduler.ts), avec le
+ *                      secret qu'il partage déjà avec le site pour les rapports
+ *                      d'appel (`x-vapi-secret`). C'est le rattrapage courant.
+ *   · Vercel Hobby   → cron une fois par jour, à 3 h : le filet du filet, si
+ *                      le serveur vocal est lui-même arrêté.
  *   · Manuellement   → curl -H "Authorization: Bearer $CRON_SECRET" \
  *                        https://www.loomina.eu/api/jobs/process
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { sweepPending } from '@/lib/loomina/events';
+import { sweepCorrections } from '@/lib/loomina/corrections';
 import { checkSharedSecret } from '@/lib/loomina/secret';
 
 export const runtime = 'nodejs';
@@ -26,10 +28,14 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
 /**
- * Vercel Cron envoie automatiquement `Authorization: Bearer $CRON_SECRET`
- * quand la variable est définie sur le projet.
+ * Deux appelants autorisés :
+ * - Vercel Cron, qui envoie `Authorization: Bearer $CRON_SECRET` ;
+ * - le serveur vocal, qui envoie `x-vapi-secret`, le secret qu'il partage
+ *   déjà avec le site. Aucun secret de plus à recopier d'un côté à l'autre.
  */
 function isAuthorized(request: NextRequest): boolean {
+    const shared = request.headers.get('x-vapi-secret');
+    if (shared) return checkSharedSecret(shared, process.env.VAPI_WEBHOOK_SECRET, 'jobs');
     const header = request.headers.get('authorization') ?? '';
     const provided = header.replace(/^Bearer\s+/i, '');
     return checkSharedSecret(provided, process.env.CRON_SECRET, 'jobs');
@@ -52,10 +58,16 @@ async function handle(request: NextRequest) {
             console.info(`[jobs] ${picked} événement(s) repris :`, results);
         }
 
+        // Les remarques des auteurs sur leurs récits, appliquées par l'IA
+        // quelques minutes après avoir été écrites.
+        const corrections = await sweepCorrections();
+        if (corrections.applied || corrections.failed) console.info('[jobs] remarques d’auteur :', corrections);
+
         return NextResponse.json({
             ok: true,
             picked,
             results,
+            corrections,
             durationMs: Date.now() - startedAt,
         });
     } catch (err) {

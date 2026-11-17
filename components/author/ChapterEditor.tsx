@@ -8,11 +8,11 @@ type Step = "closed" | "describe" | "proposing" | "review" | "saving";
 /**
  * Corriger un chapitre depuis l'espace auteur.
  *
- * 1. L'auteur décrit l'erreur (« Ma grand-mère s'appelait Rose, pas Rosa »).
- * 2. Loomina propose le texte corrigé, en changeant le moins possible.
- * 3. L'auteur relit, retouche s'il veut, puis enregistre. La correction
- *    rejoint la mémoire du livre : les chapitres suivants la respectent.
- * L'auteur peut aussi modifier le texte directement.
+ * Deux façons (demande de Solal, 17/11/2026) :
+ * - écrire une remarque (« Ma grand-mère s'appelait Rose, pas Rosa ») :
+ *   Loomina corrige le récit quelques minutes plus tard et prévient l'auteur ;
+ * - modifier le texte soi-même : enregistré et affiché tout de suite.
+ * Dans les deux cas, la correction rejoint la mémoire du livre.
  */
 export default function ChapterEditor({
   number,
@@ -37,15 +37,16 @@ export default function ChapterEditor({
       const res = await fetch(`/api/user/chapters/${number}/correction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correction, content }),
+        body: JSON.stringify({ correction, later: true }),
       });
       if (res.status === 401) return onUnauthorized();
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : "La proposition n’a pas abouti.");
-      setDraft(data.content);
-      setStep("review");
+      if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : "L’envoi n’a pas abouti.");
+      setCorrection("");
+      setStep("closed");
+      setMessage({ ok: true, text: "Remarque envoyée. Loomina corrige ce récit dans les minutes qui viennent et vous prévient dès que c’est fait." });
     } catch (err) {
-      setMessage({ ok: false, text: err instanceof Error ? err.message : "La proposition n’a pas abouti." });
+      setMessage({ ok: false, text: err instanceof Error ? err.message : "L’envoi n’a pas abouti." });
       setStep("describe");
     }
   };
@@ -56,7 +57,7 @@ export default function ChapterEditor({
       const res = await fetch(`/api/user/chapters/${number}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: draft, correction: correction.trim() || undefined }),
+        body: JSON.stringify({ content: draft }),
       });
       if (res.status === 401) return onUnauthorized();
       const data = await res.json().catch(() => ({}));
@@ -64,7 +65,7 @@ export default function ChapterEditor({
       onSaved(draft);
       setCorrection("");
       setStep("closed");
-      setMessage({ ok: true, text: "Chapitre corrigé. Loomina s’en souviendra pour la suite du livre." });
+      setMessage({ ok: true, text: "Récit enregistré." });
     } catch (err) {
       setMessage({ ok: false, text: err instanceof Error ? err.message : "L’enregistrement n’a pas abouti." });
       setStep("review");
@@ -104,7 +105,7 @@ export default function ChapterEditor({
           />
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={propose} loading={step === "proposing"} disabled={correction.trim().length < 4}>
-              Proposer le texte corrigé
+              Envoyer ma remarque
             </Button>
             <button
               type="button"
@@ -127,7 +128,7 @@ export default function ChapterEditor({
       {(step === "review" || step === "saving") && (
         <div className="space-y-3">
           <label htmlFor={`${id}-texte`} className="field-label">
-            {correction.trim() ? "Texte corrigé proposé : relisez-le, retouchez-le si besoin" : "Le texte du récit"}
+            Le texte du récit : modifiez-le directement
           </label>
           <textarea id={`${id}-texte`} rows={16} value={draft} onChange={(e) => setDraft(e.target.value)} className="field book-text !min-h-[320px]" lang="fr" />
           <div className="flex flex-wrap items-center gap-3">

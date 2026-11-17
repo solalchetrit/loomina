@@ -7,6 +7,8 @@ RUN cd voice && npm install --omit=dev
 # remontant depuis /app/lib, jamais dans /app/voice. Ce lien les rend visibles.
 RUN ln -s /app/voice/node_modules /app/node_modules
 COPY lib ./lib
+# lib/loomina lit les promesses de l'offre et les coordonnées du site.
+COPY config ./config
 COPY voice ./voice
 WORKDIR /app/voice
 ENV NODE_ENV=production

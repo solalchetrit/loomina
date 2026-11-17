@@ -36,7 +36,7 @@ export const PHASE_LABELS: Record<Phase, string> = {
 /** Ce que la phase cherche à obtenir — injecté dans le prompt du Directeur. */
 export const PHASE_GOALS: Record<Phase, string> = {
     1: "Établir la confiance, poser le cadre du projet, recueillir l'identité (nom, naissance, lieux) et esquisser une timeline de vie grossière.",
-    2: "Explorer l'enfance, les racines familiales, les lieux d'origine, les figures marquantes de la jeunesse.",
+    2: "Commencer par le bagage familial (d'où vient la famille, l'histoire des parents et des grands-parents avant sa naissance), puis explorer l'enfance, les lieux d'origine, les figures marquantes de la jeunesse.",
     3: "Explorer la vie adulte, quelle que soit sa forme : ce qui a occupé ses journées, les personnes aimées, les passions, les rencontres décisives, les épreuves traversées. Ne présume ni métier, ni mariage, ni enfants.",
     4: "Recueillir l'héritage moral : messages aux proches, valeurs transmises, regard rétrospectif sur la vie. C'est la phase de clôture du livre.",
 };

@@ -18,6 +18,7 @@ services:
       paths:
         - voice/**
         - lib/**
+        - config/**
     envVars:
       - key: NODE_ENV
         value: production
@@ -29,8 +30,6 @@ services:
         value: https://www.loomina.eu
       # Mêmes valeurs que sur Vercel.
       - key: VAPI_WEBHOOK_SECRET
-        sync: false
-      - key: CRON_SECRET
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false

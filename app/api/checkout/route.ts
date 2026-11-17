@@ -6,7 +6,7 @@ import { normalizeCallMinutes } from "@/lib/loomina/call-length";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { firstName, lastName, phone, email, isGift, callMinutes } = body;
+        const { firstName, lastName, phone, email, isGift, callMinutes, giverFirstName, giverPhone } = body;
 
         // Validation simple
         if (!email || !firstName || !lastName) {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
                         product_data: {
                             name: `Loomina — ${OFFER.name}`,
                             description: `Entretiens par téléphone, écriture, relecture humaine, livre relié (${OFFER.format}) livré chez vous, version numérique.`,
-                            images: ["https://www.loomina.eu/hero-book-v2.png"],
+                            images: ["https://www.loomina.eu/og-image.jpg"],
                         },
                         unit_amount: OFFER.price * 100,
                     },
@@ -47,6 +47,9 @@ export async function POST(request: NextRequest) {
                 email,
                 isGift: isGift ? "true" : "false",
                 callMinutes: String(normalizeCallMinutes(callMinutes)),
+                // Livre offert : la personne qui offre, pour son espace famille.
+                giverFirstName: isGift && typeof giverFirstName === "string" ? giverFirstName.trim().slice(0, 60) : "",
+                giverPhone: isGift && typeof giverPhone === "string" ? giverPhone.trim().slice(0, 20) : "",
                 // On pourrait ajouter un userId ici si l'utilisateur était authentifié via Supabase Auth
                 // userId: user.id
             },

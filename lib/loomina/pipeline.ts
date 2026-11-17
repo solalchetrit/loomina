@@ -32,6 +32,8 @@ import { runDirector } from './director';
 import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
+import type { TokenUsage } from './usage';
+import { notifyFamily, alertTeam } from './notify';
 import { autoCompose } from './book-edition';
 
 /**
@@ -125,6 +127,8 @@ interface AnalysisLog {
     /** Sujets suggérés montrés au Directeur, et ceux qu'il a jugés abordés. */
     suggestions_shown?: string[];
     covered_suggestions?: number[];
+    /** Jetons consommés par le Directeur et l'Écrivain (suivi des coûts). */
+    usage?: { director?: TokenUsage; writer?: TokenUsage };
 }
 
 /** Ce que l'Écrivain a besoin de savoir de l'analyse, rejouable depuis la base. */
@@ -395,9 +399,16 @@ export async function processEndOfCall(params: {
 
     if (chapterError) throw new Error(`Écriture chapters impossible : ${chapterError.message}`);
 
+    // Les jetons de l'Écrivain rejoignent ceux du Directeur dans le journal de
+    // l'analyse (relu ici : il a été écrit plus haut, parfois par un essai précédent).
+    const { data: logRow } = await supabase.from('interviews').select('ai_analysis_log').eq('id', interviewId).single();
+    const priorLog = (logRow?.ai_analysis_log ?? {}) as AnalysisLog;
     await supabase
         .from('interviews')
-        .update({ processing_status: 'processed' })
+        .update({
+            processing_status: 'processed',
+            ...(writer.usage ? { ai_analysis_log: { ...priorLog, usage: { ...priorLog.usage, writer: writer.usage } } } : {}),
+        })
         .eq('id', interviewId);
 
     // Après l'écriture seulement : un essai repris qui retrouve le chapitre
@@ -406,6 +417,15 @@ export async function processEndOfCall(params: {
         profile: params.profile,
         projectMetadata: project.project_metadata,
         title: writer.chapter_title,
+    });
+
+    // La personne qui a offert le livre est tenue au courant.
+    await notifyFamily({
+        projectMetadata: project.project_metadata,
+        narratorFirstName: params.profile.first_name,
+        kind: chapterNumber === 1 ? 'first_call' : 'new_story',
+        // Le titre ne part que si le narrateur partage ses récits avec l'offreur.
+        storyTitle: project.project_metadata?.share_with_giver === true ? writer.chapter_title : undefined,
     });
 
     // Le livre se recompose avec ce nouveau récit, sans attendre ici.
@@ -473,6 +493,7 @@ async function persistDirectorResult(params: {
                 family_members: director.family_members,
                 suggestions_shown: director.context.suggested_topics ?? [],
                 covered_suggestions: director.covered_suggestions,
+                usage: director.usage ? { director: director.usage } : undefined,
                 model: director.model,
                 at: new Date().toISOString(),
             },
@@ -499,6 +520,18 @@ async function persistDirectorResult(params: {
         profileUpdates: director.profile_updates,
         familyMembers: director.family_members,
     });
+
+    // Le livre vient d'être déclaré complet : la famille et l'équipe le savent.
+    // (Un essai repris peut renvoyer ce message : rare, et sans gravité.)
+    if (projectCompleted && project.status !== 'completed') {
+        const name = profile.first_name ?? 'Un auteur';
+        await notifyFamily({ projectMetadata: project.project_metadata, narratorFirstName: profile.first_name, kind: 'book_complete' });
+        await alertTeam({
+            subject: `Livre terminé : ${name}`,
+            text: `${name} a dit que son livre est complet. Il attend maintenant votre relecture.`,
+            sms: `${name} a terminé son livre. Il attend la relecture.`,
+        });
+    }
 }
 
 /**

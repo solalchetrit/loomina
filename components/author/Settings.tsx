@@ -123,15 +123,6 @@ export default function Settings({
               ))}
             </div>
           </fieldset>
-          <Input
-            label="Prononciation de votre prénom"
-            name="phonetic"
-            maxLength={80}
-            value={form.firstNamePhonetic ?? ""}
-            onChange={(e) => update({ firstNamePhonetic: e.target.value })}
-            placeholder={firstName ?? "Votre prénom"}
-            hint="Si la voix l’écorche, écrivez-le comme il se prononce (par exemple « Solale »)."
-          />
           <div>
             <label htmlFor="sujet-evite" className="field-label">
               Sujets à ne pas aborder
@@ -173,6 +164,15 @@ export default function Settings({
             )}
             <p className="t-small mt-2">Loomina ne les abordera pas. Vous restez libre d’en parler vous-même.</p>
           </div>
+          <Input
+            label="Prononciation de votre prénom"
+            name="phonetic"
+            maxLength={80}
+            value={form.firstNamePhonetic ?? ""}
+            onChange={(e) => update({ firstNamePhonetic: e.target.value })}
+            placeholder={firstName ?? "Votre prénom"}
+            hint="Si la voix l’écorche, écrivez-le comme il se prononce : par exemple « Létissia » pour Laetitia."
+          />
         </div>
       </section>
 
@@ -267,6 +267,29 @@ export default function Settings({
             </div>
             <p className="t-small mt-2">Un SMS arrive quelques minutes après l’appel, avec le lien vers le récit de l’appel.</p>
           </fieldset>
+          {form.giverFirstName !== null && (
+            <fieldset>
+              <legend className="field-label">Laisser {form.giverFirstName || "la personne qui vous a offert ce livre"} lire vos récits</legend>
+              <div className="flex gap-2">
+                {[true, false].map((v) => (
+                  <button
+                    key={String(v)}
+                    type="button"
+                    aria-pressed={form.shareWithGiver === v}
+                    onClick={() => update({ shareWithGiver: v })}
+                    className={`press min-h-12 flex-1 rounded-full text-[16px] font-bold ${
+                      form.shareWithGiver === v ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
+                    }`}
+                  >
+                    {v ? "Oui" : "Pas pour l’instant"}
+                  </button>
+                ))}
+              </div>
+              <p className="t-small mt-2">
+                {form.giverFirstName || "Cette personne"} suit l’avancement de votre livre et voit le titre de vos récits. Le texte, c’est vous qui décidez, et vous pouvez changer d’avis à tout moment.
+              </p>
+            </fieldset>
+          )}
         </div>
       </section>
 

@@ -9,6 +9,7 @@
  * `projects.project_metadata.book_plan`.
  */
 
+import { promptText, refreshPrompts } from './prompt-store';
 import OpenAI from 'openai';
 import type { LoominaContext } from './context';
 import { renderContext } from './context';
@@ -25,12 +26,20 @@ export interface BookPlan {
     at: string;
 }
 
-const MODEL = 'gpt-5.5';
+export const BOOK_PLAN_MODEL = 'gpt-5.5';
+
+/** Consigne du rangement des récits par périodes de vie. */
+export const BOOK_PLAN_SYSTEM = `Tu prépares le plan d'une autobiographie avant impression. Les chapitres ont été écrits dans l'ordre des entretiens, pas dans l'ordre de la vie.
+- Regroupe-les en 2 à 7 parties qui suivent la chronologie de la vie (enfance, jeunesse, vie adulte, aujourd'hui, messages…). Un chapitre de réflexion ou de messages aux proches va à la fin.
+- Chaque chapitre apparaît exactement une fois. Dans une partie, range-les dans l'ordre chronologique.
+- Titre de partie : court (2 à 6 mots), concret, tiré des chapitres (un lieu, une époque). Aucun fait qui n'y figure pas.
+Réponds en JSON : { "parts": [ { "title": "…", "chapters": [3, 1] } ] }`;
 
 export async function buildBookPlan(params: {
     chapters: Array<{ chapter_number: number; title: string | null; content_markdown: string | null }>;
     context: LoominaContext;
 }): Promise<BookPlan> {
+    await refreshPrompts();
     const numbers = params.chapters.map((c) => c.chapter_number);
     const list = params.chapters
         .map((c) => {
@@ -41,17 +50,13 @@ export async function buildBookPlan(params: {
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 1, timeout: 90_000 });
     const completion = await client.chat.completions.create({
-        model: MODEL,
+        model: BOOK_PLAN_MODEL,
         reasoning_effort: 'low',
         response_format: { type: 'json_object' },
         messages: [
             {
                 role: 'system',
-                content: `Tu prépares le plan d'une autobiographie avant impression. Les chapitres ont été écrits dans l'ordre des entretiens, pas dans l'ordre de la vie.
-- Regroupe-les en 2 à 7 parties qui suivent la chronologie de la vie (enfance, jeunesse, vie adulte, aujourd'hui, messages…). Un chapitre de réflexion ou de messages aux proches va à la fin.
-- Chaque chapitre apparaît exactement une fois. Dans une partie, range-les dans l'ordre chronologique.
-- Titre de partie : court (2 à 6 mots), concret, tiré des chapitres (un lieu, une époque). Aucun fait qui n'y figure pas.
-Réponds en JSON : { "parts": [ { "title": "…", "chapters": [3, 1] } ] }`,
+                content: promptText('rangement', BOOK_PLAN_SYSTEM),
             },
             { role: 'user', content: `# MÉMOIRE DU LIVRE\n${renderContext(params.context)}\n\n# CHAPITRES\n${list}` },
         ],

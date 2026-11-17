@@ -16,7 +16,7 @@ const securityHeaders = [
 const forArtifact = process.env.ARTIFACT === "1";
 
 const nextConfig: NextConfig = {
-  ...(forArtifact ? { distDir: ".next-artifact", images: { unoptimized: true } } : {}),
+  ...(forArtifact ? { distDir: ".next-artifact", images: { unoptimized: true }, turbopack: { resolveAlias: { "@/lib/loomina/artifact-hook": "./lib/loomina/artifact-api.ts" } } } : {}),
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

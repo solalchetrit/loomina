@@ -4,6 +4,7 @@ import { formatToE164 } from '@/lib/phone';
 import { db, findProfileByPhone } from '@/lib/loomina/db';
 import { stripe } from '@/lib/stripe';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
+import { notifyNewOrder } from '@/lib/loomina/notify';
 
 /**
  * Provisionnement d'un client après paiement.
@@ -66,6 +67,12 @@ export async function POST(request: NextRequest) {
     const lastName = meta.lastName?.trim() || '';
     const isGift = meta.isGift === 'true' || meta.isGift === '1';
     const phone = meta.phone ? formatToE164(meta.phone) : null;
+    // Livre offert : celui qui offre ouvrira l'espace famille avec son propre numéro.
+    const giverPhone = isGift && meta.giverPhone ? formatToE164(meta.giverPhone) : null;
+    const giver =
+        giverPhone && /^\+\d{8,15}$/.test(giverPhone) && giverPhone !== phone
+            ? { first_name: meta.giverFirstName?.trim() || null, phone: giverPhone }
+            : null;
 
     try {
         const supabase = db();
@@ -130,7 +137,12 @@ export async function POST(request: NextRequest) {
             current_topic_id: 1,
             stripe_session_id: session.id,   // la garantie d'idempotence
             // L'acheteur peut être différent du narrateur (cadeau).
-            project_metadata: { is_gift: isGift, buyer_email: email, call_minutes: normalizeCallMinutes(meta.callMinutes) },
+            project_metadata: {
+                is_gift: isGift,
+                buyer_email: email,
+                call_minutes: normalizeCallMinutes(meta.callMinutes),
+                ...(giver ? { giver } : {}),
+            },
         });
 
         if (projetErr) {
@@ -143,6 +155,9 @@ export async function POST(request: NextRequest) {
         }
 
         console.log(`[stripe] compte et projet créés pour ${email} (phase 1)`);
+        // Bienvenue au client (e-mail et SMS) et alerte à l'équipe. Une seule
+        // fois : un rejeu de Stripe est arrêté plus haut. Ne lève jamais.
+        await notifyNewOrder({ buyerEmail: email, narratorFirstName: firstName, narratorPhone: phone, isGift, giver });
         return NextResponse.json({ received: true, provisioned: true });
 
     } catch (err) {

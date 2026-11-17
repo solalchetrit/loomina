@@ -19,7 +19,7 @@ function photosOf(meta: Record<string, unknown> | null): PhotoEntry[] {
 
 async function withUrls(photos: PhotoEntry[]) {
     const urls = await signedUrls(photos.map((p) => p.path)).catch(() => ({}) as Record<string, string>);
-    return photos.map((p) => ({ id: p.id, caption: p.caption, question: p.question, at: p.at, url: urls[p.path] ?? null }));
+    return photos.map((p) => ({ id: p.id, caption: p.caption, question: p.question, chapter: p.chapter ?? null, at: p.at, url: urls[p.path] ?? null }));
 }
 
 /** Les photos du livre, avec des liens d'affichage temporaires. */
@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
         const form = await request.formData();
         const file = form.get('photo');
         const caption = typeof form.get('caption') === 'string' ? (form.get('caption') as string).trim().slice(0, 200) || null : null;
+        const chapter = typeof form.get('chapter') === 'string' ? (form.get('chapter') as string).trim().slice(0, 120) || null : null;
         if (!(file instanceof File)) return NextResponse.json({ error: 'Aucune photo reçue.' }, { status: 400 });
         const ext = TYPES[file.type];
         if (!ext) return NextResponse.json({ error: 'Format non pris en charge : envoyez une photo JPEG ou PNG.' }, { status: 415 });
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
             politeness: profile.politeness_preference === 'tu' ? 'tu' : 'vous',
             firstName: profile.first_name ?? 'le narrateur',
         });
-        const entry: PhotoEntry = { id, path, caption, description, question, at: new Date().toISOString() };
+        const entry: PhotoEntry = { id, path, caption, description, question, chapter, at: new Date().toISOString() };
 
         // Relire juste avant d'écrire : le pipeline a pu changer le contexte.
         const { data: fresh, error: readErr } = await db().from('projects').select('context, project_metadata').eq('id', project.id).single();

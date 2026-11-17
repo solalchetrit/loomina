@@ -49,8 +49,8 @@ Dans Twilio → Phone Numbers → le numéro → Voice → « A call comes in »
 Webhook `https://loomina-voice.fly.dev/twilio/voice`, méthode POST.
 Pour revenir à Vapi : remettre `https://api.vapi.ai/twilio/inbound_call`.
 
-Appels sortants depuis l'espace auteur : poser `VOICE_SERVER_URL=https://loomina-voice.fly.dev`
-sur Vercel ; `/api/call` passe alors par Twilio au lieu de Vapi.
+Appels sortants : seuls les rendez-vous d'appel en lancent (voir `src/scheduler.ts`). L'ancienne route
+`/api/call` du site, qui passait par Vapi, a été retirée le 17/11/2026.
 
 ## Réglages (variables d'environnement)
 
@@ -62,7 +62,6 @@ sur Vercel ; `/api/call` passe alors par Twilio au lieu de Vapi.
 | `VOICE_STT_MODEL` | modèle Deepgram | `nova-3-general` |
 | `VOICE_MAX_CALL_SECONDS` | durée max d'un entretien | `2700` |
 | `VOICE_SILENCE_SECONDS` | silence avant relance, puis fin | `60` |
-| `CRON_SECRET` | même valeur que sur Vercel : rattrape les appels en échec toutes les 5 min | absent = pas de rattrapage ici |
 | `CALL_SCHEDULER` | rendez-vous d'appel réguliers choisis dans l'espace auteur (`off` pour couper) | `on` |
 
 ## Rendez-vous et rattrapage

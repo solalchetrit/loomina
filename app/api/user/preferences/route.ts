@@ -63,8 +63,17 @@ export async function PATCH(request: NextRequest) {
             meta.prefs_set_at = new Date().toISOString();
             metaChanged = true;
         }
+        // L'accueil du premier passage est fait (enregistré ou remis à plus tard).
+        if (body.welcomeDone === true) {
+            meta.welcome_done_at = new Date().toISOString();
+            metaChanged = true;
+        }
         if (typeof body.smsChapter === 'boolean') {
             meta.sms_chapter = body.smsChapter;
+            metaChanged = true;
+        }
+        if (typeof body.shareWithGiver === 'boolean') {
+            meta.share_with_giver = body.shareWithGiver;
             metaChanged = true;
         }
         if (body.callSchedule !== undefined) {

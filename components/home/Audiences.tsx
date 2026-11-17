@@ -17,7 +17,7 @@ const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]
     icon: "gift",
     title: "Pour l’offrir à un parent",
     text: "Le cadeau d’un livre qui reste : votre proche raconte, et toute la famille reçoit son histoire.",
-    points: ["Vous indiquez son numéro à la commande", "Il appelle à son rythme, sans ordinateur", "Vous suivez son livre au fil des appels, dans l’espace auteur"],
+    points: ["Vous indiquez son numéro à la commande", "Il appelle à son rythme, sans ordinateur", "Vous suivez son livre dans votre espace famille"],
     cta: "Offrir le livre",
     href: "/order#pour-offrir",
     photo: { name: "grand-mere-calin", alt: "Une petite fille serre sa grand-mère dans ses bras.", focus: "50% 35%" },

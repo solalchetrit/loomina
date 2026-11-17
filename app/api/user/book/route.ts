@@ -2,7 +2,7 @@ import { NextRequest, NextResponse, after } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { readEditions, startEdition, kickEdition, publicEdition, autoCompose } from '@/lib/loomina/book-edition';
-import { DEMO_DATA } from '@/lib/loomina/demo';
+import { DEMO_DATA, demoEdition } from '@/lib/loomina/demo';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,7 +15,7 @@ const STALE_MS = 3 * 60 * 1000;
  * l'avancement de celle qui est en cours.
  */
 export async function GET(request: NextRequest) {
-    if (DEMO_DATA) return NextResponse.json({ edition: null, running: null, failed: false, sourceCount: 0 });
+    if (DEMO_DATA) return NextResponse.json(demoEdition());
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatToE164 } from "@/lib/phone";
 import { findProfileByPhone } from "@/lib/loomina/db";
-import { signSession, SESSION_COOKIE } from "@/lib/loomina/session";
+import { findGiftProjects } from "@/lib/loomina/giver";
+import { signSession, SESSION_COOKIE, SESSION_MAX_AGE_S } from "@/lib/loomina/session";
 
 // Twilio credentials from environment variables
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
@@ -42,9 +43,10 @@ export async function POST(request: NextRequest) {
 
             // 1. Le numéro doit correspondre à un client existant (schéma v2 : table profiles,
             //    lue avec la clé service role — l'ancienne RPC check_client_exists n'existe plus).
+            //    Ou à la personne qui a offert un livre : elle ouvre l'espace famille.
             let profile;
             try {
-                profile = await findProfileByPhone(formattedPhone);
+                profile = (await findProfileByPhone(formattedPhone)) ?? ((await findGiftProjects(formattedPhone)).length > 0 ? { giver: true } : null);
             } catch (dbErr) {
                 console.error("[Verify API] DB Error:", dbErr);
                 return NextResponse.json({ message: "Database error during verification check" }, { status: 500 });
@@ -143,7 +145,7 @@ export async function POST(request: NextRequest) {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
-                maxAge: 60 * 60 * 24 * 7, // 7 days
+                maxAge: SESSION_MAX_AGE_S,
                 path: '/',
             });
 
