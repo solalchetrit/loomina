@@ -87,6 +87,9 @@ export interface ClientDetail {
         giver: Giver | null;
         stripeSessionId: string | null;
         paidAt: string | null;
+        refundedAt: string | null;
+        refundAmount: number | null;
+        relances: Array<{ at: string; to?: string }>;
     };
     settings: {
         schedule: ReturnType<typeof normalizeSchedule>;
@@ -152,6 +155,9 @@ export async function getClient(profileId: string): Promise<ClientDetail | null>
             giver: readGiver(meta),
             stripeSessionId: project?.stripe_session_id ?? null,
             paidAt: project?.created_at ?? null,
+            refundedAt: typeof meta.refunded_at === 'string' ? meta.refunded_at : null,
+            refundAmount: typeof meta.refund_amount === 'number' ? meta.refund_amount : null,
+            relances: Array.isArray(meta.relances) ? (meta.relances as Array<{ at: string; to?: string }>).filter((r) => typeof r?.at === 'string') : [],
         },
         settings: {
             schedule: normalizeSchedule(meta.call_schedule),
@@ -244,6 +250,8 @@ export function configWarnings(): string[] {
         ['TWILIO_ACCOUNT_SID', 'SMS'],
         ['TWILIO_VERIFY_SERVICE_SID', 'code de connexion par SMS'],
         ['JWT_SECRET', 'sessions de l’espace auteur'],
+        ['SMTP_PASS', 'envoi des e-mails (bienvenue, alertes, nouvelles à la famille) depuis contact@loomina.eu'],
+        ['LOOMINA_ALERT_PHONE', 'SMS d’alerte à l’équipe'],
     ];
     for (const [name, role] of need) if (!process.env[name]?.trim()) w.push(`${name} absente (${role}).`);
     if (!process.env.CRON_SECRET?.trim()) w.push('CRON_SECRET absente : le rattrapage de 3 h par le site ne passe pas (celui du serveur vocal, toutes les 5 minutes, continue).');

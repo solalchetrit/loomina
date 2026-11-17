@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { signSession, SESSION_COOKIE } from "@/lib/loomina/session";
+import { signSession, SESSION_COOKIE, SESSION_MAX_AGE_S } from "@/lib/loomina/session";
 import { db, maskPhone } from "@/lib/loomina/db";
 
 /**
@@ -37,7 +37,7 @@ export async function POST() {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: SESSION_MAX_AGE_S,
     path: "/",
   });
   return response;

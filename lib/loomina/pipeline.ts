@@ -32,6 +32,7 @@ import { runDirector } from './director';
 import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
+import { notifyFamily, alertTeam } from './notify';
 import { autoCompose } from './book-edition';
 
 /**
@@ -408,6 +409,14 @@ export async function processEndOfCall(params: {
         title: writer.chapter_title,
     });
 
+    // La personne qui a offert le livre est tenue au courant.
+    await notifyFamily({
+        projectMetadata: project.project_metadata,
+        narratorFirstName: params.profile.first_name,
+        kind: chapterNumber === 1 ? 'first_call' : 'new_story',
+        storyTitle: writer.chapter_title,
+    });
+
     // Le livre se recompose avec ce nouveau récit, sans attendre ici.
     await autoCompose(project.id);
 
@@ -499,6 +508,18 @@ async function persistDirectorResult(params: {
         profileUpdates: director.profile_updates,
         familyMembers: director.family_members,
     });
+
+    // Le livre vient d'être déclaré complet : la famille et l'équipe le savent.
+    // (Un essai repris peut renvoyer ce message : rare, et sans gravité.)
+    if (projectCompleted && project.status !== 'completed') {
+        const name = profile.first_name ?? 'Un auteur';
+        await notifyFamily({ projectMetadata: project.project_metadata, narratorFirstName: profile.first_name, kind: 'book_complete' });
+        await alertTeam({
+            subject: `Livre terminé : ${name}`,
+            text: `${name} a dit que son livre est complet. Il attend maintenant votre relecture.`,
+            sms: `${name} a terminé son livre. Il attend la relecture.`,
+        });
+    }
 }
 
 /**

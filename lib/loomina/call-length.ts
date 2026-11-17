@@ -14,17 +14,21 @@
 export const CALL_MINUTES_OPTIONS = [15, 20, 30, 45] as const;
 export const DEFAULT_CALL_MINUTES = 20;
 
-/** Marge laissée après la durée visée pour finir le sujet en cours. */
-const OVERTIME_MINUTES = 20;
+/**
+ * Plafond dur d'un appel (demande de Solal, 17/11/2026) : tant que la
+ * personne continue de raconter, on la laisse faire, même bien après la
+ * durée souhaitée. Seule limite : 1 h 30 au total.
+ */
+export const MAX_CALL_MINUTES = 90;
 
 export function normalizeCallMinutes(v: unknown): number {
     const n = Number(v);
     return (CALL_MINUTES_OPTIONS as readonly number[]).includes(n) ? n : DEFAULT_CALL_MINUTES;
 }
 
-/** Plafond dur de l'appel : la durée visée plus de quoi clore le sujet. */
-export function hardLimitSeconds(targetMinutes: number, floorSeconds: number): number {
-    return Math.max(floorSeconds, (targetMinutes + OVERTIME_MINUTES) * 60);
+/** Plafond dur de l'appel : 1 h 30, quelle que soit la durée souhaitée. */
+export function hardLimitSeconds(_targetMinutes: number, floorSeconds: number): number {
+    return Math.max(floorSeconds, MAX_CALL_MINUTES * 60);
 }
 
 /**

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { formatToE164 } from "@/lib/phone";
 import { findProfileByPhone } from "@/lib/loomina/db";
 import { findGiftProjects } from "@/lib/loomina/giver";
-import { signSession, SESSION_COOKIE } from "@/lib/loomina/session";
+import { signSession, SESSION_COOKIE, SESSION_MAX_AGE_S } from "@/lib/loomina/session";
 
 // Twilio credentials from environment variables
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
-                maxAge: 60 * 60 * 24 * 7, // 7 days
+                maxAge: SESSION_MAX_AGE_S,
                 path: '/',
             });
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/loomina/db";
+import { alertTeam } from "@/lib/loomina/notify";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,33 +11,15 @@ export const dynamic = "force-dynamic";
  * Avant : un `mailto:` qui ouvrait (ou non) le logiciel de messagerie du
  * visiteur, et un message perdu si rien ne s'ouvrait.
  *
- * Maintenant : le message est enregistré dans `contact_messages`, puis, si
- * `CONTACT_NOTIFY_PHONE` est renseignée, un SMS prévient l'équipe via Twilio.
- * L'enregistrement suffit à répondre « bien reçu » ; le SMS est un confort.
+ * Maintenant : le message est enregistré dans `contact_messages`, puis
+ * l'équipe est prévenue par e-mail et par SMS (lib/loomina/notify.ts).
+ * L'enregistrement suffit à répondre « bien reçu ».
  */
 
 const MAX = { name: 120, email: 200, message: 4000 };
 
 function clean(v: unknown, max: number): string {
     return typeof v === "string" ? v.trim().slice(0, max) : "";
-}
-
-async function notifyBySms(text: string): Promise<void> {
-    const to = process.env.CONTACT_NOTIFY_PHONE;
-    const sid = process.env.TWILIO_ACCOUNT_SID;
-    const token = process.env.TWILIO_AUTH_TOKEN;
-    const from = process.env.CONTACT_SMS_FROM;
-    if (!to || !sid || !token || !from) return;
-
-    const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-        method: "POST",
-        headers: {
-            Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64"),
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({ To: to, From: from, Body: text.slice(0, 600) }),
-    });
-    if (!res.ok) console.warn("[contact] SMS non envoyé :", res.status);
 }
 
 export async function POST(request: NextRequest) {
@@ -73,7 +56,14 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    notifyBySms(`Loomina — message de ${name} (${email}) [${subject}] : ${message}`).catch(() => {});
+    // L'équipe est prévenue par e-mail et par SMS. Attendu : sur Vercel, ce
+    // qui n'est pas attendu avant la réponse peut ne jamais partir.
+    await alertTeam({
+        subject: `Message de ${name} [${subject}]`,
+        text: `${name} (${email}) a écrit depuis le formulaire de contact :\n\n${message}`,
+        sms: `message de ${name} (${email}) [${subject}] : ${message.slice(0, 300)}`,
+        replyTo: email,
+    });
 
     return NextResponse.json({ ok: true });
 }

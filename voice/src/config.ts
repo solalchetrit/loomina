@@ -46,11 +46,14 @@ export const config = {
 
     limits: {
         /** Durée maximale d'un entretien (secondes). */
-        maxCallSeconds: Number(optional('VOICE_MAX_CALL_SECONDS', '2700')),
+        maxCallSeconds: Number(optional('VOICE_MAX_CALL_SECONDS', '5400')),
         /** Silence toléré avant de relancer puis de raccrocher (secondes). */
-        // 60 s : un narrateur âgé peut parler longtemps d'une traite, et Twilio
-        // ne signale la parole qu'à la fin de chaque phrase.
-        silenceSeconds: Number(optional('VOICE_SILENCE_SECONDS', '60')),
+        // 30 s (demande de Solal, 17/11/2026) : Loomina dit qu'elle est toujours
+        // là. Le compte repart de zéro tant que la personne parle.
+        silenceSeconds: Number(optional('VOICE_SILENCE_SECONDS', '30')),
+        /** Après la relance, silence toléré avant de raccrocher (secondes). */
+        // Plus long que la relance : une personne âgée peut chercher ses mots.
+        hangupSilenceSeconds: Number(optional('VOICE_HANGUP_SILENCE_SECONDS', '60')),
         /** Couper la réplique après sa première question (« off » pour laisser passer). */
         // Malgré le prompt, 16 à 28 % des répliques en posaient plusieurs
         // (appels simulés du 16/11/2026) : une personne âgée ne sait plus à

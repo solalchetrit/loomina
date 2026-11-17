@@ -4,6 +4,7 @@ import { formatToE164 } from '@/lib/phone';
 import { db, findProfileByPhone } from '@/lib/loomina/db';
 import { stripe } from '@/lib/stripe';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
+import { notifyNewOrder } from '@/lib/loomina/notify';
 
 /**
  * Provisionnement d'un client après paiement.
@@ -154,6 +155,9 @@ export async function POST(request: NextRequest) {
         }
 
         console.log(`[stripe] compte et projet créés pour ${email} (phase 1)`);
+        // Bienvenue au client (e-mail et SMS) et alerte à l'équipe. Une seule
+        // fois : un rejeu de Stripe est arrêté plus haut. Ne lève jamais.
+        await notifyNewOrder({ buyerEmail: email, narratorFirstName: firstName, narratorPhone: phone, isGift, giver });
         return NextResponse.json({ received: true, provisioned: true });
 
     } catch (err) {

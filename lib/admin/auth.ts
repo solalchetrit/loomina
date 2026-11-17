@@ -7,7 +7,7 @@
  *
  * Le cookie `loomina_admin` contient l'heure de connexion et sa signature
  * (HMAC du mot de passe). Changer le mot de passe déconnecte donc tout le
- * monde. Il expire au bout de 12 heures.
+ * monde. Il expire au bout de 30 jours (demande de Solal, 17/11/2026).
  */
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
@@ -15,7 +15,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export const ADMIN_COOKIE = 'loomina_admin';
-export const ADMIN_MAX_AGE_S = 12 * 60 * 60;
+export const ADMIN_MAX_AGE_S = 30 * 24 * 60 * 60;
 
 function password(): string | null {
     const p = process.env.ADMIN_PASSWORD?.trim();

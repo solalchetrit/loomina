@@ -11,6 +11,7 @@ import { db, findProfileByPhone, findActiveProject, maskPhone } from './db';
 import type { Profile, Project } from './db';
 import { processEndOfCall, extractCallData } from './pipeline';
 import type { PipelineOutcome, VapiMessage } from './pipeline';
+import { alertTeam } from './notify';
 
 export const MAX_ATTEMPTS = 3;
 
@@ -150,6 +151,16 @@ export async function markFailed(eventId: string, message: string) {
             processed_at: new Date().toISOString(),
         })
         .eq('id', eventId);
+
+    // Échec définitif : l'équipe est prévenue, le récit de cet appel ne
+    // s'écrira pas tout seul.
+    if (attempts >= MAX_ATTEMPTS) {
+        await alertTeam({
+            subject: 'Un appel n’a pas pu être traité',
+            text: `Le traitement d'un appel a échoué ${attempts} fois et s'arrête là : son récit n'a pas été écrit.\n\nErreur : ${message.slice(0, 500)}\nÉvénement : ${eventId}`,
+            sms: `un appel n'a pas pu être traité après ${attempts} essais. Voir l'admin.`,
+        });
+    }
 }
 
 /**

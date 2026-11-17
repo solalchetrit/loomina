@@ -6,7 +6,7 @@
  * filtres par colonne, légende, mini-carte, et une vue Liste.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { MapGroup, MapNode, MapRoot } from "@/lib/admin/map";
 import AIcon from "./icons";
 
@@ -135,6 +135,16 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [dragging, setDragging] = useState(false);
   const drag = useRef<{ px: number; py: number; x: number; y: number; moved: boolean } | null>(null);
+  // Les mouvements demandés (boutons, filtres, flèches) glissent en douceur ; le doigt et la molette suivent sans délai.
+  const [anim, setAnim] = useState(false);
+  const animTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const smooth = useCallback(() => {
+    setAnim(true);
+    if (animTimer.current) clearTimeout(animTimer.current);
+    animTimer.current = setTimeout(() => setAnim(false), 300);
+  }, []);
+  const pop = useRef<HTMLElement>(null);
+  const [popH, setPopH] = useState(0);
 
   const all = useMemo(() => groups.flatMap((g) => g.nodes), [groups]);
   const counts = useMemo(() => ({ total: all.length, todo: all.filter((n) => n.status === "todo").length, partial: all.filter((n) => n.status === "partial").length }), [all]);
@@ -146,27 +156,32 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
       if (!el) return;
       const b = box ?? { x: 0, y: 0, w: L.width, h: L.height };
       const z = Math.min(maxZoom, (el.clientWidth - 32) / b.w, (el.clientHeight - 32) / b.h);
+      smooth();
       setView({ z, x: (el.clientWidth - b.w * z) / 2 - b.x * z, y: Math.max(16, (el.clientHeight - b.h * z) / 2) - b.y * z });
     },
-    [L]
+    [L, smooth]
   );
+
+  /** Toute la carte, cadrée sur la largeur (on fait défiler vers le bas). */
+  const fitWidth = useCallback(() => {
+    const el = frame.current;
+    if (!el) return;
+    const z = Math.min(1, (el.clientWidth - 24) / L.width);
+    smooth();
+    setView({ z, x: (el.clientWidth - L.width * z) / 2, y: 12 });
+  }, [L, smooth]);
 
   useEffect(() => {
     if (mode !== "schema") return;
     const g = L.boxes.find((b) => b.group.key === filter);
-    // Toute la carte : on cadre sur la largeur, quitte à faire défiler vers le bas.
     if (g) fit({ x: g.x - 24, y: g.y - 24, w: g.w + 48, h: g.h + 48 }, 1.1);
-    else {
-      const el = frame.current;
-      if (!el) return;
-      const z = Math.min(1, (el.clientWidth - 24) / L.width);
-      setView({ z, x: (el.clientWidth - L.width * z) / 2, y: 12 });
-    }
-  }, [filter, mode, fit, L]);
+    else fitWidth();
+  }, [filter, mode, fit, fitWidth, L]);
 
   const zoom = (factor: number) => {
     const el = frame.current;
     if (!el) return;
+    smooth();
     setView((v) => {
       const z = Math.max(0.2, Math.min(1.6, v.z * factor));
       const cx = el.clientWidth / 2;
@@ -184,23 +199,49 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
     return () => ro.disconnect();
   }, [mode]);
 
-  // Zoom à la molette avec Ctrl ou ⌘ (ou en pinçant sur un pavé tactile).
+  // Zoom autour du pointeur : Ctrl ou ⌘ + molette, ou pincement sur le pavé tactile.
+  // Le pas suit la force du geste (un pincement donne de petits pas, une molette de plus grands),
+  // au lieu d'un pas fixe qui faisait sauter le zoom.
   useEffect(() => {
     const el = frame.current;
     if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey) return;
-      e.preventDefault();
+    const zoomAt = (factor: number, clientX: number, clientY: number) => {
       const r = el.getBoundingClientRect();
-      const cx = e.clientX - r.left;
-      const cy = e.clientY - r.top;
+      const cx = clientX - r.left;
+      const cy = clientY - r.top;
+      setAnim(false);
       setView((v) => {
-        const z = Math.max(0.2, Math.min(1.6, v.z * (e.deltaY < 0 ? 1.08 : 0.92)));
+        const z = Math.max(0.2, Math.min(1.6, v.z * factor));
         return { z, x: cx - ((cx - v.x) / v.z) * z, y: cy - ((cy - v.y) / v.z) * z };
       });
     };
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      zoomAt(Math.exp(-Math.max(-80, Math.min(80, dy)) * 0.006), e.clientX, e.clientY);
+    };
+    // Safari envoie le pincement comme un « geste » : sans ça, c'est toute la page qui zoome.
+    type Gesture = Event & { scale: number; clientX: number; clientY: number };
+    let last = 1;
+    const onGestureStart = (e: Event) => {
+      e.preventDefault();
+      last = 1;
+    };
+    const onGestureChange = (e: Event) => {
+      const g = e as Gesture;
+      e.preventDefault();
+      zoomAt(g.scale / last, g.clientX, g.clientY);
+      last = g.scale;
+    };
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
+    el.addEventListener("gesturestart", onGestureStart);
+    el.addEventListener("gesturechange", onGestureChange);
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("gesturestart", onGestureStart);
+      el.removeEventListener("gesturechange", onGestureChange);
+    };
   }, [mode]);
 
   // ---- Flèches du clavier : passer d'une case à sa voisine ----
@@ -265,7 +306,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
     [L, groups, reachable]
   );
 
-  /** Ramène la case à l'écran (à gauche du détail), et zoome si la carte est trop petite pour lire. */
+  /** Ramène la case à l'écran (le détail s'ouvre à côté), et zoome si la carte est trop petite pour lire. */
   const reveal = useCallback(
     (id: string) => {
       const el = frame.current;
@@ -273,8 +314,9 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
       if (!el || !o) return;
       const fw = el.clientWidth;
       const fh = el.clientHeight;
-      const right = fw >= 700 ? fw - 370 : fw - 16;
+      const right = fw - 16;
       const bottom = fh - 70;
+      smooth();
       setView((v) => {
         const z = v.z < 0.55 ? 0.8 : v.z;
         const sx = o.x * z + v.x;
@@ -283,7 +325,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
         return { z, x: (16 + right) / 2 - (o.x + o.w / 2) * z, y: (16 + bottom) / 2 - (o.y + o.h / 2) * z };
       });
     },
-    [reachable]
+    [reachable, smooth]
   );
 
   const go = useCallback(
@@ -311,6 +353,15 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [mode, selected, neighbour, reachable, roots, go]);
+
+  // La hauteur du détail, pour qu'il ne dépasse pas du cadre.
+  useLayoutEffect(() => {
+    const h = pop.current?.offsetHeight ?? 0;
+    if (h !== popH) setPopH(h);
+    // Taille du cadre, au cas où l'observateur ne l'a pas encore donnée.
+    const el = frame.current;
+    if (el && (el.clientWidth !== size.w || el.clientHeight !== size.h)) setSize({ w: el.clientWidth, h: el.clientHeight });
+  }, [selected, popH, size.w, size.h]);
 
   const sel = selected ? L.placed.get(selected) : null;
   const selRoot = selected ? L.roots.find((r) => r.root.id === selected) : null;
@@ -401,6 +452,25 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
   };
 
   const detail = sel ?? null;
+
+  // Le détail s'ouvre à côté de la case : à droite, ou à gauche s'il n'y a pas la place.
+  // Sur un écran étroit, il se pose en bas du cadre.
+  const target = sel ? { x: sel.x, y: sel.y, w: NW } : selRoot ? { x: selRoot.x, y: selRoot.y, w: RW } : null;
+  let popStyle: React.CSSProperties = {};
+  if (target && size.w) {
+    const pw = Math.min(340, size.w - 24);
+    if (size.w < 640) popStyle = { left: 12, right: 12, bottom: 12, maxHeight: "55%" };
+    else {
+      const sx = target.x * view.z + view.x;
+      const sy = target.y * view.z + view.y;
+      const sw = target.w * view.z;
+      let left = sx + sw + 14;
+      if (left + pw > size.w - 12) left = sx - 14 - pw;
+      left = Math.max(12, Math.min(size.w - 12 - pw, left));
+      const top = Math.max(12, Math.min(size.h - 12 - popH, sy - 10));
+      popStyle = { left, top, width: pw, maxHeight: size.h - 24, transition: anim ? "left .28s cubic-bezier(.2,.7,.2,1), top .28s cubic-bezier(.2,.7,.2,1)" : "none" };
+    }
+  }
   const detailGroup = detail ? groups.find((g) => g.key === detail.group) : null;
 
   return (
@@ -432,6 +502,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
           style={{ backgroundImage: "radial-gradient(var(--rule-strong) 1px, transparent 1px)", backgroundSize: `${22 * view.z}px ${22 * view.z}px`, backgroundPosition: `${view.x}px ${view.y}px`, cursor: dragging ? "grabbing" : "grab" }}
           onPointerDown={(e) => {
             if ((e.target as HTMLElement).closest("[data-ui]")) return;
+            setAnim(false);
             drag.current = { px: e.clientX, py: e.clientY, x: view.x, y: view.y, moved: false };
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
           }}
@@ -457,7 +528,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
             }
           }}
         >
-          <div className="absolute left-0 top-0 origin-top-left" style={{ width: L.width, height: L.height, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})` }}>
+          <div className="absolute left-0 top-0 origin-top-left" style={{ width: L.width, height: L.height, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})`, transition: anim ? "transform .28s cubic-bezier(.2,.7,.2,1)" : "none" }}>
             {L.boxes.map((b) => (
               <div key={b.group.key} className="absolute rounded-[22px] border border-[var(--line)] bg-white/70 transition-opacity" style={{ left: b.x, top: b.y - 10, width: b.w, height: b.h + 10, opacity: filter !== "all" && filter !== "todo" && filter !== b.group.key ? 0.3 : 1 }} />
             ))}
@@ -518,7 +589,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
 
           {/* Détail de la case choisie */}
           {(detail || selRoot) && (
-            <aside data-ui className="card absolute right-3 top-3 max-h-[calc(100%-24px)] w-[min(340px,calc(100%-24px))] cursor-auto select-text overflow-auto p-5 shadow-[var(--shadow-float)]" aria-live="polite">
+            <aside ref={pop} data-ui className="card absolute z-10 cursor-auto select-text overflow-auto p-5 shadow-[var(--shadow-float)]" style={popStyle} aria-live="polite">
               <div className="flex items-start justify-between gap-3">
                 <span className="pill pill-amber">{detailGroup?.label ?? "Point de départ"}</span>
                 <button type="button" onClick={() => setSelected(null)} aria-label="Fermer" className="-mr-1 -mt-1 flex h-8 w-8 items-center justify-center rounded-full text-[20px] leading-none text-[var(--ink-3)] hover:bg-[var(--surface-2)]">×</button>
@@ -578,7 +649,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
               <button type="button" onClick={() => zoom(0.85)} aria-label="Dézoomer" className="h-9 w-9 rounded-full text-[18px] font-bold hover:bg-[var(--surface-2)]">−</button>
               <span className="w-12 text-center text-[14px] font-bold tabular-nums">{Math.round(view.z * 100)} %</span>
               <button type="button" onClick={() => zoom(1.18)} aria-label="Zoomer" className="h-9 w-9 rounded-full text-[18px] font-bold hover:bg-[var(--surface-2)]">+</button>
-              <button type="button" onClick={() => fit()} aria-label="Voir toute la carte" className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[var(--surface-2)]"><AIcon name="expand" size={16} /></button>
+              <button type="button" onClick={fitWidth} aria-label="Voir toute la carte" className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[var(--surface-2)]"><AIcon name="expand" size={16} /></button>
             </div>
           </div>
         </div>
