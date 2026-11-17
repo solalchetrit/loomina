@@ -66,13 +66,15 @@ export function PageHeader({
   return (
     <section className="w-full pb-8 pt-32 md:pb-12 md:pt-40">
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
-        {photo ? (
-          <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-            <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise" />
-            <Photo {...photo} priority ratio="aspect-[4/3]" className="rise" />
-          </div>
-        ) : (
-          <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise" />
+        <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise !max-w-4xl" />
+        {photo && (
+          <Photo
+            {...photo}
+            priority
+            ratio="aspect-[4/3] sm:aspect-[5/2]"
+            sizes="(min-width: 1240px) 1200px, 100vw"
+            className="rise mt-10 md:mt-12"
+          />
         )}
         {children}
       </div>

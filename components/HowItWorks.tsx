@@ -28,8 +28,7 @@ function CallPreview() {
 function ChapterPreview() {
   return (
     <div className="w-full max-w-[260px] rounded-[14px] bg-white px-5 py-4 shadow-[var(--shadow-bar)]">
-      <p className="text-[11px] font-bold text-[var(--amber-ink)]">Votre 4e appel</p>
-      <p className="mt-1 font-serif text-[17px] italic leading-tight">L’été de mes seize ans</p>
+      <p className="font-serif text-[17px] italic leading-tight">L’été de mes seize ans</p>
       <div className="mt-3 space-y-1.5">
         <span className="block h-[5px] w-full rounded bg-[var(--line)]" />
         <span className="block h-[5px] w-11/12 rounded bg-[var(--line)]" />
@@ -59,11 +58,11 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
     text: `Quand votre récit est complet, notre équipe relit le livre, y place vos photos et l’envoie à l’impression. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé.`,
     preview: (
       <Photo
-        name="livre-couverture"
+        name="livre-debout"
         alt=""
         ratio="h-40"
-        focus="50% 42%"
         sizes="400px"
+        contain
         className="-mx-5 w-[calc(100%+2.5rem)] max-w-none shrink-0 !rounded-none"
       />
     ),
@@ -74,7 +73,7 @@ export default function HowItWorks() {
   return (
     <Section id="parcours">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-        <SectionHead title="Trois étapes, et rien à écrire" text="Pas d’application, pas de rendez-vous. Un téléphone suffit." />
+        <SectionHead title="Trois étapes, et rien à écrire" text="Pas d’application, rien à installer. Un téléphone suffit." />
         <Link href="/experience" className="link shrink-0 text-[16px]">
           Le détail, appel par appel
         </Link>

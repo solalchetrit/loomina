@@ -30,8 +30,8 @@ export const INCLUDED: { title: string; detail: string }[] = [
   { title: "Les entretiens par téléphone", detail: "autant d’appels qu’il vous faut, quand vous voulez" },
   { title: "Le récit de chaque appel", detail: "dans vos mots, à relire et corriger" },
   { title: "Une relecture humaine", detail: "notre équipe relit votre livre avant l’impression" },
-  { title: "Vos photos dans le livre", detail: "envoyées par e-mail, nous les plaçons pour vous" },
-  { title: "Le livre relié, livré chez vous", detail: `${OFFER.format}, avec sa version ${OFFER.digital} pour la famille` },
+  { title: "Vos photos dans le livre", detail: "ajoutées dans votre espace auteur ou envoyées par e-mail, nous les plaçons pour vous" },
+  { title: "Le livre relié, livré chez vous", detail: `${OFFER.format}, avec sa version ${OFFER.digital}` },
 ];
 
 export const GUARANTEE = `Si le premier entretien ne vous convient pas, nous vous remboursons intégralement, sur simple demande dans les ${OFFER.guaranteeDays} jours qui suivent.`;

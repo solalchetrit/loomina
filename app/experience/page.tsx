@@ -16,7 +16,7 @@ const BEFORE = [
   },
   {
     title: "Vous appelez quand vous êtes prêt",
-    text: `Il n’y a pas de rendez-vous. Vous composez le ${SITE.phoneDisplay} depuis le numéro de la commande, le jour et à l’heure qui vous conviennent. Loomina vous accueille par votre prénom.`,
+    text: `Aucun rendez-vous n’est imposé. Vous composez le ${SITE.phoneDisplay} depuis le numéro de la commande, le jour et à l’heure qui vous conviennent. Loomina vous accueille par votre prénom.`,
   },
 ];
 
@@ -26,8 +26,8 @@ const DURING = [
     text: "Loomina se présente, puis vous demande par où vous aimeriez commencer. Souvent l’enfance. Elle écoute, relance, et vous laisse le temps de chercher vos souvenirs. Vous n’avez rien à préparer.",
   },
   {
-    title: "Un appel dure ce que vous voulez",
-    text: "Dix minutes ou une heure. Vous pouvez dire « on s’arrête là » à tout moment, et reprendre un autre jour : Loomina se souvient de ce que vous lui avez dit et reprend là où vous en étiez.",
+    title: "Vous choisissez la durée de vos appels",
+    text: "Un quart d’heure ou trois quarts d’heure, c’est vous qui décidez. Vous pouvez dire « on s’arrête là » à tout moment, et reprendre un autre jour : Loomina se souvient de ce que vous lui avez dit et reprend là où vous en étiez.",
   },
   {
     title: "Le récit de votre appel est écrit aussitôt",
@@ -37,8 +37,8 @@ const DURING = [
 
 const AFTER = [
   {
-    title: "Vous relisez, nous relisons",
-    text: "Vous avez le dernier mot sur chaque récit, puis sur le livre. Puis une personne de l’équipe relit l’ensemble, corrige, et place les photos que vous nous avez envoyées par e-mail.",
+    title: "Une dernière relecture avant l’impression",
+    text: "Vous avez le dernier mot sur chaque récit, puis sur le livre. Une personne de l’équipe relit ensuite l’ensemble, corrige, et place les photos que vous avez ajoutées.",
   },
   {
     title: "Le livre arrive chez vous",
@@ -63,7 +63,7 @@ const PHASES: { id: string; icon: IconName; label: string; title: string; text: 
     icon: "phone",
     label: "Pendant",
     title: "Une conversation, pas un interrogatoire",
-    text: "Loomina est une intelligence artificielle conçue pour écouter patiemment. Elle ne vous presse jamais et ne change pas de sujet avant vous.",
+    text: "Loomina est une intelligence conçue pour écouter patiemment. Elle ne vous presse jamais et ne change pas de sujet avant vous.",
     duration: `En général ${OFFER.delay}`,
     steps: DURING,
   },
@@ -117,7 +117,7 @@ export default function ExperiencePage() {
       <PageHeader
         title="Un téléphone, des conversations, un livre"
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
-        photo={{ name: "homme-casquette-telephone", alt: "Assis sur un banc, un homme âgé parle au téléphone.", focus: "50% 22%" }}
+        photo={{ name: "homme-casquette-telephone", alt: "Assis sur un banc, un homme âgé parle au téléphone.", focus: "50% 36%" }}
       />
 
       {PHASES.map((p, idx) => {
@@ -185,7 +185,7 @@ export default function ExperiencePage() {
       <Section id="chapitres">
         <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
           <SectionHead
-            title="Des points de départ, pas un questionnaire"
+            title="Des thèmes pour vous guider, jamais imposés"
             text="Loomina propose ces thèmes au fil des appels. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
           />
           <Photo name="panier-de-photos" alt="Un panier rempli de vieilles photos de famille." ratio="aspect-[16/10]" />

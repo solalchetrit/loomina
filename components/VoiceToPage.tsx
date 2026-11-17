@@ -5,8 +5,6 @@
 
 import { Section, SectionHead } from "@/components/ui/Section";
 import Icon from "@/components/ui/Icon";
-import Button from "@/components/ui/Button";
-import { SITE } from "@/config/site";
 
 const SPOKEN = [
   { who: "Loomina", text: "Vous me parliez de la ferme de vos grands-parents. Qu’est-ce qu’on voyait en entrant dans la cour ?" },
@@ -14,7 +12,7 @@ const SPOKEN = [
     who: "Jeanne",
     text: "Oh, le tilleul. Un grand tilleul, énorme… Ma grand-mère faisait sécher les fleurs dessous, sur des draps. Ça sentait jusque dans la cuisine. Et le samedi, elle faisait le pain, alors là ça sentait le pain et le tilleul, les deux.",
   },
-  { who: "Loomina", text: "Vous l’aidiez, pour le pain ?" },
+  { who: "Loomina", text: "Vous l’aidiez pour la préparation du pain ?" },
   {
     who: "Jeanne",
     text: "J’avais le droit de façonner la petite boule. La mienne. Elle la marquait d’une croix avec le couteau pour qu’on la reconnaisse.",
@@ -82,13 +80,6 @@ export default function VoiceToPage() {
             </p>
           </BookPage>
         </figure>
-      </div>
-
-      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="t-small">Exemple écrit pour illustrer la méthode : Jeanne n’est pas une cliente réelle.</p>
-        <Button href={`tel:${SITE.phone}`} variant="secondary" className="shrink-0">
-          Écouter Loomina par vous-même
-        </Button>
       </div>
     </Section>
   );

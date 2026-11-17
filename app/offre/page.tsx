@@ -13,7 +13,7 @@ const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
     icon: "phone",
     title: "Les appels",
     items: [
-      "Autant d’appels qu’il vous faut, sans rendez-vous",
+      "Autant d’appels qu’il vous faut : vous appelez quand vous voulez, ou Loomina vous appelle à l’heure que vous choisissez",
       `${OFFER.chapters} thèmes proposés pour vous guider`,
       "Depuis un fixe ou un portable, au prix d’un appel normal",
     ],
@@ -24,7 +24,7 @@ const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
     items: [
       "Le récit de chaque appel, écrit dans vos mots",
       "Vos corrections, autant que nécessaire",
-      "Chaque page relue par une personne de l’équipe avant l’impression",
+      "Votre livre relu par notre équipe avant l’impression",
     ],
   },
   {
@@ -71,7 +71,7 @@ export default function OffrePage() {
         </div>
       </PageHeader>
 
-      <WhatYouGet showDetailLink={false} />
+      <WhatYouGet showDetailLink={false} photo="mains" />
 
       <Section>
         <SectionHead title="Ce que couvre le prix, en détail" />
@@ -104,7 +104,7 @@ export default function OffrePage() {
               <Icon name="shield" />
             </span>
             <h3 className="t-heading mt-5">Votre récit vous appartient</h3>
-            <p className="t-body mt-2">Pas d’option payante, pas d’abonnement. Vous conservez l’intégralité des droits sur votre histoire.</p>
+            <p className="t-body mt-2">Vous conservez l’intégralité des droits sur votre histoire. Vos récits et vos données restent privés : ils ne sont ni revendus, ni utilisés pour entraîner des modèles, et vous pouvez les faire supprimer à tout moment.</p>
           </li>
           <li className="card p-7">
             <span className="chip-icon">

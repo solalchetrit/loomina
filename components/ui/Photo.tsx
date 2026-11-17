@@ -11,6 +11,7 @@ export default function Photo({
   focus = "center",
   sizes = "(min-width: 1024px) 600px, 100vw",
   priority = false,
+  contain = false,
   className = "",
 }: {
   /** Nom du fichier dans /public/photos, sans l'extension. */
@@ -22,11 +23,22 @@ export default function Photo({
   focus?: string;
   sizes?: string;
   priority?: boolean;
+  /** Montre la photo entière, sans la recadrer : le reste du cadre reprend ses couleurs, floutées. */
+  contain?: boolean;
   className?: string;
 }) {
   return (
     <div className={`relative overflow-hidden rounded-[28px] bg-[var(--line)] ${ratio} ${className}`}>
-      <Image src={`/photos/${name}.jpg`} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" style={{ objectPosition: focus }} />
+      {contain && <Image src={`/photos/${name}.jpg`} alt="" aria-hidden fill sizes="200px" className="scale-150 object-cover blur-2xl" />}
+      <Image
+        src={`/photos/${name}.jpg`}
+        alt={alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        className={contain ? "object-contain" : "object-cover"}
+        style={{ objectPosition: focus }}
+      />
     </div>
   );
 }
