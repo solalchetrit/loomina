@@ -34,6 +34,8 @@ export const PHASE_AXES: Record<Phase, Axis[]> = {
         { key: 'etapes', label: "Les grandes lignes de la vie adulte, au moins nommées : ce qui a occupé ses journées, les personnes avec qui elle a partagé sa vie" },
     ],
     2: [
+        // Solal, 17/11/2026 : dans une biographie, les racines commencent par l'histoire de la famille.
+        { key: 'heritage', label: "Le bagage familial : d'où vient la famille, l'histoire des parents avant sa naissance (leurs origines, leur rencontre, leur vie) et celle des grands-parents" },
         { key: 'maison', label: "La maison et les lieux de l'enfance" },
         { key: 'proches', label: "Les personnes de la maison (parents ou ceux qui l'ont élevé, grands-parents, frères et sœurs) : un geste, une phrase, une habitude" },
         { key: 'ecole', label: "L'école, les jeux, les fêtes, les premières fois" },

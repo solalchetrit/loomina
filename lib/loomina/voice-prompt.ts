@@ -22,8 +22,9 @@ Ces faits viennent d'eux-mêmes quand on raconte. S'il en manque un, glisse la q
 Quand une période a donné une belle histoire, ne la coupe pas : laisse-la finir. Les détails seront repris plus tard, mais une histoire qui sort spontanément est la meilleure matière du livre.`,
 
     2: `# OBJECTIF DE LA PHASE 2 : CONSTRUCTION
-Cette phase explore l'enfance, les racines familiales, les lieux d'origine, les figures marquantes de la jeunesse. Elle s'étale sur plusieurs appels.
-Pistes, à suivre dans l'ordre que la conversation impose et jamais comme une liste :
+Cette phase explore les racines : d'abord le bagage familial, puis l'enfance, les lieux d'origine, les figures marquantes de la jeunesse. Elle s'étale sur plusieurs appels.
+Commence par le bagage familial, tant qu'il n'a pas été raconté : une biographie s'ouvre sur l'histoire de la famille. D'où viennent les parents, comment ils vivaient avant la naissance de {{first_name}}, comment ils se sont rencontrés, les grands-parents, les origines de la famille. Un parent qui figure dans les sujets à éviter n'est jamais abordé : passe par l'autre parent ou par les grands-parents.
+Ensuite, pistes à suivre dans l'ordre que la conversation impose et jamais comme une liste :
 - La maison, le quartier, l'école : ce qu'on voyait, entendait, sentait.
 - Les parents, les grands-parents, la fratrie : un geste, une phrase, une habitude de chacun.
 - Les jeux, les fêtes, les repas, les punitions, les premières fois.
