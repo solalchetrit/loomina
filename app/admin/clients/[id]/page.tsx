@@ -14,9 +14,10 @@ import AIcon from "@/components/admin/icons";
 
 export const metadata = { title: "Fiche client" };
 
-export default async function AdminClient({ params }: { params: Promise<{ id: string }> }) {
+export default async function AdminClient({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ fait?: string; erreur?: string }> }) {
   await requireAdmin();
   const { id } = await params;
+  const { fait, erreur } = await searchParams;
   const c = await getClient(id);
   if (!c) notFound();
 
@@ -52,10 +53,16 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
               <h1 className="text-[30px] font-extrabold leading-tight tracking-[-0.025em] sm:text-[34px]">{name}</h1>
               {st && <Badge tone={st.tone}>{st.label}</Badge>}
               {order.isGift && <Badge tone="wait">Livre offert</Badge>}
+              {order.refundedAt && <Badge tone="bad">Remboursé</Badge>}
             </div>
             <p className="mt-1 text-[15px] tabular-nums text-[var(--ink-3)]">{profile.phone_number ?? "pas de numéro"} · client depuis le {fmtDate(profile.created_at, false)}</p>
           </div>
         </div>
+        {(fait || erreur) && (
+          <p role="status" className={`mt-5 rounded-[16px] px-4 py-3 text-[15px] font-semibold ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[#fbeae6] text-[#a8402f]"}`}>
+            {fait ?? erreur}
+          </p>
+        )}
         <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div className="rounded-[18px] border border-black/[0.06] bg-white p-4">
             <p className="text-[13px] font-semibold text-[var(--ink-3)]">Phase</p>
@@ -109,6 +116,39 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
           </dl>
         </Panel>
       </div>
+
+      {project && (
+        <Panel icon="pen" title="Agir">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-[18px] bg-[var(--canvas)] p-4">
+              <p className="text-[16px] font-bold">Relancer ce client</p>
+              <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">
+                Envoie un SMS et un e-mail qui rappellent le numéro à appeler. Pour un livre offert sans aucun appel, la relance va à celui qui l’a offert.
+                {order.relances.length > 0 && ` Dernière relance : ${fmtDate(order.relances[order.relances.length - 1].at)} (${order.relances.length} en tout).`}
+              </p>
+              <form action={`/api/admin/clients/${id}/relance`} method="post" className="mt-3">
+                <button disabled={!!order.refundedAt} className="press inline-flex h-11 items-center rounded-[14px] bg-[var(--ink)] px-4 text-[15px] font-bold text-white disabled:opacity-40">Envoyer la relance</button>
+              </form>
+            </div>
+            <div className="rounded-[18px] bg-[var(--canvas)] p-4">
+              <p className="text-[16px] font-bold">Rembourser ce client</p>
+              {order.refundedAt ? (
+                <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">Remboursé le {fmtDate(order.refundedAt)}{order.refundAmount != null ? ` (${order.refundAmount} €)` : ""}. Le livre est fermé.</p>
+              ) : !order.stripeSessionId ? (
+                <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">Pas de paiement Stripe lié à ce livre : rien à rembourser.</p>
+              ) : (
+                <>
+                  <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">Rembourse toute la commande dans Stripe, ferme le livre et arrête les rendez-vous. Le client reçoit un e-mail. On ne peut pas revenir en arrière.</p>
+                  <form action={`/api/admin/clients/${id}/refund`} method="post" className="mt-3 flex flex-wrap items-center gap-2">
+                    <input name="confirmation" required autoComplete="off" placeholder="Écrire REMBOURSER" aria-label="Écrire REMBOURSER pour confirmer" className="h-11 w-[200px] rounded-[14px] border border-[var(--line)] bg-white px-3 text-[15px]" />
+                    <button className="press inline-flex h-11 items-center rounded-[14px] bg-[#a8402f] px-4 text-[15px] font-bold text-white">Rembourser ce client</button>
+                  </form>
+                </>
+              )}
+            </div>
+          </div>
+        </Panel>
+      )}
 
       {project && (
         <Panel icon="spark" title="Ce que Loomina sait et prépare">
@@ -221,7 +261,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-[14px]">
               <thead className="text-[12px] uppercase tracking-[0.05em] text-[var(--ink-3)]">
-                <tr><th className="py-2 pr-3">Reçu</th><th className="pr-3">État</th><th className="pr-3">Essais</th><th className="pr-3">Traité</th><th>Message</th></tr>
+                <tr><th className="py-2 pr-3">Reçu</th><th className="pr-3">État</th><th className="pr-3">Essais</th><th className="pr-3">Traité</th><th>Message</th><th /></tr>
               </thead>
               <tbody>
                 {c.events.map((e) => {
@@ -233,6 +273,13 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
                       <td className="pr-3">{String(e.attempts ?? 0)}</td>
                       <td className="pr-3 whitespace-nowrap">{fmtDate(e.processed_at)}</td>
                       <td className="text-[var(--ink-2)]">{String(e.error ?? "")}</td>
+                      <td className="pl-3">
+                        {e.status === "failed" && (
+                          <form action={`/api/admin/events/${String(e.id)}/retry?client=${id}`} method="post">
+                            <button className="press whitespace-nowrap rounded-[10px] bg-[var(--ink)] px-3 py-1.5 text-[13px] font-bold text-white">Relancer</button>
+                          </form>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}

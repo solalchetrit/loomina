@@ -149,7 +149,10 @@ export async function findActiveProject(userId: string): Promise<Project | null>
 
     if (error) throw new Error(`Lecture projects impossible : ${error.message}`);
     const rows = (data ?? []) as Project[];
-    return rows.find((p) => p.status !== 'completed') ?? rows[0] ?? null;
+    // Une commande remboursée depuis l'admin ne donne plus droit à rien :
+    // ni entretien, ni espace auteur.
+    const open = rows.filter((p) => typeof p.project_metadata?.refunded_at !== 'string');
+    return open.find((p) => p.status !== 'completed') ?? open[0] ?? null;
 }
 
 /** « +33781311298 » → « ***1298 », pour les journaux et les tables lisibles. */

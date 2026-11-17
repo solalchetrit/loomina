@@ -47,11 +47,11 @@ function Bars({ data, unit }: { data: Array<{ label: string; value: number; hint
   );
 }
 
-function Row({ c, children }: { c: CrmClient; children?: React.ReactNode }) {
+function Row({ c, children, relance = false }: { c: CrmClient; children?: React.ReactNode; relance?: boolean }) {
   const h = HEALTH[c.health];
   return (
-    <li>
-      <Link href={`/admin/clients/${c.id}`} className="-mx-3 flex flex-wrap items-center gap-3 rounded-[16px] px-3 py-3 hover:bg-[var(--canvas)]">
+    <li className="flex flex-wrap items-center gap-2">
+      <Link href={`/admin/clients/${c.id}`} className="-mx-3 flex min-w-0 flex-1 flex-wrap items-center gap-3 rounded-[16px] px-3 py-3 hover:bg-[var(--canvas)]">
         <Avatar name={c.name} />
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-2">
@@ -63,12 +63,18 @@ function Row({ c, children }: { c: CrmClient; children?: React.ReactNode }) {
         </span>
         <span className="t-small shrink-0 tabular-nums">{c.phone ?? ""}</span>
       </Link>
+      {relance && (
+        <form action={`/api/admin/clients/${c.id}/relance?retour=suivi`} method="post">
+          <button className="press inline-flex h-10 items-center whitespace-nowrap rounded-[12px] bg-[var(--ink)] px-3.5 text-[14px] font-bold text-white">Relancer</button>
+        </form>
+      )}
     </li>
   );
 }
 
-export default async function AdminCrm() {
+export default async function AdminCrm({ searchParams }: { searchParams: Promise<{ fait?: string; erreur?: string }> }) {
   await requireAdmin();
+  const { fait, erreur } = await searchParams;
   const { clients, weeks, months } = await getCrm();
 
   const total = clients.length;
@@ -131,12 +137,15 @@ export default async function AdminCrm() {
       </Panel>
 
       <Panel icon="alert" title={`À relancer (${followUp.length})`}>
+        {(fait || erreur) && (
+          <p role="status" className={`mb-3 rounded-[14px] px-4 py-2.5 text-[15px] font-semibold ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[#fbeae6] text-[#a8402f]"}`}>{fait ?? erreur}</p>
+        )}
         {followUp.length === 0 ? (
           <Empty>Personne à relancer : tous vos clients avancent.</Empty>
         ) : (
           <ul className="divide-y divide-[var(--line-soft)]">
             {followUp.map((c) => (
-              <Row key={c.id} c={c}>
+              <Row key={c.id} c={c} relance>
                 {c.health === "relancer"
                   ? `A commandé il y a ${c.daysSinceOrder} jours et n’a pas encore fait de vrai appel${c.shortCalls ? ` (${c.shortCalls} appel(s) trop court(s))` : ""}.`
                   : c.health === "inactif"
