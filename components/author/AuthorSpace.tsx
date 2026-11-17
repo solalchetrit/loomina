@@ -105,7 +105,7 @@ export default function AuthorSpace({
 
         {data?.demo && (
           <p className="mt-6 rounded-[14px] bg-[var(--amber-soft)] px-4 py-3 text-[15px] font-semibold text-[var(--amber-deep)]">
-            Mode démo local : livre d’exemple de Jeanne, rien n’est lu ni écrit en base.
+            Démonstration : livre d’exemple de Jeanne, rien n’est lu ni écrit en base.
           </p>
         )}
 
