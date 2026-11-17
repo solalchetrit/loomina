@@ -12,7 +12,11 @@ const securityHeaders = [
   { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
 ];
 
+// Copie du site pour l'hébergeur Claude (ARTIFACT=1) : dossier de build à part, images servies telles quelles.
+const forArtifact = process.env.ARTIFACT === "1";
+
 const nextConfig: NextConfig = {
+  ...(forArtifact ? { distDir: ".next-artifact", images: { unoptimized: true } } : {}),
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

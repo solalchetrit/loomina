@@ -47,3 +47,4 @@ yarn-error.log*
 .taste-skill/
 scripts/bench/rapports/
 scripts/tests/rapports/
+/.next-artifact/
