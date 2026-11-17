@@ -23,22 +23,31 @@ export default function Photo({
   focus?: string;
   sizes?: string;
   priority?: boolean;
-  /** Montre la photo entière, sans la recadrer : le reste du cadre reprend ses couleurs, floutées. */
-  contain?: boolean;
+  /**
+   * Montre la photo entière, sans la recadrer. Donner son format (par exemple "aspect-[4/5]") :
+   * le reste du cadre reprend ses couleurs, floutées, et ses bords s'y fondent sans démarcation.
+   */
+  contain?: false | string;
   className?: string;
 }) {
   return (
     <div className={`relative overflow-hidden rounded-[28px] bg-[var(--line)] ${ratio} ${className}`}>
-      {contain && <Image src={`/photos/${name}.jpg`} alt="" aria-hidden fill sizes="200px" className="scale-150 object-cover blur-2xl" />}
-      <Image
-        src={`/photos/${name}.jpg`}
-        alt={alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        className={contain ? "object-contain" : "object-cover"}
-        style={{ objectPosition: focus }}
-      />
+      {contain ? (
+        <>
+          <Image src={`/photos/${name}.jpg`} alt="" aria-hidden fill sizes="200px" className="scale-[2] object-cover blur-2xl" />
+          <div
+            className={`absolute inset-y-0 left-1/2 -translate-x-1/2 ${contain}`}
+            style={{
+              maskImage: "linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent)",
+              WebkitMaskImage: "linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent)",
+            }}
+          >
+            <Image src={`/photos/${name}.jpg`} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
+          </div>
+        </>
+      ) : (
+        <Image src={`/photos/${name}.jpg`} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" style={{ objectPosition: focus }} />
+      )}
     </div>
   );
 }

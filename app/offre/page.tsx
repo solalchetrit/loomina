@@ -13,7 +13,7 @@ const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
     icon: "phone",
     title: "Les appels",
     items: [
-      "Autant d’appels qu’il vous faut : vous appelez quand vous voulez, ou Loomina vous appelle à l’heure que vous choisissez",
+      "Autant d’appels qu’il vous faut, avec ou sans rendez-vous",
       `${OFFER.chapters} thèmes proposés pour vous guider`,
       "Depuis un fixe ou un portable, au prix d’un appel normal",
     ],

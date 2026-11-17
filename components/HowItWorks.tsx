@@ -62,7 +62,7 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
         alt=""
         ratio="h-40"
         sizes="400px"
-        contain
+        contain="aspect-[4/5]"
         className="-mx-5 w-[calc(100%+2.5rem)] max-w-none shrink-0 !rounded-none"
       />
     ),
