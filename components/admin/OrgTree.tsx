@@ -6,7 +6,7 @@
  * `branch` : les suites possibles côte à côte ; sinon, les étapes l'une sous l'autre.
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AIcon from "./icons";
 import { ACTORS, type TreeNode } from "./tree-types";
 import s from "./org.module.css";
@@ -92,6 +92,12 @@ export default function OrgTree({ stages }: { stages: TreeNode[] }) {
     setSelected(stages[i]);
   };
   const stage = stages[step];
+  const scroller = useRef<HTMLDivElement>(null);
+  // Une étape plus large que l'écran s'ouvre centrée sur sa case de départ.
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+  }, [step]);
 
   return (
     <div>
@@ -127,7 +133,7 @@ export default function OrgTree({ stages }: { stages: TreeNode[] }) {
               </button>
             </div>
           </div>
-          <div className="overflow-x-auto px-2 pb-2 pt-6">
+          <div ref={scroller} className="overflow-x-auto px-2 pb-2 pt-6">
             <div className={s.chart}>
               <Node n={stage} root selected={selected} onSelect={setSelected} />
             </div>
