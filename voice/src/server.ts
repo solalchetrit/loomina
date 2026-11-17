@@ -196,6 +196,20 @@ wss.on('connection', (ws: WebSocket) => {
                     return;
                 }
                 session.attach(ws);
+                // Enregistrement audio de l'entretien (demande de Solal, 17/11/2026).
+                // Jamais pour une démonstration : on y promet que rien n'est gardé.
+                // Lancé ici, une fois l'appel établi ; un échec ne gêne pas l'appel.
+                if (config.recordingEnabled && !session.plan.demo) {
+                    const current = session;
+                    twilio(config.twilio.accountSid, config.twilio.authToken)
+                        .calls(callSid)
+                        .recordings.create({ recordingChannels: 'dual' })
+                        .then((rec) => {
+                            current.recordingSid = rec.sid;
+                            console.info(`[voice] ${callSid} : enregistrement ${rec.sid}`);
+                        })
+                        .catch((err) => console.warn(`[voice] ${callSid} : enregistrement impossible —`, err instanceof Error ? err.message : err));
+                }
                 break;
             }
             case 'prompt':

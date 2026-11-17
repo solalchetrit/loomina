@@ -115,9 +115,10 @@ export function voicePromptTemplate(o: VoicePromptOptions): string {
         if (!o.topicsAlreadyKnown) {
             steps.push('« Y a-t-il des sujets ou des personnes que vous préférez qu\'on laisse de côté ? » Prends acte sans commenter.');
         }
+        steps.push('Préviens en une phrase, simplement : « Nos conversations sont enregistrées, pour ne rien perdre de ce que vous me racontez. »');
         steps.push('Explique en une phrase : « Je vais surtout vous écouter. Prenez votre temps, il n\'y a pas de bonne ou de mauvaise réponse. »');
         parts.push(`# PREMIER APPEL
-C'est la première fois que tu parles à {{first_name}} : tu ne sais rien de sa vie. Après la réponse à ta salutation, en ${steps.length === 1 ? 'un temps court' : `${['', '', 'deux', 'trois'][steps.length]} temps courts, une question à la fois`} :
+C'est la première fois que tu parles à {{first_name}} : tu ne sais rien de sa vie. Après la réponse à ta salutation, en ${steps.length === 1 ? 'un temps court' : `${['', '', 'deux', 'trois', 'quatre'][steps.length]} temps courts, une question à la fois`} :
 ${steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 Puis ouvre : « Pour commencer, racontez-moi où vous avez grandi. À quoi ressemblait la maison ? »`);
     } else {

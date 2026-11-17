@@ -133,7 +133,7 @@ export const MAP_GROUPS: MapGroup[] = [
             { id: 'c-livre', label: 'Livre créé, phase 1', kind: 'end', d: '« Biographie de [prénom] », en cours, 0 %. Avec : cadeau ou non, e-mail de l’acheteur, durée d’appel, l’offreur. Table projects.' },
             { id: 'c-offrir', label: 'Pour offrir : « Et vous ? »', col: 1, from: 'c-qui', d: 'Le prénom et le portable de la personne qui offre, différent de celui du narrateur. Il ouvrira l’espace famille.' },
             { id: 'c-abandon', label: 'Abandon', col: 1, from: 'c-stripe', d: 'Retour sur la page de commande. Aucun compte, aucun livre.' },
-            { id: 'c-relance', label: 'Relance des paniers abandonnés', col: 1, from: 'c-abandon', status: 'todo', d: 'Rien n’est gardé d’une commande non payée : impossible de relancer.' },
+            { id: 'c-relance', label: 'Relance des paniers abandonnés', col: 1, from: 'c-abandon', status: 'partial', d: 'Une commande commencée et pas payée expire au bout de deux heures. Stripe prévient le site, qui envoie une seule fois un e-mail et un SMS avec le lien pour la reprendre. À faire dans Stripe pour que cela marche : ajouter l’événement « checkout.session.expired » au webhook.' },
             { id: 'c-ignore', label: 'Oui : ignoré', col: 1, from: 'c-deja' },
             { id: 'c-echec', label: 'Erreur : Stripe réessaie', col: 1, from: 'c-compte', d: 'Le site répond « échec » à Stripe, qui renvoie le message plus tard. Un client ne repart jamais sans compte en silence.' },
             { id: 'c-bienvenue', label: 'Message de bienvenue', col: 1, from: 'c-livre', status: 'partial', d: 'Après le paiement, le client reçoit un e-mail et un SMS : le numéro à appeler, le mode d’emploi, son espace. Pour un livre offert, ils vont à celui qui offre, jamais au narrateur. Les e-mails partent de la boîte contact@loomina.eu, une fois son mot de passe posé sur Vercel (SMTP_PASS).' },
@@ -207,7 +207,7 @@ export const MAP_GROUPS: MapGroup[] = [
             { id: 'p-panne', label: 'Base injoignable', col: 1, from: 'p-reconnu', status: 'partial', d: '« Un problème technique m’empêche de vous répondre, rappelez dans quelques minutes », puis elle raccroche. L’entretien de secours n’existe que sur l’ancien chemin Vapi.' },
             { id: 'p-connaissance', label: 'Oui : fait connaissance', col: 1, from: 'p-premier', d: 'Tu ou vous ? Des sujets à éviter ? (sauf si déjà réglés), puis « Racontez-moi où vous avez grandi ».' },
             { id: 'p-tait', label: 'Silence : relance, puis raccroche', col: 1, from: 'p-tts' },
-            { id: 'p-audio', label: 'Enregistrement audio', col: 1, from: 'p-fin', status: 'todo', d: 'Seul le texte est gardé. La voix de la personne n’est pas conservée (elle pourrait accompagner le livre).' },
+            { id: 'p-audio', label: 'Enregistrement audio', col: 1, from: 'p-fin', d: 'Chaque entretien est enregistré (jamais la démonstration). Loomina le dit au premier appel. Le son reste chez Twilio et s’écoute dans l’admin, sur la fiche du client, au-dessus du transcript.', code: 'voice/src/server.ts' },
         ],
     },
     {

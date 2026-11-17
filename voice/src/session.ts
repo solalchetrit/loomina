@@ -93,6 +93,9 @@ export class CallSession {
     // Cycle de vie
     // ------------------------------------------------------------
 
+    /** L'enregistrement audio de l'appel chez Twilio, s'il a démarré. */
+    recordingSid: string | null = null;
+
     get attached(): boolean {
         return this.ws !== null;
     }
@@ -222,7 +225,7 @@ export class CallSession {
             endedAt,
             endedReason: reason,
             turns: this.turns,
-            metadata: this.plan.metadata,
+            metadata: { ...this.plan.metadata, ...(this.recordingSid ? { recordingSid: this.recordingSid } : {}) },
             modelLatenciesMs: this.modelLatenciesMs,
             promptTokens: this.promptTokens,
             completionTokens: this.completionTokens,

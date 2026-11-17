@@ -25,6 +25,8 @@ export interface CallCost {
     total: number;
     totalTtc: number;
     estimated: boolean;
+    /** Le rapport d'appel qui porte un enregistrement audio (pour l'écouter dans l'admin). */
+    recordingEventId?: string | null;
 }
 
 const eur = (usd: number) => usd * COSTS.usdToEur;
@@ -67,11 +69,11 @@ interface InterviewRow {
 export async function callCosts(interviews: InterviewRow[]): Promise<Map<string, CallCost>> {
     const out = new Map<string, CallCost>();
     const eventIds = interviews.map((i) => i.call_event_id).filter((v): v is string => typeof v === 'string');
-    const events = new Map<string, { sid: string | null; prompt: number; completion: number; model: string | null }>();
+    const events = new Map<string, { sid: string | null; prompt: number; completion: number; model: string | null; recorded: boolean }>();
     if (eventIds.length) {
         const { data } = await db()
             .from('call_events')
-            .select('id, vapi_call_id, tokens:payload->message->costBreakdown, model:payload->message->call->metadata->>model')
+            .select('id, vapi_call_id, tokens:payload->message->costBreakdown, model:payload->message->call->metadata->>model, rec:payload->message->call->metadata->>recordingSid')
             .in('id', eventIds);
         for (const e of (data ?? []) as Array<Record<string, unknown>>) {
             const t = (e.tokens ?? {}) as { llmPromptTokens?: number; llmCompletionTokens?: number };
@@ -80,6 +82,7 @@ export async function callCosts(interviews: InterviewRow[]): Promise<Map<string,
                 prompt: Number(t.llmPromptTokens) || 0,
                 completion: Number(t.llmCompletionTokens) || 0,
                 model: typeof e.model === 'string' ? e.model : null,
+                recorded: typeof e.rec === 'string' && e.rec.length > 0,
             });
         }
     }
@@ -112,7 +115,7 @@ export async function callCosts(interviews: InterviewRow[]): Promise<Map<string,
             }
 
             const total = line + voice + conversation + writing;
-            out.set(id, { line, voice, conversation, writing, total, totalTtc: total * (1 + COSTS.vat), estimated });
+            out.set(id, { line, voice, conversation, writing, total, totalTtc: total * (1 + COSTS.vat), estimated, recordingEventId: event?.recorded ? (i.call_event_id as string) : null });
         })
     );
     return out;
