@@ -250,6 +250,8 @@ export function configWarnings(): string[] {
         ['TWILIO_ACCOUNT_SID', 'SMS'],
         ['TWILIO_VERIFY_SERVICE_SID', 'code de connexion par SMS'],
         ['JWT_SECRET', 'sessions de l’espace auteur'],
+        ['SMTP_PASS', 'envoi des e-mails (bienvenue, alertes, nouvelles à la famille) depuis contact@loomina.eu'],
+        ['LOOMINA_ALERT_PHONE', 'SMS d’alerte à l’équipe'],
     ];
     for (const [name, role] of need) if (!process.env[name]?.trim()) w.push(`${name} absente (${role}).`);
     if (!process.env.CRON_SECRET?.trim()) w.push('CRON_SECRET absente : le rattrapage de 3 h par le site ne passe pas (celui du serveur vocal, toutes les 5 minutes, continue).');

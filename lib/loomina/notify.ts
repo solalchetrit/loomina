@@ -6,9 +6,11 @@
  * e-mail et un SMS de bienvenue ; la famille est tenue au courant.
  *
  * - SMS : Twilio, déjà en place (`sms.ts`).
- * - E-mail : Resend (API REST, sans dépendance). Tant que `RESEND_API_KEY`
- *   n'est pas posée, aucun e-mail ne part : on le note dans les journaux et
- *   le SMS part quand même.
+ * - E-mail : par la boîte contact@loomina.eu elle-même (SMTP de l'hébergeur
+ *   du domaine, avec nodemailer), comme l'outil d'envoi de L'Étincelle. Pas
+ *   de service externe (choix de Solal, 17/11/2026). Tant que `SMTP_PASS`
+ *   n'est pas posée sur Vercel, aucun e-mail ne part : on le note dans les
+ *   journaux et le SMS part quand même.
  *
  * Rien ici ne lève : un message manqué ne doit jamais faire échouer une
  * commande ou le traitement d'un appel.
@@ -31,14 +33,31 @@ function escapeHtml(s: string): string {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/** La boîte d'envoi : celle de contact@loomina.eu, chez l'hébergeur du domaine. */
+function smtpConfig(): { host: string; port: number; user: string; pass: string } | null {
+    const pass = process.env.SMTP_PASS?.trim();
+    if (!pass) return null;
+    return {
+        host: process.env.SMTP_HOST?.trim() || 'mail.loomina.eu',
+        port: Number(process.env.SMTP_PORT?.trim() || 465),
+        user: process.env.SMTP_USER?.trim() || 'contact@loomina.eu',
+        pass,
+    };
+}
+
+/** L'envoi d'e-mails est-il branché ? (lu par l'admin, « À surveiller ») */
+export function mailConfigured(): boolean {
+    return smtpConfig() !== null;
+}
+
 /** Un e-mail simple : le texte, tel quel, dans une mise en page sobre. */
 export async function sendEmail(params: { to: string; subject: string; text: string; replyTo?: string }): Promise<boolean> {
-    const key = process.env.RESEND_API_KEY?.trim();
-    if (!key) {
-        console.warn(`[mail] RESEND_API_KEY manquante : e-mail « ${params.subject} » non envoyé`);
+    const smtp = smtpConfig();
+    if (!smtp) {
+        console.warn(`[mail] SMTP_PASS manquante : e-mail « ${params.subject} » non envoyé`);
         return false;
     }
-    const from = process.env.LOOMINA_MAIL_FROM?.trim() || 'Loomina <contact@loomina.eu>';
+    const from = process.env.LOOMINA_MAIL_FROM?.trim() || `Loomina <${smtp.user}>`;
     const html =
         '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#161616;max-width:560px">' +
         params.text
@@ -47,22 +66,25 @@ export async function sendEmail(params: { to: string; subject: string; text: str
             .join('') +
         '</div>';
     try {
-        const res = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                from,
-                to: [params.to],
-                subject: params.subject.slice(0, 200),
-                text: params.text,
-                html,
-                ...(params.replyTo ? { reply_to: params.replyTo } : {}),
-            }),
+        // Chargé à la demande : le serveur vocal n'envoie pas d'e-mail et n'a pas ce paquet.
+        const { createTransport } = await import('nodemailer');
+        const transporter = createTransport({
+            host: smtp.host,
+            port: smtp.port,
+            secure: smtp.port === 465,
+            auth: { user: smtp.user, pass: smtp.pass },
+            connectionTimeout: 15_000,
+            greetingTimeout: 15_000,
+            socketTimeout: 30_000,
         });
-        if (!res.ok) {
-            console.warn(`[mail] refusé par Resend (${res.status}) : ${(await res.text().catch(() => '')).slice(0, 200)}`);
-            return false;
-        }
+        await transporter.sendMail({
+            from,
+            to: params.to,
+            subject: params.subject.slice(0, 200),
+            text: params.text,
+            html,
+            ...(params.replyTo ? { replyTo: params.replyTo } : {}),
+        });
         return true;
     } catch (err) {
         console.warn('[mail] échec :', err instanceof Error ? err.message : String(err));
