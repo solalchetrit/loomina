@@ -7,9 +7,8 @@ import Icon, { type IconName } from "@/components/ui/Icon";
 import Button from "@/components/ui/Button";
 import WhatYouGet from "@/components/home/WhatYouGet";
 import Compare from "@/components/home/Compare";
-import Plans from "@/components/Plans";
 import Closing from "@/components/Closing";
-import { OFFER, GUARANTEE } from "@/config/offer";
+import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
 
 const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
   {
@@ -64,7 +63,7 @@ const FAQ = [
 export default function OffrePage() {
   return (
     <>
-      {/* Haut de page : une grande carte sombre, le titre à gauche, les livres à droite. Les prix sont dans le tableau, dessous. */}
+      {/* Haut de page : une grande carte sombre. Le titre et le prix à gauche, les livres à droite, puis ce que la formule comprend. */}
       <section className="w-full pb-10 pt-28 md:pb-14 md:pt-32">
         <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
           <div className="rise grid grid-cols-1 overflow-hidden rounded-[32px] bg-[var(--ink)] text-white lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
@@ -76,17 +75,18 @@ export default function OffrePage() {
               <p className="mt-6 max-w-md text-[18px] leading-relaxed text-[#cfcfc8]">
                 Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus.
               </p>
-              <p className="mt-6 text-[20px] font-bold text-white">
-                À partir de{" "}
-                <span className="text-[var(--amber)]">
-                  {OFFER.price} {OFFER.currencySymbol}
-                </span>
-              </p>
-              <div className="mt-8 flex flex-col items-start gap-4">
-                <Button href="#formules" variant="accent" size="lg">
-                  Comparer les formules
+              <div className="mt-7 flex items-end gap-5">
+                <p className="text-[64px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[76px]">
+                  {OFFER.price}
+                  <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
+                </p>
+                <p className="max-w-[13rem] pb-1 text-[15px] leading-snug text-[#cfcfc8]">Paiement unique. {OFFER.delivery}.</p>
+              </div>
+              <div className="mt-7 flex flex-col items-start gap-4">
+                <Button href="/order" variant="accent" size="lg">
+                  Commander
                 </Button>
-                <Button href={`tel:${SITE.phone}`} variant="ghost" className="!text-white !decoration-white/40 hover:!decoration-white">
+                <Button href={`tel:${SITE.phone}`} variant="ghost" className="!px-0 !text-white !decoration-white/40 hover:!decoration-white">
                   Essayer d’abord gratuitement
                 </Button>
               </div>
@@ -114,11 +114,24 @@ export default function OffrePage() {
                 />
               </div>
             </div>
+
+            <div className="border-t border-white/15 p-7 sm:p-10 lg:col-span-2 lg:px-12 lg:py-10">
+              <h2 className="text-[15px] font-bold text-[var(--amber)]">Ce que comprend la formule</h2>
+              <ul className="mt-6 grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-5">
+                {INCLUDED.map((it) => (
+                  <li key={it.title}>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
+                      <Icon name="check" size={18} />
+                    </span>
+                    <b className="mt-4 block text-[17px] leading-snug text-white">{it.title}</b>
+                    <span className="mt-1.5 block text-[15px] leading-snug text-[#cfcfc8]">{it.detail.charAt(0).toUpperCase() + it.detail.slice(1)}.</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
-
-      <Plans />
 
       <WhatYouGet showDetailLink={false} photo="mains" />
 

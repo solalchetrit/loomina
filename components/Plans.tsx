@@ -4,7 +4,11 @@ import { Section, SectionHead } from "@/components/ui/Section";
 import { OFFER } from "@/config/offer";
 
 /**
- * Tableau comparatif des formules.
+ * TABLEAU COMPARATIF DE PLUSIEURS SERVICES (formules et prix).
+ * Mis de côté le 17/11/2026 à la demande de Solal : il n'est affiché sur aucune page pour l'instant.
+ * Pour le remettre : `import Plans from "@/components/Plans"` puis `<Plans />` dans app/offre/page.tsx,
+ * sous le haut de page.
+ *
  * Pour ajouter ou modifier une formule : PLANS (une colonne par formule) et ROWS
  * (une ligne par critère, une valeur par formule, dans le même ordre).
  * `draft: true` marque une formule pas encore décidée : elle s'affiche en pointillés, sans bouton.
