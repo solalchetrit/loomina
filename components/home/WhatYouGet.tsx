@@ -36,7 +36,18 @@ export function BookCover({ className = "max-w-[340px]", compact = false }: { cl
   );
 }
 
-export default function WhatYouGet({ showDetailLink = true, photo = "collection" }: { showDetailLink?: boolean; photo?: "collection" | "mains" }) {
+export default function WhatYouGet({
+  showDetailLink = true,
+  photo = "collection",
+  title = "Votre histoire, en livre et pour longtemps",
+  features = FEATURES,
+}: {
+  showDetailLink?: boolean;
+  photo?: "collection" | "mains";
+  title?: string;
+  /** Quatre points, pas plus : la grille est faite pour ça. */
+  features?: { icon: IconName; title: string; text: string }[];
+}) {
   return (
     <Section id="le-livre" className="bg-white">
       <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
@@ -57,9 +68,9 @@ export default function WhatYouGet({ showDetailLink = true, photo = "collection"
           />
         )}
         <div>
-          <SectionHead title="Votre histoire, en livre et pour longtemps" />
+          <SectionHead title={title} />
           <ul className="mt-8 grid gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2" data-reveal>
-            {FEATURES.map((f) => (
+            {features.map((f) => (
               <li key={f.title} className="flex gap-4">
                 <span className="chip-icon">
                   <Icon name={f.icon} />

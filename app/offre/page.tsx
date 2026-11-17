@@ -8,7 +8,7 @@ import Button from "@/components/ui/Button";
 import WhatYouGet from "@/components/home/WhatYouGet";
 import Compare from "@/components/home/Compare";
 import Closing from "@/components/Closing";
-import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
+import { OFFER, GUARANTEE } from "@/config/offer";
 
 const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
   {
@@ -63,7 +63,7 @@ const FAQ = [
 export default function OffrePage() {
   return (
     <>
-      {/* Haut de page : une grande carte sombre. Le titre et le prix à gauche, les livres à droite, puis ce que la formule comprend. */}
+      {/* Haut de page : une grande carte sombre. Le titre et le prix à gauche, les livres à droite. */}
       <section className="w-full pb-10 pt-24 md:pb-14 md:pt-28">
         <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
           <div className="rise grid grid-cols-1 overflow-hidden rounded-[32px] bg-[var(--ink)] text-white lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
@@ -114,26 +114,21 @@ export default function OffrePage() {
                 />
               </div>
             </div>
-
-            <div className="border-t border-white/15 p-7 sm:p-9 lg:col-span-2 lg:px-11 lg:py-7">
-              <h2 className="text-[14px] font-bold text-[var(--amber)]">Ce que comprend la formule</h2>
-              <ul className="mt-4 grid gap-x-7 gap-y-5 sm:grid-cols-2 lg:grid-cols-5">
-                {INCLUDED.map((it) => (
-                  <li key={it.title}>
-                    <b className="flex gap-2 text-[15px] leading-snug text-white">
-                      <Icon name="check" size={18} className="mt-px shrink-0 text-[var(--amber)]" />
-                      {it.title}
-                    </b>
-                    <span className="mt-1.5 block pl-[26px] text-[14px] leading-snug text-[#cfcfc8]">{it.detail.charAt(0).toUpperCase() + it.detail.slice(1)}.</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
       </section>
 
-      <WhatYouGet showDetailLink={false} photo="mains" />
+      <WhatYouGet
+        showDetailLink={false}
+        photo="mains"
+        title="Ce que comprend la formule"
+        features={[
+          { icon: "phone", title: "Autant d’appels qu’il vous faut", text: "Les entretiens par téléphone, quand vous voulez." },
+          { icon: "pen", title: "Le récit de chaque appel", text: "Écrit dans vos mots, à relire et corriger." },
+          { icon: "check", title: "Relu par notre équipe", text: "Votre livre est relu, et vos photos placées, avant l’impression." },
+          { icon: "book", title: "Le livre relié, livré chez vous", text: `${OFFER.format}, avec sa version ${OFFER.digital}.` },
+        ]}
+      />
 
       <Section>
         <SectionHead title="Ce que couvre le prix, en détail" />
