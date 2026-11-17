@@ -478,3 +478,6 @@ export function politeness(v: unknown): 'tu' | 'vous' | null {
 
 /** Exporté pour les tests locaux : rejouer un transcript sans appeler l'API. */
 export const __testing = { systemPrompt, userPrompt };
+
+/** Le prompt système du Directeur pour une phase (page admin « Structure »). */
+export const directorSystemPrompt = systemPrompt;
