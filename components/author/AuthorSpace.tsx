@@ -81,7 +81,7 @@ export default function AuthorSpace({ onLogout, onUnauthorized }: { onLogout: ()
   const lastCall = project?.calls[0];
 
   return (
-    <div className="w-full pb-24 pt-32 md:pb-32 md:pt-40">
+    <div className="page-top section-b w-full">
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
         <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>

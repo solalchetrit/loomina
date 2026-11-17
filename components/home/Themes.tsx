@@ -14,7 +14,7 @@ export function Contents({ className = "", details = true }: { className?: strin
       <span className="pill pill-neutral absolute right-5 top-5">Exemple</span>
       <p className="text-center font-serif text-[32px] italic leading-none">Sommaire</p>
       <p className="mt-3 text-center text-[14px] font-bold text-[var(--amber-ink)]">Les {OFFER.chapters} thèmes proposés</p>
-      <div className="mt-10 grid gap-x-12 md:grid-cols-2">
+      <div className="head-gap grid gap-x-12 md:grid-cols-2">
         {columns.map((col, c) => (
           <ol key={c} start={c * half + 1} className="divide-y divide-[var(--line-soft)]">
             {col.map((t, i) => (

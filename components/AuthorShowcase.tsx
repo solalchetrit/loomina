@@ -66,7 +66,7 @@ export default function AuthorShowcase({ id = "espace-auteur", className = "" }:
         text="Après chaque appel, vous retrouvez votre livre en ligne. Vous lisez, vous corrigez, vous orientez la suite. Loomina écrit, vous gardez la main."
       />
 
-      <div className="mt-10 grid items-start gap-6 lg:grid-cols-[1fr_1.25fr] lg:gap-10" data-reveal>
+      <div className="head-gap grid items-start gap-6 lg:grid-cols-[1fr_1.25fr] lg:gap-10" data-reveal>
         <ul className="flex flex-col gap-3" role="tablist" aria-label="Ce que permet l’espace auteur">
           {FEATURES.map((f, i) => {
             const on = i === active;
@@ -107,7 +107,7 @@ export default function AuthorShowcase({ id = "espace-auteur", className = "" }:
       </div>
 
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="t-small">Captures de l’espace auteur, sur le livre d’exemple de Jeanne, une personne fictive.</p>
+        <p className="t-small">Captures de l’espace auteur, sur un livre d’exemple.</p>
         <Button href={`tel:${SITE.phone}`} variant="secondary" className="shrink-0">
           Essayer Loomina gratuitement
         </Button>

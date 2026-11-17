@@ -11,7 +11,7 @@ const COMMITMENTS: { icon: IconName; title: string; text: string }[] = [
   },
   {
     icon: "check",
-    title: "Chaque page est relue par une personne",
+    title: "Votre livre est relu par notre équipe",
     text: "Avant l’impression, quelqu’un de l’équipe relit l’ensemble. Vous relisez aussi, et vous avez le dernier mot.",
   },
   {
@@ -32,9 +32,10 @@ export default function AboutPage() {
       <PageHeader
         title="Tout a commencé avec ma grand-mère"
         text="Loomina est née d’une histoire de famille : une vie qui méritait un livre, et une personne pour qui écrire était devenu trop difficile."
+        photo={{ name: "photos-de-famille", alt: "Une main tient deux vieilles photos de famille." }}
       />
 
-      <Section size="sm">
+      <Section>
         <div className="grid gap-4 lg:grid-cols-[1fr_1.8fr]">
           <aside className="card self-start p-7 lg:sticky lg:top-32">
             <span className="chip-icon">
@@ -72,7 +73,7 @@ export default function AboutPage() {
 
       <Section>
         <SectionHead title="Quatre règles qui ne bougent pas" />
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2">
+        <ul className="head-gap grid gap-4 sm:grid-cols-2">
           {COMMITMENTS.map((c) => (
             <li key={c.title} className="card p-7 md:p-8">
               <span className="chip-icon">
@@ -85,7 +86,7 @@ export default function AboutPage() {
         </ul>
       </Section>
 
-      <Section size="sm">
+      <Section>
         <div className="card flex flex-col gap-6 p-7 md:flex-row md:items-center md:justify-between md:p-10">
           <div className="max-w-2xl">
             <h2 className="t-heading">Une personne vous répond, pas un service client</h2>

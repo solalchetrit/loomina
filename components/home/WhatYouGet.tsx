@@ -2,11 +2,12 @@ import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { Section, SectionHead } from "@/components/ui/Section";
 import { OFFER } from "@/config/offer";
+import Photo from "@/components/ui/Photo";
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: "book", title: "Un vrai livre relié", text: `${OFFER.format}, imprimé et livré chez vous.` },
-  { icon: "image", title: "Vos photos dedans", text: "Envoyées par e-mail, placées au bon souvenir." },
-  { icon: "check", title: "Relu par une personne", text: "Chaque page, avant l’impression." },
+  { icon: "image", title: "Vos photos dedans", text: "Ajoutez-les dans votre espace auteur ou envoyez-les par e-mail." },
+  { icon: "check", title: "Relu par notre équipe", text: "Votre livre est relu avant l’impression." },
   { icon: "heart", title: "À partager en famille", text: `La version ${OFFER.digital}, pour ceux qui sont loin.` },
 ];
 
@@ -35,25 +36,48 @@ export function BookCover({ className = "max-w-[340px]", compact = false }: { cl
   );
 }
 
-export default function WhatYouGet({ showDetailLink = true }: { showDetailLink?: boolean }) {
+export default function WhatYouGet({
+  showDetailLink = true,
+  photo = "collection",
+  title = "Votre histoire, en livre et pour longtemps",
+  features = FEATURES,
+}: {
+  showDetailLink?: boolean;
+  photo?: "collection" | "mains";
+  title?: string;
+  /** Quatre points, pas plus : la grille est faite pour ça. */
+  features?: { icon: IconName; title: string; text: string }[];
+}) {
   return (
     <Section id="le-livre" className="bg-white">
-      <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.25fr] lg:gap-16">
-        <BookCover />
-        <div>
-          <SectionHead
-            title="Votre histoire, en livre et pour longtemps"
-            text="Pas un fichier oublié dans un ordinateur : un livre qu’on pose sur la table, qu’on prête, qu’on relit."
+      <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+        {photo === "collection" ? (
+          <Photo
+            name="collection-de-livres"
+            alt="Quatre livres Loomina reliés, aux couvertures en toile beige, bleue, verte et bordeaux."
+            ratio="aspect-[4/3]"
+            sizes="(min-width: 1024px) 640px, 100vw"
           />
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2" data-reveal>
-            {FEATURES.map((f) => (
-              <li key={f.title} className="flex gap-4 rounded-[20px] bg-[var(--canvas)] p-5">
-                <span className="chip-icon !bg-white">
+        ) : (
+          <Photo
+            name="livre-dans-les-mains"
+            alt="Deux mains tiennent un livre Loomina relié, à la couverture en toile beige."
+            ratio="aspect-[4/5]"
+            sizes="(min-width: 1024px) 480px, 100vw"
+            className="mx-auto w-full max-w-[480px]"
+          />
+        )}
+        <div>
+          <SectionHead title={title} />
+          <ul className="mt-8 grid gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2" data-reveal>
+            {features.map((f) => (
+              <li key={f.title} className="flex gap-4">
+                <span className="chip-icon">
                   <Icon name={f.icon} />
                 </span>
                 <span>
                   <b className="block text-[17px] leading-snug">{f.title}</b>
-                  <span className="mt-0.5 block text-[15px] leading-snug text-[var(--ink-3)]">{f.text}</span>
+                  <span className="mt-1 block text-[15px] leading-snug text-[var(--ink-3)]">{f.text}</span>
                 </span>
               </li>
             ))}

@@ -33,7 +33,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "Faut-il prendre rendez-vous ?",
-        a: "Non. Vous appelez quand vous voulez, de jour comme de nuit, depuis le numéro donné à la commande : c’est ainsi que Loomina vous reconnaît.",
+        a: "Ce n’est pas obligatoire. Vous appelez quand vous voulez, de jour comme de nuit, depuis le numéro donné à la commande : c’est ainsi que Loomina vous reconnaît. Si vous préférez, choisissez un jour et une heure dans votre espace auteur, et c’est Loomina qui vous appelle.",
       },
     ],
   },
@@ -51,7 +51,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "Puis-je ajouter des photos ?",
-        a: "Oui. Envoyez-les par e-mail à contact@loomina.eu, en indiquant à quel souvenir elles se rapportent. Un proche peut le faire pour vous. Nous les plaçons au bon endroit lors de la mise en page.",
+        a: "Oui. Ajoutez-les dans votre espace auteur, ou envoyez-les par e-mail à contact@loomina.eu, en indiquant à quel souvenir elles se rapportent. Un proche peut le faire pour vous. Nous les plaçons au bon endroit lors de la mise en page.",
       },
       {
         q: "Puis-je relire et modifier le texte ?",
@@ -138,9 +138,10 @@ export default function FAQPage() {
             , une personne vous répond.
           </>
         }
+        photo={{ name: "grand-pere-petite-fille", alt: "Un grand-père tient sa petite-fille dans ses bras, ils se sourient.", focus: "50% 20%", ratio: "aspect-[5/4]" }}
       />
 
-      <Section size="sm">
+      <Section>
         <div className="grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-16">
           <nav aria-label="Thèmes" className="lg:sticky lg:top-32 lg:self-start">
             <ul className="flex flex-wrap gap-2 lg:flex-col">

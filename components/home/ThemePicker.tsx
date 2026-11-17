@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/components/ui/Button";
-import { SITE } from "@/config/site";
 import { OFFER, THEMES } from "@/config/offer";
 
 /** La première question que Loomina pourrait poser pour chaque thème. Des exemples, pas un script figé. */
@@ -31,13 +29,13 @@ export default function ThemePicker() {
   const [current, setCurrent] = useState(THEMES[0].title);
 
   return (
-    <section id="themes" className="w-full scroll-mt-28 py-20 md:py-32">
+    <section id="themes" className="section-y w-full scroll-mt-28">
       <div className="mx-auto grid w-full max-w-[1240px] items-start gap-10 px-5 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-16">
         <div data-reveal>
           <h2 className="t-title">Par quoi commenceriez-vous ?</h2>
           <p className="t-lead mt-5 max-w-lg">
             Loomina vous guide à travers {OFFER.chapters} thèmes, de l’enfance à ce que vous voulez transmettre. Choisissez-en un pour
-            entendre sa première question.
+            lire un exemple de question.
           </p>
           <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Thèmes">
             {THEMES.map((t) => {
@@ -71,22 +69,11 @@ export default function ThemePicker() {
                   />
                 ))}
               </span>
-              <p className="text-[15px] font-bold text-[var(--amber)]">Loomina vous demanderait</p>
+              <p className="text-[15px] font-bold text-[var(--amber)]">Loomina pourrait vous demander</p>
             </div>
-            <p key={current} aria-live="polite" className="rise mt-6 min-h-[7.5em] font-serif text-[clamp(1.6rem,2.6vw,2.2rem)] leading-[1.3] text-white">
+            <p key={current} aria-live="polite" className="rise mt-6 min-h-[5.5em] font-serif text-[clamp(1.6rem,2.6vw,2.2rem)] leading-[1.3] text-white">
               « {QUESTIONS[current]} »
             </p>
-            <p className="mt-2 text-[15px] text-[#cfcfc8]">
-              Thème : {current}. Vous répondez comme vous voulez, elle relance, vous laisse le temps.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button href={`tel:${SITE.phone}`} variant="accent" size="lg">
-                Répondre au téléphone
-              </Button>
-              <Button href="/order" variant="ghost" className="!text-white !decoration-white/40 hover:!decoration-white">
-                Commencer mon livre
-              </Button>
-            </div>
           </div>
         </div>
       </div>

@@ -1,9 +1,10 @@
 import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
-import { type IconName } from "@/components/ui/Icon";
+import Icon, { type IconName } from "@/components/ui/Icon";
 import { BookPage } from "@/components/VoiceToPage";
-import { BookCover } from "@/components/home/WhatYouGet";
 import { Contents } from "@/components/home/Themes";
+import Photo from "@/components/ui/Photo";
+import { CallPreview } from "@/components/HowItWorks";
 import Closing from "@/components/Closing";
 import AuthorShowcase from "@/components/AuthorShowcase";
 import { SITE } from "@/config/site";
@@ -16,7 +17,7 @@ const BEFORE = [
   },
   {
     title: "Vous appelez quand vous êtes prêt",
-    text: `Il n’y a pas de rendez-vous. Vous composez le ${SITE.phoneDisplay} depuis le numéro de la commande, le jour et à l’heure qui vous conviennent. Loomina vous accueille par votre prénom.`,
+    text: `Aucun rendez-vous n’est imposé. Vous composez le ${SITE.phoneDisplay} depuis le numéro de la commande, le jour et à l’heure qui vous conviennent. Loomina vous accueille par votre prénom.`,
   },
 ];
 
@@ -26,8 +27,8 @@ const DURING = [
     text: "Loomina se présente, puis vous demande par où vous aimeriez commencer. Souvent l’enfance. Elle écoute, relance, et vous laisse le temps de chercher vos souvenirs. Vous n’avez rien à préparer.",
   },
   {
-    title: "Un appel dure ce que vous voulez",
-    text: "Dix minutes ou une heure. Vous pouvez dire « on s’arrête là » à tout moment, et reprendre un autre jour : Loomina se souvient de ce que vous lui avez dit et reprend là où vous en étiez.",
+    title: "Vous choisissez la durée de vos appels",
+    text: "Un quart d’heure ou trois quarts d’heure, c’est vous qui décidez. Vous pouvez dire « on s’arrête là » à tout moment, et reprendre un autre jour : Loomina se souvient de ce que vous lui avez dit et reprend là où vous en étiez.",
   },
   {
     title: "Le récit de votre appel est écrit aussitôt",
@@ -37,8 +38,8 @@ const DURING = [
 
 const AFTER = [
   {
-    title: "Vous relisez, nous relisons",
-    text: "Vous avez le dernier mot sur chaque récit, puis sur le livre. Puis une personne de l’équipe relit l’ensemble, corrige, et place les photos que vous nous avez envoyées par e-mail.",
+    title: "Une dernière relecture avant l’impression",
+    text: "Vous avez le dernier mot sur chaque récit, puis sur le livre. Une personne de l’équipe relit ensuite l’ensemble, corrige, et place les photos que vous avez ajoutées.",
   },
   {
     title: "Le livre arrive chez vous",
@@ -63,7 +64,7 @@ const PHASES: { id: string; icon: IconName; label: string; title: string; text: 
     icon: "phone",
     label: "Pendant",
     title: "Une conversation, pas un interrogatoire",
-    text: "Loomina est une intelligence artificielle conçue pour écouter patiemment. Elle ne vous presse jamais et ne change pas de sujet avant vous.",
+    text: "Loomina est une intelligence conçue pour écouter patiemment. Elle ne vous presse jamais et ne change pas de sujet avant vous.",
     duration: `En général ${OFFER.delay}`,
     steps: DURING,
   },
@@ -115,8 +116,44 @@ export default function ExperiencePage() {
   return (
     <>
       <PageHeader
-        title="Un téléphone, des conversations, un livre"
+        title={
+          <>
+            Un téléphone,
+            <br />
+            des conversations,
+            <br />
+            un livre
+          </>
+        }
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
+        photo={{ name: "mains-telephone", alt: "Les mains d’une personne âgée tiennent un téléphone." }}
+        badge={
+          <div className="w-[230px]">
+            <CallPreview />
+          </div>
+        }
+        actions={
+          <>
+            <ul className="flex flex-col gap-2.5 text-[17px] text-[var(--ink-2)]">
+              {["Depuis un fixe ou un portable", "À votre rythme, quand vous voulez", `En général ${OFFER.delay} jusqu’au livre validé`].map((t) => (
+                <li key={t} className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                    <Icon name="check" size={16} />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button href={`tel:${SITE.phone}`} size="lg">
+                Essayer {OFFER.demoMinutes} minutes gratuitement
+              </Button>
+              <Button href="#avant" variant="secondary" size="lg">
+                Voir les étapes
+              </Button>
+            </div>
+          </>
+        }
       />
 
       {PHASES.map((p, idx) => {
@@ -134,8 +171,8 @@ export default function ExperiencePage() {
               <div>
                 <Timeline steps={p.steps} start={start} />
                 {p.id === "apres" && (
-                  <div className="mt-6 grid items-center gap-6 rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white sm:grid-cols-[130px_1fr] md:p-9">
-                    <BookCover className="max-w-[130px] !py-0" compact />
+                  <div className="mt-6 grid items-center gap-6 rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white sm:grid-cols-[160px_1fr] md:p-9">
+                    <Photo name="livre-debout" alt="Le livre Loomina relié, posé debout." ratio="aspect-[4/5]" sizes="160px" className="w-full max-w-[160px] !rounded-[16px]" />
                     <div>
                       <p className="text-[15px] font-bold text-[var(--amber)]">Ce que vous recevez</p>
                       <p className="mt-2 text-[24px] font-extrabold leading-tight tracking-[-0.02em]">
@@ -167,7 +204,6 @@ export default function ExperiencePage() {
               title="Vos mots, mis en page"
               text="Loomina ne romance pas. Elle garde votre façon de dire les choses, ordonne, et quand un détail manque, elle vous le demande au prochain appel plutôt que de l’inventer."
             />
-            <p className="t-small mt-6">Exemple écrit pour illustrer la méthode : Jeanne n’est pas une cliente réelle.</p>
           </div>
           <BookPage chapter="Chapitre 7" title="La maison de famille" page="112">
             <p>
@@ -182,11 +218,14 @@ export default function ExperiencePage() {
       </Section>
 
       <Section id="chapitres">
-        <SectionHead
-          title="Des points de départ, pas un questionnaire"
-          text="Loomina propose ces thèmes au fil des appels. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
-        />
-        <Contents className="mt-10" />
+        <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+          <SectionHead
+            title="Des thèmes pour vous guider, jamais imposés"
+            text="Loomina propose ces thèmes au fil des appels. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
+          />
+          <Photo name="panier-de-photos" alt="Un panier rempli de vieilles photos de famille." ratio="aspect-[16/10]" />
+        </div>
+        <Contents className="head-gap" />
       </Section>
 
       <Closing title="Essayez d’abord, commandez ensuite" />

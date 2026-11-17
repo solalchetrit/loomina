@@ -3,11 +3,11 @@ import { OFFER } from "@/config/offer";
 import { SITE } from "@/config/site";
 import { Section, SectionHead, Steps } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
-import { BookCover } from "@/components/home/WhatYouGet";
+import Photo from "@/components/ui/Photo";
 import type { IconName } from "@/components/ui/Icon";
 
 /** Aperçu 1 : un appel en cours. */
-function CallPreview() {
+export function CallPreview() {
   const bars = [10, 22, 34, 18, 40, 26, 14, 30, 38, 20, 12, 28, 36, 16, 24];
   return (
     <div className="w-full max-w-[260px] rounded-[18px] bg-white p-4 shadow-[var(--shadow-bar)]">
@@ -28,8 +28,7 @@ function CallPreview() {
 function ChapterPreview() {
   return (
     <div className="w-full max-w-[260px] rounded-[14px] bg-white px-5 py-4 shadow-[var(--shadow-bar)]">
-      <p className="text-[11px] font-bold text-[var(--amber-ink)]">Votre 4e appel</p>
-      <p className="mt-1 font-serif text-[17px] italic leading-tight">L’été de mes seize ans</p>
+      <p className="font-serif text-[17px] italic leading-tight">L’été de mes seize ans</p>
       <div className="mt-3 space-y-1.5">
         <span className="block h-[5px] w-full rounded bg-[var(--line)]" />
         <span className="block h-[5px] w-11/12 rounded bg-[var(--line)]" />
@@ -57,7 +56,16 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
     icon: "book",
     title: "Le livre arrive chez vous",
     text: `Quand votre récit est complet, notre équipe relit le livre, y place vos photos et l’envoie à l’impression. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé.`,
-    preview: <BookCover className="max-w-[96px] !py-0" compact />,
+    preview: (
+      <Photo
+        name="livre-debout"
+        alt=""
+        ratio="h-40"
+        sizes="400px"
+        contain="aspect-[4/5]"
+        className="-mx-5 w-[calc(100%+2.5rem)] max-w-none shrink-0 !rounded-none"
+      />
+    ),
   },
 ];
 
@@ -65,12 +73,12 @@ export default function HowItWorks() {
   return (
     <Section id="parcours">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-        <SectionHead title="Trois étapes, et rien à écrire" text="Pas d’application, pas de rendez-vous. Un téléphone suffit." />
+        <SectionHead title="Trois étapes, et rien à écrire" text="Pas d’application, rien à installer. Un téléphone suffit." />
         <Link href="/experience" className="link shrink-0 text-[16px]">
           Le détail, appel par appel
         </Link>
       </div>
-      <Steps items={STEPS} className="mt-10" />
+      <Steps items={STEPS} className="head-gap" />
       <div className="mt-6 flex flex-col items-start gap-4 rounded-[var(--radius-card)] bg-[var(--amber-soft)] p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
         <p className="text-[17px] font-bold text-[var(--amber-deep)]">Le plus simple pour comprendre, c’est d’essayer : {OFFER.demoMinutes} minutes, gratuitement.</p>
         <Button href={`tel:${SITE.phone}`} className="shrink-0">

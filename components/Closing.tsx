@@ -16,10 +16,10 @@ export default function Closing({
   secondary?: { href: string; label: string } | null;
 }) {
   return (
-    <section className="w-full px-5 pb-20 pt-4 sm:px-6 md:pb-28">
+    <section className="section-b w-full px-5 sm:px-6">
       <div className="mx-auto flex max-w-[1240px] flex-col gap-10 rounded-[32px] bg-[var(--ink)] px-7 py-12 text-white sm:px-12 md:py-14 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-xl">
-          <h2 className="text-[clamp(1.9rem,3.4vw,2.6rem)] leading-[1.1] text-white">{title}</h2>
+          <h2 className="t-banner text-white">{title}</h2>
           <p className="mt-4 text-[17px] leading-relaxed text-[#cfcfc8]">{text}</p>
         </div>
         <div className="flex flex-col gap-4 lg:items-end">

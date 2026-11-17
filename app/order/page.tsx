@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CALL_MINUTES_OPTIONS, DEFAULT_CALL_MINUTES } from "@/lib/loomina/call-length";
 import Link from "next/link";
 import { formatToE164 } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
 import { CheckList } from "@/components/ui/Section";
+import Photo from "@/components/ui/Photo";
 import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
@@ -27,6 +28,15 @@ export default function OrderPage() {
   const [errors, setErrors] = useState<Errors>({});
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "" });
   const [callMinutes, setCallMinutes] = useState<number>(DEFAULT_CALL_MINUTES);
+
+  // Les boutons « Commencer mon livre » et « Offrir le livre » arrivent ici avec le choix déjà fait.
+  useEffect(() => {
+    const choice = window.location.hash;
+    const preset: Who | null = choice === "#pour-moi" ? "me" : choice === "#pour-offrir" ? "gift" : null;
+    if (!preset) return;
+    const id = window.setTimeout(() => setWho(preset), 0);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const step = who ? 2 : 1;
   const isGift = who === "gift";
@@ -74,7 +84,7 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="min-h-[80svh] w-full pb-20 pt-32 md:pb-28 md:pt-40">
+    <div className="page-top section-b min-h-[80svh] w-full">
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
         <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
           <div className="card p-6 sm:p-8 md:p-10">
@@ -221,6 +231,14 @@ export default function OrderPage() {
 
           {/* Récapitulatif */}
           <aside className="card p-6 sm:p-8 lg:sticky lg:top-32 lg:self-start">
+            <Photo
+              name="livre-deux-exemplaires"
+              alt="Deux exemplaires du livre Loomina relié, posés l’un sur l’autre."
+              ratio="aspect-[16/10]"
+              focus="50% 45%"
+              sizes="(min-width: 1024px) 420px, 100vw"
+              className="mb-6 !rounded-[20px]"
+            />
             <p className="text-[15px] font-bold text-[var(--ink-3)]">Votre commande</p>
             <p className="mt-2 text-[20px] font-extrabold leading-tight tracking-[-0.02em]">{OFFER.name}</p>
             <p className="mt-4 text-[56px] font-extrabold leading-none tracking-[-0.05em]">
