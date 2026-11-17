@@ -104,7 +104,7 @@ export default function OffrePage() {
               <Icon name="shield" />
             </span>
             <h3 className="t-heading mt-5">Votre récit vous appartient</h3>
-            <p className="t-body mt-2">Vous conservez l’intégralité des droits sur votre histoire. Vos récits et vos données restent privés : ils ne sont ni revendus, ni utilisés pour entraîner des modèles, et vous pouvez les faire supprimer à tout moment.</p>
+            <p className="t-body mt-2">Vous gardez tous les droits sur votre histoire. Vos récits restent privés, et vous pouvez les faire supprimer à tout moment.</p>
           </li>
           <li className="card p-7">
             <span className="chip-icon">

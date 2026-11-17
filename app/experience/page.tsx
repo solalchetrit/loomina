@@ -168,7 +168,6 @@ export default function ExperiencePage() {
               title="Vos mots, mis en page"
               text="Loomina ne romance pas. Elle garde votre façon de dire les choses, ordonne, et quand un détail manque, elle vous le demande au prochain appel plutôt que de l’inventer."
             />
-            <p className="t-small mt-6">Exemple écrit pour illustrer la méthode : Jeanne n’est pas une cliente réelle.</p>
           </div>
           <BookPage chapter="Chapitre 7" title="La maison de famille" page="112">
             <p>

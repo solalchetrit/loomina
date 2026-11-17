@@ -107,7 +107,7 @@ export default function AuthorShowcase({ id = "espace-auteur", className = "" }:
       </div>
 
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="t-small">Captures de l’espace auteur, sur le livre d’exemple de Jeanne, une personne fictive.</p>
+        <p className="t-small">Captures de l’espace auteur, sur un livre d’exemple.</p>
         <Button href={`tel:${SITE.phone}`} variant="secondary" className="shrink-0">
           Essayer Loomina gratuitement
         </Button>
