@@ -240,3 +240,13 @@ test('famille : les nouvelles ne contiennent jamais le texte du récit', () => {
     assert.match(familyNewsText('new_story', 'Jeanne', 'La maison de Lyon').text, /« La maison de Lyon »/);
     assert.match(familyNewsText('book_complete', 'Jeanne').subject, /terminé/);
 });
+
+import { abandonedCartTexts } from '../../lib/loomina/notify';
+
+test('panier abandonné : le message donne le lien de reprise et ne promet qu’un seul envoi', () => {
+    const t = abandonedCartTexts({ email: 'a@b.fr', phone: '+33611111111', firstName: 'Paul', isGift: true, narratorFirstName: 'Jeanne', recoveryUrl: 'https://checkout.stripe.com/c/pay/abc' });
+    assert.match(t.email, /https:\/\/checkout\.stripe\.com\/c\/pay\/abc/);
+    assert.match(t.email, /pas une seconde fois/);
+    assert.match(t.sms, /le livre de Jeanne/);
+    assert.match(abandonedCartTexts({ email: 'a@b.fr', phone: null, firstName: null, isGift: false, narratorFirstName: null, recoveryUrl: null }).email, /loomina\.eu\/order/);
+});

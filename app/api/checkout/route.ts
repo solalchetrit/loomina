@@ -35,6 +35,12 @@ export async function POST(request: NextRequest) {
                 },
             ],
             mode: "payment",
+            // Panier abandonné : la page de paiement expire au bout de deux heures.
+            // Stripe nous prévient alors (checkout.session.expired) et fournit un lien
+            // qui rouvre la commande telle quelle : on l'envoie une fois, par e-mail
+            // et par SMS (voir app/api/webhook/stripe).
+            expires_at: Math.floor(Date.now() / 1000) + 2 * 60 * 60,
+            after_expiration: { recovery: { enabled: true, allow_promotion_codes: true } },
             // Permet les codes promo (dont un code 100 % réservé aux tests du parcours complet)
             allow_promotion_codes: true,
             customer_email: email, // Pré-remplit l'email dans Stripe

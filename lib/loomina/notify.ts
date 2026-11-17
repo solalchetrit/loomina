@@ -222,3 +222,46 @@ export async function notifyFamily(params: {
         console.warn('[famille] nouvelles non envoyées :', err instanceof Error ? err.message : String(err));
     }
 }
+
+// ------------------------------------------------------------
+// Panier abandonné
+// ------------------------------------------------------------
+
+export interface AbandonedCart {
+    email: string;
+    phone: string | null;
+    /** Prénom de la personne qui commandait. */
+    firstName: string | null;
+    isGift: boolean;
+    narratorFirstName: string | null;
+    /** Lien Stripe qui rouvre la commande telle quelle (valable 30 jours). */
+    recoveryUrl: string | null;
+}
+
+export function abandonedCartTexts(cart: AbandonedCart): { subject: string; email: string; sms: string } {
+    const hello = cart.firstName ? `Bonjour ${cart.firstName},` : 'Bonjour,';
+    const link = cart.recoveryUrl ?? `${SITE.url}/order`;
+    const what = cart.isGift && cart.narratorFirstName ? `le livre de ${cart.narratorFirstName}` : 'votre livre';
+    return {
+        subject: cart.isGift && cart.narratorFirstName ? `Le livre de ${cart.narratorFirstName} vous attend` : 'Votre livre Loomina vous attend',
+        email: [
+            hello,
+            `Vous avez commencé une commande sur Loomina sans la terminer. Si vous le souhaitez, vous pouvez la reprendre là où vous l'avez laissée :`,
+            link,
+            `Pour rappel : si le premier entretien ne convient pas, nous vous remboursons intégralement, sur simple demande dans les 7 jours qui suivent.`,
+            `Une question avant de vous décider ? Répondez simplement à ce message, ou essayez la démonstration gratuite en appelant le ${SITE.phoneDisplay}.`,
+            `Nous ne vous écrirons pas une seconde fois à ce sujet.`,
+            `L'équipe Loomina`,
+        ].join('\n\n'),
+        sms: `Loomina : votre commande pour ${what} n'a pas été terminée. Vous pouvez la reprendre ici : ${link} Une question ? ${SITE.phoneDisplay}`,
+    };
+}
+
+/** Relance unique d'une commande commencée et jamais payée : e-mail et SMS. Ne lève pas. */
+export async function notifyAbandonedCart(cart: AbandonedCart): Promise<void> {
+    const t = abandonedCartTexts(cart);
+    await Promise.allSettled([
+        sendEmail({ to: cart.email, subject: t.subject, text: t.email, replyTo: teamContacts().email }),
+        cart.phone ? sendSms(cart.phone, t.sms) : Promise.resolve(false),
+    ]);
+}
