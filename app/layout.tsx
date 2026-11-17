@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import ScrollTop from "@/components/ScrollTop";
-import Script from "next/script";
+import Analytics from "@/components/Analytics";
 import Footer from "@/components/Footer";
 import MobileCta from "@/components/MobileCta";
 import { SITE } from "@/config/site";
@@ -101,13 +101,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <MobileCta />
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-3F6NDBKRJ8" strategy="afterInteractive" />
-        <Script id="gtag" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-3F6NDBKRJ8');`}
-        </Script>
+        <Analytics />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
