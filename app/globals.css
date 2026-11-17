@@ -130,30 +130,73 @@
 }
 
 /* ================================================================
+   RYTHME VERTICAL
+   Une seule mesure pour tout le site : --gap, la marge haute et basse
+   d'une section. Deux blocs qui se suivent sont donc toujours séparés
+   par 2 × --gap, sur ordinateur comme sur téléphone.
+     .section-y   marge en haut et en bas (toutes les sections)
+     .section-b   marge en bas seulement (bloc collé au précédent)
+     .page-top    dégagement sous le menu flottant, en haut de page
+     .head-gap    espace entre la tête d'une section et son contenu
+   ================================================================ */
+
+:root {
+  --gap: 3.5rem;
+  --page-top: 6.5rem;
+  --head-gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gap: 5.5rem;
+    --page-top: 8.5rem;
+    --head-gap: 2.75rem;
+  }
+}
+
+.section-y { padding-block: var(--gap); }
+.section-b { padding-bottom: var(--gap); }
+.page-top { padding-top: var(--page-top); }
+.head-gap { margin-top: var(--head-gap); }
+
+/* ================================================================
    TYPOGRAPHIE
    Une seule famille, Plus Jakarta Sans. Le serif est réservé aux
    extraits de livre : c'est ce que le client recevra imprimé.
    ================================================================ */
 
+/* Échelle des titres. Une taille par rôle, la même sur toutes les pages :
+   t-hero    le titre de l'accueil ;
+   t-display le titre des autres pages (h1) ;
+   t-title   le titre d'une section (h2) ;
+   t-banner  le titre d'un bandeau sombre ;
+   t-heading le titre d'une carte ou d'une étape (h3). */
 .t-hero {
-  font-size: clamp(3rem, 7.2vw, 6.4rem);
+  font-size: clamp(2.6rem, 5.4vw, 4.9rem);
   font-weight: 800;
-  line-height: 0.96;
+  line-height: 0.98;
   letter-spacing: -0.045em;
 }
 
 .t-display {
-  font-size: clamp(2.6rem, 5.6vw, 4.6rem);
+  font-size: clamp(2.3rem, 4.3vw, 3.7rem);
   font-weight: 800;
-  line-height: 1.04;
-  letter-spacing: -0.03em;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
 }
 
 .t-title {
-  font-size: clamp(2.1rem, 3.8vw, 3rem);
+  font-size: clamp(1.9rem, 3.4vw, 2.75rem);
   font-weight: 800;
-  line-height: 1.07;
+  line-height: 1.08;
   letter-spacing: -0.032em;
+}
+
+.t-banner {
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
 .t-heading {

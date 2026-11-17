@@ -13,7 +13,7 @@ export default function ContactPage() {
         text="Un projet de livre, un cadeau à préparer, un doute avant de commander : écrivez-nous, c’est Solal, le fondateur, qui lit et répond."
       />
 
-      <section className="w-full pb-20 md:pb-28">
+      <section className="section-y w-full">
         <div className="mx-auto grid w-full max-w-[1240px] gap-4 px-5 sm:px-6 lg:grid-cols-[1fr_1.5fr]">
           <div className="flex flex-col gap-4 lg:sticky lg:top-32 lg:self-start">
             <div className="card p-7">

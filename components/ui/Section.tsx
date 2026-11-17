@@ -2,21 +2,18 @@ import type { ReactNode } from "react";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import Photo from "@/components/ui/Photo";
 
-/** Conteneur de section : largeur, gouttières et rythme vertical communs. */
+/** Conteneur de section : largeur, gouttières et rythme vertical communs (voir « Rythme vertical » dans globals.css). */
 export function Section({
   id,
   children,
   className = "",
-  size = "md",
 }: {
   id?: string;
   children: ReactNode;
   className?: string;
-  size?: "sm" | "md" | "lg";
 }) {
-  const pad = { sm: "py-14 md:py-20", md: "py-20 md:py-32", lg: "py-24 md:py-40" }[size];
   return (
-    <section id={id} className={`w-full scroll-mt-28 ${pad} ${className}`}>
+    <section id={id} className={`section-y w-full scroll-mt-28 ${className}`}>
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">{children}</div>
     </section>
   );
@@ -43,7 +40,7 @@ export function SectionHead({
     <div className={`max-w-2xl ${center} ${className}`} data-reveal={Tag === "h2" ? "" : undefined}>
       {eyebrow && <p className="t-eyebrow">{eyebrow}</p>}
       <Tag className={`${eyebrow ? "mt-3" : ""} ${Tag === "h1" ? "t-display" : "t-title"}`}>{title}</Tag>
-      {text && <p className={`t-lead mt-5 ${align === "center" ? "mx-auto" : ""} max-w-xl`}>{text}</p>}
+      {text && <p className={`t-lead mt-4 md:mt-5 ${align === "center" ? "mx-auto" : ""} max-w-xl`}>{text}</p>}
     </div>
   );
 }
@@ -74,12 +71,12 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <section className="w-full pb-8 pt-28 md:pb-10 md:pt-36">
+    <section className="page-top w-full">
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
         {photo ? (
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)] lg:gap-16">
             <div className="min-w-0">
-              <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise text-balance [&_h1]:!text-[clamp(2.5rem,4.3vw,3.7rem)]" />
+              <SectionHead as="h1" eyebrow={eyebrow} title={title} text={text} className="rise text-balance" />
               {actions && <div className="rise mt-8">{actions}</div>}
             </div>
             <div className="rise relative min-w-0 pb-6 sm:pl-6">

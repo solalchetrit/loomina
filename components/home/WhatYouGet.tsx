@@ -82,7 +82,7 @@ export default function WhatYouGet({
               </li>
             ))}
           </ul>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button href="/order" size="lg">
               Commander · {OFFER.price} €
             </Button>

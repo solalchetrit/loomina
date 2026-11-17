@@ -225,7 +225,7 @@ export default function ExperiencePage() {
           />
           <Photo name="panier-de-photos" alt="Un panier rempli de vieilles photos de famille." ratio="aspect-[16/10]" />
         </div>
-        <Contents className="mt-10" />
+        <Contents className="head-gap" />
       </Section>
 
       <Closing title="Essayez d’abord, commandez ensuite" />

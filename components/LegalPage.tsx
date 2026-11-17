@@ -15,7 +15,7 @@ export default function LegalPage({
   return (
     <>
       <PageHeader title={title} text={`Dernière mise à jour : ${updated}.`} />
-      <section className="w-full pb-24 md:pb-32">
+      <section className="section-y w-full">
         <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
           <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
             <aside className="card self-start p-7 lg:sticky lg:top-32">

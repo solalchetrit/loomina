@@ -64,12 +64,12 @@ export default function OffrePage() {
   return (
     <>
       {/* Haut de page : une grande carte sombre. Le titre et le prix à gauche, les livres à droite. */}
-      <section className="flex min-h-[100svh] w-full flex-col pb-5 pt-[88px] md:pb-8 md:pt-28">
+      <section className="flex min-h-[100svh] w-full flex-col pb-4 pt-[84px] md:pb-8 md:pt-28">
         <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col px-4 sm:px-6">
           <div className="rise grid flex-1 grid-cols-1 content-center overflow-hidden rounded-[28px] bg-[var(--ink)] text-white md:rounded-[32px] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
-            <div className="flex min-w-0 flex-col justify-center p-6 pb-5 sm:p-9 lg:px-12 lg:py-10">
+            <div className="flex min-w-0 flex-col justify-center p-5 pb-4 sm:p-9 lg:px-12 lg:py-10">
               <p className="text-[14px] font-bold text-[var(--amber)]">Le livre et le prix</p>
-              <h1 className="mt-2 text-balance text-[clamp(2rem,3.6vw,3.4rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-white">
+              <h1 className="t-display mt-2 text-balance text-white">
                 Votre livre, tout compris
               </h1>
               <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-[#cfcfc8] md:mt-5 md:text-[17px]">
@@ -132,7 +132,7 @@ export default function OffrePage() {
 
       <Section>
         <SectionHead title="Ce que couvre le prix, en détail" />
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="head-gap grid gap-4 md:grid-cols-3">
           {DETAILS.map((g) => (
             <div key={g.title} className="card p-7 md:p-8">
               <span className="chip-icon">
@@ -154,7 +154,7 @@ export default function OffrePage() {
 
       <Compare />
 
-      <Section size="sm">
+      <Section>
         <ul className="grid gap-4 md:grid-cols-3">
           <li className="card p-7">
             <span className="chip-icon">

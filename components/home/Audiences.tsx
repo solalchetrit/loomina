@@ -27,7 +27,7 @@ export default function Audiences() {
   return (
     <Section id="pour-qui">
       <SectionHead title="Racontez votre histoire, ou offrez-la à un proche" text="Vous pouvez commander pour vous, ou pour un parent qui racontera à son tour. Tout le reste est identique." />
-      <div className="mt-10 grid gap-4 md:grid-cols-2" data-reveal>
+      <div className="head-gap grid gap-4 md:grid-cols-2" data-reveal>
         {AUDIENCES.map((a) => (
           <div
             key={a.title}
@@ -38,7 +38,7 @@ export default function Audiences() {
             <span className={`chip-icon ${a.dark ? "!bg-[var(--amber)] !text-[var(--ink)]" : ""}`}>
               <Icon name={a.icon} />
             </span>
-            <h3 className={`mt-6 text-[clamp(1.5rem,2.4vw,1.9rem)] ${a.dark ? "text-white" : ""}`}>{a.title}</h3>
+            <h3 className={`t-heading mt-6 !text-[clamp(1.45rem,2.2vw,1.8rem)] ${a.dark ? "text-white" : ""}`}>{a.title}</h3>
             <p className={`mt-3 text-[17px] leading-relaxed ${a.dark ? "text-[#cfcfc8]" : "text-[var(--ink-2)]"}`}>{a.text}</p>
             <ul className="mt-6 space-y-2.5">
               {a.points.map((p) => (

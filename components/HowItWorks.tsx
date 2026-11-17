@@ -78,7 +78,7 @@ export default function HowItWorks() {
           Le détail, appel par appel
         </Link>
       </div>
-      <Steps items={STEPS} className="mt-10" />
+      <Steps items={STEPS} className="head-gap" />
       <div className="mt-6 flex flex-col items-start gap-4 rounded-[var(--radius-card)] bg-[var(--amber-soft)] p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
         <p className="text-[17px] font-bold text-[var(--amber-deep)]">Le plus simple pour comprendre, c’est d’essayer : {OFFER.demoMinutes} minutes, gratuitement.</p>
         <Button href={`tel:${SITE.phone}`} className="shrink-0">

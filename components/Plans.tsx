@@ -54,7 +54,7 @@ export default function Plans() {
       <SectionHead title="Comparez les formules" text="Ce que chaque formule comprend, ligne par ligne." />
 
       {/* Téléphone : une carte par formule. */}
-      <ul className="mt-10 space-y-4 lg:hidden">
+      <ul className="head-gap space-y-4 lg:hidden">
         {PLANS.map((p, i) => (
           <li
             key={p.name}
@@ -83,7 +83,7 @@ export default function Plans() {
       </ul>
 
       {/* Ordinateur : le tableau. */}
-      <div className="mt-10 hidden overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] lg:block" data-reveal>
+      <div className="head-gap hidden overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] lg:block" data-reveal>
         <table className="w-full table-fixed border-collapse text-left text-[16px]">
           <caption className="sr-only">Comparaison des formules Loomina</caption>
           <thead>

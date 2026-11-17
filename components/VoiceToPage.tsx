@@ -40,7 +40,7 @@ export default function VoiceToPage() {
         text="À gauche, un extrait de conversation. À droite, la page que Loomina en tire : vos souvenirs et vos expressions, mis en forme, sans rien inventer."
       />
 
-      <div className="mt-12 grid gap-4 lg:grid-cols-2" data-reveal>
+      <div className="head-gap grid gap-4 lg:grid-cols-2" data-reveal>
         <figure className="flex flex-col rounded-[var(--radius-card)] bg-[var(--canvas)] p-5 sm:p-7">
           <figcaption className="flex items-center gap-3 text-[15px] font-bold">
             <span className="chip-icon !h-9 !w-9 !rounded-[12px]">

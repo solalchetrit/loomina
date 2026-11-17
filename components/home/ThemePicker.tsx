@@ -29,7 +29,7 @@ export default function ThemePicker() {
   const [current, setCurrent] = useState(THEMES[0].title);
 
   return (
-    <section id="themes" className="w-full scroll-mt-28 py-20 md:py-32">
+    <section id="themes" className="section-y w-full scroll-mt-28">
       <div className="mx-auto grid w-full max-w-[1240px] items-start gap-10 px-5 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-16">
         <div data-reveal>
           <h2 className="t-title">Par quoi commenceriez-vous ?</h2>

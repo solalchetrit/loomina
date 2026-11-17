@@ -141,7 +141,7 @@ export default function FAQPage() {
         photo={{ name: "grand-pere-petite-fille", alt: "Un grand-père tient sa petite-fille dans ses bras, ils se sourient.", focus: "50% 20%", ratio: "aspect-[5/4]" }}
       />
 
-      <Section size="sm">
+      <Section>
         <div className="grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-16">
           <nav aria-label="Thèmes" className="lg:sticky lg:top-32 lg:self-start">
             <ul className="flex flex-wrap gap-2 lg:flex-col">
