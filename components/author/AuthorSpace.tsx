@@ -11,6 +11,8 @@ import LifeStory from "./LifeStory";
 import Calls from "./Calls";
 import Settings from "./Settings";
 import Photos from "./Photos";
+import Welcome from "./Welcome";
+import Shipping from "./Shipping";
 import { formatDate, type Overview } from "./types";
 
 const TABS = [
@@ -109,6 +111,10 @@ export default function AuthorSpace({
           </p>
         )}
 
+        {data?.welcome && tab === "apercu" && (
+          <Welcome ask={data.welcome} prefs={data.prefs} onDone={load} onUnauthorized={onUnauthorized} />
+        )}
+
         <nav aria-label="Rubriques de l’espace auteur" className="-mx-5 mt-8 overflow-x-auto px-5 sm:mx-0 sm:px-0">
           <ul className="flex w-max gap-1 rounded-full bg-white p-1.5 shadow-[inset_0_0_0_1px_var(--line)]">
             {TABS.map((t) => (
@@ -147,6 +153,7 @@ export default function AuthorSpace({
 
           {data && tab === "apercu" && (
             <div className="flex flex-col gap-4">
+              {project?.completed && <Shipping saved={data.shipping ?? null} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
               {project && <Progress project={project} />}
               <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
                 <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />

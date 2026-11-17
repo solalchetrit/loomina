@@ -4,6 +4,7 @@
  * Lecture seule : l'admin ne modifie rien dans la base.
  */
 
+import { readShipping, shippingLines } from '@/lib/loomina/shipping';
 import { db } from '@/lib/loomina/db';
 import type { Profile, Project } from '@/lib/loomina/db';
 import { readEditions } from '@/lib/loomina/book-edition';
@@ -87,6 +88,8 @@ export interface ClientDetail {
         giver: Giver | null;
         stripeSessionId: string | null;
         paidAt: string | null;
+        /** Adresse d'envoi du livre, donnée par l'auteur une fois le livre terminé. */
+        shipping: string[] | null;
         refundedAt: string | null;
         refundAmount: number | null;
         relances: Array<{ at: string; to?: string }>;
@@ -155,6 +158,7 @@ export async function getClient(profileId: string): Promise<ClientDetail | null>
             giver: readGiver(meta),
             stripeSessionId: project?.stripe_session_id ?? null,
             paidAt: project?.created_at ?? null,
+            shipping: readShipping(meta) ? shippingLines(readShipping(meta)!) : null,
             refundedAt: typeof meta.refunded_at === 'string' ? meta.refunded_at : null,
             refundAmount: typeof meta.refund_amount === 'number' ? meta.refund_amount : null,
             relances: Array.isArray(meta.relances) ? (meta.relances as Array<{ at: string; to?: string }>).filter((r) => typeof r?.at === 'string') : [],
@@ -288,6 +292,8 @@ export interface CrmClient {
     orderedAt: string;
     isGift: boolean;
     paid: boolean;
+    /** Le paiement Stripe lié au livre (pour lire le montant réel). */
+    stripeSessionId: string | null;
     phase: number | null;
     progress: number;
     realCalls: number;
@@ -366,6 +372,7 @@ export async function getCrm(now = Date.now()): Promise<Crm> {
             orderedAt,
             isGift: meta.is_gift === true,
             paid: Boolean(project?.stripe_session_id),
+            stripeSessionId: (project?.stripe_session_id as string | null | undefined) ?? null,
             phase,
             progress: Number(project?.phase_progress ?? 0),
             realCalls: real.length,

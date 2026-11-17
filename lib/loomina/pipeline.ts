@@ -424,7 +424,8 @@ export async function processEndOfCall(params: {
         projectMetadata: project.project_metadata,
         narratorFirstName: params.profile.first_name,
         kind: chapterNumber === 1 ? 'first_call' : 'new_story',
-        storyTitle: writer.chapter_title,
+        // Le titre ne part que si le narrateur partage ses récits avec l'offreur.
+        storyTitle: project.project_metadata?.share_with_giver === true ? writer.chapter_title : undefined,
     });
 
     // Le livre se recompose avec ce nouveau récit, sans attendre ici.

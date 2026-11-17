@@ -156,7 +156,7 @@ function Book({ book, onChange, onUnauthorized }: { book: FamilyBook; onChange: 
               <p className="t-body mt-1">
                 {book.shared
                   ? `${name} a choisi de vous laisser lire ses récits.`
-                  : `Vous voyez les titres. Le texte reste entre ${name} et Loomina tant qu’il ou elle n’a pas choisi de le partager : cela se règle dans son espace auteur.`}
+                  : `Vous voyez l’avancement du livre. Les récits restent entre ${name} et Loomina tant qu’il ou elle n’a pas choisi de les partager : cela se règle dans son espace auteur.`}
               </p>
               <ul className="mt-5 divide-y divide-[var(--line-soft)]">
                 {book.chapters.map((c) => (

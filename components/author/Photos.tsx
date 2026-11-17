@@ -130,7 +130,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
           className="block w-full text-[15px] file:mr-3 file:min-h-11 file:rounded-full file:border-0 file:bg-[var(--surface-2)] file:px-4 file:font-bold"
         />
         <label htmlFor="photo-legende" className="field-label">
-          Une légende (facultatif)
+          Un titre pour cette photo (facultatif)
         </label>
         <input
           id="photo-legende"
