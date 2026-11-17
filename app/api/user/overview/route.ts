@@ -6,6 +6,7 @@ import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
 import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
+import { readGiver, sharesWithGiver } from '@/lib/loomina/giver';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -27,6 +28,9 @@ export async function GET(request: NextRequest) {
             smsChapter: (project?.project_metadata as Record<string, unknown> | null)?.sms_chapter !== false,
             callSchedule: normalizeSchedule((project?.project_metadata as Record<string, unknown> | null)?.call_schedule),
             callMinutes: normalizeCallMinutes((project?.project_metadata as Record<string, unknown> | null)?.call_minutes),
+            // Livre offert : qui l'a offert, et si l'auteur lui laisse lire ses récits.
+            giverFirstName: readGiver(project?.project_metadata)?.firstName ?? (readGiver(project?.project_metadata) ? '' : null),
+            shareWithGiver: sharesWithGiver(project?.project_metadata),
         };
 
         if (!project) {

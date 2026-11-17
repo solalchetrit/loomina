@@ -113,6 +113,10 @@ const FAQ_CATEGORIES = [
         a: "À la commande, choisissez « C’est pour offrir » et indiquez le prénom et le numéro de téléphone de la personne qui racontera. C’est elle qui appellera Loomina, depuis ce numéro, quand elle le souhaite. Vous pouvez aussi lui annoncer le cadeau vous-même, avant son premier appel.",
       },
       {
+        q: "Puis-je suivre le livre que j’ai offert ?",
+        a: "Oui. À la commande, vous donnez aussi votre prénom et votre numéro de portable : ils ouvrent votre espace famille. Vous y voyez l’avancement du livre et le titre des récits, et vous pouvez souffler à Loomina un souvenir ou une question à aborder. Le texte des récits, c’est la personne qui raconte qui choisit de vous le montrer, depuis son espace auteur.",
+      },
+      {
         q: "La personne doit-elle savoir se servir d’un ordinateur ?",
         a: "Non. Tout se passe au téléphone, fixe ou portable. L’espace auteur, où les récits et le livre apparaissent, est là pour relire, mais ce n’est pas une obligation : un proche peut relire pour elle, et les corrections se disent de vive voix à Loomina.",
       },

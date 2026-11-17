@@ -67,6 +67,10 @@ export async function PATCH(request: NextRequest) {
             meta.sms_chapter = body.smsChapter;
             metaChanged = true;
         }
+        if (typeof body.shareWithGiver === 'boolean') {
+            meta.share_with_giver = body.shareWithGiver;
+            metaChanged = true;
+        }
         if (body.callSchedule !== undefined) {
             meta.call_schedule = normalizeSchedule(body.callSchedule);
             metaChanged = true;
