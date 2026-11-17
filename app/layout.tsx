@@ -6,6 +6,7 @@ import ScrollTop from "@/components/ScrollTop";
 import Script from "next/script";
 import Footer from "@/components/Footer";
 import MobileCta from "@/components/MobileCta";
+import HideOnAdmin from "@/components/HideOnAdmin";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
@@ -97,10 +98,9 @@ export default function RootLayout({
         className={`${plusJakartaSans.variable} ${newsreader.variable} min-h-screen bg-[var(--canvas)] font-sans text-[var(--ink)] antialiased`}
       >
         <ScrollTop />
-        <Header />
+        <HideOnAdmin><Header /></HideOnAdmin>
         <main>{children}</main>
-        <Footer />
-        <MobileCta />
+        <HideOnAdmin><Footer /><MobileCta /></HideOnAdmin>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-3F6NDBKRJ8" strategy="afterInteractive" />
         <Script id="gtag" strategy="afterInteractive">
           {`window.dataLayer = window.dataLayer || [];

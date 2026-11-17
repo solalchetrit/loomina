@@ -405,7 +405,12 @@ export const DEMO_MAX_SECONDS = 300;
  * ignore de toute façon tout appel marqué `demo` dans ses métadonnées.
  */
 export function buildUnknownCallerAssistant(serverUrl: string) {
-    const systemPrompt = `Tu es Loomina, un biographe masculin, chaleureux, patient et curieux. Tu fais une DÉMONSTRATION de trois minutes à une personne qui découvre le service. Elle n'est pas cliente : rien de ce qu'elle dit n'est conservé.
+    const systemPrompt = DEMO_SYSTEM;
+    return buildDemoPayload(serverUrl, systemPrompt);
+}
+
+/** Le prompt de la démonstration offerte aux numéros inconnus. */
+export const DEMO_SYSTEM = `Tu es Loomina, un biographe masculin, chaleureux, patient et curieux. Tu fais une DÉMONSTRATION de trois minutes à une personne qui découvre le service. Elle n'est pas cliente : rien de ce qu'elle dit n'est conservé.
 
 # PRONONCIATION (ce que tu écris est lu à voix haute, jamais affiché)
 - Écris toujours la marque « Loumina », jamais « Loomina ».
@@ -428,6 +433,7 @@ export function buildUnknownCallerAssistant(serverUrl: string) {
 - Si la personne dit qu'elle est déjà cliente, explique qu'il faut appeler depuis le numéro communiqué à la commande, et termine par ##END_CALL##.
 - Si elle veut arrêter, remercie-la et termine par ##END_CALL##.`;
 
+function buildDemoPayload(serverUrl: string, systemPrompt: string) {
     return {
         assistant: {
             name: 'Loomina-Demo',
@@ -478,7 +484,12 @@ export const RECOVERY_MAX_SECONDS = 1200;
  * celui d'aucun client, l'événement est simplement classé « no_project ».
  */
 export function buildRecoveryAssistant(serverUrl: string) {
-    const systemPrompt = `Tu es Loomina, un biographe masculin, chaleureux, patient et curieux. Tu mènes un entretien au téléphone pour un livre de souvenirs.
+    const systemPrompt = RECOVERY_SYSTEM;
+    return buildRecoveryPayload(serverUrl, systemPrompt);
+}
+
+/** Le prompt de l'entretien de secours, quand la base ne répond pas. */
+export const RECOVERY_SYSTEM = `Tu es Loomina, un biographe masculin, chaleureux, patient et curieux. Tu mènes un entretien au téléphone pour un livre de souvenirs.
 
 Ce jour-là, tu n'as pas accès au dossier de la personne. Ne parle jamais de problème technique, de base de données ou de dossier introuvable au-delà de ta première phrase.
 
@@ -498,6 +509,7 @@ Ce jour-là, tu n'as pas accès au dossier de la personne. Ne parle jamais de pr
 - Ne demande ni adresse, ni e-mail, ni coordonnées bancaires.
 - N'invente rien sur sa vie : tu ne connais que ce qu'elle te dit pendant cet appel.`;
 
+function buildRecoveryPayload(serverUrl: string, systemPrompt: string) {
     return {
         assistant: {
             name: 'Loomina-Secours',
