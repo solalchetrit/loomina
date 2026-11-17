@@ -16,12 +16,15 @@ import {
     DEMO_MAX_SECONDS,
 } from '../../lib/loomina/assistant';
 import { config } from './config.ts';
+import { hardLimitSeconds, normalizeCallMinutes } from '../../lib/loomina/call-length';
 
 export interface CallPlan {
     systemPrompt: string;
     firstMessage: string;
     metadata: Record<string, unknown>;
     maxSeconds: number;
+    /** Durée souhaitée par la personne (minutes) ; null pour la démonstration. */
+    targetMinutes: number | null;
     demo: boolean;
     label: string;
 }
@@ -35,6 +38,7 @@ function fromVapiShape(payload: any, maxSeconds: number, demo: boolean, label: s
         firstMessage: assistant?.firstMessage ?? '',
         metadata: { ...(assistant?.metadata ?? {}), ...(demo ? { demo: true } : {}) },
         maxSeconds,
+        targetMinutes: null,
         demo,
         label,
     };
@@ -66,5 +70,9 @@ export async function planForCaller(customerNumber: string | null): Promise<Call
     const prompt = await getSystemPrompt(phase).catch(() => null);
 
     const payload = buildAssistant({ profile, project, prompt, phase, serverUrl });
-    return fromVapiShape(payload, config.limits.maxCallSeconds, false, `phase-${phase}`);
+    const targetMinutes = normalizeCallMinutes(project.project_metadata?.call_minutes);
+    return {
+        ...fromVapiShape(payload, hardLimitSeconds(targetMinutes, config.limits.maxCallSeconds), false, `phase-${phase}`),
+        targetMinutes,
+    };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CALL_MINUTES_OPTIONS, DEFAULT_CALL_MINUTES } from "@/lib/loomina/call-length";
 import Link from "next/link";
 import { formatToE164 } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
@@ -25,6 +26,7 @@ export default function OrderPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "" });
+  const [callMinutes, setCallMinutes] = useState<number>(DEFAULT_CALL_MINUTES);
 
   const step = who ? 2 : 1;
   const isGift = who === "gift";
@@ -56,7 +58,7 @@ export default function OrderPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, phone, isGift }),
+        body: JSON.stringify({ ...form, phone, isGift, callMinutes }),
       });
       const data = await res.json();
       if (data.url) {
@@ -174,6 +176,25 @@ export default function OrderPage() {
                       required
                     />
                   </div>
+                  <fieldset className="sm:col-span-2">
+                    <legend className="field-label">Durée souhaitée de chaque appel</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {CALL_MINUTES_OPTIONS.map((m) => (
+                        <button
+                          key={m}
+                          type="button"
+                          aria-pressed={callMinutes === m}
+                          onClick={() => setCallMinutes(m)}
+                          className={`press min-h-12 flex-1 rounded-full px-4 text-[16px] font-bold ${
+                            callMinutes === m ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
+                          }`}
+                        >
+                          {m} min
+                        </button>
+                      ))}
+                    </div>
+                    <p className="t-small mt-2">À peu près : Loomina laisse toujours finir le souvenir en cours. Cela se change à tout moment dans l’espace auteur.</p>
+                  </fieldset>
                 </div>
 
                 {submitError && (

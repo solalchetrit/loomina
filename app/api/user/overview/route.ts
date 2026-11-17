@@ -4,6 +4,7 @@ import { currentAuthor, splitTopics } from '@/lib/loomina/author';
 import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
 import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
 import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
+import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
 
 export const runtime = 'nodejs';
@@ -25,6 +26,7 @@ export async function GET(request: NextRequest) {
             sensitiveTopics: splitTopics(profile.sensitive_topics),
             smsChapter: (project?.project_metadata as Record<string, unknown> | null)?.sms_chapter !== false,
             callSchedule: normalizeSchedule((project?.project_metadata as Record<string, unknown> | null)?.call_schedule),
+            callMinutes: normalizeCallMinutes((project?.project_metadata as Record<string, unknown> | null)?.call_minutes),
         };
 
         if (!project) {

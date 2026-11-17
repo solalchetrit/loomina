@@ -94,12 +94,15 @@ Ton travail : décider du plan du livre. Tu n'écris pas le livre.
 - Les chapitres suivent la vie de la personne, de l'enfance à aujourd'hui ; les réflexions, les valeurs et les messages aux proches vont à la fin.
 - Un récit ne correspond PAS à un chapitre : un chapitre du livre rassemble ce qui va ensemble (une époque, un lieu, une personne, une épreuve), d'où qu'il vienne. Un récit peut nourrir plusieurs chapitres, un chapitre peut puiser dans plusieurs récits.
 - Chaque scène, chaque fait figure dans UN SEUL chapitre : celui où le lecteur s'attend à le trouver. Une scène racontée dans trois récits est une seule scène du plan, avec ses trois sources.
-- Ne perds rien : toute scène et tout fait des récits doit avoir sa place dans un chapitre. Seules les politesses d'appel (« ça va », « je suis fatiguée aujourd'hui ») sont écartées.
+- Ne perds rien : toute scène et tout fait des récits doit avoir sa place dans un chapitre. Sont seulement écartés :
+  - les politesses d'appel (« ça va », « je suis fatiguée aujourd'hui ») ;
+  - les coulisses du livre : tout ce qui parle de Loomina, du projet d'écriture ou des entretiens eux-mêmes (le plaisir de commencer, le tutoiement, les consignes, les sujets que la personne préfère éviter, ce qu'on racontera la prochaine fois). Le lecteur lit une vie, pas la fabrication du livre. Un récit qui ne contient que cela ne donne aucune scène, et jamais un chapitre.
 - Taille : un chapitre du livre fait de 700 à 2 000 mots. Compte environ un chapitre pour 1 000 mots de récits, redites déduites : 6 000 mots de récits donnent 5 ou 6 chapitres, pas 13. Pas de chapitre pour une seule petite scène : rattache-la à un chapitre voisin.
 - Pas de chapitre « bilan » qui reprend ce que les autres racontent : les réflexions et les valeurs ne forment un chapitre que si la personne en a vraiment parlé, et il ne redit alors aucune scène.
 - Avant de répondre, relis ton plan : si une scène, une personne ou un lieu apparaît dans les scènes de deux chapitres, garde-le dans un seul.
 - Regroupe les chapitres en 2 à 6 parties, aux titres concrets tirés des récits (un lieu, une époque).
 - Titres de chapitres : 3 à 8 mots, évocateurs, sans numéro, tous différents.
+- Si la personne a demandé à éviter des sujets (liste fournie), aucune scène ne porte sur eux, et le plan ne dit jamais qu'ils sont évités.
 - N'ajoute aucun fait qui ne figure pas dans les récits. Les titres de parties et de chapitres ne nomment que des lieux, des personnes et des choses présents dans les récits.
 
 # FORMAT
@@ -122,7 +125,8 @@ const WRITE_SYSTEM = `Tu es l'écrivain d'une autobiographie. Tu écris UN chapi
 - Ne dis jamais « comme je l'ai raconté » ni « je l'ai déjà dit » : dans le livre, c'est la première fois.
 
 # CE QUI N'ENTRE PAS
-- Les politesses d'appel et tout ce qui parle de l'entretien lui-même.
+- Les politesses d'appel et tout ce qui parle de l'entretien lui-même, de Loomina ou du projet de livre.
+- Le fait qu'un sujet soit évité : n'écris jamais « je préfère ne pas parler de… ».
 - Les scènes qui appartiennent aux AUTRES chapitres (la liste t'en est donnée) : tu peux y faire une allusion de quelques mots si le fil l'exige, jamais les raconter.
 
 # LES CHAPITRES DÉJÀ ÉCRITS
@@ -152,13 +156,14 @@ function renderWritten(written: Array<{ title: string; content: string }>): stri
 }
 
 /** Premier temps : le plan du livre. */
-export async function planBook(sources: Source[], context: LoominaContext): Promise<PlannedChapter[]> {
+export async function planBook(sources: Source[], context: LoominaContext, sensitiveTopics?: string | null): Promise<PlannedChapter[]> {
     const known = new Set(sources.map((s) => s.number));
     // Le plan ne voit que les récits : la mémoire du projet contient des faits
     // que la personne a dits sans les raconter, et le plan en faisait des titres.
     void context;
     const total = sources.reduce((a, s) => a + countWords(s.content), 0);
-    const parsed = await json(PLAN_SYSTEM, `# LES RÉCITS (${sources.length} récits, ${total} mots au total)\n${renderSources(sources)}`, 'medium');
+    const avoid = sensitiveTopics?.trim() ? `# SUJETS QUE LA PERSONNE PRÉFÈRE ÉVITER\n${sensitiveTopics.trim()}\n\n` : '';
+    const parsed = await json(PLAN_SYSTEM, `${avoid}# LES RÉCITS (${sources.length} récits, ${total} mots au total)\n${renderSources(sources)}`, 'medium');
     const out: PlannedChapter[] = [];
     for (const item of Array.isArray(parsed.chapters) ? parsed.chapters : []) {
         const c = (item ?? {}) as Record<string, unknown>;
@@ -201,7 +206,7 @@ export async function writeBookChapter(params: {
         .join('\n');
     const user = `# STYLE DEMANDÉ
 ${params.writingStyle?.trim() || 'Naturel et sobre'}
-${params.sensitiveTopics?.trim() ? `\n# SUJETS QUE LA PERSONNE NE VEUT PAS VOIR DÉVELOPPÉS\n${params.sensitiveTopics.trim()}\nN'en écris rien de plus que ce que les récits en disent, avec retenue.\n` : ''}
+${params.sensitiveTopics?.trim() ? `\n# SUJETS QUE LA PERSONNE NE VEUT PAS VOIR DÉVELOPPÉS\n${params.sensitiveTopics.trim()}\nN'en écris rien de plus que ce que les récits en disent, avec retenue, et n'écris jamais que la personne préfère les éviter.\n` : ''}
 # CE QU'ON SAIT DE LA PERSONNE (pour la cohérence des noms et des dates, PAS pour inventer)
 ${renderContext(params.context)}
 
@@ -237,7 +242,7 @@ export async function composeBook(params: {
 }): Promise<BookEdition> {
     const sources = params.sources.filter((s) => s.content.trim());
     if (!sources.length) throw new Error('Livre : aucun récit à composer');
-    const plan = await planBook(sources, params.context);
+    const plan = await planBook(sources, params.context, params.sensitiveTopics);
 
     // L'un après l'autre : chaque chapitre est écrit en ayant sous les yeux
     // ceux qui le précèdent. Écrits en parallèle, ils se répétaient entre eux.

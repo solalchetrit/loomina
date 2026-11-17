@@ -23,7 +23,9 @@ export function conversationRelayTwiml(params: {
     const attrs: Record<string, string> = {
         url: wsUrl(),
         welcomeGreeting: params.welcomeGreeting,
-        welcomeGreetingInterruptible: 'true',
+        // Le bonjour est dit en entier : au premier vrai appel, le « bonjour »
+        // du narrateur le coupait et Loomina repartait de travers.
+        welcomeGreetingInterruptible: 'none',
         language: config.voice.language,
         ttsProvider: 'ElevenLabs',
         voice: config.voice.ttsVoice,
@@ -37,7 +39,16 @@ export function conversationRelayTwiml(params: {
         // Les noms propres de la marque, pour la transcription.
         hints: 'Loomina,Loumina',
         dtmfDetection: 'false',
+        // Morceaux de phrase en direct : Loomina sait que le narrateur a
+        // repris la parole et retient sa réponse (session.ts).
+        partialPrompts: 'true',
     };
+    // Détection de fin de tour par Twilio (un modèle qui juge si la phrase
+    // est finie). Pas encore essayée en français : activable par variable.
+    if (process.env.VOICE_TURN_DETECTION === 'on') {
+        attrs.turnDetection = 'true';
+        attrs.speechTimeout = process.env.VOICE_SPEECH_TIMEOUT_MS ?? '2000';
+    }
 
     const attrString = Object.entries(attrs)
         .map(([k, v]) => `${k}="${escapeXml(v)}"`)

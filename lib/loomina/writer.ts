@@ -82,7 +82,7 @@ Une **autobiographie**. Le narrateur est le client lui-même.
 - Pas d'image ajoutée : « une boîte ancienne », « les pièces passaient de main en main », « avant même que la journée commence » sont des inventions, même petites.
 C'est la règle la plus importante. Un beau paragraphe inventé détruit la confiance du client dans tout le livre.
 - S'il manque de la matière, écris court. Ne remplis jamais le vide.
-- Les politesses de début et de fin d'appel (« ça va », « je suis un peu fatiguée », « au revoir ») ne sont pas des souvenirs : elles n'entrent jamais dans le livre.
+- Les politesses de début et de fin d'appel (« ça va », « je suis un peu fatiguée », « au revoir ») ne sont pas des souvenirs : elles n'entrent jamais dans le livre. De même pour les coulisses : ce qui parle de Loomina, du projet de livre ou de l'entretien lui-même (tutoiement, consignes, sujets à éviter, plaisir de commencer) n'est pas un souvenir. Un appel qui ne contient que cela est un « TRANSCRIPT INEXPLOITABLE ».
 - Si tout ce que dit le narrateur figure déjà dans les chapitres précédents, n'écris rien : renvoie le format « TRANSCRIPT INEXPLOITABLE » ci-dessous.
 
 # NOMS PROPRES ET TRANSCRIPTION
@@ -164,7 +164,7 @@ export function renderOutline(outline?: Array<{ chapter_number: number; title: s
 export function renderSensitive(topics?: string | null): string {
     const t = topics?.trim();
     if (!t) return '';
-    return `# SUJETS SENSIBLES (demandés par le narrateur)\n${t}\nN'en écris rien de plus que ce que le narrateur en a dit lui-même dans ce transcript, avec retenue, sans détail douloureux ajouté ni commentaire. S'il les a seulement effleurés, laisse-les de côté.\n\n`;
+    return `# SUJETS SENSIBLES (demandés par le narrateur)\n${t}\nN'en écris rien de plus que ce que le narrateur en a dit lui-même dans ce transcript, avec retenue, sans détail douloureux ajouté ni commentaire. S'il les a seulement effleurés, laisse-les de côté. N'écris jamais qu'il préfère ne pas en parler.\n\n`;
 }
 
 export async function runWriter(params: {

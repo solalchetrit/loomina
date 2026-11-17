@@ -13,6 +13,7 @@ import { phoneVariants } from '../../lib/loomina/db';
 import { countWords, renderPreviousChapters } from '../../lib/loomina/writer';
 import { buildAssistant } from '../../lib/loomina/assistant';
 import type { Profile, Project } from '../../lib/loomina/db';
+import { normalizeCallMinutes, timeNote, hardLimitSeconds, DEFAULT_CALL_MINUTES } from '../../lib/loomina/call-length';
 
 const empty = (phase: 1 | 2 | 3 | 4): PhaseState => ({ phase, covered: [], skipped: [], check: null });
 const all = (phase: 1 | 2 | 3 | 4) => PHASE_AXES[phase].map((a) => a.key);
@@ -186,4 +187,33 @@ test('voix : règles toujours présentes (une question, sujets sensibles, ne rie
     assert.ok(p.includes('son frère'));
     assert.ok(p.includes('Ne présume jamais d\'une vie'));
     assert.ok(p.includes('Loumina'));
+});
+
+// ------------------------------------------------------------
+// Durée d'appel souhaitée (lib/loomina/call-length.ts)
+// ------------------------------------------------------------
+
+test('durée souhaitée : une valeur inconnue revient à 20 minutes', () => {
+    assert.equal(normalizeCallMinutes(30), 30);
+    assert.equal(normalizeCallMinutes('45'), 45);
+    assert.equal(normalizeCallMinutes(7), DEFAULT_CALL_MINUTES);
+    assert.equal(normalizeCallMinutes(undefined), DEFAULT_CALL_MINUTES);
+});
+
+test('durée souhaitée : avant le temps visé, Loomina ne propose pas d’arrêter', () => {
+    const note = timeNote(8 * 60 + 30, 30);
+    assert.match(note, /8 min écoulées sur environ 30 min/);
+    assert.match(note, /ne propose pas d'arrêter/);
+});
+
+test('durée souhaitée : une fois le temps atteint, elle attend la fin du sujet', () => {
+    const note = timeNote(31 * 60, 30);
+    assert.match(note, /durée souhaitée est atteinte/);
+    assert.match(note, /plus grand-chose à raconter sur ce sujet/);
+    assert.doesNotMatch(note, /ne propose pas d'arrêter/);
+});
+
+test('durée souhaitée : le plafond laisse le temps de finir le sujet', () => {
+    assert.equal(hardLimitSeconds(20, 2700), 2700);
+    assert.equal(hardLimitSeconds(45, 2700), 65 * 60);
 });
