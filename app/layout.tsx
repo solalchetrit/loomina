@@ -56,10 +56,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Livre Loomina - Biographie par téléphone',
+        alt: 'Quatre livres Loomina reliés en toile',
       },
     ],
   },
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Loomina : votre vie, racontée au téléphone",
     description: "Racontez votre vie au téléphone, nous en faisons un livre relié.",
-    images: ['/og-image.png'],
+    images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
@@ -129,7 +129,7 @@ export default function RootLayout({
                 {
                   "@type": "Product",
                   "name": OFFER.name,
-                  "image": `${SITE.url}/hero-book-v2.png`,
+                  "image": `${SITE.url}/og-image.jpg`,
                   "description": "Service de création de livre autobiographique par entretiens téléphoniques avec IA.",
                   "brand": {
                     "@type": "Brand",

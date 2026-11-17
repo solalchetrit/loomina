@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
                         product_data: {
                             name: `Loomina — ${OFFER.name}`,
                             description: `Entretiens par téléphone, écriture, relecture humaine, livre relié (${OFFER.format}) livré chez vous, version numérique.`,
-                            images: ["https://www.loomina.eu/hero-book-v2.png"],
+                            images: ["https://www.loomina.eu/og-image.jpg"],
                         },
                         unit_amount: OFFER.price * 100,
                     },
