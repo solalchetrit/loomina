@@ -9,7 +9,8 @@ import { describeSchedule } from "@/lib/loomina/schedule";
 import { readTopics } from "@/lib/loomina/phase-plan";
 import { buildAssistant } from "@/lib/loomina/assistant";
 import { getSystemPrompt } from "@/lib/loomina/db";
-import { Badge, Panel, Field, Fold, Empty } from "@/components/admin/ui";
+import { Badge, Panel, Field, Fold, Empty, Avatar, Progress, Stat } from "@/components/admin/ui";
+import AIcon from "@/components/admin/icons";
 
 export const metadata = { title: "Fiche client" };
 
@@ -39,21 +40,36 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
   const edition = c.editions.running ?? c.editions.ready ?? c.editions.failed;
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6 sm:gap-8">
       <div>
-        <Link href="/admin/clients" className="text-[15px] font-semibold text-[var(--ink-3)] underline">← Clients</Link>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1 className="text-[28px] font-extrabold tracking-[-0.02em]">{name}</h1>
-          {st && <Badge tone={st.tone}>{st.label}</Badge>}
-          {order.isGift && <Badge tone="wait">Livre offert</Badge>}
+        <Link href="/admin/clients" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-3)] hover:text-[var(--ink)]">
+          <AIcon name="chevron" size={14} className="rotate-180" /> Clients
+        </Link>
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <Avatar name={name} size={64} />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-[30px] font-extrabold leading-tight tracking-[-0.025em] sm:text-[34px]">{name}</h1>
+              {st && <Badge tone={st.tone}>{st.label}</Badge>}
+              {order.isGift && <Badge tone="wait">Livre offert</Badge>}
+            </div>
+            <p className="mt-1 text-[15px] tabular-nums text-[var(--ink-3)]">{profile.phone_number ?? "pas de numéro"} · client depuis le {fmtDate(profile.created_at, false)}</p>
+          </div>
         </div>
-        <p className="mt-1 text-[15px] text-[var(--ink-3)]">
-          {phase ? `Phase ${phase}, ${PHASE_LABELS[phase]} (${project?.phase_progress ?? 0} %)` : "Pas de livre en cours"} · {c.interviews.length} appel(s), {fmtDuration(totalSeconds)} · {c.chapters.length} récit(s), {fmtNumber(words)} mots
-        </p>
+        <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="rounded-[18px] border border-black/[0.06] bg-white p-4">
+            <p className="text-[13px] font-semibold text-[var(--ink-3)]">Phase</p>
+            <p className="mt-1 text-[18px] font-extrabold tracking-[-0.01em]">{phase ? `${phase}. ${PHASE_LABELS[phase]}` : "—"}</p>
+            <div className="mt-2"><Progress value={project?.phase_progress ?? 0} /></div>
+          </div>
+          <Stat icon="phone" tone="amber" label="Appels" value={c.interviews.length} hint={fmtDuration(totalSeconds)} />
+          <Stat icon="book" label="Récits" value={c.chapters.length} hint={`${fmtNumber(words)} mots`} />
+          <Stat icon="layers" label="Livre composé" value={edition ? (EDITION_STATUS[edition.status] ?? EDITION_STATUS.failed).label : "—"} hint={edition ? `${edition.chapters.length} chapitre(s)` : "dès 2 récits"} />
+        </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Panel title="Narrateur">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Panel icon="user" title="Narrateur">
           <dl>
             <Field label="Prénom, nom">{name}</Field>
             <Field label="Prononcé">{profile.first_name_phonetic ?? "comme écrit"}</Field>
@@ -65,7 +81,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
             <Field label="Compte créé">{fmtDate(profile.created_at)}</Field>
           </dl>
         </Panel>
-        <Panel title="Commande">
+        <Panel icon="card" title="Commande">
           <dl>
             <Field label="Payée le">{fmtDate(order.paidAt)}</Field>
             <Field label="Pour">{order.isGift ? "un proche (cadeau)" : "soi-même"}</Field>
@@ -82,7 +98,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
             {c.projects.length > 1 && <Field label="Autres livres">{`${c.projects.length - 1} commande(s) plus ancienne(s)`}</Field>}
           </dl>
         </Panel>
-        <Panel title="Réglages de l’espace auteur">
+        <Panel icon="pen" title="Réglages de l’espace auteur" className="md:col-span-2 xl:col-span-1">
           <dl>
             <Field label="Rendez-vous">{describeSchedule(settings.schedule) ?? "aucun : il appelle quand il veut"}</Field>
             <Field label="SMS « récit prêt »">{settings.smsChapter ? "oui" : "coupé"}</Field>
@@ -95,7 +111,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
       </div>
 
       {project && (
-        <Panel title="Ce que Loomina sait et prépare">
+        <Panel icon="spark" title="Ce que Loomina sait et prépare">
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="grid gap-3">
               <div>
@@ -138,7 +154,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
         </Panel>
       )}
 
-      <Panel title={`Appels (${c.interviews.length})`}>
+      <Panel icon="phone" title={`Appels (${c.interviews.length})`}>
         {c.interviews.length === 0 ? (
           <Empty>Aucun appel pour l’instant.</Empty>
         ) : (
@@ -147,7 +163,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
               const s = INTERVIEW_STATUS[String(i.processing_status)] ?? { label: String(i.processing_status), tone: "muted" as const };
               const chapter = c.chapters.find((ch) => ch.latest_interview_id === i.id);
               return (
-                <li key={String(i.id)} className="rounded-[14px] border border-[var(--line)] p-4">
+                <li key={String(i.id)} className="rounded-[18px] border border-[var(--line)] bg-[#fcfbf8] p-4 sm:p-5">
                   <div className="flex flex-wrap items-center gap-2 text-[15px]">
                     <b>{fmtDate(i.created_at)}</b>
                     <span className="text-[var(--ink-3)]">· {fmtDuration(i.duration_seconds)} · phase {String(i.phase ?? "?")}</span>
@@ -166,7 +182,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
         )}
       </Panel>
 
-      <Panel title={`Récits d’appel (${c.chapters.length})`}>
+      <Panel icon="book" title={`Récits d’appel (${c.chapters.length})`}>
         {c.chapters.length === 0 ? (
           <Empty>Aucun récit écrit.</Empty>
         ) : (
@@ -180,7 +196,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
         )}
       </Panel>
 
-      <Panel title="Livre composé">
+      <Panel icon="layers" title="Livre composé">
         {!edition ? (
           <Empty>Pas encore composé (il faut au moins deux récits).</Empty>
         ) : (
@@ -198,7 +214,7 @@ export default async function AdminClient({ params }: { params: Promise<{ id: st
         )}
       </Panel>
 
-      <Panel title="Journal technique des appels">
+      <Panel icon="server" title="Journal technique des appels">
         {c.events.length === 0 ? (
           <Empty>Aucun rapport d’appel reçu.</Empty>
         ) : (

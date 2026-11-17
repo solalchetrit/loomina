@@ -1,8 +1,11 @@
 import { requireAdmin } from "@/lib/admin/auth";
 import { aiCatalog } from "@/lib/admin/prompts";
-import { Panel, Fold } from "@/components/admin/ui";
+import { Panel, Fold, PageHeader } from "@/components/admin/ui";
+import AIcon, { type AdminIconName } from "@/components/admin/icons";
 
 export const metadata = { title: "Structure et IA" };
+
+const AI_ICONS: Record<string, AdminIconName> = { voix: "phone", demo: "gift", directeur: "route", ecrivain: "pen", editeur: "book", periodes: "layers", photos: "spark", secours: "alert" };
 
 const SERVICES = [
   { name: "Site (Vercel)", what: "Les pages, la commande, l’espace auteur et famille, et tout le traitement après un appel (Directeur, Écrivain, livre). Code : app/, lib/.", where: "www.loomina.eu" },
@@ -48,7 +51,7 @@ function Diagram() {
     </g>
   );
   return (
-    <svg viewBox="0 0 1000 640" role="img" aria-label="Schéma des services de Loomina" className="h-auto w-full min-w-[720px]">
+    <svg viewBox="0 0 1000 640" role="img" aria-label="Schéma des services de Loomina" className="h-auto w-full min-w-[600px]">
       <defs>
         <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0 0 L10 5 L0 10 z" fill="#66665f" />
@@ -93,17 +96,16 @@ export default async function AdminStructure() {
   const ais = aiCatalog();
 
   return (
-    <div className="grid gap-6">
-      <div>
-        <h1 className="text-[28px] font-extrabold tracking-[-0.02em]">Structure et IA</h1>
-        <p className="mt-1 max-w-3xl text-[16px] text-[var(--ink-2)]">Comment Loomina fonctionne, qui parle à qui, et les prompts exacts de chaque IA. Les prompts sont lus directement dans le code : ce que vous voyez ici est ce qui tourne en ligne.</p>
-      </div>
+    <div className="grid grid-cols-1 gap-8">
+      <PageHeader eyebrow="Structure et IA" title="Comment Loomina fonctionne">
+        Qui parle à qui, et les prompts exacts de chaque IA. Les prompts sont lus directement dans le code : ce que vous voyez ici est ce qui tourne en ligne.
+      </PageHeader>
 
-      <Panel title="Qui parle à qui">
+      <Panel icon="globe" title="Qui parle à qui">
         <div className="overflow-x-auto"><Diagram /></div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((s) => (
-            <div key={s.name} className="rounded-[14px] bg-[var(--canvas)] p-4">
+            <div key={s.name} className="rounded-[16px] border border-[var(--line)] bg-[#fcfbf8] p-4">
               <p className="font-bold">{s.name}</p>
               <p className="mt-1 text-[15px] text-[var(--ink-2)]">{s.what}</p>
               <p className="mt-1 font-mono text-[12px] text-[var(--ink-3)]">{s.where}</p>
@@ -112,23 +114,38 @@ export default async function AdminStructure() {
         </div>
       </Panel>
 
-      <Panel title={`Les IA (${ais.length})`}>
+      <Panel icon="spark" title={`Les ${ais.length} IA de Loomina`}>
+        <div className="mb-5 flex flex-wrap gap-2">
+          {ais.map((ai) => (
+            <a key={ai.key} href={`#${ai.key}`} className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-white px-3 py-1.5 text-[14px] font-semibold hover:border-[var(--ink)]"><AIcon name={AI_ICONS[ai.key] ?? "spark"} size={14} />{ai.name}</a>
+          ))}
+        </div>
         <div className="grid gap-4">
           {ais.map((ai) => (
-            <article key={ai.key} id={ai.key} className="rounded-[16px] border border-[var(--line)] p-4 sm:p-5">
-              <h3 className="text-[18px] font-extrabold">{ai.name}</h3>
-              <p className="mt-1 text-[16px] text-[var(--ink-2)]">{ai.role}</p>
-              <dl className="mt-3 grid gap-x-6 gap-y-1.5 text-[15px] sm:grid-cols-2">
-                <div><dt className="inline text-[var(--ink-3)]">Modèle : </dt><dd className="inline">{ai.model}</dd></div>
-                <div><dt className="inline text-[var(--ink-3)]">Où : </dt><dd className="inline">{ai.where}</dd></div>
-                <div><dt className="inline text-[var(--ink-3)]">Quand : </dt><dd className="inline">{ai.when}</dd></div>
-                <div><dt className="inline text-[var(--ink-3)]">Lit : </dt><dd className="inline">{ai.reads}</dd></div>
-                <div><dt className="inline text-[var(--ink-3)]">Écrit : </dt><dd className="inline">{ai.writes}</dd></div>
-                <div><dt className="inline text-[var(--ink-3)]">Code : </dt><dd className="inline font-mono text-[13px]">{ai.file}</dd></div>
+            <article key={ai.key} id={ai.key} className="scroll-mt-24 rounded-[20px] border border-[var(--line)] bg-[#fcfbf8] p-4 sm:p-6">
+              <div className="flex flex-wrap items-start gap-4">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-[var(--ink)] text-[var(--amber)]"><AIcon name={AI_ICONS[ai.key] ?? "spark"} size={20} /></span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-[20px] font-extrabold tracking-[-0.015em]">{ai.name}</h3>
+                  <p className="mt-1 max-w-[75ch] text-[15.5px] leading-relaxed text-[var(--ink-2)]">{ai.role}</p>
+                </div>
+              </div>
+              <dl className="mt-4 grid gap-2 sm:grid-cols-2">
+                {([["Modèle", ai.model], ["Où", ai.where], ["Quand", ai.when], ["Lit", ai.reads], ["Écrit", ai.writes]] as const).map(([k, v]) => (
+                  <div key={k} className="rounded-[12px] bg-white px-3.5 py-2.5 text-[14.5px] shadow-[0_0_0_1px_rgba(0,0,0,0.05)]">
+                    <dt className="text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--ink-3)]">{k}</dt>
+                    <dd className="mt-0.5 leading-relaxed">{v}</dd>
+                  </div>
+                ))}
+                <div className="rounded-[12px] bg-white px-3.5 py-2.5 text-[14.5px] shadow-[0_0_0_1px_rgba(0,0,0,0.05)]">
+                  <dt className="text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--ink-3)]">Code</dt>
+                  <dd className="mt-0.5 font-mono text-[12.5px] [overflow-wrap:anywhere]">{ai.file}</dd>
+                </div>
               </dl>
-              <div className="mt-3 grid gap-2">
+              <p className="mt-5 text-[12px] font-bold uppercase tracking-[0.1em] text-[var(--ink-3)]">{ai.prompts.length > 1 ? `${ai.prompts.length} prompts` : "Prompt"}</p>
+              <div className="mt-2 grid gap-2">
                 {ai.prompts.map((p) => (
-                  <Fold key={p.title} summary={p.title} mono>{p.text}</Fold>
+                  <Fold key={p.title} summary={p.title} meta={`${Math.round(p.text.length / 100) / 10} k car.`} mono>{p.text}</Fold>
                 ))}
               </div>
             </article>
@@ -137,14 +154,14 @@ export default async function AdminStructure() {
       </Panel>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel title="Ce que contient la base">
+        <Panel icon="database" title="Ce que contient la base">
           <ul className="grid gap-2 text-[15px]">
             {TABLES.map(([t, d]) => (
               <li key={t}><span className="font-mono text-[13px] font-semibold">{t}</span> <span className="text-[var(--ink-2)]">· {d}</span></li>
             ))}
           </ul>
         </Panel>
-        <Panel title="Ce qui tourne tout seul">
+        <Panel icon="clock" title="Ce qui tourne tout seul">
           <ul className="grid gap-2 text-[15px]">
             {TIMERS.map(([when, who, what]) => (
               <li key={when}><b>{when}</b> <span className="text-[var(--ink-3)]">({who})</span> · <span className="text-[var(--ink-2)]">{what}</span></li>

@@ -1,7 +1,11 @@
 /**
- * Un arbre de parcours : chaque nœud est une action (de qui, quoi) et ce
- * qu'elle produit. Les branches se replient.
+ * Un arbre de parcours : des grandes étapes numérotées, puis le fil des
+ * actions de chaque étape. Chaque action dit qui agit (couleur et icône),
+ * ce qu'il fait, et ce que ça produit. Les branches se replient.
  */
+
+import AIcon, { type AdminIconName } from "./icons";
+import TreeControls from "./TreeControls";
 
 export type Actor = "client" | "offreur" | "site" | "stripe" | "twilio" | "voix" | "ia" | "base" | "sms" | "loomina";
 
@@ -21,88 +25,162 @@ export interface TreeNode {
   closed?: boolean;
 }
 
-export const ACTORS: Record<Actor, { label: string; className: string }> = {
-  client: { label: "Client", className: "bg-[#e6eefb] text-[#1f4a8a]" },
-  offreur: { label: "Offreur", className: "bg-[#efe6fb] text-[#5a2f8a]" },
-  site: { label: "Site", className: "bg-[var(--surface-2)] text-[var(--ink-2)]" },
-  stripe: { label: "Stripe", className: "bg-[#ece9fe] text-[#4b3bb8]" },
-  twilio: { label: "Twilio", className: "bg-[#fde8ea] text-[#a3263a]" },
-  voix: { label: "Serveur vocal", className: "bg-[var(--amber-soft)] text-[var(--amber-deep)]" },
-  ia: { label: "IA", className: "bg-[#e3f3f1] text-[#1d5e57]" },
-  base: { label: "Base", className: "bg-[var(--success-soft)] text-[var(--success)]" },
-  sms: { label: "SMS", className: "bg-[#fde8ea] text-[#a3263a]" },
-  loomina: { label: "Équipe Loomina", className: "bg-[var(--ink)] text-white" },
+export const ACTORS: Record<Actor, { label: string; color: string; soft: string; text: string; icon: AdminIconName }> = {
+  client: { label: "Client", color: "#2f6fd6", soft: "#e8effc", text: "#1f4a8a", icon: "user" },
+  offreur: { label: "Offreur", color: "#8a4fd6", soft: "#f1e9fc", text: "#5a2f8a", icon: "gift" },
+  site: { label: "Site", color: "#5c5c55", soft: "#efeee9", text: "#3b3b37", icon: "globe" },
+  stripe: { label: "Stripe", color: "#635bff", soft: "#ecebff", text: "#3f37c9", icon: "card" },
+  twilio: { label: "Twilio", color: "#e0303f", soft: "#fde9eb", text: "#a3263a", icon: "phone" },
+  voix: { label: "Serveur vocal", color: "#e08a14", soft: "#fdf0dc", text: "#7a4706", icon: "server" },
+  ia: { label: "IA", color: "#14917f", soft: "#e2f4f1", text: "#11594f", icon: "spark" },
+  base: { label: "Base", color: "#2f8a4a", soft: "#e5f3e8", text: "#265233", icon: "database" },
+  sms: { label: "SMS", color: "#e0303f", soft: "#fde9eb", text: "#a3263a", icon: "message" },
+  loomina: { label: "Équipe Loomina", color: "#161616", soft: "#ecebe6", text: "#161616", icon: "star" },
 };
 
-function NodeBody({ n }: { n: TreeNode }) {
-  const a = ACTORS[n.who];
+function Who({ who }: { who: Actor }) {
+  const a = ACTORS[who];
   return (
-    <div className="min-w-0">
-      <div className="flex flex-wrap items-baseline gap-2">
-        <span className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[12px] font-bold uppercase tracking-[0.04em] ${a.className}`}>{a.label}</span>
-        <span className="text-[16px] font-bold leading-snug">{n.label}</span>
-      </div>
-      {n.detail && <p className="mt-1 text-[15px] leading-relaxed text-[var(--ink-2)]">{n.detail}</p>}
-      {n.effects && n.effects.length > 0 && (
-        <ul className="mt-1.5 grid gap-1">
-          {n.effects.map((e) => (
-            <li key={e} className="flex gap-2 text-[15px] leading-relaxed text-[var(--ink-2)]">
-              <span aria-hidden className="text-[var(--amber-ink)]">→</span>
-              <span>{e}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-      {n.code && <p className="mt-1 font-mono text-[12px] text-[var(--ink-3)]">{n.code}</p>}
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-[3px] text-[11.5px] font-bold uppercase leading-none tracking-[0.06em]" style={{ background: a.soft, color: a.text }}>
+      {a.label}
+    </span>
+  );
+}
+
+function Effects({ effects }: { effects: string[] }) {
+  return (
+    <ul className="mt-3 grid grid-cols-1 gap-1.5 rounded-[12px] bg-[#faf9f6] px-3 py-2.5 sm:px-3.5 sm:py-3">
+      {effects.map((e) => (
+        <li key={e} className="flex gap-2.5 text-[14.5px] leading-relaxed text-[var(--ink-2)]">
+          <AIcon name="arrow" size={14} className="mt-[5px] text-[var(--amber)]" />
+          <span className="min-w-0 [overflow-wrap:anywhere]">{e}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Body({ n }: { n: TreeNode }) {
+  return (
+    <div className="min-w-0 flex-1">
+      <Who who={n.who} />
+      <p className="mt-1.5 text-[16px] font-bold leading-snug [overflow-wrap:anywhere] tracking-[-0.01em] text-[var(--ink)]">{n.label}</p>
+      {n.detail && <p className="mt-1 text-[14.5px] leading-relaxed text-[var(--ink-2)]">{n.detail}</p>}
+      {n.effects && n.effects.length > 0 && <Effects effects={n.effects} />}
+      {n.code && <p className="mt-2 font-mono text-[11.5px] text-[var(--ink-3)] [overflow-wrap:anywhere]">{n.code}</p>}
     </div>
   );
 }
 
-function Branch({ n }: { n: TreeNode }) {
+/** Pastille de l'acteur, posée sur le fil. */
+function Dot({ who }: { who: Actor }) {
+  const a = ACTORS[who];
+  return (
+    <span className="absolute left-0 top-3 z-[1] flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white" style={{ background: a.color, color: "#fff" }}>
+      <AIcon name={a.icon} size={15} />
+    </span>
+  );
+}
+
+function Step({ n }: { n: TreeNode }) {
+  const card = "rounded-[16px] border border-black/[0.07] bg-white px-4 py-3.5 shadow-[0_1px_2px_rgba(20,20,10,0.04)]";
   if (!n.children?.length) {
     return (
-      <li className="relative pl-4 sm:pl-6 before:absolute before:left-0 before:top-5 before:h-px before:w-3 sm:before:w-4 before:bg-[var(--line)]">
-        <div className="rounded-[14px] border border-[var(--line)] bg-white px-4 py-3">
-          <NodeBody n={n} />
-        </div>
+      <li className="relative min-w-0 pl-10 sm:pl-12">
+        <Dot who={n.who} />
+        <div className={card}><Body n={n} /></div>
       </li>
     );
   }
   return (
-    <li className="relative pl-4 sm:pl-6 before:absolute before:left-0 before:top-5 before:h-px before:w-3 sm:before:w-4 before:bg-[var(--line)]">
-      <details open={!n.closed} className="group">
-        <summary className="cursor-pointer list-none rounded-[14px] border border-[var(--line)] bg-white px-4 py-3 marker:hidden">
-          <div className="flex gap-2">
-            <span aria-hidden className="mt-0.5 inline-block text-[18px] leading-none text-[var(--ink-3)] transition-transform group-open:rotate-90">›</span>
-            <NodeBody n={n} />
-          </div>
+    <li className="relative min-w-0 pl-10 sm:pl-12">
+      <Dot who={n.who} />
+      <details open={!n.closed} className="group/d">
+        <summary className={`${card} flex cursor-pointer list-none gap-3 transition-colors hover:border-black/20 [&::-webkit-details-marker]:hidden`}>
+          <Body n={n} />
+          <span className="mt-0.5 flex h-7 shrink-0 items-center gap-1 self-start rounded-full bg-[var(--surface-2)] px-2.5 text-[12.5px] font-semibold text-[var(--ink-2)]">
+            {n.children.length}
+            <AIcon name="chevron" size={14} className="transition-transform group-open/d:rotate-90" />
+          </span>
         </summary>
-        <ul className="ml-2 sm:ml-3 mt-2 grid gap-2 border-l border-[var(--line)] pb-1">
-          {n.children.map((c, i) => (
-            <Branch key={i} n={c} />
-          ))}
-        </ul>
+        <Flow nodes={n.children} nested />
       </details>
     </li>
   );
 }
 
-export default function Tree({ nodes }: { nodes: TreeNode[] }) {
+function Flow({ nodes, nested = false }: { nodes: TreeNode[]; nested?: boolean }) {
   return (
-    <ul className="grid gap-2 border-l border-[var(--line)]">
-      {nodes.map((n, i) => (
-        <Branch key={i} n={n} />
+    <ul className={`relative grid grid-cols-1 gap-3 before:absolute before:bottom-4 before:left-[15px] before:top-4 before:w-[2px] before:rounded-full before:bg-[#e4e2da] ${nested ? "mt-3 sm:ml-4" : ""}`}>
+      {nodes.map((c, i) => (
+        <Step key={i} n={c} />
       ))}
     </ul>
+  );
+}
+
+/** Une grande étape du parcours : numéro, titre, puis le fil de ses actions. */
+function Stage({ n, index, anchor }: { n: TreeNode; index: number; anchor: string }) {
+  return (
+    <section id={anchor} className="scroll-mt-24">
+      <div className="flex gap-4">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-[var(--ink)] text-[17px] font-extrabold text-[var(--amber)] tabular-nums">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <div className="min-w-0 flex-1 pt-0.5">
+          <Who who={n.who} />
+          <h3 className="mt-1.5 text-[21px] font-extrabold leading-tight tracking-[-0.02em] [text-wrap:balance]">{n.label}</h3>
+          {n.detail && <p className="mt-1 max-w-[70ch] text-[15px] leading-relaxed text-[var(--ink-2)]">{n.detail}</p>}
+          {n.effects && n.effects.length > 0 && <div className="max-w-[80ch]"><Effects effects={n.effects} /></div>}
+        </div>
+      </div>
+      {n.children?.length ? (
+        <div className="mt-5 sm:pl-[60px]">
+          <Flow nodes={n.children} />
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+export default function Tree({ nodes, id }: { nodes: TreeNode[]; id: string }) {
+  return (
+    <div id={id}>
+      <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
+        <ol className="flex flex-wrap items-center gap-x-1 gap-y-2">
+          {nodes.map((n, i) => (
+            <li key={i} className="flex items-center gap-1">
+              <a href={`#${id}-${i}`} className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-white py-1.5 pl-1.5 pr-3.5 text-[14px] font-semibold hover:border-[var(--ink)]">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--ink)] text-[12px] font-extrabold text-[var(--amber)]">{i + 1}</span>
+                {n.label}
+              </a>
+              {i < nodes.length - 1 && <AIcon name="chevron" size={14} className="text-[var(--ink-3)]" />}
+            </li>
+          ))}
+        </ol>
+        <TreeControls target={id} />
+      </div>
+      <div className="grid grid-cols-1 gap-12">
+        {nodes.map((n, i) => (
+          <Stage key={i} n={n} index={i} anchor={`${id}-${i}`} />
+        ))}
+      </div>
+    </div>
   );
 }
 
 export function Legend() {
   return (
     <div className="flex flex-wrap gap-2">
-      {(Object.keys(ACTORS) as Actor[]).map((k) => (
-        <span key={k} className={`inline-flex rounded-full px-2 py-0.5 text-[12px] font-bold uppercase tracking-[0.04em] ${ACTORS[k].className}`}>{ACTORS[k].label}</span>
-      ))}
+      {(Object.keys(ACTORS) as Actor[]).map((k) => {
+        const a = ACTORS[k];
+        return (
+          <span key={k} className="inline-flex items-center gap-2 rounded-full bg-white py-1 pl-1 pr-3 text-[13px] font-semibold shadow-[0_0_0_1px_rgba(0,0,0,0.06)]">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full text-white" style={{ background: a.color }}><AIcon name={a.icon} size={12} /></span>
+            {a.label}
+          </span>
+        );
+      })}
     </div>
   );
 }
