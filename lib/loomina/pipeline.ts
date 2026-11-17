@@ -32,6 +32,7 @@ import { runDirector } from './director';
 import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
+import type { TokenUsage } from './usage';
 import { notifyFamily, alertTeam } from './notify';
 import { autoCompose } from './book-edition';
 
@@ -126,6 +127,8 @@ interface AnalysisLog {
     /** Sujets suggérés montrés au Directeur, et ceux qu'il a jugés abordés. */
     suggestions_shown?: string[];
     covered_suggestions?: number[];
+    /** Jetons consommés par le Directeur et l'Écrivain (suivi des coûts). */
+    usage?: { director?: TokenUsage; writer?: TokenUsage };
 }
 
 /** Ce que l'Écrivain a besoin de savoir de l'analyse, rejouable depuis la base. */
@@ -396,9 +399,16 @@ export async function processEndOfCall(params: {
 
     if (chapterError) throw new Error(`Écriture chapters impossible : ${chapterError.message}`);
 
+    // Les jetons de l'Écrivain rejoignent ceux du Directeur dans le journal de
+    // l'analyse (relu ici : il a été écrit plus haut, parfois par un essai précédent).
+    const { data: logRow } = await supabase.from('interviews').select('ai_analysis_log').eq('id', interviewId).single();
+    const priorLog = (logRow?.ai_analysis_log ?? {}) as AnalysisLog;
     await supabase
         .from('interviews')
-        .update({ processing_status: 'processed' })
+        .update({
+            processing_status: 'processed',
+            ...(writer.usage ? { ai_analysis_log: { ...priorLog, usage: { ...priorLog.usage, writer: writer.usage } } } : {}),
+        })
         .eq('id', interviewId);
 
     // Après l'écriture seulement : un essai repris qui retrouve le chapitre
@@ -482,6 +492,7 @@ async function persistDirectorResult(params: {
                 family_members: director.family_members,
                 suggestions_shown: director.context.suggested_topics ?? [],
                 covered_suggestions: director.covered_suggestions,
+                usage: director.usage ? { director: director.usage } : undefined,
                 model: director.model,
                 at: new Date().toISOString(),
             },

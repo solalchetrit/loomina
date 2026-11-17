@@ -18,6 +18,8 @@
  * anti-invention.
  */
 
+import { tokenUsage } from './usage';
+import type { TokenUsage } from './usage';
 import OpenAI from 'openai';
 import type { Phase } from './phases';
 import { PHASE_GOALS, PHASE_LABELS, isFinalPhase, toPhase } from './phases';
@@ -60,7 +62,7 @@ function isReasoningModel(model: string): boolean {
     return /^(gpt-5|o\d)/.test(model);
 }
 
-async function complete(model: string, system: string, user: string, timeoutMs: number): Promise<string> {
+async function complete(model: string, system: string, user: string, timeoutMs: number): Promise<{ raw: string; usage?: TokenUsage }> {
     const messages = [
         { role: 'system' as const, content: system },
         { role: 'user' as const, content: user },
@@ -89,7 +91,7 @@ async function complete(model: string, system: string, user: string, timeoutMs: 
     const raw = completion.choices[0]?.message?.content;
     if (!raw) throw new Error(`Directeur (${model}) : réponse vide du modèle`);
     JSON.parse(raw); // un JSON invalide déclenche le repli
-    return raw;
+    return { raw, usage: tokenUsage(model, completion.usage) };
 }
 
 export interface DirectorResult {
@@ -116,6 +118,8 @@ export interface DirectorResult {
     covered_suggestions: number[];
     /** Modèle qui a réellement produit l'analyse (principal ou repli). */
     model: string;
+    /** Jetons consommés par cette analyse (suivi des coûts). */
+    usage?: TokenUsage;
     next_topic_id: number | null;
     chapter_title_hint: string | null;
     /**
@@ -335,15 +339,16 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     const user = userPrompt(params);
     let model = params.model ?? DIRECTOR_MODEL;
     let raw: string;
+    let usage: TokenUsage | undefined;
     try {
-        raw = await complete(model, system, user, 60_000);
+        ({ raw, usage } = await complete(model, system, user, 60_000));
     } catch (err) {
         if (model === DIRECTOR_FALLBACK_MODEL) throw err;
         console.warn(
             `[directeur] ${model} en échec (${err instanceof Error ? err.message : String(err)}), repli sur ${DIRECTOR_FALLBACK_MODEL}`
         );
         model = DIRECTOR_FALLBACK_MODEL;
-        raw = await complete(model, system, user, 45_000);
+        ({ raw, usage } = await complete(model, system, user, 45_000));
     }
     const parsed = JSON.parse(raw) as Record<string, unknown>;
 
@@ -367,6 +372,7 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
 
     return {
         model,
+        usage,
         context,
         progress_percentage: step.progress,
         covered_axes: step.nextPhase === phase ? step.state.covered : PHASE_AXES[phase].map((a) => a.key),

@@ -11,6 +11,7 @@ import { buildAssistant } from "@/lib/loomina/assistant";
 import { getSystemPrompt } from "@/lib/loomina/db";
 import { Badge, Panel, Field, Fold, Empty, Avatar, Progress, Stat } from "@/components/admin/ui";
 import AIcon from "@/components/admin/icons";
+import { callCosts, sumCosts, fmtEur } from "@/lib/admin/costs";
 
 export const metadata = { title: "Fiche client" };
 
@@ -39,6 +40,10 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
   }
 
   const edition = c.editions.running ?? c.editions.ready ?? c.editions.failed;
+
+  // Ce que chaque appel a coûté : ligne (prix réel Twilio), voix, IA de la conversation, analyse et écriture.
+  const costs = await callCosts(c.interviews).catch(() => new Map());
+  const spent = sumCosts(costs.values());
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:gap-8">
@@ -195,6 +200,18 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
       )}
 
       <Panel icon="phone" title={`Appels (${c.interviews.length})`}>
+        {c.interviews.length > 0 && (
+          <div className="mb-4 rounded-[18px] bg-[var(--canvas)] p-4">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-3)]">Ce que ces appels ont coûté</p>
+            <p className="mt-1 text-[24px] font-extrabold tracking-[-0.02em] tabular-nums">
+              {fmtEur(spent.totalTtc)} TTC <span className="text-[15px] font-semibold text-[var(--ink-3)]">({fmtEur(spent.total)} HT{spent.estimated ? ", en partie estimé" : ""})</span>
+            </p>
+            <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">
+              Ligne téléphonique {fmtEur(spent.line)} · voix {fmtEur(spent.voice)} · IA de la conversation {fmtEur(spent.conversation)} · analyse et écriture des récits {fmtEur(spent.writing)}.
+              Soit {fmtEur(spent.totalTtc / c.interviews.length)} TTC par appel en moyenne.
+            </p>
+          </div>
+        )}
         {c.interviews.length === 0 ? (
           <Empty>Aucun appel pour l’instant.</Empty>
         ) : (
@@ -202,6 +219,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
             {c.interviews.map((i) => {
               const s = INTERVIEW_STATUS[String(i.processing_status)] ?? { label: String(i.processing_status), tone: "muted" as const };
               const chapter = c.chapters.find((ch) => ch.latest_interview_id === i.id);
+              const cost = costs.get(String(i.id));
               return (
                 <li key={String(i.id)} className="rounded-[18px] border border-[var(--line)] bg-[#fcfbf8] p-4 sm:p-5">
                   <div className="flex flex-wrap items-center gap-2 text-[15px]">
@@ -209,6 +227,11 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
                     <span className="text-[var(--ink-3)]">· {fmtDuration(i.duration_seconds)} · phase {String(i.phase ?? "?")}</span>
                     <Badge tone={s.tone}>{s.label}</Badge>
                     {chapter ? <Badge tone="ok">Récit n° {String(chapter.chapter_number)}</Badge> : null}
+                    {cost && (
+                      <span className="ml-auto text-[14px] font-bold tabular-nums" title={`Ligne ${fmtEur(cost.line)} · voix ${fmtEur(cost.voice)} · conversation ${fmtEur(cost.conversation)} · analyse et écriture ${fmtEur(cost.writing)} (hors taxes)`}>
+                        {fmtEur(cost.totalTtc)} TTC{cost.estimated ? " (estimé)" : ""}
+                      </span>
+                    )}
                   </div>
                   {i.topics_summary ? <p className="mt-2 text-[15px] text-[var(--ink-2)]">{String(i.topics_summary)}</p> : null}
                   <div className="mt-3 grid gap-2">
@@ -236,7 +259,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
         )}
       </Panel>
 
-      <Panel icon="layers" title="Livre composé">
+      <Panel icon="layers" title="Livre composé" action={c.editions.ready ? <Link href={`/admin/clients/${id}/livre`} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Relire le livre et demander l’avis de l’IA <AIcon name="arrow" size={14} /></Link> : undefined}>
         {!edition ? (
           <Empty>Pas encore composé (il faut au moins deux récits).</Empty>
         ) : (

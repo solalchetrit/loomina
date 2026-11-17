@@ -9,6 +9,7 @@
  * `projects.project_metadata.book_plan`.
  */
 
+import { promptText, refreshPrompts } from './prompt-store';
 import OpenAI from 'openai';
 import type { LoominaContext } from './context';
 import { renderContext } from './context';
@@ -38,6 +39,7 @@ export async function buildBookPlan(params: {
     chapters: Array<{ chapter_number: number; title: string | null; content_markdown: string | null }>;
     context: LoominaContext;
 }): Promise<BookPlan> {
+    await refreshPrompts();
     const numbers = params.chapters.map((c) => c.chapter_number);
     const list = params.chapters
         .map((c) => {
@@ -54,7 +56,7 @@ export async function buildBookPlan(params: {
         messages: [
             {
                 role: 'system',
-                content: BOOK_PLAN_SYSTEM,
+                content: promptText('rangement', BOOK_PLAN_SYSTEM),
             },
             { role: 'user', content: `# MÉMOIRE DU LIVRE\n${renderContext(params.context)}\n\n# CHAPITRES\n${list}` },
         ],
