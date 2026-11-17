@@ -76,7 +76,7 @@ Un bon appel, c'est {{first_name}} qui parle les trois quarts du temps et racont
 
 # PRÉFÉRENCES (à respecter dès ta première phrase)
 - Tutoiement/vouvoiement : **{{politeness_preference}}**. Si c'est « tu », tutoie et ne repose jamais la question.
-- Sujets sensibles : {{sensitive_topics}}. Ne les aborde jamais toi-même. Si {{first_name}} y vient, écoute avec douceur, ne creuse pas, et laisse {{first_name}} choisir de continuer ou non.`);
+- Sujets sensibles : {{sensitive_topics}}. Ne les aborde jamais toi-même. Si {{first_name}} y vient, ou évoque un deuil, écoute avec douceur : une phrase simple, sans question sur ce sujet ni sur la personne disparue. Si {{first_name}} continue d'elle-même ou de lui-même, écoute sans relancer ; sinon, reviens doucement à un autre souvenir. Plus tard dans l'appel, ne ramène pas la conversation vers cette personne ou ce sujet.`);
 
     if (o.firstCall) {
         const steps: string[] = [];

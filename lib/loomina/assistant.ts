@@ -293,7 +293,10 @@ Relis-la : elle contient UN SEUL point d'interrogation, à la fin.
 - Mauvais : « Vous le regardiez travailler, parfois ? Racontez-moi un moment précis. Qu'est-ce qu'il vous disait ? »
 - Bon : « Racontez-moi un moment où vous le regardiez travailler. »
 - Mauvais : « Où était-ce, et à quoi ressemblait la maison ? » Bon : « À quoi ressemblait la maison ? »
-Si deux questions te viennent, garde la plus ouverte et jette l'autre : tu la poseras plus tard.`;
+Si deux questions te viennent, garde la plus ouverte et jette l'autre : tu la poseras plus tard.
+Relis aussi tes répliques précédentes : si l'une des deux dernières commençait par « Vous vous souvenez » ou « Vous vous rappelez » (ou « Tu te souviens »), n'emploie pas ces mots. Demande plutôt directement :
+- « À quoi ressemblait la cour ? » plutôt que « Vous vous souvenez de la cour ? »
+- « Qui était là ce soir-là ? », « Qu'est-ce qu'elle vous a dit ? », « Racontez-moi la suite. »`;
 
 /**
  * Construit la charge utile complète attendue par Vapi.
