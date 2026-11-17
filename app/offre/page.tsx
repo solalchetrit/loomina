@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
+import Image from "next/image";
+import { Section, SectionHead } from "@/components/ui/Section";
+import { SITE } from "@/config/site";
 import Accordion from "@/components/ui/Accordion";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import Button from "@/components/ui/Button";
@@ -61,37 +63,57 @@ const FAQ = [
 export default function OffrePage() {
   return (
     <>
-      <PageHeader
-        title="Un prix, tout compris"
-        text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus."
-        photo={{ name: "lecture", alt: "Une mère lit un livre à sa fille, assises sur un lit.", ratio: "aspect-[16/10]" }}
-        badge={
-          <div className="rounded-[18px] bg-white px-5 py-4 shadow-[var(--shadow-bar)]">
-            <p className="flex items-center gap-2.5 text-[16px] font-bold">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
-                <Icon name="check" size={16} />
-              </span>
-              Satisfait ou remboursé
-            </p>
-            <p className="mt-1 pl-[38px] text-[14px] text-[var(--ink-3)]">sous {OFFER.guaranteeDays} jours après le premier entretien</p>
-          </div>
-        }
-        actions={
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-8">
-            <p className="text-[72px] font-extrabold leading-[0.85] tracking-[-0.05em] md:text-[88px]">
-              {OFFER.price}
-              <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
-            </p>
-            <div>
-              <p className="t-small max-w-[16rem]">Paiement unique. {OFFER.delivery}.</p>
-              <Button href="/order" size="lg" className="mt-3">
-                Commander
-              </Button>
+      {/* Haut de page : une grande carte sombre, le prix à gauche, les livres à droite. */}
+      <section className="w-full pb-10 pt-28 md:pb-14 md:pt-32">
+        <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
+          <div className="rise grid grid-cols-1 overflow-hidden rounded-[32px] bg-[var(--ink)] text-white lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <div className="flex min-w-0 flex-col justify-center p-7 sm:p-10 lg:p-12">
+              <h1 className="text-balance text-[clamp(2.3rem,4vw,3.4rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-white">
+                Un prix, tout compris
+              </h1>
+              <p className="mt-5 max-w-md text-[18px] leading-relaxed text-[#cfcfc8]">
+                Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus.
+              </p>
+              <p className="mt-8 text-[76px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[92px]">
+                {OFFER.price}
+                <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
+              </p>
+              <p className="mt-4 text-[16px] text-[#cfcfc8]">Paiement unique. {OFFER.delivery}.</p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button href="/order" variant="accent" size="lg">
+                  Commander
+                </Button>
+                <Button href={`tel:${SITE.phone}`} variant="ghost" className="!text-white !decoration-white/40 hover:!decoration-white">
+                  Essayer d’abord gratuitement
+                </Button>
+              </div>
+              <p className="mt-8 flex items-center gap-3 text-[16px] text-white">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
+                  <Icon name="check" size={16} />
+                </span>
+                <span>
+                  Satisfait ou remboursé sous {OFFER.guaranteeDays} jours.{" "}
+                  <Link href="/cgv#garantie" className="underline decoration-white/40 underline-offset-4 hover:decoration-white">
+                    Conditions
+                  </Link>
+                </span>
+              </p>
+            </div>
+            <div className="min-w-0 self-center p-4 pt-0 sm:p-5 sm:pt-0 lg:p-6 lg:pl-0">
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[22px]">
+              <Image
+                src="/photos/collection-de-livres.jpg"
+                alt="Quatre livres Loomina reliés, aux couvertures en toile beige, bleue, verte et bordeaux."
+                fill
+                priority
+                sizes="(min-width: 1024px) 640px, 100vw"
+                className="object-cover"
+              />
+              </div>
             </div>
           </div>
-        }
-      >
-        <div className="card mt-12 p-6 md:mt-14 md:p-9" data-reveal>
+
+        <div className="card mt-4 p-6 md:p-9" data-reveal>
           <p className="text-[16px] font-bold">Ce qui est compris</p>
           <ul className="mt-5 grid gap-x-10 gap-y-5 md:grid-cols-2">
             {INCLUDED.map((it) => (
@@ -110,7 +132,8 @@ export default function OffrePage() {
             </li>
           </ul>
         </div>
-      </PageHeader>
+        </div>
+      </section>
 
       <WhatYouGet showDetailLink={false} photo="mains" />
 
