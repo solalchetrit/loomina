@@ -30,6 +30,8 @@ export interface MapNode {
     label: string;
     /** Sous-colonne : 0 (le fil principal) ou 1, 2 (cas particuliers). */
     col?: number;
+    /** Rangées laissées vides au-dessus (fil principal), pour loger les cases de droite de l'étape précédente. */
+    gap?: number;
     /** D'où vient le trait. Par défaut : la case précédente du fil principal. `null` : aucun trait. */
     from?: string | string[] | null;
     kind?: 'q' | 'end';
@@ -68,6 +70,7 @@ export const MAP_ROOTS: MapRoot[] = [
     { id: 'r-visiteur', label: 'Une personne découvre Loomina', row: 0, over: ['decouvrir', 'commander', 'auteur', 'famille'], d: 'Par le site, le bouche-à-oreille ou un cadeau reçu.' },
     { id: 'r-site', label: 'Le site loomina.eu', row: 1, from: 'r-visiteur', over: ['decouvrir', 'commander', 'auteur', 'famille'], d: 'Pages publiques, commande, espace auteur et espace famille. Hébergé sur Vercel.' },
     { id: 'r-tel', label: `Un appel au ${SITE.phoneDisplay}`, row: 0, over: ['appel', 'apres', 'livre'], d: 'Le numéro Twilio de Loomina. Entrant (la personne appelle) ou sortant (rendez-vous).' },
+    { id: 'r-admin', label: 'Vous, sur loomina.eu/admin', row: 1, over: ['admin'], d: 'L’espace réservé à l’équipe, protégé par un mot de passe. Aucun lien n’y mène depuis le site.' },
     { id: 'r-num', label: 'Quel numéro appelle ?', kind: 'q', row: 1, from: 'r-tel', over: ['appel', 'apres', 'livre'], d: 'Le serveur vocal (Render) cherche le numéro dans la base. Connu avec un livre en cours : entretien. Sinon : démonstration.' },
 ];
 
@@ -252,9 +255,45 @@ export const MAP_GROUPS: MapGroup[] = [
         ],
     },
     {
+        key: 'admin',
+        label: 'L’admin',
+        about: 'Ce que vous pouvez faire sur loomina.eu/admin. Tout y est en lecture : l’admin montre, elle ne modifie rien.',
+        nodes: [
+            { id: 'm-mdp', label: 'Mot de passe', d: 'Un seul mot de passe (ADMIN_PASSWORD, sur Vercel). Aucun lien depuis le site, pages non indexées.', code: 'lib/admin/auth.ts' },
+            { id: 'm-session', label: 'Session de 12 heures', kind: 'end', d: 'Changer le mot de passe déconnecte tout le monde.' },
+            { id: 'm-vue', label: 'Vue d’ensemble', d: 'La page d’accueil de l’admin.', code: 'app/admin/page.tsx' },
+            { id: 'm-suivi', label: 'Suivi client', gap: 2, d: 'Où en sont les clients, d’un coup d’œil.', code: 'app/admin/suivi' },
+            { id: 'm-clients', label: 'Clients', gap: 2, d: 'La liste de tous les narrateurs, du plus récent au plus ancien.', code: 'app/admin/clients' },
+            { id: 'm-fiche', label: 'Fiche d’un client', d: 'Tout ce que Loomina sait d’un client, sur une page.', code: 'app/admin/clients/[id]' },
+            { id: 'm-carte', label: 'La carte', gap: 3, d: 'Cette page : tout le projet sur un seul arbre, avec ce qui manque.', code: 'lib/admin/map.ts' },
+            { id: 'm-structure', label: 'Structure', d: 'Le schéma « qui parle à qui », le contenu de la base, ce qui tourne tout seul.', code: 'app/admin/structure' },
+            { id: 'm-ia', label: 'Les IA', d: 'Les huit IA : modèle, moment, ce qu’elles lisent et écrivent.', code: 'app/admin/ia' },
+            { id: 'm-refus', label: 'Mauvais mot de passe', col: 1, from: 'm-mdp', d: 'Refusé, avec une petite attente pour décourager les essais en série.' },
+            { id: 'm-alertes', label: 'Alertes « À surveiller »', col: 1, from: 'm-vue', d: 'Appel dont le traitement a échoué, livre en échec, serveur vocal injoignable, réglage risqué sur Vercel.' },
+            { id: 'm-chiffres', label: 'Chiffres et derniers appels', col: 1, from: 'm-alertes', d: 'Clients, appels de la semaine, récits écrits, état du serveur vocal, les douze derniers appels.' },
+            { id: 'm-contact', label: 'Messages de contact', col: 1, from: 'm-chiffres', d: 'Les messages du formulaire de contact du site.' },
+            { id: 'm-embarques', label: 'Embarqués et parcours', col: 1, from: 'm-suivi', d: 'Combien ont commandé, fait un premier vrai appel, reçu un premier récit, dépassé la phase 1, terminé.' },
+            { id: 'm-relancer', label: 'Clients à relancer', col: 1, from: 'm-embarques', d: 'Pas de vrai appel 3 jours après la commande, ou plus d’appel depuis 14 jours.' },
+            { id: 'm-activite', label: 'Activité et moyennes', col: 1, from: 'm-relancer', d: 'Appels par semaine, commandes par mois, délai avant le premier appel, durée d’un appel, mots par livre.' },
+            { id: 'm-commande', label: 'Commande et réglages', col: 1, from: 'm-fiche', d: 'Date, cadeau ou non, offreur, durée d’appel, lien vers le paiement Stripe ; rendez-vous, SMS, partage.' },
+            { id: 'm-memoire', label: 'Mémoire et prochain appel', col: 1, from: 'm-commande', d: 'Ce que Loomina sait de la personne, la question prévue, les sujets en attente, et le prompt exact de son prochain appel.' },
+            { id: 'm-appels', label: 'Appels et transcripts', col: 1, from: 'm-memoire', d: 'Chaque appel : durée, résumé, transcript complet, analyse du Directeur.' },
+            { id: 'm-recits', label: 'Récits et livre composé', col: 1, from: 'm-appels', d: 'Chaque récit et ses versions, le livre recomposé, et le journal technique des appels.' },
+            { id: 'm-manques', label: 'Ce qui manque', col: 1, from: 'm-carte', d: 'Le filtre « Ce qui manque » de la carte : les cases à faire et à surveiller.' },
+            { id: 'm-prompts', label: 'Prompts exacts', col: 1, from: 'm-ia', d: 'Lus directement dans le code : ce qui est affiché est ce qui tourne en ligne.' },
+            { id: 'm-actions', label: 'Agir depuis l’admin', col: 2, from: 'm-commande', status: 'todo', d: 'Relancer un appel en échec, recomposer un livre, corriger une fiche, mettre en pause, rembourser : rien de tout cela ne se fait encore depuis l’admin.' },
+            { id: 'm-prevenir', label: 'Être prévenu', col: 2, from: 'm-alertes', status: 'todo', d: 'Les alertes ne se voient qu’en ouvrant l’admin : aucun SMS ni e-mail à l’équipe (nouvelle commande, appel en échec, client à relancer).' },
+            { id: 'm-relance', label: 'Relancer un client', col: 2, from: 'm-relancer', status: 'todo', d: 'La liste existe, mais l’envoi d’un SMS ou d’un e-mail de relance se fait à la main.' },
+            { id: 'm-argent', label: 'Montants réels et coûts', col: 2, from: 'm-activite', status: 'todo', d: 'Le chiffre d’affaires est estimé (commandes × prix) : codes promo et remboursements sont dans Stripe. Le coût OpenAI et Twilio par client n’est pas suivi.' },
+            { id: 'm-audience', label: 'Audience du site', col: 2, from: 'm-chiffres', status: 'todo', d: 'Les visites et les pages vues restent dans Google Analytics.' },
+            { id: 'm-modifier', label: 'Modifier un prompt', col: 2, from: 'm-prompts', status: 'todo', d: 'Les prompts se lisent dans l’admin mais se changent dans le code.' },
+            { id: 'm-comptes', label: 'Plusieurs comptes admin', col: 2, from: 'm-refus', status: 'todo', d: 'Un seul mot de passe partagé : pas de compte par personne, pas d’historique de qui a consulté quoi.' },
+        ],
+    },
+    {
         key: 'coulisses',
         label: 'Coulisses',
-        about: 'Les services qui font tourner Loomina, et l’admin.',
+        about: 'Les services qui font tourner Loomina.',
         flat: true,
         nodes: [
             { id: 'k-vercel', label: 'Site · Vercel', d: 'Les pages, la commande, les espaces, et tout le traitement après l’appel.' },
@@ -263,8 +302,6 @@ export const MAP_GROUPS: MapGroup[] = [
             { id: 'k-openai', label: 'OpenAI', d: 'Tous les modèles : la voix, le Directeur, l’Écrivain, l’Éditeur du livre, les photos.' },
             { id: 'k-supabase', label: 'Supabase', d: 'La base (clients, livres, appels, récits) et les photos.' },
             { id: 'k-stripe', label: 'Stripe', d: 'Le paiement.' },
-            { id: 'k-admin', label: 'Admin · lecture seule', d: 'Clients, appels, récits, prompts, cette carte.' },
-            { id: 'k-actions', label: 'Actions depuis l’admin', status: 'todo', d: 'Relancer un appel en échec, recomposer un livre, corriger une fiche, rembourser : rien de tout cela ne se fait encore depuis l’admin.' },
             { id: 'k-credits', label: 'Alerte crédits OpenAI', status: 'todo', d: 'Si le compte OpenAI est à sec, les appels et l’écriture s’arrêtent sans prévenir (arrivé le 16/11/2026).' },
             { id: 'k-sauvegarde', label: 'Sauvegarde de la base', status: 'partial', d: 'Celle de Supabase, selon l’offre souscrite. Pas de copie à part des récits et des transcripts.' },
         ],
@@ -283,4 +320,7 @@ export const MAP_LINKS: Array<{ from: string; to: string; label: string }> = [
     { from: 'x-recit', to: 'a-lire', label: 'à lire' },
     { from: 'x-phase', to: 'l-1', label: 'avancement' },
     { from: 'x-recompose', to: 'a-livre', label: 'à lire' },
+    { from: 'x-alerte', to: 'm-alertes', label: 'visible dans l’admin' },
+    { from: 'd-msg', to: 'm-contact', label: 'visible dans l’admin' },
+    { from: 'c-livre', to: 'm-clients', label: 'nouveau client' },
 ];

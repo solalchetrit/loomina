@@ -65,7 +65,7 @@ function layout(groups: MapGroup[], roots: MapRoot[]): Layout {
       const parents = (Array.isArray(from) ? from : from ? [from] : []).map((id) => local.get(id)).filter(Boolean) as Array<{ col: number; row: number }>;
       // Sous le parent s'il est dans la même sous-colonne, à sa hauteur sinon.
       let row = parents.length ? Math.max(...parents.map((p) => (p.col === col ? p.row + 1 : p.row))) : 0;
-      if (col === 0 && node.from === undefined && lastMain) row = Math.max(row, local.get(lastMain)!.row + 1);
+      if (col === 0 && node.from === undefined && lastMain) row = Math.max(row, local.get(lastMain)!.row + 1 + (node.gap ?? 0));
       taken[col] ??= new Set();
       while (taken[col].has(row)) row++;
       taken[col].add(row);
