@@ -20,7 +20,9 @@
 
 import OpenAI from 'openai';
 import type { Phase } from './phases';
-import { PHASE_GOALS, PHASE_LABELS, isFinalPhase, nextPhase } from './phases';
+import { PHASE_GOALS, PHASE_LABELS, isFinalPhase, toPhase } from './phases';
+import { PHASE_AXES, AXIS_RULE, stepPhase, mergeTopics } from './phase-plan';
+import type { PhaseState, PhaseAnswer, Topic } from './phase-plan';
 import type { LoominaContext } from './context';
 import { normalizeContext, renderContext } from './context';
 
@@ -92,7 +94,20 @@ async function complete(model: string, system: string, user: string, timeoutMs: 
 
 export interface DirectorResult {
     context: LoominaContext;
+    /** Part des sujets couverts dans la phase en cours après cet appel (calculée, jamais estimée). */
     progress_percentage: number;
+    /** Sujets de la phase analysée couverts à ce jour. */
+    covered_axes: string[];
+    /** Réponse à « on ajoute quelque chose ou on passe à la suite ? ». */
+    phase_answer: PhaseAnswer;
+    /** État de phase à enregistrer dans `project_metadata.phase_state`. */
+    phase_state: PhaseState;
+    /** Sujets propres à la personne, à enregistrer dans `project_metadata.book_topics`. */
+    book_topics: Topic[];
+    /** La personne a confirmé que le livre est complet. */
+    project_completed: boolean;
+    /** Période de vie à laquelle appartient ce que le narrateur a raconté : le chapitre y est rangé. */
+    chapter_phase: Phase;
     sentiment_score: number;
     call_summary: string;
     next_question: string;
@@ -164,15 +179,34 @@ Tu reçois le contexte accumulé et le nouveau transcript.
 Tu renvoies le contexte **complet, fusionné et mis à jour** — pas un ajout.
 Cela veut dire : fusionner les doublons, préciser ce qui était vague, retirer une question qui a trouvé sa réponse.
 Reste sous 1 500 tokens. Si tu dois couper, garde ce qui sert à écrire le livre.
+Un récit que le narrateur a annoncé sans le raconter (« je vous en reparlerai », un deuil ou une épreuve seulement nommés) reste dans \`open_questions\` tant qu'il n'a pas été raconté ou refusé : c'est souvent une page importante du livre.
+\`open_questions\` : huit au plus, seulement ce qui compte pour le livre (identité, dates des grandes étapes, proches principaux, un récit resté inachevé). Pas le nom de famille d'un personnage secondaire, pas le nom officiel d'un lieu.
 
-# CALIBRAGE DE LA PROGRESSION (\`progress_percentage\`)
-Évalue la couverture de la phase ${phase}, pas de la vie entière.
-- 0-25   : un seul sujet effleuré, rien d'exploitable en profondeur
-- 26-50  : plusieurs sujets abordés, mais sans anecdote ni détail sensoriel
-- 51-80  : sujets couverts avec des anecdotes concrètes et datées
-- 81-99  : phase quasi complète, quelques zones d'ombre subsistent
-- 100    : tous les axes de la phase ont été traités en profondeur
-N'atteins 100 que si la phase est réellement épuisée. Une phase clôturée trop tôt produit un livre creux.
+# SUJETS DE LA PHASE (\`covered_axes\`)
+La phase ${phase} avance selon l'information reçue, pas selon le nombre d'appels. Voici ses sujets, avec leur clé :
+${PHASE_AXES[phase].map((a) => `- ${a.key} : ${a.label}`).join('\n')}
+${AXIS_RULE[phase]}
+Renvoie dans \`covered_axes\` les clés de TOUS les sujets couverts à ce jour, en tenant compte de la mémoire et de cet appel. Les sujets déjà cochés (donnés plus bas) le restent. Sois juste : un sujet coché trop tôt donne un livre creux, un sujet jamais coché empêche le livre d'avancer.
+
+Toutes les vies ne se ressemblent pas : certaines personnes n'ont jamais travaillé, jamais vécu en couple, pas eu d'enfants, pas connu leurs parents. Si le narrateur a dit qu'un sujet ne le concerne pas, ou qu'il ne souhaite pas en parler, mets sa clé dans \`axes_not_applicable\` : seulement s'il l'a dit, jamais par supposition. Un sujet vécu sous une autre forme (une compagne sans mariage, le foyer plutôt qu'un emploi) n'est pas sans objet : il est couvert dès qu'il est raconté. N'écris jamais \`next_question\` en supposant un mari, une épouse, des enfants ou un métier que le narrateur n'a pas mentionnés.
+
+# SUJETS PROPRES À CETTE PERSONNE (\`topics\`)
+La liste ci-dessus est la même pour tout le monde ; chaque vie a aussi ses sujets à elle. Tu tiens cette seconde liste, donnée plus bas avec un numéro par sujet.
+- \`add\` : chaque sujet que le narrateur a évoqué dans cet appel et qui mérite d'être raconté dans le livre, s'il n'est pas déjà dans la liste : un lieu, une personne, une activité, un événement précis de SA vie (« la boulangerie de ses parents », « son service militaire à Trèves », « la chorale du jeudi », « la mort de son petit frère »). Donne la phase où il devra être raconté (2 = enfance et jeunesse, 3 = vie adulte, 4 = transmission et vie d'aujourd'hui), MÊME si ce n'est pas la phase en cours : un métier nommé pendant la phase 1 est un sujet de la phase 3, on y reviendra le moment venu. N'ajoute que ce qui reste à raconter : un sujet déjà raconté en entier dans cet appel n'a pas besoin d'entrer dans la liste.
+- \`done\` : les numéros des sujets de la liste que le narrateur a racontés dans cet appel avec au moins une scène concrète, quelle que soit leur phase.
+- \`skip\` : les numéros des sujets dont il a dit ne pas vouloir parler.
+Reste sobre : cinq à dix sujets propres par phase suffisent. Pas de sujet général (« son enfance »), pas de doublon d'un sujet de la liste commune, rien que le narrateur n'ait dit.
+
+# LE POINT SUR LA PHASE (\`phase_answer\`)
+Quand tous les sujets sont couverts, l'assistant demande au narrateur, au début de l'appel, s'il veut ajouter quelque chose ou passer à la suite (pour la phase 4 : si le livre est complet). On te dit plus bas si cette question devait être posée dans cet appel.
+- "advance" : la question a été posée et le narrateur a choisi de passer à la suite (ou a dit qu'il n'avait rien à ajouter).
+- "stay" : la question a été posée et le narrateur a voulu ajouter quelque chose, ou a continué sur la phase en cours.
+- "none" : la question ne devait pas être posée, n'a pas été posée, ou n'a pas reçu de réponse claire.
+N'écris jamais toi-même cette question dans \`next_question\` : c'est le code qui la fait poser. \`next_question\` reste une question de souvenir.
+Si la réponse est "advance", \`next_question\` ouvre la phase suivante${isFinalPhase(phase) ? ' (ici, le livre est complet : une question ouverte et douce suffit)' : ` : ${PHASE_GOALS[(phase + 1) as Phase]}`}
+
+# PÉRIODE RACONTÉE (\`chapter_phase\`)
+Le narrateur peut revenir sur une période déjà couverte, ou prendre de l'avance. Dis à quelle période appartient l'essentiel de ce qu'il a raconté dans CET appel, pour que le chapitre soit rangé au bon endroit : 2 = enfance et jeunesse, 3 = vie adulte, 4 = regard sur sa vie, messages, vie d'aujourd'hui, 1 = seulement un survol général de sa vie. En cas de doute, ${phase}.
 
 # MATIÈRE POUR UN CHAPITRE (\`chapter_material\`)
 L'Écrivain ne doit écrire que s'il y a quelque chose à raconter. Évalue ce que le narrateur (lignes « User: ») a réellement apporté de NOUVEAU dans cet appel :
@@ -193,6 +227,12 @@ BON : "La dernière fois, vous m'avez parlé des étés à Casablanca chez votre
 
 Si le transcript est trop pauvre pour accrocher un fait précis, propose une question d'ouverture douce sur la phase en cours.
 
+Si l'interlocuteur a demandé le tutoiement ou le vouvoiement PENDANT cet appel, rédige \`next_question\` ainsi, même si la consigne reçue dit l'inverse.
+
+\`next_question\` porte sur la phase en cours (ou sur la suivante si le narrateur vient de choisir d'y passer). Un sujet noté pour une phase ultérieure attend son tour : ne l'ouvre pas maintenant.
+
+UNE seule question, un seul point d'interrogation : jamais une liste de renseignements (« votre nom complet, votre date et votre lieu de naissance ? »), jamais deux questions reliées par « et ». S'il manque un fait d'identité ou une date, ne le demande pas ici : note-le dans \`open_questions\`, l'assistant le glissera au bon moment.
+
 Ne bâtis JAMAIS \`next_question\` sur un sujet de la liste « Sujets à laisser de côté », même si le narrateur l'a évoqué dans cet appel.
 Si un récit est resté inachevé à la fin de l'appel, reprends-le : c'est presque toujours la meilleure question. Sinon, et si un sujet suggéré depuis le site attend, tu peux ouvrir sur lui.
 
@@ -212,7 +252,11 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
     "open_questions": [],
     "last_call":      { "date": "", "summary": "", "topics": [] }
   },
-  "progress_percentage": 0,
+  "covered_axes": [],
+  "axes_not_applicable": [],
+  "topics": { "add": [ { "phase": 3, "label": "" } ], "done": [], "skip": [] },
+  "phase_answer": "none",
+  "chapter_phase": ${phase},
   "sentiment_score": 0.0,
   "call_summary": "3 à 5 phrases sur ce qui s'est dit dans CET appel",
   "next_question": "",
@@ -233,7 +277,7 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
 
 Pour \`profile_updates\` : ne renseigne un champ que si l'interlocuteur l'a EXPRIMÉ pendant cet appel. Sinon laisse \`null\` ou un tableau vide.
 - \`politeness_preference\` vaut EXACTEMENT "tu" ou "vous" (rien d'autre) : "tu" s'il a demandé le tutoiement, "vous" s'il a demandé le vouvoiement.
-- \`sensitive_topics\` ne contient que les sujets nouvellement identifiés comme douloureux ou à éviter, formulés en quelques mots chacun (ex. "son père", "le divorce de 1998").`;
+- \`sensitive_topics\` ne contient que les sujets que l'interlocuteur a DEMANDÉ de laisser de côté dans cet appel (« je préfère ne pas en parler », « je ne veux pas que ce soit dans le livre »), en quelques mots chacun (ex. "son père", "le divorce de 1998"). Un souvenir douloureux qu'il raconte de lui-même, ou dont il dit qu'on peut lui parler, n'en fait PAS partie : un deuil raconté est souvent une des pages les plus importantes du livre. N'écris nulle part ailleurs dans le contexte qu'un sujet est « à laisser de côté ».`;
 }
 
 interface DirectorInput {
@@ -245,6 +289,10 @@ interface DirectorInput {
     durationSeconds: number | null;
     /** `profiles.sensitive_topics` : réglés sur le site ou dits au téléphone. */
     sensitiveTopics?: string | null;
+    /** État de la phase avant cet appel (`project_metadata.phase_state`). */
+    phaseState?: PhaseState;
+    /** Sujets propres à la personne, toutes phases (`project_metadata.book_topics`). */
+    topics?: Topic[];
     /** Banc d'essai : forcer un modèle. */
     model?: string;
 }
@@ -264,6 +312,18 @@ ${suggestions.length ? suggestions.map((t, i) => `${i + 1}. ${t}`).join('\n') : 
 Prénom : ${params.firstName}
 Tutoiement/vouvoiement : ${params.politeness === 'tu' ? 'tu — rédige `next_question` en tutoyant' : 'vous — rédige `next_question` en vouvoyant'}
 Durée de l'appel : ${params.durationSeconds ?? 'inconnue'} secondes
+
+# OÙ EN EST LA PHASE
+Sujets déjà cochés : ${params.phaseState?.covered.length ? params.phaseState.covered.join(', ') : 'aucun'}
+Sujets sans objet pour cette personne : ${params.phaseState?.skipped.length ? params.phaseState.skipped.join(', ') : 'aucun'}
+
+# SUJETS PROPRES À CETTE PERSONNE, À CE JOUR
+${
+    params.topics?.length
+        ? params.topics.map((t) => `${t.id}. [phase ${t.phase}] ${t.label} — ${t.status === 'open' ? 'à raconter' : t.status === 'done' ? 'raconté' : 'ne souhaite pas en parler'}`).join('\n')
+        : 'Aucun pour l\'instant'
+}
+Question « on ajoute quelque chose ou on passe à la suite ? » à poser dans cet appel : ${params.phaseState?.check === 'to_ask' ? 'OUI' : 'non'}
 
 # TRANSCRIPT DE L'APPEL
 ${params.transcript}`;
@@ -286,8 +346,14 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     }
     const parsed = JSON.parse(raw) as Record<string, unknown>;
 
-    const progress = clamp(Number(parsed.progress_percentage) || 0, 0, 100);
     const phase = params.phase;
+    const before: PhaseState = params.phaseState ?? { phase, covered: [], skipped: [], check: null };
+    const topics = mergeTopics(params.topics ?? [], parsed.topics);
+    const answer: PhaseAnswer =
+        before.check === 'to_ask' && (parsed.phase_answer === 'advance' || parsed.phase_answer === 'stay') ? parsed.phase_answer : 'none';
+    // Le passage de phase est décidé par le CODE (phase-plan.ts), à partir
+    // des sujets couverts et de la réponse de la personne.
+    const step = stepPhase(before, { covered: parsed.covered_axes, skipped: parsed.axes_not_applicable }, answer, topics);
 
     const suggestions = params.context.suggested_topics ?? [];
     // Les suggestions ne passent jamais par la plume du modèle : on garde
@@ -301,7 +367,13 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     return {
         model,
         context,
-        progress_percentage: progress,
+        progress_percentage: step.progress,
+        covered_axes: step.nextPhase === phase ? step.state.covered : PHASE_AXES[phase].map((a) => a.key),
+        phase_answer: answer,
+        phase_state: step.state,
+        book_topics: topics,
+        project_completed: step.completed,
+        chapter_phase: toPhase(parsed.chapter_phase, phase),
         sentiment_score: clamp(Number(parsed.sentiment_score) || 0, -1, 1),
         call_summary: text(parsed.call_summary, 2000) ?? '',
         next_question:
@@ -316,16 +388,13 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
         profile_updates: profileUpdates(parsed.profile_updates),
         resolved: {
             phase,
-            // La transition de phase est décidée par le CODE, jamais par le
-            // modèle. Auparavant Make écrivait `lower(next_phase)` — une
-            // chaîne libre générée par GPT — directement en base.
-            next_phase: nextPhase(phase, progress),
+            next_phase: step.nextPhase,
         },
     };
 }
 
 export function shouldCompleteProject(result: DirectorResult): boolean {
-    return isFinalPhase(result.resolved.phase) && result.progress_percentage >= 100;
+    return result.project_completed;
 }
 
 // ------------------------------------------------------------

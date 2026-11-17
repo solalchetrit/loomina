@@ -16,7 +16,7 @@ const FEATURES: { id: string; icon: IconName; title: string; text: string; image
     id: "chapitre",
     icon: "book",
     title: "Lire chaque chapitre, comme dans le livre",
-    text: "Quelques minutes après l’appel, le chapitre est là, mis en page. Vous pouvez le corriger vous-même, ou demander à Loomina de le faire.",
+    text: "Après chaque appel, le récit est écrit et votre livre se recompose, mis en page. Vous pouvez corriger un passage vous-même, ou demander à Loomina de le faire.",
     image: "/espace-auteur/chapitre.webp",
     alt: "Un chapitre dans l’espace auteur, mis en page comme un livre, avec le bouton « Corriger ce chapitre »",
     w: 1200,

@@ -78,7 +78,7 @@ export default function ChapterEditor({
       {step === "closed" && (
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="secondary" onClick={() => setStep("describe")}>
-            Corriger ce chapitre
+            Corriger ce récit
           </Button>
           {message && (
             <p role="status" className={`text-[15px] font-semibold ${message.ok ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>
@@ -127,12 +127,12 @@ export default function ChapterEditor({
       {(step === "review" || step === "saving") && (
         <div className="space-y-3">
           <label htmlFor={`${id}-texte`} className="field-label">
-            {correction.trim() ? "Texte corrigé proposé : relisez-le, retouchez-le si besoin" : "Le texte du chapitre"}
+            {correction.trim() ? "Texte corrigé proposé : relisez-le, retouchez-le si besoin" : "Le texte du récit"}
           </label>
           <textarea id={`${id}-texte`} rows={16} value={draft} onChange={(e) => setDraft(e.target.value)} className="field book-text !min-h-[320px]" lang="fr" />
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={save} loading={step === "saving"} disabled={!draft.trim()}>
-              Enregistrer le chapitre
+              Enregistrer le récit
             </Button>
             <button
               type="button"

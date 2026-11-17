@@ -166,7 +166,7 @@ export default function DashboardPage() {
                   <a href={`tel:${SITE.phone}`} className="link whitespace-nowrap font-semibold">
                     {SITE.phoneDisplay}
                   </a>{" "}
-                  depuis le numéro indiqué à la commande, quand vous voulez. Les chapitres apparaîtront ici.
+                  depuis le numéro indiqué à la commande, quand vous voulez. Le récit de chaque appel apparaîtra ici.
                 </p>
               </div>
             )}

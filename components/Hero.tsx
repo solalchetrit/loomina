@@ -23,7 +23,7 @@ export default function Hero() {
         <div className="mt-10 grid items-start gap-12 lg:mt-14 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
           <div className="min-w-0 lg:pt-4">
             <p className="rise max-w-[30rem] text-[clamp(1.25rem,1.9vw,1.6rem)] font-medium leading-[1.45] tracking-[-0.015em] text-[var(--ink)]" style={{ "--i": 1 } as CSSProperties}>
-              Vous racontez au téléphone, Loomina écrit un chapitre après chaque appel, vous le relisez dans votre espace auteur, et le livre relié arrive chez vous.
+              Vous racontez au téléphone, Loomina écrit le récit de chaque appel et en compose votre livre. Vous le relisez dans votre espace auteur, et le livre relié arrive chez vous.
             </p>
             <div className="rise mt-9 flex flex-col gap-3 sm:flex-row" style={{ "--i": 2 } as CSSProperties}>
               <Button href="/order" size="lg">

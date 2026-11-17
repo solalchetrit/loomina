@@ -7,7 +7,7 @@
  */
 
 import type { Profile } from './db';
-import { SITE } from '@/config/site';
+import { SITE } from '../../config/site';
 
 export async function sendSms(to: string, body: string): Promise<boolean> {
     const sid = process.env.TWILIO_ACCOUNT_SID;
@@ -39,8 +39,8 @@ export function chapterReadyText(profile: Pick<Profile, 'first_name' | 'politene
     const hello = name ? `Bonjour ${name}` : 'Bonjour';
     const host = SITE.url.replace(/^https?:\/\//, '');
     return tu
-        ? `${hello}, ton nouveau chapitre « ${title} » est prêt. Tu peux le lire sur ${host}/dashboard. À bientôt, Loomina`
-        : `${hello}, votre nouveau chapitre « ${title} » est prêt. Vous pouvez le lire sur ${host}/dashboard. À bientôt, Loomina`;
+        ? `${hello}, le récit de ton appel, « ${title} », est prêt. Tu peux le lire sur ${host}/dashboard. À bientôt, Loomina`
+        : `${hello}, le récit de votre appel, « ${title} », est prêt. Vous pouvez le lire sur ${host}/dashboard. À bientôt, Loomina`;
 }
 
 /**
@@ -58,7 +58,7 @@ export async function notifyChapterReady(params: {
         const to = params.profile.phone_number;
         if (!to) return;
         const sent = await sendSms(to, chapterReadyText(params.profile, params.title));
-        if (sent) console.info('[sms] chapitre prêt : SMS envoyé');
+        if (sent) console.info('[sms] récit prêt : SMS envoyé');
     } catch (err) {
         console.warn('[sms] échec :', err instanceof Error ? err.message : String(err));
     }

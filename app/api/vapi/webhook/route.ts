@@ -27,7 +27,7 @@ import { NextRequest, NextResponse, after } from 'next/server';
 
 import { findProfileByPhone, findActiveProject, getSystemPrompt, db, maskPhone } from '@/lib/loomina/db';
 import { toPhase } from '@/lib/loomina/phases';
-import { buildAssistant, buildUnknownCallerAssistant } from '@/lib/loomina/assistant';
+import { buildAssistant, buildUnknownCallerAssistant, buildRecoveryAssistant } from '@/lib/loomina/assistant';
 import { extractCallData } from '@/lib/loomina/pipeline';
 import type { VapiMessage } from '@/lib/loomina/pipeline';
 import { recordEvent, processEvent } from '@/lib/loomina/events';
@@ -104,10 +104,11 @@ export async function POST(request: NextRequest) {
         console.error(`[vapi] Erreur sur "${type}" :`, detail);
 
         // Sur assistant-request, une erreur 500 fait échouer l'appel du
-        // client. Mieux vaut renvoyer l'assistant d'accueil : il entendra
-        // une voix plutôt qu'une tonalité.
+        // client. On ne sait pas qui appelle : l'assistant de secours mène
+        // un entretien libre et le rattache ensuite par le numéro, au lieu
+        // de servir la démonstration à un client qui a payé.
         if (type === 'assistant-request') {
-            return NextResponse.json(buildUnknownCallerAssistant(serverUrl(request)));
+            return NextResponse.json(buildRecoveryAssistant(serverUrl(request)));
         }
         return NextResponse.json({ error: 'internal', detail }, { status: 500 });
     }
@@ -130,13 +131,26 @@ async function handleAssistantRequest(
         return NextResponse.json(buildUnknownCallerAssistant(url));
     }
 
-    const profile = await findProfileByPhone(phone);
+    // La base doit répondre vite : Vapi attend, et la personne entend un
+    // silence. Une lecture lente ou en échec est retentée une fois, puis on
+    // bascule sur l'assistant de secours plutôt que sur la démonstration :
+    // « base indisponible » n'est pas « appelant inconnu ».
+    let profile: Awaited<ReturnType<typeof findProfileByPhone>>;
+    let project: Awaited<ReturnType<typeof findActiveProject>> = null;
+    try {
+        profile = await readWithRetry(() => findProfileByPhone(phone), 'profil');
+        if (profile) project = await readWithRetry(() => findActiveProject(profile!.id), 'projet');
+    } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        console.error(`[vapi] Base indisponible pour ${maskPhone(phone)}, assistant de secours servi : ${detail}`);
+        return NextResponse.json(buildRecoveryAssistant(url));
+    }
+
     if (!profile) {
         console.info(`[vapi] Appelant inconnu : ${maskPhone(phone)}`);
         return NextResponse.json(buildUnknownCallerAssistant(url));
     }
 
-    const project = await findActiveProject(profile.id);
     if (!project) {
         console.warn(`[vapi] Profil ${profile.id} sans projet actif`);
         return NextResponse.json(buildUnknownCallerAssistant(url));
@@ -154,6 +168,30 @@ async function handleAssistantRequest(
     );
 
     return NextResponse.json(payload);
+}
+
+/** Délai accordé à chaque lecture de la base pendant l'assistant-request. */
+const DB_READ_TIMEOUT_MS = 2500;
+
+/**
+ * Une lecture avec délai maximal, retentée une fois. Pire cas : environ
+ * 5 secondes, bien en dessous des 20 secondes que Vapi accorde.
+ */
+async function readWithRetry<T>(read: () => Promise<T>, label: string): Promise<T> {
+    try {
+        return await withTimeout(read(), DB_READ_TIMEOUT_MS, label);
+    } catch (first) {
+        console.warn(`[vapi] Lecture ${label} en échec, nouvel essai : ${first instanceof Error ? first.message : first}`);
+        return await withTimeout(read(), DB_READ_TIMEOUT_MS, label);
+    }
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`lecture ${label} au-delà de ${ms} ms`)), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 // ------------------------------------------------------------

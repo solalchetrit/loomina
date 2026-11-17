@@ -7,7 +7,7 @@ const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]
     icon: "user",
     title: "Pour raconter votre vie",
     text: "Vous avez des souvenirs à transmettre, mais pas l’envie ni le temps d’écrire. Vous parlez, Loomina écrit.",
-    points: ["Vous appelez quand vous voulez", "Vous relisez chaque chapitre", "Vous gardez tous les droits sur votre récit"],
+    points: ["Vous appelez quand vous voulez", "Vous relisez le récit de chaque appel", "Vous gardez tous les droits sur votre récit"],
     cta: "Commencer mon livre",
   },
   {

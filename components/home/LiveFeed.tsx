@@ -8,12 +8,12 @@ type Item = { icon: IconName; title: string; detail: string; badge?: { label: st
 /** Une semaine type dans l'espace auteur de Jeanne. Exemple, présenté comme tel. */
 const EVENTS: Item[] = [
   { icon: "phone", title: "Appel terminé, 32 minutes", detail: "Les dimanches à la mer" },
-  { icon: "pen", title: "Chapitre 4 écrit", detail: "« L’été de mes seize ans »", badge: { label: "À relire", tone: "amber" } },
-  { icon: "check", title: "Chapitre 3 relu par l’équipe", detail: "Deux corrections, prêt pour le livre", badge: { label: "Validé", tone: "green" } },
+  { icon: "pen", title: "Récit du 4e appel écrit", detail: "« L’été de mes seize ans »", badge: { label: "À relire", tone: "amber" } },
+  { icon: "check", title: "Récit du 3e appel relu par l’équipe", detail: "Deux corrections, prêt pour le livre", badge: { label: "Validé", tone: "green" } },
   { icon: "image", title: "3 photos ajoutées", detail: "Envoyées par sa fille" },
   { icon: "phone", title: "Appel terminé, 18 minutes", detail: "Le premier emploi, à la poste" },
-  { icon: "pen", title: "Chapitre 5 écrit", detail: "« Le guichet de la rue Haute »", badge: { label: "À relire", tone: "amber" } },
-  { icon: "check", title: "Chapitre 4 relu par l’équipe", detail: "Une date corrigée par Jeanne", badge: { label: "Validé", tone: "green" } },
+  { icon: "pen", title: "Récit du 5e appel écrit", detail: "« Le guichet de la rue Haute »", badge: { label: "À relire", tone: "amber" } },
+  { icon: "check", title: "Récit du 4e appel relu par l’équipe", detail: "Une date corrigée par Jeanne", badge: { label: "Validé", tone: "green" } },
   { icon: "heart", title: "Une question ajoutée", detail: "Par son fils : « Et papa, comment l’as-tu rencontré ? »" },
 ];
 
@@ -78,7 +78,7 @@ export default function LiveFeed() {
       <div className="mt-4 flex gap-8 rounded-[18px] bg-[var(--ink)] px-5 py-4 text-white">
         <p className="leading-tight">
           <b className="text-[28px] font-extrabold tabular-nums tracking-[-0.03em]">{chapters}</b>{" "}
-          <span className="text-[14px] text-[#cfcfc8]">chapitres écrits</span>
+          <span className="text-[14px] text-[#cfcfc8]">récits écrits</span>
         </p>
         <p className="leading-tight">
           <b className="text-[28px] font-extrabold tracking-[-0.03em] text-[var(--amber)]">0</b>{" "}

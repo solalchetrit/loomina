@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
             chapters.map((c) => ({
                 ...base,
                 story_id: c.chapter_number,
-                story_title: c.title ?? `Chapitre ${c.chapter_number}`,
+                story_title: c.title ?? `Appel ${c.chapter_number}`,
                 story_content: c.content_markdown ?? '',
                 story_date: c.created_at,
             }))

@@ -22,7 +22,9 @@
 
 import { db, findActiveProject, getRecentChapters, getNextChapterNumber, getChapterOutline } from './db';
 import type { Profile, Project } from './db';
-import { toPhase, isFinalPhase } from './phases';
+import { toPhase } from './phases';
+import { readPhaseState, readTopics } from './phase-plan';
+import type { PhaseState, Topic } from './phase-plan';
 import type { Phase } from './phases';
 import { normalizeContext, contextFromLegacy, isEmptyContext, remainingSuggestions } from './context';
 import type { LoominaContext } from './context';
@@ -30,6 +32,7 @@ import { runDirector } from './director';
 import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
+import { autoCompose } from './book-edition';
 
 /**
  * Seuils du garde-fou.
@@ -40,6 +43,15 @@ import { notifyChapterReady } from './sms';
  */
 export const MIN_TRANSCRIPT_CHARS = 200;
 export const MIN_DURATION_SECONDS = 60;
+
+/**
+ * Chapitres déjà écrits que l'Écrivain relit. Avec trois, le livre simulé
+ * du 16/11/2026 redécrivait le même décor dans quatre chapitres.
+ */
+export const PREVIOUS_CHAPTERS = 40;
+
+/** En dessous, le texte de l'Écrivain n'est pas gardé comme chapitre. */
+export const MIN_CHAPTER_WORDS = 40;
 
 export interface PipelineOutcome {
     status: 'processed' | 'no_material' | 'too_short' | 'no_project';
@@ -104,6 +116,9 @@ interface AnalysisLog {
     profile_updates?: { writing_style?: string | null };
     chapter_material?: DirectorResult['chapter_material'];
     chapter_title_hint?: string | null;
+    chapter_phase?: number;
+    phase_state?: PhaseState;
+    book_topics?: Topic[];
     next_topic_id?: number | null;
     project_update?: Record<string, unknown> & { context?: unknown };
     family_members?: DirectorResult['family_members'];
@@ -115,6 +130,8 @@ interface AnalysisLog {
 /** Ce que l'Écrivain a besoin de savoir de l'analyse, rejouable depuis la base. */
 interface WriterBrief {
     phase: Phase;
+    /** Période racontée : la phase sous laquelle le chapitre est rangé. */
+    chapterPhase: Phase;
     context: LoominaContext;
     material: DirectorResult['chapter_material'];
     titleHint: string | null;
@@ -222,7 +239,9 @@ export async function processEndOfCall(params: {
                     project.id,
                     log.project_update,
                     log.suggestions_shown ?? [],
-                    log.covered_suggestions ?? []
+                    log.covered_suggestions ?? [],
+                    log.phase_state,
+                    log.book_topics
                 )
             );
         }
@@ -236,6 +255,7 @@ export async function processEndOfCall(params: {
         });
         brief = {
             phase,
+            chapterPhase: toPhase(log.chapter_phase, phase),
             context: normalizeContext(newer ? project.context : log.project_update?.context ?? project.context),
             material: log.chapter_material,
             titleHint: log.chapter_title_hint ?? null,
@@ -250,6 +270,8 @@ export async function processEndOfCall(params: {
             : normalizeContext(project.context);
 
         const director = await runDirector({
+            phaseState: readPhaseState(project.project_metadata, phase),
+            topics: readTopics(project.project_metadata),
             transcript: data.transcript,
             context: currentContext,
             phase,
@@ -263,6 +285,7 @@ export async function processEndOfCall(params: {
 
         brief = {
             phase,
+            chapterPhase: director.chapter_phase,
             context: director.context,
             material: director.chapter_material,
             titleHint: director.chapter_title_hint,
@@ -315,7 +338,7 @@ export async function processEndOfCall(params: {
     }
 
     const [previousChapters, outline] = await Promise.all([
-        getRecentChapters(project.id, 3),
+        getRecentChapters(project.id, PREVIOUS_CHAPTERS),
         getChapterOutline(project.id),
     ]);
 
@@ -323,13 +346,28 @@ export async function processEndOfCall(params: {
         transcript: data.transcript,
         context: brief.context,
         previousChapters,
-        phase,
+        phase: brief.chapterPhase,
         writingStyle: brief.writingStyle,
         titleHint: brief.titleHint,
         material: brief.material,
         outline,
         sensitiveTopics: params.profile.sensitive_topics,
     });
+
+    // Un texte de quelques mots n'est pas un chapitre : sur un livre simulé
+    // (16/11/2026), l'Écrivain, n'ayant rien de nouveau à raconter, avait
+    // rendu 28 mots de politesses (« J'allais bien, un peu fatiguée »).
+    if (writer.word_count < MIN_CHAPTER_WORDS) {
+        await supabase.from('interviews').update({ processing_status: 'processed' }).eq('id', interviewId);
+        return {
+            status: 'no_material',
+            interviewId,
+            phase,
+            nextPhase: brief.nextPhase,
+            progress: brief.progress,
+            reason: `L'Écrivain n'a rien trouvé de nouveau à raconter (${writer.word_count} mots) : mémoire mise à jour, pas de chapitre.`,
+        };
+    }
 
     // ---------------------------------------------------------
     // 5. Le chapitre — une ligne, pas une concaténation
@@ -341,7 +379,8 @@ export async function processEndOfCall(params: {
         .insert({
             project_id: project.id,
             chapter_number: chapterNumber,
-            phase,
+            // Un souvenir d'enfance raconté en phase 3 est rangé dans l'enfance.
+            phase: brief.chapterPhase,
             title: writer.chapter_title,
             content_markdown: writer.chapter_content,
             word_count: writer.word_count,
@@ -369,6 +408,9 @@ export async function processEndOfCall(params: {
         title: writer.chapter_title,
     });
 
+    // Le livre se recompose avec ce nouveau récit, sans attendre ici.
+    await autoCompose(project.id);
+
     return {
         status: 'processed',
         interviewId,
@@ -390,8 +432,7 @@ async function persistDirectorResult(params: {
     const supabase = db();
     const { project, profile, interviewId, director } = params;
 
-    const projectCompleted =
-        isFinalPhase(director.resolved.phase) && director.progress_percentage >= 100;
+    const projectCompleted = director.project_completed;
 
     const projectUpdate = {
         phase: director.resolved.next_phase,
@@ -422,6 +463,11 @@ async function persistDirectorResult(params: {
                 // De quoi relancer l'Écrivain sans repasser par le Directeur.
                 chapter_material: director.chapter_material,
                 chapter_title_hint: director.chapter_title_hint,
+                chapter_phase: director.chapter_phase,
+                covered_axes: director.covered_axes,
+                phase_answer: director.phase_answer,
+                phase_state: director.phase_state,
+                book_topics: director.book_topics,
                 next_topic_id: director.next_topic_id,
                 project_update: projectUpdate,
                 family_members: director.family_members,
@@ -441,7 +487,9 @@ async function persistDirectorResult(params: {
             project.id,
             projectUpdate,
             director.context.suggested_topics ?? [],
-            director.covered_suggestions
+            director.covered_suggestions,
+            director.phase_state,
+            director.book_topics
         )
     );
 
@@ -462,15 +510,20 @@ async function withLatestSuggestions(
     projectId: string,
     update: Record<string, unknown> & { context?: unknown },
     shown: string[],
-    covered: number[]
+    covered: number[],
+    phaseState?: PhaseState,
+    topics?: Topic[]
 ): Promise<Record<string, unknown>> {
-    const { data, error } = await db().from('projects').select('context').eq('id', projectId).single();
+    const { data, error } = await db().from('projects').select('context, project_metadata').eq('id', projectId).single();
     if (error) throw new Error(`Lecture projects impossible : ${error.message}`);
     const fresh = normalizeContext(data?.context);
     const latest = fresh.suggested_topics ?? [];
     const context = normalizeContext(update.context);
     return {
         ...update,
+        // Les réglages de l'espace auteur (rendez-vous, SMS…) sont relus et
+        // gardés ; seul l'état de la phase est remplacé.
+        ...(phaseState ? { project_metadata: { ...((data?.project_metadata ?? {}) as Record<string, unknown>), phase_state: phaseState, ...(topics ? { book_topics: topics } : {}) } } : {}),
         context: {
             ...context,
             suggested_topics: remainingSuggestions(shown, covered, latest),

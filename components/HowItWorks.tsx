@@ -28,7 +28,7 @@ function CallPreview() {
 function ChapterPreview() {
   return (
     <div className="w-full max-w-[260px] rounded-[14px] bg-white px-5 py-4 shadow-[var(--shadow-bar)]">
-      <p className="text-[11px] font-bold text-[var(--amber-ink)]">Chapitre 4</p>
+      <p className="text-[11px] font-bold text-[var(--amber-ink)]">Votre 4e appel</p>
       <p className="mt-1 font-serif text-[17px] italic leading-tight">L’été de mes seize ans</p>
       <div className="mt-3 space-y-1.5">
         <span className="block h-[5px] w-full rounded bg-[var(--line)]" />
@@ -49,7 +49,7 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
   },
   {
     icon: "pen",
-    title: "Un chapitre après chaque appel",
+    title: "Le récit de chaque appel",
     text: "Loomina l’écrit dans vos mots, dans le style que vous avez choisi. Vous le relisez dans votre espace auteur et le corrigez : le livre se construit à deux.",
     preview: <ChapterPreview />,
   },

@@ -17,7 +17,7 @@ const FAQ_CATEGORIES = [
     questions: [
       {
         q: "Comment fonctionne Loomina ?",
-        a: `Vous appelez le ${SITE.phoneDisplay} quand vous voulez. Loomina mène l’entretien et écrit un chapitre après chaque appel, dans vos mots. Vous relisez, vous corrigez, notre équipe relit tout, et le livre relié arrive chez vous.`,
+        a: `Vous appelez le ${SITE.phoneDisplay} quand vous voulez. Loomina mène l’entretien et écrit le récit de chaque appel, dans vos mots, puis en compose le livre. Vous relisez, vous corrigez, notre équipe relit tout, et le livre relié arrive chez vous.`,
       },
       {
         q: "Combien de temps dure le processus ?",
@@ -55,7 +55,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "Puis-je relire et modifier le texte ?",
-        a: "Oui, c’est même la règle. Chaque chapitre apparaît dans votre espace auteur après l’appel. Vous dites à Loomina, au prochain appel, ce qu’il faut changer, et vous avez le dernier mot avant l’impression.",
+        a: "Oui, c’est même la règle. Le récit de chaque appel apparaît dans votre espace auteur quelques minutes après. Vous dites à Loomina, au prochain appel, ce qu’il faut changer, et vous avez le dernier mot avant l’impression.",
       },
     ],
   },
@@ -114,7 +114,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "La personne doit-elle savoir se servir d’un ordinateur ?",
-        a: "Non. Tout se passe au téléphone, fixe ou portable. L’espace auteur, où les chapitres apparaissent, est là pour relire, mais ce n’est pas une obligation : un proche peut relire pour elle, et les corrections se disent de vive voix à Loomina.",
+        a: "Non. Tout se passe au téléphone, fixe ou portable. L’espace auteur, où les récits et le livre apparaissent, est là pour relire, mais ce n’est pas une obligation : un proche peut relire pour elle, et les corrections se disent de vive voix à Loomina.",
       },
       {
         q: "Livrez-vous ailleurs qu’en France ?",

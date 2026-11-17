@@ -1,0 +1,46 @@
+# Render — serveur vocal Loomina (Twilio ConversationRelay, sans Vapi).
+# Le site Next.js reste sur Vercel ; seul le serveur vocal vit ici, car il
+# doit garder des WebSockets ouverts pendant les appels.
+#
+# Déploiement manuel uniquement (autoDeploy: false) : un déploiement coupe
+# les appels en cours, on le lance donc hors des heures d'appel.
+services:
+  - type: web
+    name: loomina-voice
+    runtime: docker
+    region: frankfurt
+    plan: starter
+    dockerfilePath: ./voice/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: false
+    buildFilter:
+      paths:
+        - voice/**
+        - lib/**
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # URL publique du service, donnée par Render à la création
+      # (https://loomina-voice.onrender.com si le nom est libre).
+      - key: PUBLIC_URL
+        sync: false
+      - key: NEXT_BASE_URL
+        value: https://www.loomina.eu
+      # Mêmes valeurs que sur Vercel.
+      - key: VAPI_WEBHOOK_SECRET
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        value: "+33159169357"

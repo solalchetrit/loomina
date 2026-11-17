@@ -25,7 +25,7 @@ const QUESTIONS = [
   },
   {
     q: "Est-ce qu’une machine écrit mon livre ?",
-    a: "Loomina mène les entretiens et écrit le premier jet de chaque chapitre, sans rien inventer, dans le style que vous avez choisi. Vous relisez et corrigez dans votre espace auteur, puis notre équipe relit votre livre avant l’impression.",
+    a: "Loomina mène les entretiens et écrit le récit de chaque appel, sans rien inventer, dans le style que vous avez choisi, puis compose le livre. Vous relisez et corrigez dans votre espace auteur, puis notre équipe relit votre livre avant l’impression.",
   },
   {
     q: "Je veux l’offrir. Comment ça se passe ?",

@@ -12,8 +12,9 @@
  */
 
 import type { Phase } from './phases';
-import { PHASE_KEYS } from './phases';
-import { voicePromptTemplate } from './voice-prompt';
+import { PHASE_KEYS, toPhase, isFinalPhase } from './phases';
+import { voicePromptTemplate, PHASE_OBJECTIVES } from './voice-prompt';
+import { readPhaseState, spokenPhase, readTopics, openTopics, pendingAxes } from './phase-plan';
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
@@ -182,6 +183,35 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
     const tu = vars.politeness_preference === 'tu';
     const parts: string[] = [];
 
+    const check = phaseCheck(project, vars);
+    if (check) parts.push(check.block);
+
+    // Sujets propres à cette personne pour la partie en cours : évoqués un
+    // jour (parfois des appels plus tôt), pas encore racontés.
+    const own = first ? [] : openTopics(readTopics(meta), toPhase(project.phase));
+    if (own.length && !check) {
+        parts.push(
+            [
+                `# CE QUE ${name.toUpperCase()} A DÉJÀ ÉVOQUÉ ET QUI RESTE À RACONTER`,
+                ...own.slice(0, 10).map((t) => `- ${t.label}`),
+                `Ce sont des sujets propres à ${name}, qu'on n'a pas encore creusés. Après la question de OÙ REPRENDRE, amène-les un par un quand la conversation s'y prête (« ${tu ? 'Tu m\'avais' : 'Vous m\'aviez'} parlé de… ${tu ? 'Raconte-moi' : 'Racontez-moi'}. »). Jamais comme une liste, jamais plus de deux ou trois par appel. Si ${name} préfère ne pas en parler, n'insiste pas.`,
+            ].join('\n')
+        );
+    }
+
+    // Sujets du socle commun dont on ne sait encore rien : on demande d'abord
+    // s'ils concernent la personne. C'est elle qui choisit d'en parler ou non.
+    const pending = first || check ? [] : pendingAxes(readPhaseState(meta, toPhase(project.phase)));
+    if (pending.length && toPhase(project.phase) !== 1) {
+        parts.push(
+            [
+                '# CE DONT ON NE SAIT ENCORE RIEN',
+                ...pending.map((a) => `- ${a.label}`),
+                `${name} n'en a pas encore parlé, et rien ne dit que ces sujets le ou la concernent. Au cours de cet appel, quand une histoire vient de se terminer, ouvre UN de ces sujets par une question douce qui ne suppose rien, et laisse ${name} choisir d'en parler ou non. Si ${name} dit que ça ne le ou la concerne pas, ou préfère ne pas en parler : « D'accord. » et passe à autre chose. Un seul de ces sujets par appel.`,
+            ].join('\n')
+        );
+    }
+
     const suggestions = ctx.suggested_topics ?? [];
     if (suggestions.length) {
         parts.push(
@@ -213,6 +243,34 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
     return parts.join('\n\n');
 }
 
+/**
+ * Tous les sujets de la phase sont couverts : avant de passer à la suite,
+ * Loomina demande à la personne, qui décide (voir phase-plan.ts). Renvoie la
+ * question à poser et les consignes, ou null s'il n'y a pas de point à faire.
+ */
+export function phaseCheck(project: Project, vars: Record<string, string>): { ask: string; block: string } | null {
+    const meta = (project.project_metadata ?? {}) as Record<string, unknown>;
+    const phase = toPhase(project.phase);
+    if (isFirstCall(project) || readPhaseState(meta, phase).check !== 'to_ask') return null;
+    const name = vars.first_name;
+    const tu = vars.politeness_preference === 'tu';
+    const here = spokenPhase(phase, tu);
+    const final = isFinalPhase(phase);
+    const ask = final
+        ? `Je crois qu'on a fait un beau tour de ${tu ? 'ta' : 'votre'} vie. ${tu ? 'Tu veux' : 'Vous voulez'} encore ajouter quelque chose, ou on considère que le livre est complet ?`
+        : `Je crois qu'on a bien fait le tour de ${here}. ${tu ? 'Tu veux' : 'Vous voulez'} y ajouter quelque chose, ou on passe à ${spokenPhase((phase + 1) as Phase, tu)} ?`;
+    const block = [
+        '# FAIRE LE POINT AVANT DE PASSER À LA SUITE',
+        `${name} a raconté tout ce qu'on attendait sur ${here}. La question de OÙ REPRENDRE est celle-ci, à poser avec tes mots juste après la réponse à ta salutation, avant toute autre question : « ${ask} »`,
+        `- Si ${name} veut ajouter quelque chose : écoute, creuse comme d'habitude, et reste sur ${here} pour cet appel.`,
+        final
+            ? `- Si ${name} dit que le livre est complet : remercie chaleureusement, dis que le livre va maintenant être préparé et qu'un appel reste possible à tout moment pour ajouter un souvenir, puis termine l'appel.`
+            : `- Si ${name} veut passer à la suite : enchaîne dans ce même appel sur ${spokenPhase((phase + 1) as Phase, tu)}, avec une première question ouverte tirée de ces pistes.\n${fillTemplate(PHASE_OBJECTIVES[(phase + 1) as Phase], vars)}`,
+        `- Ne parle jamais de « phase » ni de numéro : ${name} ne connaît pas ces mots.`,
+    ].join('\n');
+    return { ask, block };
+}
+
 /** « Solal » → « S-O-L-A-L », pour que le modèle épelle les vraies lettres. */
 export function spellOut(name: string): string {
     return Array.from(name.trim().toUpperCase()).filter((c) => c !== ' ').join('-');
@@ -222,6 +280,19 @@ export function spellOut(name: string): string {
 export function spokenForm(text: string): string {
     return text.replace(/Loomina/g, 'Loumina');
 }
+
+/**
+ * Placé en toute fin de prompt : sur les appels simulés du 16/11/2026, 28 %
+ * des répliques posaient deux questions malgré la règle de « COMMENT TU
+ * PARLES ». Le modèle suit mieux une règle répétée en dernier, avec le
+ * mauvais exemple à côté du bon.
+ */
+export const ONE_QUESTION_REMINDER = `# AVANT CHAQUE RÉPLIQUE
+Relis-la : elle contient UN SEUL point d'interrogation, à la fin.
+- Mauvais : « Vous le regardiez travailler, parfois ? Racontez-moi un moment précis. Qu'est-ce qu'il vous disait ? »
+- Bon : « Racontez-moi un moment où vous le regardiez travailler. »
+- Mauvais : « Où était-ce, et à quoi ressemblait la maison ? » Bon : « À quoi ressemblait la maison ? »
+Si deux questions te viennent, garde la plus ouverte et jette l'autre : tu la poseras plus tard.`;
 
 /**
  * Construit la charge utile complète attendue par Vapi.
@@ -234,6 +305,10 @@ export function buildAssistant({
     serverUrl,
 }: BuildAssistantInput) {
     const vars = buildTemplateVars(profile, project, phase);
+    // Le point sur la phase prend la place de la question prévue : laissée
+    // dans OÙ REPRENDRE, celle-ci passait devant et le point n'était jamais fait.
+    const check = phaseCheck(project, vars);
+    if (check) vars.next_question_strategy = check.ask;
 
     const session = sessionBlock(profile, project, vars);
     const meta = (project.project_metadata ?? {}) as Record<string, unknown>;
@@ -243,7 +318,7 @@ export function buildAssistant({
         politenessAlreadySet: Boolean(meta.prefs_set_at),
         topicsAlreadyKnown: Boolean(profile.sensitive_topics?.trim()),
     });
-    const systemPrompt = [fillTemplate(template, vars), session, pronunciationBlock(vars)]
+    const systemPrompt = [fillTemplate(template, vars), session, pronunciationBlock(vars), ONE_QUESTION_REMINDER]
         .filter((part) => part.trim())
         .join('\n\n');
 
@@ -377,6 +452,72 @@ export function buildUnknownCallerAssistant(serverUrl: string) {
             maxDurationSeconds: DEMO_MAX_SECONDS,
             silenceTimeoutSeconds: 30,
             endCallPhrases: ['##END_CALL##'],
+        },
+    };
+}
+
+/** Durée maximale d'un entretien de secours. */
+export const RECOVERY_MAX_SECONDS = 1200;
+
+/**
+ * Réponse quand la base ne répond pas : on ne sait pas si l'appelant est
+ * un client. Plutôt que la démonstration (qui promet que rien n'est
+ * conservé, et coupe au bout de cinq minutes), un entretien libre sur un
+ * souvenir, de vingt minutes au plus.
+ *
+ * Le rapport de fin d'appel est bien envoyé : sans `project_id` dans les
+ * métadonnées, le webhook retrouve le projet par le numéro appelant
+ * (resolveCaller), et le souvenir rejoint le livre. Si le numéro n'est
+ * celui d'aucun client, l'événement est simplement classé « no_project ».
+ */
+export function buildRecoveryAssistant(serverUrl: string) {
+    const systemPrompt = `Tu es Loomina, un biographe masculin, chaleureux, patient et curieux. Tu mènes un entretien au téléphone pour un livre de souvenirs.
+
+Ce jour-là, tu n'as pas accès au dossier de la personne. Ne parle jamais de problème technique, de base de données ou de dossier introuvable au-delà de ta première phrase.
+
+# PRONONCIATION (ce que tu écris est lu à voix haute, jamais affiché)
+- Écris toujours la marque « Loumina », jamais « Loomina ».
+
+# DÉROULÉ
+1. Après ta première phrase, attends sa réponse.
+2. Si la personne dit qu'elle découvre le service ou qu'elle n'est pas cliente : explique en deux phrases que Loumina l'aide à raconter sa vie au fil d'appels, qu'un livre relié est ensuite imprimé, que tout est expliqué sur loomina point e u, remercie-la et termine par ##END_CALL##.
+3. Sinon, demande-lui de quoi elle aimerait parler aujourd'hui. Si elle ne sait pas, propose : « Racontez-moi la maison où vous avez grandi. »
+4. Creuse ce souvenir, une question à la fois : les lieux, les personnes, ce qu'on se disait, ce qu'elle ressentait. Réagis à ce qu'elle dit avant de poser la question suivante.
+5. Après une vingtaine de minutes, ou si elle souhaite s'arrêter, remercie-la, dis que ce souvenir rejoindra son livre, et termine par ##END_CALL##.
+
+# RÈGLES
+- Une seule question à la fois. Une à deux phrases par intervention.
+- Vouvoie toujours, sauf si la personne te demande de la tutoyer.
+- Ne demande ni adresse, ni e-mail, ni coordonnées bancaires.
+- N'invente rien sur sa vie : tu ne connais que ce qu'elle te dit pendant cet appel.`;
+
+    return {
+        assistant: {
+            name: 'Loomina-Secours',
+            transcriber: TRANSCRIBER,
+            voice: VOICE,
+            backgroundDenoisingEnabled: true,
+            backgroundSound: 'off',
+            startSpeakingPlan: { waitSeconds: 1.5 },
+            stopSpeakingPlan: { numWords: 0, voiceSeconds: 0, backoffSeconds: 3 },
+            silenceTimeoutSeconds: 60,
+            firstMessageMode: 'assistant-speaks-first',
+            firstMessage:
+                "Bonjour, ici Loumina, votre biographe. " +
+                "Je n'ai pas votre carnet de notes sous la main aujourd'hui, mais nous pouvons quand même avancer : " +
+                "racontez-moi un souvenir, et il rejoindra votre livre.",
+            endCallPhrases: ['##END_CALL##'],
+            model: {
+                provider: 'openai',
+                model: 'gpt-4o',
+                temperature: 0.7,
+                messages: [{ role: 'system', content: systemPrompt }],
+                tools: [{ type: 'endCall', messages: [{ type: 'request-start', content: 'À bientôt !' }] }],
+            },
+            server: { url: serverUrl, timeoutSeconds: 20 },
+            serverMessages: [...SERVER_MESSAGES],
+            metadata: { recovery: true },
+            maxDurationSeconds: RECOVERY_MAX_SECONDS,
         },
     };
 }

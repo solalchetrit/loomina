@@ -30,7 +30,7 @@ const DURING = [
     text: "Dix minutes ou une heure. Vous pouvez dire « on s’arrête là » à tout moment, et reprendre un autre jour : Loomina se souvient de ce que vous lui avez dit et reprend là où vous en étiez.",
   },
   {
-    title: "Le chapitre est écrit après l’appel",
+    title: "Le récit de votre appel est écrit aussitôt",
     text: "Dans vos mots, sans rien inventer, et dans le style d’écriture que vous avez choisi. Vous le retrouvez dans votre espace auteur : vous le corrigez vous-même, ou vous le dites à Loomina au prochain appel.",
   },
 ];
@@ -38,7 +38,7 @@ const DURING = [
 const AFTER = [
   {
     title: "Vous relisez, nous relisons",
-    text: "Vous avez le dernier mot sur chaque chapitre. Puis une personne de l’équipe relit l’ensemble, corrige, et place les photos que vous nous avez envoyées par e-mail.",
+    text: "Vous avez le dernier mot sur chaque récit, puis sur le livre. Puis une personne de l’équipe relit l’ensemble, corrige, et place les photos que vous nous avez envoyées par e-mail.",
   },
   {
     title: "Le livre arrive chez vous",
