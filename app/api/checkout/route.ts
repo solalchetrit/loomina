@@ -27,12 +27,15 @@ export async function POST(request: NextRequest) {
         // Après paiement : page de bienvenue, qui ouvre ensuite l'espace (app/bienvenue).
         const welcomeUrl = `${origin}/bienvenue?session_id={CHECKOUT_SESSION_ID}`;
 
-        // Create Checkout Session
-        const session = await stripe().checkout.sessions.create({
+        // Paiement en 3 ou 4 fois (demande de Solal, 18/11/2026) : Klarna, proposé
+        // à côté de la carte dans le formulaire intégré. Il doit être activé dans
+        // Stripe (Paramètres, Moyens de paiement) ; sinon Stripe refuse la
+        // session, et on la recrée avec la carte seule.
+        const create = (methods: ("card" | "klarna")[]) => stripe().checkout.sessions.create({
             ...(embedded
                 ? { ui_mode: "custom" as const, return_url: welcomeUrl }
                 : { success_url: welcomeUrl, cancel_url: `${origin}/order` }),
-            payment_method_types: ["card"],
+            payment_method_types: methods,
             line_items: [
                 {
                     price_data: {
@@ -74,8 +77,19 @@ export async function POST(request: NextRequest) {
             },
         });
 
+        let installments = embedded;
+        let session;
+        try {
+            session = await create(embedded ? ["card", "klarna"] : ["card"]);
+        } catch (err) {
+            if (!embedded) throw err;
+            console.warn("[checkout] Klarna indisponible, carte seule :", err instanceof Error ? err.message : String(err));
+            installments = false;
+            session = await create(["card"]);
+        }
+
         if (embedded) {
-            return NextResponse.json({ clientSecret: session.client_secret, publishableKey });
+            return NextResponse.json({ clientSecret: session.client_secret, publishableKey, installments });
         }
         return NextResponse.json({ url: session.url });
 

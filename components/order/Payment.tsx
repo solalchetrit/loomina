@@ -19,12 +19,15 @@ export default function Payment({
   clientSecret,
   publishableKey,
   label,
+  installments = false,
   onBack,
 }: {
   clientSecret: string;
   publishableKey: string;
   /** « Votre livre » ou « Le livre de Jeanne ». */
   label: string;
+  /** Klarna est proposé : paiement en 3 ou 4 fois. */
+  installments?: boolean;
   onBack: () => void;
 }) {
   const stripePromise = useMemo(() => loadStripe(publishableKey), [publishableKey]);
@@ -58,12 +61,12 @@ export default function Payment({
         },
       }}
     >
-      <PaymentForm label={label} onBack={onBack} />
+      <PaymentForm label={label} installments={installments} onBack={onBack} />
     </CheckoutElementsProvider>
   );
 }
 
-function PaymentForm({ label, onBack }: { label: string; onBack: () => void }) {
+function PaymentForm({ label, installments, onBack }: { label: string; installments: boolean; onBack: () => void }) {
   const state = useCheckout();
   const [code, setCode] = useState("");
   const [codeOpen, setCodeOpen] = useState(false);
@@ -179,9 +182,15 @@ function PaymentForm({ label, onBack }: { label: string; onBack: () => void }) {
       {/* Carte */}
       {!free && (
         <div className="mt-5">
+          {installments && (
+            <p className="mb-3 flex items-center gap-2 text-[14px] text-[var(--ink-2)]">
+              <span className="pill pill-amber !py-0.5">En 3 ou 4 fois</span>
+              Par carte en une fois, ou en plusieurs fois avec Klarna.
+            </p>
+          )}
           <PaymentElement
             options={{
-              layout: "tabs",
+              layout: { type: "accordion", defaultCollapsed: false, radios: "if_multiple", spacedAccordionItems: true },
               wallets: { link: "never", applePay: "auto", googlePay: "auto" },
             }}
           />
