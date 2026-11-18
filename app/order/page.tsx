@@ -14,6 +14,7 @@ import { track } from "@/lib/analytics";
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
 
 type Who = "me" | "gift";
+type PayMethod = "card" | "klarna";
 type Errors = Partial<Record<"firstName" | "lastName" | "phone" | "email" | "giverFirstName" | "giverPhone", string>>;
 
 function validPhone(raw: string): boolean {
@@ -30,7 +31,9 @@ export default function OrderPage() {
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", giverFirstName: "", giverPhone: "" });
   const [callMinutes, setCallMinutes] = useState<number>(DEFAULT_CALL_MINUTES);
   // Paiement intégré : le formulaire Stripe s'affiche ici, à l'étape 3.
-  const [checkout, setCheckout] = useState<{ clientSecret: string; publishableKey: string; installments: boolean } | null>(null);
+  const [checkout, setCheckout] = useState<{ clientSecret: string; publishableKey: string; installments: boolean; method: PayMethod } | null>(null);
+  // Code promo appliqué : réappliqué si le client passe de la carte à Klarna (nouvelle session).
+  const [promo, setPromo] = useState<string | null>(null);
 
   // Les boutons « Commencer mon livre » et « Offrir le livre » arrivent ici avec le choix déjà fait.
   useEffect(() => {
@@ -69,6 +72,41 @@ export default function OrderPage() {
     return Object.keys(next).length === 0;
   };
 
+  const startCheckout = async (method: PayMethod, replaces: string | null, phone = formatToE164(form.phone)) => {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        phone,
+        isGift,
+        callMinutes,
+        giverFirstName: isGift ? form.giverFirstName.trim() : "",
+        giverPhone: isGift ? formatToE164(form.giverPhone) : "",
+        method,
+        replaces,
+      }),
+    });
+    return (await res.json().catch(() => ({}))) as { clientSecret?: string; publishableKey?: string; installments?: boolean; url?: string; error?: string };
+  };
+
+  /** Carte ↔ Klarna : une nouvelle session Stripe pour le moyen choisi. Renvoie false si elle n'a pas pu être créée. */
+  const switchMethod = async (method: PayMethod): Promise<boolean> => {
+    if (!checkout || checkout.method === method) return true;
+    const replaces = checkout.clientSecret.split("_secret_")[0] || null;
+    try {
+      const data = await startCheckout(method, replaces);
+      if (!data.clientSecret || !data.publishableKey) {
+        if (data.error === "klarna") setCheckout({ ...checkout, installments: false });
+        return false;
+      }
+      setCheckout({ clientSecret: data.clientSecret, publishableKey: data.publishableKey, installments: checkout.installments, method });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting || !validate()) return;
@@ -84,21 +122,10 @@ export default function OrderPage() {
       transport_type: "beacon",
     });
     try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          phone,
-          isGift,
-          callMinutes,
-          giverFirstName: isGift ? form.giverFirstName.trim() : "",
-          giverPhone: isGift ? formatToE164(form.giverPhone) : "",
-        }),
-      });
-      const data = await res.json();
+      const data = await startCheckout("card", null, phone);
       if (data.clientSecret && data.publishableKey) {
-        setCheckout({ clientSecret: data.clientSecret, publishableKey: data.publishableKey, installments: Boolean(data.installments) });
+        setPromo(null);
+        setCheckout({ clientSecret: data.clientSecret, publishableKey: data.publishableKey, installments: Boolean(data.installments), method: "card" });
         setSubmitting(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else if (data.url) {
@@ -156,7 +183,12 @@ export default function OrderPage() {
             {step === 3 && checkout && (
               <div className="rise mt-6">
                 <Payment
+                  key={checkout.clientSecret}
                   clientSecret={checkout.clientSecret}
+                  method={checkout.method}
+                  onSwitch={switchMethod}
+                  promo={promo}
+                  onPromo={setPromo}
                   publishableKey={checkout.publishableKey}
                   installments={checkout.installments}
                   label={isGift && form.firstName.trim() ? `Le livre de ${form.firstName.trim()}` : "Votre livre de vie"}
