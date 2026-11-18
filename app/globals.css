@@ -479,18 +479,6 @@ textarea.field {
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
-/* Le dernier événement de la carte vivante glisse en tête de liste. */
-@keyframes loomina-drop {
-  from {
-    opacity: 0;
-    transform: translateY(-14px) scale(0.98);
-  }
-}
-
-.feed-new {
-  animation: loomina-drop 620ms var(--ease-out) both;
-}
-
 /*
  * Apparition au défilement (components/Reveal.tsx) : les enfants directs d'un bloc
  * [data-reveal] montent l'un après l'autre, une seule fois, quand le bloc entre à
@@ -597,8 +585,7 @@ textarea.field {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise,
-  .feed-new {
+  .rise {
     animation: loomina-fade 200ms ease both;
   }
 

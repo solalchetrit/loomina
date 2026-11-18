@@ -60,8 +60,8 @@ export default function WhatYouGet({
           />
         ) : (
           <Photo
-            name="livre-dans-les-mains"
-            alt="Deux mains tiennent un livre Loomina relié, à la couverture en toile beige."
+            name="livre-bleu-dans-les-mains"
+            alt="Deux mains tiennent un livre Loomina relié, à la couverture en toile bleu nuit."
             ratio="aspect-[4/5]"
             sizes="(min-width: 1024px) 480px, 100vw"
             className="mx-auto w-full max-w-[480px]"

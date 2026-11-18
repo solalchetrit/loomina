@@ -3,15 +3,20 @@ import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
-import LiveFeed from "@/components/home/LiveFeed";
+import VoiceToBook from "@/components/home/VoiceToBook";
 
-const REASSURANCE: { text: string; href?: string }[] = [
-  { text: "Votre livre relu par notre équipe avant l’impression" },
-  { text: `Satisfait ou remboursé sous ${OFFER.guaranteeDays} jours*`, href: "/cgv#garantie" },
-  { text: "Paiement sécurisé par Stripe" },
+/** Les trois garanties sous les boutons : un titre court, puis la précision. */
+const REASSURANCE: { title: string; detail: string; href?: string }[] = [
+  { title: "Relu par notre équipe", detail: "avant l’impression de votre livre" },
+  {
+    title: "Satisfait ou remboursé",
+    detail: `dans les ${OFFER.guaranteeDays} jours qui suivent le premier entretien`,
+    href: "/cgv#garantie",
+  },
+  { title: "Paiement sécurisé", detail: "par Stripe" },
 ];
 
-/** Haut de page, en deux colonnes : à gauche le titre, la promesse et les deux actions ; à droite la carte vivante, à leur hauteur. */
+/** Haut de page, en deux colonnes : à gauche le titre, la promesse et les deux actions ; à droite la scène « de la voix au livre », à leur hauteur. */
 export default function Hero() {
   return (
     <section className="page-top w-full pb-10 md:pb-14">
@@ -38,32 +43,34 @@ export default function Hero() {
             </a>
             , rien n’est enregistré.
           </p>
-          <ul className="rise mt-7 flex flex-col gap-2.5 text-[16px] text-[var(--ink-2)]" style={{ "--i": 4 } as CSSProperties}>
+          <ul
+            className="rise mt-9 grid max-w-[40rem] gap-x-8 gap-y-5 border-t border-[var(--line)] pt-7 sm:grid-cols-3"
+            style={{ "--i": 4 } as CSSProperties}
+          >
             {REASSURANCE.map((r) => (
-              <li key={r.text} className="flex items-center gap-3">
+              <li key={r.title} className="flex gap-3 sm:flex-col sm:gap-2.5">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
                   <Icon name="check" size={16} />
                 </span>
-                {r.href ? (
-                  <a href={r.href} className="underline decoration-[var(--line)] underline-offset-4 hover:decoration-[var(--ink)]">
-                    {r.text}
-                  </a>
-                ) : (
-                  r.text
-                )}
+                <p className="text-[15px] leading-snug text-[var(--ink-2)]">
+                  <b className="block text-[16px] text-[var(--ink)]">{r.title}</b>
+                  {r.detail}
+                  {r.href && (
+                    <>
+                      .{" "}
+                      <a href={r.href} className="link whitespace-nowrap">
+                        Voir les conditions
+                      </a>
+                    </>
+                  )}
+                </p>
               </li>
             ))}
           </ul>
-          <p className="rise mt-3 text-[14px] text-[var(--ink-3)]" style={{ "--i": 4 } as CSSProperties}>
-            * Remboursement intégral sur simple demande dans les {OFFER.guaranteeDays} jours qui suivent le premier entretien.{" "}
-            <a href="/cgv#garantie" className="link">
-              Voir les conditions
-            </a>
-          </p>
         </div>
 
         <div className="rise mx-auto w-full min-w-0 max-w-[460px] lg:mr-0" style={{ "--i": 2 } as CSSProperties}>
-          <LiveFeed />
+          <VoiceToBook />
         </div>
       </div>
     </section>

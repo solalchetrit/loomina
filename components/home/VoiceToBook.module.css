@@ -1,0 +1,255 @@
+/* Le module du haut de page : l'appel, la page qui s'écrit, le livre refermé puis debout.
+   Les tailles de la scène sont en cqw : tout suit la largeur du module. */
+
+.stage {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 28px;
+  overflow: hidden;
+  container-type: size;
+  background: #cdb19e; /* le fond du studio des photos */
+  box-shadow: 0 40px 80px -40px rgba(22, 22, 22, 0.34);
+}
+
+/* L'appel : un voile sombre posé sur les photos du livre */
+.call {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  padding: 6cqw;
+  background: var(--ink);
+  color: #fff;
+  transition: opacity 0.8s var(--ease-out), transform 1s var(--ease-out);
+}
+.stage:not([data-act="1"]) .call {
+  opacity: 0;
+  transform: translateY(-4%);
+  pointer-events: none;
+}
+.callTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: max(14px, 3.3cqw);
+  font-weight: 700;
+}
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65em;
+}
+.dot {
+  width: 0.62em;
+  height: 0.62em;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  50% { opacity: 0.35; }
+}
+.timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #cfcfc8;
+}
+.said {
+  margin: auto 0;
+  font-size: 6.5cqw;
+  font-weight: 600;
+  line-height: 1.32;
+  letter-spacing: -0.022em;
+}
+.said span {
+  opacity: 0.16;
+  transition: opacity 0.4s;
+}
+.stage[data-act="1"] .said span {
+  animation: say 0.4s ease-out forwards;
+  animation-delay: calc(0.5s + var(--w) * 250ms);
+}
+@keyframes say {
+  to { opacity: 1; }
+}
+.wave {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 11cqw;
+}
+.wave b {
+  width: 1cqw;
+  height: 18%;
+  border-radius: 1cqw;
+  background: var(--amber);
+  animation: wave 1.1s ease-in-out infinite;
+}
+@keyframes wave {
+  50% { height: 100%; }
+}
+
+/* Le livre, en photos : ouvert, refermé, puis debout */
+.open,
+.shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.shot {
+  object-fit: cover;
+}
+.open {
+  transform-origin: 52% 46%;
+  transition: transform 0s 0.9s;
+}
+.stage[data-act="2"] .open {
+  transform: scale(1.05);
+  transition: transform 7.5s linear;
+}
+.stage[data-act="3"] .open {
+  transform: scale(1.05);
+  transition: none;
+}
+.closed,
+.standing {
+  opacity: 0;
+  transition: opacity 0s 0.9s, transform 0s 0.9s;
+}
+.stage[data-act="3"] .closed {
+  opacity: 1;
+  transition: opacity 1.5s ease-in-out 0.15s;
+}
+.standing {
+  transform: scale(1.07);
+}
+.stage[data-act="3"] .standing {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 1.1s ease-in-out 2.6s, transform 7s var(--ease-out) 2.6s;
+}
+
+/* Le texte qui s'écrit sur la page de droite, dans la mise en page du livre imprimé */
+.ink {
+  position: absolute;
+  left: 24%;
+  right: 20%;
+  top: 23%;
+  bottom: 14%;
+  display: flex;
+  flex-direction: column;
+  color: #1d1b19;
+  mix-blend-mode: multiply;
+  font-family: "Times New Roman", Times, "Liberation Serif", "Nimbus Roman", serif;
+  font-size: 2.6cqw;
+  line-height: 1.27;
+}
+.ink p {
+  margin: 0;
+}
+.chapter {
+  text-align: center;
+}
+.title {
+  margin-top: 1.3cqw !important;
+  text-align: center;
+  font-style: italic;
+  font-size: 1.06em;
+}
+.par {
+  margin-top: 2.1cqw !important;
+  text-align: justify;
+  hyphens: auto;
+}
+.title + .par {
+  margin-top: 5.2cqw !important;
+}
+.sub {
+  margin-top: 2.9cqw !important;
+  font-weight: 700;
+}
+.pageNumber {
+  margin-top: auto !important;
+  text-align: right;
+  font-size: 0.86em;
+}
+.w {
+  opacity: 0;
+}
+.stage[data-act="2"] .w {
+  animation: write 0.5s ease-out forwards;
+  animation-delay: calc(0.9s + var(--w) * 46ms);
+}
+.stage[data-act="3"] .w {
+  opacity: 1;
+}
+@keyframes write {
+  to { opacity: 1; }
+}
+
+/* Les trois temps, sous la scène */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+.step {
+  min-width: 0;
+  padding: 0 0 4px;
+  text-align: left;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.bar {
+  display: block;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+.bar::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--ink);
+}
+.step[data-state="done"] .bar::after {
+  width: 100%;
+}
+.step[data-state="on"] .bar::after {
+  animation: fill var(--dur) linear forwards;
+}
+@keyframes fill {
+  to { width: 100%; }
+}
+.label {
+  display: block;
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  transition: color 0.3s;
+}
+.step[data-state="on"] .label,
+.step:hover .label {
+  color: var(--ink);
+}
+
+/* « Réduire les animations » : la scène reste sur le livre fini. */
+@media (prefers-reduced-motion: reduce) {
+  .stage *,
+  .steps * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .said span,
+  .w {
+    opacity: 1;
+  }
+}
