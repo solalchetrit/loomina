@@ -19,12 +19,8 @@
   display: flex;
   flex-direction: column;
   padding: 6cqw;
-  background:
-    radial-gradient(85% 60% at 10% 0%, rgba(140, 170, 240, 0.22), transparent 62%),
-    radial-gradient(70% 45% at 100% 100%, color-mix(in srgb, var(--amber) 9%, transparent), transparent 70%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 40%, rgba(8, 12, 26, 0.3) 100%),
-    var(--ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 55%), var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   color: #fff;
   transition: opacity 0.8s var(--ease-out), transform 1s var(--ease-out);
 }
