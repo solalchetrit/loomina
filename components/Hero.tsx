@@ -4,6 +4,7 @@ import { OFFER } from "@/config/offer";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import VoiceToBook from "@/components/home/VoiceToBook";
+import ScrollCue from "@/components/home/ScrollCue";
 
 /** Les trois garanties, sous les boutons et la ligne de la démo : un titre court, puis la précision. */
 const REASSURANCE: { title: string; detail: string; href?: string }[] = [
@@ -72,16 +73,7 @@ export default function Hero() {
         </div>
       </div>
       {/* Le haut de page occupe tout l'écran : cette invitation, en bas au milieu, donne la suite. */}
-      <a
-        href="#parcours"
-        className="rise mx-auto mt-6 hidden items-center gap-2.5 rounded-full px-4 py-2 text-[15px] font-bold text-[var(--ink)] lg:flex"
-        style={{ "--i": 5 } as CSSProperties}
-      >
-        Comment ça marche
-        <span className="scroll-cue flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] bg-white">
-          <Icon name="arrow" size={16} className="rotate-90" />
-        </span>
-      </a>
+      <ScrollCue target="parcours" label="Comment ça marche" style={{ "--i": 5 } as CSSProperties} />
     </section>
   );
 }

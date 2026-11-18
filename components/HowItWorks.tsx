@@ -71,7 +71,7 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
 
 export default function HowItWorks() {
   return (
-    <Section id="parcours" className="!scroll-mt-[-4rem] md:!scroll-mt-[-5.5rem]">
+    <Section id="parcours">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <SectionHead title="Trois étapes, et rien à écrire" text="Pas d’application, rien à installer. Un téléphone suffit." />
         <Link href="/experience" className="link shrink-0 text-[16px]">
