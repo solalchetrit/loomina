@@ -266,3 +266,92 @@ function fileName(title: string): string {
     const base = title.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
     return `Loomina - ${base || 'recit'}`;
 }
+
+/**
+ * Délai minimal, depuis l'appel, avant chaque nouvel essai d'un récit en échec.
+ * Cinq essais en douze heures : de quoi laisser le temps de recharger les
+ * crédits OpenAI, sans réécrire en boucle un transcript qui ne passe pas.
+ */
+export const DEMO_RETRY_AFTER_MIN = [5, 30, 120, 360, 720];
+/** Au-delà, un SMS « votre récit est écrit » n'a plus de sens : on n'essaie plus. */
+const DEMO_RETRY_WINDOW_H = 24;
+/** Un récit encore « pending » après ce délai : le traitement d'après l'appel a été interrompu. */
+const DEMO_STUCK_MIN = 10;
+
+/** Le nombre d'essais déjà faits, lu dans `error` (« essai 2 : … »). */
+export function demoAttempts(error: string | null | undefined): number {
+    const m = /^essai (\d+) :/.exec(error ?? '');
+    return m ? Number(m[1]) : error ? 1 : 0;
+}
+
+/** Ce récit en échec peut-il être retenté maintenant ? */
+export function demoRetryDue(row: { error: string | null; created_at: string }, now = Date.now()): boolean {
+    const done = demoAttempts(row.error);
+    if (done >= DEMO_RETRY_AFTER_MIN.length) return false;
+    const ageMin = (now - new Date(row.created_at).getTime()) / 60_000;
+    return ageMin >= DEMO_RETRY_AFTER_MIN[done] && ageMin <= DEMO_RETRY_WINDOW_H * 60;
+}
+
+/**
+ * Le rattrapage des démos, appelé par /api/jobs/process (toutes les 5 minutes
+ * par le serveur vocal) :
+ *  - un récit en échec (OpenAI à sec, coupure) est réécrit, avec un délai croissant ;
+ *  - un récit resté « pending » (traitement interrompu) est repris ;
+ *  - un récit écrit dont le SMS n'est pas parti : le SMS est renvoyé une fois.
+ * Chaque ligne est d'abord réservée par une mise à jour conditionnelle, pour
+ * qu'un double passage (serveur vocal et cron Vercel) n'envoie jamais deux SMS.
+ * Ne lève jamais.
+ */
+export async function sweepDemoStories(limit = 5): Promise<{ retried: number; sms: number; results: string[] }> {
+    const out = { retried: 0, sms: 0, results: [] as string[] };
+    try {
+        const since = new Date(Date.now() - DEMO_RETRY_WINDOW_H * 3_600_000).toISOString();
+        const stuckBefore = new Date(Date.now() - DEMO_STUCK_MIN * 60_000).toISOString();
+        const { data, error } = await db()
+            .from('demo_stories')
+            .select('id, token, phone, status, error, sms_sent_at, created_at')
+            .gte('created_at', since)
+            .or(`status.eq.failed,and(status.eq.pending,created_at.lt."${stuckBefore}"),and(status.eq.written,sms_sent_at.is.null)`)
+            .order('created_at', { ascending: true })
+            .limit(20);
+        if (error) throw new Error(error.message);
+
+        for (const row of data ?? []) {
+            if (out.retried + out.sms >= limit) break;
+            const id = row.id as string;
+            const err = (row.error as string | null) ?? null;
+
+            if (row.status === 'written') {
+                // SMS jamais parti : un seul renvoi, marqué dans `error`.
+                if (err === 'sms renvoyé') continue;
+                let smsClaim = db().from('demo_stories').update({ error: 'sms renvoyé' }).eq('id', id).is('sms_sent_at', null);
+                smsClaim = err === null ? smsClaim.is('error', null) : smsClaim.eq('error', err);
+                const { data: claimed } = await smsClaim.select('id');
+                if (!claimed?.length) continue;
+                const sent = await sendSms(row.phone as string, demoSmsText(row.token as string));
+                if (sent) await db().from('demo_stories').update({ sms_sent_at: new Date().toISOString() }).eq('id', id);
+                out.sms++;
+                out.results.push(`${id} : SMS ${sent ? 'renvoyé' : 'toujours en échec'}`);
+                continue;
+            }
+
+            if (row.status === 'failed' && !demoRetryDue({ error: err, created_at: row.created_at as string })) continue;
+            const attempt = demoAttempts(err) + 1;
+            // Réservation : repasse en « pending » seulement si personne ne l'a pris entre-temps.
+            let claim = db().from('demo_stories').update({ status: 'pending', error: `essai ${attempt} : reprise` }).eq('id', id).eq('status', row.status as string);
+            claim = err === null ? claim.is('error', null) : claim.eq('error', err);
+            const { data: claimed } = await claim.select('id');
+            if (!claimed?.length) continue;
+
+            const outcome = await processDemoStory(id);
+            if (outcome.startsWith('échec : ')) {
+                await db().from('demo_stories').update({ error: `essai ${attempt} : ${outcome.slice(8)}`.slice(0, 500) }).eq('id', id);
+            }
+            out.retried++;
+            out.results.push(`${id} : essai ${attempt}, ${outcome}`);
+        }
+    } catch (err) {
+        console.error('[demo] rattrapage :', err instanceof Error ? err.message : String(err));
+    }
+    return out;
+}

@@ -250,3 +250,17 @@ test('panier abandonné : le message donne le lien de reprise et ne promet qu’
     assert.match(t.sms, /le livre de Jeanne/);
     assert.match(abandonedCartTexts({ email: 'a@b.fr', phone: null, firstName: null, isGift: false, narratorFirstName: null, recoveryUrl: null }).email, /loomina\.eu\/order/);
 });
+
+test('démo : un récit en échec est retenté avec un délai croissant, cinq fois au plus, sur 24 h', async () => {
+    const { demoAttempts, demoRetryDue } = await import('../../lib/loomina/demo-story');
+    const at = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
+    assert.equal(demoAttempts(null), 0);
+    assert.equal(demoAttempts('429 You have no credits remaining'), 1);
+    assert.equal(demoAttempts('essai 3 : 429'), 3);
+    assert.equal(demoRetryDue({ error: '429', created_at: at(2) }), false); // trop tôt
+    assert.equal(demoRetryDue({ error: '429', created_at: at(31) }), true); // 2e essai après 30 min
+    assert.equal(demoRetryDue({ error: 'essai 2 : 429', created_at: at(60) }), false); // 3e essai après 2 h
+    assert.equal(demoRetryDue({ error: 'essai 2 : 429', created_at: at(125) }), true);
+    assert.equal(demoRetryDue({ error: 'essai 5 : 429', created_at: at(800) }), false); // plus d'essai
+    assert.equal(demoRetryDue({ error: 'essai 4 : 429', created_at: at(25 * 60) }), false); // plus de 24 h
+});

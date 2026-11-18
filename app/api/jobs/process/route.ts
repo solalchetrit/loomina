@@ -23,6 +23,7 @@ import { sweepPending } from '@/lib/loomina/events';
 import { sweepCorrections } from '@/lib/loomina/corrections';
 import { sweepReviews, sweepRelanceAlerts } from '@/lib/admin/watch';
 import { checkSharedSecret } from '@/lib/loomina/secret';
+import { sweepDemoStories } from '@/lib/loomina/demo-story';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -64,6 +65,10 @@ async function handle(request: NextRequest) {
         const corrections = await sweepCorrections();
         if (corrections.applied || corrections.failed) console.info('[jobs] remarques d’auteur :', corrections);
 
+        // Les récits de démo en échec (OpenAI à sec…) ou dont le SMS n'est pas parti.
+        const demos = await sweepDemoStories();
+        if (demos.retried || demos.sms) console.info('[jobs] récits de démo :', demos.results);
+
         // La veille de l'admin : clients à relancer signalés, avis de l'IA sur
         // un livre qui vient d'être terminé.
         const watch = { relances: await sweepRelanceAlerts(), reviews: await sweepReviews() };
@@ -74,6 +79,7 @@ async function handle(request: NextRequest) {
             picked,
             results,
             corrections,
+            demos,
             watch,
             durationMs: Date.now() - startedAt,
         });
