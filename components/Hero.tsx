@@ -45,7 +45,7 @@ export default function Hero() {
             <a href={`tel:${SITE.phone}`} className="link whitespace-nowrap">
               {SITE.phoneDisplay}
             </a>
-            , rien n’est enregistré.
+             : vous recevez votre récit écrit par SMS.
           </p>
           </div>
           <ul

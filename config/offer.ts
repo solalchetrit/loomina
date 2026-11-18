@@ -13,7 +13,7 @@ export const OFFER = {
   delay: "6 à 8 semaines",
   /** Impression et acheminement une fois le livre validé. */
   printDelay: "2 à 3 semaines",
-  demoMinutes: 3,
+  demoMinutes: 5,
   /** Thèmes proposés au fil des appels, de l'enfance à aujourd'hui. */
   chapters: 14,
   format: "15 × 23 cm, couverture rigide",
@@ -23,6 +23,18 @@ export const OFFER = {
   guaranteeDays: 7,
   /** Droit de rétractation légal. */
   withdrawalDays: 14,
+};
+
+/**
+ * La réduction offerte dans l'e-mail du récit de démonstration : un code
+ * personnel, utilisable une fois, créé dans Stripe sur ce coupon.
+ * Le coupon est créé une fois dans Stripe avec cet identifiant.
+ */
+export const DEMO_PROMO = {
+  couponId: "loomina-recit-demo-10",
+  /** Réduction en pourcentage (Solal, 18/11/2026 : 10 %). */
+  percentOff: 10,
+  days: 14,
 };
 
 /** Ce qui est inclus, dans l'ordre où le client le vit. */

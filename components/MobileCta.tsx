@@ -9,7 +9,7 @@ import { SITE } from "@/config/site";
 export default function MobileCta() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
-  const hidden = pathname.startsWith("/order") || pathname.startsWith("/dashboard");
+  const hidden = pathname.startsWith("/order") || pathname.startsWith("/dashboard") || pathname.startsWith("/recit");
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 480);

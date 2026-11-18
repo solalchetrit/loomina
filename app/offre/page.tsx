@@ -119,7 +119,7 @@ export default function OffrePage() {
         </div>
       </Section>
 
-      <Closing title="Pas encore sûr ? Essayez trois minutes" />
+      <Closing title={`Pas encore sûr ? Essayez ${OFFER.demoMinutes} minutes`} />
     </>
   );
 }

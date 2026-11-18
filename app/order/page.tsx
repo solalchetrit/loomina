@@ -35,6 +35,14 @@ export default function OrderPage() {
   const [checkout, setCheckout] = useState<{ clientSecret: string; publishableKey: string; installments: boolean; method: PayMethod } | null>(null);
   // Code promo appliqué : réappliqué si le client passe de la carte à Klarna (nouvelle session).
   const [promo, setPromo] = useState<string | null>(null);
+  // Code venu d'un lien (e-mail du récit de démonstration : /order?code=…), appliqué dès l'étape du paiement.
+  const [linkCode, setLinkCode] = useState<string | null>(null);
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("code")?.trim().toUpperCase();
+    if (!code || !/^[A-Z0-9-]{4,40}$/.test(code)) return;
+    const id = window.setTimeout(() => setLinkCode(code), 0);
+    return () => window.clearTimeout(id);
+  }, []);
 
   // Les boutons « Commencer mon livre » et « Offrir le livre » arrivent ici avec le choix déjà fait.
   useEffect(() => {
@@ -125,7 +133,7 @@ export default function OrderPage() {
     try {
       const data = await startCheckout("card", null, phone);
       if (data.clientSecret && data.publishableKey) {
-        setPromo(null);
+        setPromo(linkCode);
         setCheckout({ clientSecret: data.clientSecret, publishableKey: data.publishableKey, installments: Boolean(data.installments), method: "card" });
         setSubmitting(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -174,6 +182,11 @@ export default function OrderPage() {
             })}
           </ol>
 
+          {linkCode && step !== 3 && (
+            <p className="mb-4 flex items-center justify-center gap-2 rounded-[14px] bg-[var(--amber-soft)] px-4 py-3 text-center text-[15px] font-semibold text-[var(--amber-deep)]" role="status">
+              <Icon name="check" size={16} /> Votre réduction est prête : elle s’appliquera toute seule au paiement.
+            </p>
+          )}
           <div className="card card-float p-5 sm:p-8">
             <h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[30px]">{title}</h1>
 

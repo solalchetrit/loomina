@@ -15,6 +15,7 @@ import type { CallPlan } from './plan.ts';
 import { buildEndOfCallReport, deliverReport } from './report.ts';
 import type { TurnRecord } from './report.ts';
 import { timeNote } from '../../lib/loomina/call-length';
+import { demoTimeNote } from '../../lib/loomina/assistant';
 
 const END_MARKER = '##END_CALL##';
 
@@ -115,7 +116,10 @@ export class CallSession {
         this.warmUp();
         this.maxTimer = setTimeout(() => {
             console.info(`[${this.callSid}] durée maximale atteinte`);
-            void this.sayAndEnd("Nous avons bien travaillé aujourd'hui. Reprenons la prochaine fois. À bientôt !", 'max-duration');
+            const goodbye = this.plan.demo
+                ? "Je dois vous laisser, merci pour ce beau moment. Tout est expliqué sur loomina point e u. À bientôt !"
+                : "Nous avons bien travaillé aujourd'hui. Reprenons la prochaine fois. À bientôt !";
+            void this.sayAndEnd(goodbye, 'max-duration');
         }, this.plan.maxSeconds * 1000);
     }
 
@@ -211,8 +215,10 @@ export class CallSession {
             `(max ${this.replyDelaysMs.length ? Math.max(...this.replyDelaysMs) : 0} ms), ${this.interruptions} interruption(s)`
         );
 
-        if (this.plan.demo) {
-            console.info(`[${this.callSid}] démo : rien n'est conservé`);
+        // Démonstration : le transcript part au site, qui écrit le récit et
+        // l'envoie par SMS. Sans portable, ou sans échange, rien n'est envoyé.
+        if (this.plan.demo && (this.plan.metadata.can_text !== true || !this.turns.some((t) => t.role === 'user'))) {
+            console.info(`[${this.callSid}] démo sans envoi possible : rien n'est conservé`);
             return;
         }
 
@@ -419,7 +425,9 @@ export class CallSession {
         const messages: ChatMessage[] = [{ role: 'system', content: this.plan.systemPrompt }, ...history];
         // Le modèle ne voit pas l'heure. La note va en dernier : le début de
         // la conversation reste identique d'une réplique à l'autre (cache).
-        if (this.plan.targetMinutes) {
+        if (this.plan.demo) {
+            messages.push({ role: 'system', content: demoTimeNote((Date.now() - this.startedAt.getTime()) / 1000) });
+        } else if (this.plan.targetMinutes) {
             const elapsed = (Date.now() - this.startedAt.getTime()) / 1000;
             messages.push({ role: 'system', content: timeNote(elapsed, this.plan.targetMinutes) });
         }

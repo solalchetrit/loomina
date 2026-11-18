@@ -28,7 +28,8 @@ import { NextRequest, NextResponse, after } from 'next/server';
 
 import { findProfileByPhone, findActiveProject, getSystemPrompt, db, maskPhone } from '@/lib/loomina/db';
 import { toPhase } from '@/lib/loomina/phases';
-import { buildAssistant, buildUnknownCallerAssistant, buildRecoveryAssistant } from '@/lib/loomina/assistant';
+import { buildAssistant, buildUnknownCallerAssistant, buildRecoveryAssistant, canReceiveSms } from '@/lib/loomina/assistant';
+import { recordDemoCall, processDemoStory, purgeOldDemoStories } from '@/lib/loomina/demo-story';
 import { extractCallData } from '@/lib/loomina/pipeline';
 import type { VapiMessage } from '@/lib/loomina/pipeline';
 import { recordEvent, processEvent } from '@/lib/loomina/events';
@@ -207,13 +208,12 @@ async function handleEndOfCall(
 ) {
     const data = extractCallData(message);
 
-    // Démonstration pour appelant inconnu : promesse « rien n'est
-    // enregistré ». L'assistant n'envoie normalement pas de rapport, mais
-    // si Vapi en envoie un, on ne l'archive pas.
+    // Démonstration pour appelant inconnu : on écrit le récit et on
+    // l'envoie par SMS (lib/loomina/demo-story.ts). Jamais dans call_events
+    // ni dans un livre : la personne n'est pas cliente.
     const metadata = message.call?.metadata ?? message.metadata ?? {};
     if (metadata.demo === true) {
-        console.info('[vapi] end-of-call d\'une démo ignoré (rien n\'est conservé)');
-        return NextResponse.json({ received: true, demo: true, stored: false });
+        return handleDemoEnd(data);
     }
 
     const { id: eventId, alreadySeen } = await recordEvent({
@@ -249,6 +249,21 @@ async function handleEndOfCall(
     );
 
     return NextResponse.json({ received: true, eventId });
+}
+
+async function handleDemoEnd(data: ReturnType<typeof extractCallData>) {
+    if (!data.vapiCallId || !data.phone || !data.transcript || !canReceiveSms(data.phone)) {
+        console.info('[vapi] démo sans récit possible (pas de portable ou pas de transcript)');
+        return NextResponse.json({ received: true, demo: true, stored: false });
+    }
+    const id = await recordDemoCall({ callId: data.vapiCallId, phone: data.phone, transcript: data.transcript, durationSeconds: data.durationSeconds });
+    if (!id) return NextResponse.json({ received: true, demo: true, duplicate: true });
+    after(async () => {
+        const outcome = await processDemoStory(id);
+        console.info(`[vapi] récit de démo ${id} : ${outcome}`);
+        await purgeOldDemoStories();
+    });
+    return NextResponse.json({ received: true, demo: true, id });
 }
 
 // ------------------------------------------------------------

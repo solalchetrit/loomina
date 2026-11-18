@@ -9,7 +9,7 @@
 import type { Phase } from '@/lib/loomina/phases';
 import { PHASE_LABELS } from '@/lib/loomina/phases';
 import type { Profile, Project } from '@/lib/loomina/db';
-import { buildAssistant, DEMO_SYSTEM, RECOVERY_SYSTEM, ONE_QUESTION_REMINDER } from '@/lib/loomina/assistant';
+import { buildAssistant, DEMO_SYSTEM, RECOVERY_SYSTEM, ONE_QUESTION_REMINDER, demoFirstMessage, demoNumberBlock, demoTimeNote } from '@/lib/loomina/assistant';
 import { voicePromptTemplate, VOICE_INTRO, VOICE_SPEAK, PHASE_OBJECTIVES } from '@/lib/loomina/voice-prompt';
 import { REVIEW_SYSTEM } from '@/lib/loomina/book-review';
 import { directorSystemPrompt, DIRECTOR_MODEL, DIRECTOR_FALLBACK_MODEL } from '@/lib/loomina/director';
@@ -134,14 +134,19 @@ export function aiCatalog(): Ai[] {
         {
             key: 'demo',
             name: 'La démonstration',
-            role: "Répond à un numéro inconnu : trois minutes sur un souvenir, puis explique comment commander. Rien n'est enregistré.",
+            role: "Répond à un numéro inconnu : se présente, puis recueille en cinq minutes de quoi écrire le récit d'une période de sa vie (l'enfance par défaut). Le récit part ensuite par SMS.",
             model: `${voiceModel} (OpenAI), même chaîne que la voix.`,
             where: 'Serveur vocal (Render)',
             when: "Quand le numéro qui appelle n'est celui d'aucun client (ou d'un client sans livre en cours).",
             reads: 'Rien.',
-            writes: 'Rien : pas de rapport, pas de transcript.',
-            file: 'lib/loomina/assistant.ts (DEMO_SYSTEM)',
-            prompts: [{ title: 'Prompt de la démonstration', text: promptText('demo', DEMO_SYSTEM) }],
+            writes: "Le transcript (jamais l'audio) part au site, dans demo_stories, effacé après 30 jours. L'Écrivain en tire le récit, envoyé par SMS avec un lien ; sur la page du lien, l'e-mail donne le PDF.",
+            file: 'lib/loomina/assistant.ts (DEMO_SYSTEM), lib/loomina/demo-story.ts',
+            prompts: [
+                { title: 'Prompt de la démonstration', text: promptText('demo', DEMO_SYSTEM) },
+                { title: 'Première phrase (portable, puis fixe ou numéro masqué)', text: `${demoFirstMessage(true)}\n\n---\n\n${demoFirstMessage(false)}` },
+                { title: 'Ajouté selon le numéro (portable, puis fixe)', text: `${demoNumberBlock(true)}\n\n---\n\n${demoNumberBlock(false)}` },
+                { title: 'Note de temps ajoutée à chaque réplique (à 2, 4 et 5 min)', text: [120, 240, 300].map(demoTimeNote).join('\n\n---\n\n') },
+            ],
         },
         {
             key: 'directeur',

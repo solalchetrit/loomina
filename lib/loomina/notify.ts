@@ -53,7 +53,15 @@ export function mailConfigured(): boolean {
 }
 
 /** Un e-mail simple : le texte, tel quel, dans une mise en page sobre. */
-export async function sendEmail(params: { to: string; subject: string; text: string; replyTo?: string }): Promise<boolean> {
+export async function sendEmail(params: {
+    to: string;
+    subject: string;
+    text: string;
+    replyTo?: string;
+    attachments?: { filename: string; content: Buffer; contentType: string }[];
+    /** Une mise en page HTML à la place de celle tirée du texte (le texte reste la version brute). */
+    html?: string;
+}): Promise<boolean> {
     const smtp = smtpConfig();
     if (!smtp) {
         console.warn(`[mail] SMTP_PASS manquante : e-mail « ${params.subject} » non envoyé`);
@@ -61,6 +69,7 @@ export async function sendEmail(params: { to: string; subject: string; text: str
     }
     const from = process.env.LOOMINA_MAIL_FROM?.trim() || `Loomina <${smtp.user}>`;
     const html =
+        params.html ??
         '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#161616;max-width:560px">' +
         params.text
             .split(/\n{2,}/)
@@ -86,6 +95,7 @@ export async function sendEmail(params: { to: string; subject: string; text: str
             text: params.text,
             html,
             ...(params.replyTo ? { replyTo: params.replyTo } : {}),
+            ...(params.attachments?.length ? { attachments: params.attachments } : {}),
         };
         const info = await transporter.sendMail(message);
         // Une copie dans « Envoyés », pour retrouver dans la boîte (et dans l'admin,
