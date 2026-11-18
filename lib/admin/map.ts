@@ -119,7 +119,7 @@ export const MAP_GROUPS: MapGroup[] = [
         label: 'Commander',
         about: 'Du bouton « Commander » au compte créé.',
         nodes: [
-            { id: 'c-qui', label: 'Pour qui ?', kind: 'q', d: '« C’est pour moi » ou « C’est pour offrir ».', code: 'app/order/page.tsx' },
+            { id: 'c-qui', label: 'Pour qui ?', kind: 'q', d: 'Deux cartes avec photo : « Pour moi » ou « Pour offrir ». Une fois le choix fait, les photos se réduisent et l’autre carte passe en grisé.', code: 'app/order/page.tsx' },
             { id: 'c-coord', label: 'Coordonnées du narrateur', d: 'Prénom, nom, téléphone, e-mail. Le téléphone est celui qui le fera reconnaître quand il appellera.' },
             { id: 'c-duree', label: 'Durée des appels', d: `${minutes} min. Modifiable plus tard.` },
             { id: 'c-verif', label: 'Formulaire vérifié', d: 'Champs remplis, numéro plausible, e-mail valide. Sinon, un message sous le champ.' },
