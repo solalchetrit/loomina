@@ -22,6 +22,8 @@ export const COSTS = {
     defaultWritingModel: 'gpt-5.5',
     /** Twilio ConversationRelay (écoute + voix de synthèse), par minute d'appel. */
     conversationRelayPerMinute: 0.07,
+    /** Enregistrement audio de l'appel chez Twilio, par minute entamée (0,005 $ constaté pour 97 s le 18/11/2026). */
+    recordingPerMinute: 0.0025,
     /** Repli si Twilio ne donne pas le prix de la ligne : par minute. */
     lineFallbackPerMinute: 0.01,
     /**
