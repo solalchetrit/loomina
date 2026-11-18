@@ -24,7 +24,7 @@ import { WRITER_SYSTEM, WRITER_MODEL, WRITER_REASONING_EFFORT, WRITER_MAX_TOKENS
 import { tokenUsage } from './usage';
 import { buildRecitPdf } from './recit-pdf';
 import { SITE } from '../../config/site';
-import { OFFER, DEMO_PROMO } from '../../config/offer';
+import { DEMO_PROMO } from '../../config/offer';
 import { stripe } from '../stripe';
 
 /** Durée de conservation d'un récit de démonstration. */
@@ -219,31 +219,24 @@ function esc(s: string): string {
 export function demoEmail(params: { firstName: string | null; title: string; promo: { code: string; expires: Date } | null }) {
     const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
     const orderUrl = `https://${HOST}/order${params.promo ? `?code=${params.promo.code}` : ''}`;
-    const price = params.promo ? Math.round(OFFER.price * (100 - DEMO_PROMO.percentOff)) / 100 : OFFER.price;
-    const euros = (n: number) => `${n.toLocaleString('fr-FR', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })} €`;
     const until = params.promo?.expires.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
     const intro = [
         hello,
         `Voici votre récit, « ${params.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page comme il le serait dans votre livre.`,
         `Ce n’était qu’un moment de votre vie. Imaginez-les tous réunis, appel après appel, dans un livre relié à garder et à transmettre.`,
     ];
-    const ctaTitle = 'Vous souhaitez écrire votre livre ?';
-    const ctaText = params.promo
-        ? `Votre réduction de ${DEMO_PROMO.percentOff} % est déjà appliquée sur ce lien : le livre tout compris à ${euros(price)} au lieu de ${euros(OFFER.price)}, jusqu’au ${until}.`
-        : `Tout est compris : les appels, les récits à relire, et le livre relié livré chez vous, pour ${OFFER.price} €.`;
-    const button = `Écrire mon livre · ${euros(price)}`;
+    // Demande de Solal : un simple bouton, la réduction en pourcentage, jamais le prix réduit.
+    const promoLine = params.promo ? `Votre réduction de ${DEMO_PROMO.percentOff} % est déjà appliquée sur ce lien, jusqu’au ${until}.` : null;
+    const button = 'Écrire mon livre';
     const outro = ['Pour nous poser une question, répondez simplement à cet e-mail.', 'À très bientôt,\nLoomina'];
 
-    const text = [...intro, `${ctaTitle}\n${ctaText}\n${button} : ${orderUrl}`, ...outro].join('\n\n');
+    const text = [...intro, ...(promoLine ? [promoLine] : []), `${button} : ${orderUrl}`, ...outro].join('\n\n');
     const p = (t: string) => `<p style="margin:0 0 16px">${esc(t).replace(/\n/g, '<br>')}</p>`;
     const html =
         '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#161616;max-width:560px">' +
         intro.map(p).join('') +
-        '<div style="margin:28px 0;padding:24px;border-radius:18px;background:#161616;color:#ffffff">' +
-        `<p style="margin:0 0 8px;font-size:21px;font-weight:800;line-height:1.25">${esc(ctaTitle)}</p>` +
-        `<p style="margin:0 0 20px;color:#dcdcd4">${esc(ctaText)}</p>` +
-        `<a href="${esc(orderUrl)}" style="display:inline-block;padding:14px 26px;border-radius:999px;background:#ee9b2d;color:#161616;font-weight:800;text-decoration:none">${esc(button)}</a>` +
-        '</div>' +
+        (promoLine ? p(promoLine) : '') +
+        `<p style="margin:8px 0 28px"><a href="${esc(orderUrl)}" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#161616;color:#ffffff;font-weight:800;text-decoration:none">${esc(button)}</a></p>` +
         outro.map(p).join('') +
         '</div>';
     return { text, html, orderUrl };
