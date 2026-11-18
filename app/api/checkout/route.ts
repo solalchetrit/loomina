@@ -17,8 +17,9 @@ export async function POST(request: NextRequest) {
         // Utilise l'URL de base de la requête ou une variable d'environnement
         const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-        // Paiement intégré au site (demande de Solal, 18/11/2026) : le formulaire
-        // Stripe s'affiche dans la page de commande au lieu d'une page externe.
+        // Paiement intégré au site (demande de Solal, 18/11/2026) : la page de
+        // commande dessine elle-même le récapitulatif, le code promo et le bouton ;
+        // Stripe ne fournit que le champ carte (ui_mode « custom », sans Link).
         // Il lui faut la clé publiable (pk_live_…, sans danger côté navigateur),
         // lue ici à l'exécution. Sans elle, on garde la page Stripe externe.
         const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY?.trim() || "";
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
         // Create Checkout Session
         const session = await stripe().checkout.sessions.create({
             ...(embedded
-                ? { ui_mode: "embedded" as const, return_url: welcomeUrl }
+                ? { ui_mode: "custom" as const, return_url: welcomeUrl }
                 : { success_url: welcomeUrl, cancel_url: `${origin}/order` }),
             payment_method_types: ["card"],
             line_items: [
@@ -51,8 +52,10 @@ export async function POST(request: NextRequest) {
             // Stripe nous prévient alors (checkout.session.expired) et fournit un lien
             // qui rouvre la commande telle quelle : on l'envoie une fois, par e-mail
             // et par SMS (voir app/api/webhook/stripe).
+            // En mode intégré, Stripe ne fournit pas de lien de reprise : la relance
+            // renvoie alors vers la page de commande du site.
             expires_at: Math.floor(Date.now() / 1000) + 2 * 60 * 60,
-            after_expiration: { recovery: { enabled: true, allow_promotion_codes: true } },
+            ...(embedded ? {} : { after_expiration: { recovery: { enabled: true, allow_promotion_codes: true } } }),
             // Permet les codes promo (dont un code 100 % réservé aux tests du parcours complet)
             allow_promotion_codes: true,
             customer_email: email, // Pré-remplit l'email dans Stripe
