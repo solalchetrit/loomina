@@ -12,7 +12,7 @@ import OfferCard from "@/components/OfferCard";
 import Closing from "@/components/Closing";
 import Accordion from "@/components/ui/Accordion";
 import { Section, SectionHead } from "@/components/ui/Section";
-import { GUARANTEE } from "@/config/offer";
+import { GUARANTEE, OFFER } from "@/config/offer";
 import Photo from "@/components/ui/Photo";
 
 const QUESTIONS = [
@@ -31,6 +31,10 @@ const QUESTIONS = [
   {
     q: "Je veux l’offrir. Comment ça se passe ?",
     a: "À la commande, indiquez le prénom et le numéro de la personne qui racontera. C’est elle qui appellera Loomina, depuis ce numéro, quand elle le souhaite.",
+  },
+  {
+    q: "Combien de temps faut-il pour avoir le livre ?",
+    a: `En général ${OFFER.delay} entre le premier appel et le livre validé, à votre rythme. Comptez ensuite ${OFFER.printDelay} pour l’impression et l’acheminement.`,
   },
   { q: "Et si ça ne me plaît pas ?", a: GUARANTEE },
 ];
@@ -96,7 +100,7 @@ export default function Home() {
       </Section>
 
       <Section id="questions">
-        <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+        <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
           <div>
           <SectionHead
             title="Vos questions"

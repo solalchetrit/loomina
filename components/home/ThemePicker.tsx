@@ -4,7 +4,7 @@ import { useState } from "react";
 import { OFFER, THEMES } from "@/config/offer";
 
 /** La première question que Loomina pourrait poser pour chaque thème. Des exemples, pas un script figé. */
-const QUESTIONS: Record<string, string> = {
+export const QUESTIONS: Record<string, string> = {
   "L’enfance": "Quelle est la première maison dont vous vous souvenez ? Qu’est-ce qu’on voyait en ouvrant la porte ?",
   "L’adolescence": "Qui était votre meilleur ami à quinze ans, et qu’est-ce que vous faisiez ensemble ?",
   "Les premiers amours": "Vous souvenez-vous du jour où vous avez compris que vous étiez amoureux ?",

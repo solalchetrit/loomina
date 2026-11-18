@@ -11,7 +11,16 @@ import { SITE } from "@/config/site";
  * L'espace auteur, montré tel qu'il est : de vraies captures de l'espace,
  * prises sur le livre d'exemple de Jeanne (personne fictive, présentée comme telle).
  */
-const FEATURES: { id: string; icon: IconName; title: string; text: string; image: string; alt: string; w: number; h: number }[] = [
+const FEATURES: {
+  id: string;
+  icon: IconName;
+  title: string;
+  text: string;
+  image: string;
+  alt: string;
+  w: number;
+  h: number;
+}[] = [
   {
     id: "chapitre",
     icon: "book",
@@ -54,7 +63,13 @@ const FEATURES: { id: string; icon: IconName; title: string; text: string; image
   },
 ];
 
-export default function AuthorShowcase({ id = "espace-auteur", className = "" }: { id?: string; className?: string }) {
+export default function AuthorShowcase({
+  id = "espace-auteur",
+  className = "",
+}: {
+  id?: string;
+  className?: string;
+}) {
   const [active, setActive] = useState(0);
   const current = FEATURES[active];
 
@@ -66,8 +81,15 @@ export default function AuthorShowcase({ id = "espace-auteur", className = "" }:
         text="Après chaque appel, vous retrouvez votre livre en ligne. Vous lisez, vous corrigez, vous orientez la suite. Loomina écrit, vous gardez la main."
       />
 
-      <div className="head-gap grid items-start gap-6 lg:grid-cols-[1fr_1.25fr] lg:gap-10" data-reveal>
-        <ul className="flex flex-col gap-3" role="tablist" aria-label="Ce que permet l’espace auteur">
+      <div
+        className="head-gap grid items-start gap-6 lg:grid-cols-[1fr_1.25fr] lg:gap-10"
+        data-reveal
+      >
+        <ul
+          className="flex flex-col gap-3"
+          role="tablist"
+          aria-label="Ce que permet l’espace auteur"
+        >
           {FEATURES.map((f, i) => {
             const on = i === active;
             return (
@@ -79,15 +101,25 @@ export default function AuthorShowcase({ id = "espace-auteur", className = "" }:
                   aria-controls={`${id}-apercu`}
                   onClick={() => setActive(i)}
                   className={`press flex w-full gap-4 rounded-[var(--radius-card)] border p-5 text-left transition-colors md:p-6 ${
-                    on ? "border-[var(--ink)] bg-white shadow-[var(--shadow-bar)]" : "border-[var(--line)] bg-transparent hover:border-[var(--ink-3)]"
+                    on
+                      ? "border-[var(--ink)] bg-white shadow-[var(--shadow-bar)]"
+                      : "border-[var(--line)] bg-transparent hover:border-[var(--ink-3)]"
                   }`}
                 >
-                  <span className={`chip-icon shrink-0 ${on ? "!bg-[var(--amber)] !text-[var(--ink)]" : ""}`}>
+                  <span
+                    className={`chip-icon shrink-0 ${on ? "!bg-[var(--amber)] !text-[var(--ink)]" : ""}`}
+                  >
                     <Icon name={f.icon} />
                   </span>
                   <span>
-                    <span className="block text-[18px] font-bold leading-snug text-[var(--ink)]">{f.title}</span>
-                    <span className={`mt-1.5 block text-[16px] leading-relaxed text-[var(--ink-2)] ${on ? "" : "hidden md:block"}`}>{f.text}</span>
+                    <span className="block text-[18px] font-bold leading-snug text-[var(--ink)]">
+                      {f.title}
+                    </span>
+                    <span
+                      className={`mt-1.5 block text-[16px] leading-relaxed text-[var(--ink-2)] ${on ? "" : "hidden md:block"}`}
+                    >
+                      {f.text}
+                    </span>
                   </span>
                 </button>
                 {/* Sur téléphone, la capture s'affiche sous l'onglet ouvert. */}
@@ -101,14 +133,24 @@ export default function AuthorShowcase({ id = "espace-auteur", className = "" }:
           })}
         </ul>
 
-        <div id={`${id}-apercu`} role="tabpanel" className="hidden lg:sticky lg:top-32 lg:block">
+        <div
+          id={`${id}-apercu`}
+          role="tabpanel"
+          className="hidden lg:sticky lg:top-32 lg:block"
+        >
           <Screen feature={current} />
         </div>
       </div>
 
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="t-small">Captures de l’espace auteur, sur un livre d’exemple.</p>
-        <Button href={`tel:${SITE.phone}`} variant="secondary" className="shrink-0">
+        <p className="t-small">
+          Captures de l’espace auteur, sur un livre d’exemple.
+        </p>
+        <Button
+          href={`tel:${SITE.phone}`}
+          variant="secondary"
+          className="shrink-0"
+        >
           Essayer Loomina gratuitement
         </Button>
       </div>
@@ -120,16 +162,80 @@ export default function AuthorShowcase({ id = "espace-auteur", className = "" }:
 function Screen({ feature }: { feature: (typeof FEATURES)[number] }) {
   return (
     <figure className="overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--canvas)] shadow-[var(--shadow-bar)]">
-      <div className="flex items-center gap-2 border-b border-[var(--line)] bg-white px-4 py-3" aria-hidden="true">
+      <div
+        className="flex items-center gap-2 border-b border-[var(--line)] bg-white px-4 py-3"
+        aria-hidden="true"
+      >
         <span className="h-3 w-3 rounded-full bg-[var(--line)]" />
         <span className="h-3 w-3 rounded-full bg-[var(--line)]" />
         <span className="h-3 w-3 rounded-full bg-[var(--line)]" />
-        <span className="ml-3 truncate rounded-full bg-[var(--canvas)] px-3 py-1 text-[13px] text-[var(--ink-3)]">loomina.eu/espace-auteur</span>
+        <span className="ml-3 truncate rounded-full bg-[var(--canvas)] px-3 py-1 text-[13px] text-[var(--ink-3)]">
+          loomina.eu/espace-auteur
+        </span>
       </div>
       <div className="flex max-h-[560px] items-start justify-center overflow-hidden p-4 sm:p-6">
-        <Image src={feature.image} alt={feature.alt} width={feature.w} height={feature.h} className="h-auto w-full max-w-[560px] rounded-[18px]" />
+        {feature.id === "chapitre" ? (
+          <ChapterScreen />
+        ) : (
+          <Image
+            src={feature.image}
+            alt={feature.alt}
+            width={feature.w}
+            height={feature.h}
+            className="h-auto w-full max-w-[560px] rounded-[18px]"
+          />
+        )}
       </div>
       <figcaption className="sr-only">{feature.title}</figcaption>
     </figure>
+  );
+}
+
+/** Le chapitre tel qu'on le lit dans l'espace auteur : la mise en page du livre imprimé. */
+function ChapterScreen() {
+  return (
+    <div
+      role="img"
+      aria-label={FEATURES[0].alt}
+      className="w-full max-w-[560px] rounded-[18px] bg-white px-6 pb-6 pt-9 sm:px-10"
+    >
+      <div
+        className="text-[#1d1b19]"
+        style={{
+          fontFamily: '"Times New Roman", Times, "Liberation Serif", serif',
+        }}
+        lang="fr"
+      >
+        <p className="text-center text-[16px]">Chapitre 1</p>
+        <p className="mt-1.5 text-center text-[18px] italic">
+          La maison de la rue des Tilleuls
+        </p>
+        <div className="mt-7 space-y-3 hyphens-auto text-justify text-[16px] leading-[1.4]">
+          <p>
+            Je suis née en 1948 à Rennes, dans une maison étroite de la rue des
+            Tilleuls, la troisième d’une fratrie de quatre. On y entrait par la
+            cuisine, toujours chaude, où ma mère faisait chanter la radio en
+            épluchant les légumes.
+          </p>
+          <p className="!mt-4 font-bold">Les trains du dimanche</p>
+          <p>
+            Mon père était cheminot. Il partait avant le jour et rentrait avec
+            l’odeur du charbon sur sa veste. Le dimanche, il nous emmenait voir
+            passer les trains depuis le pont de la gare, et il connaissait
+            chacun par son heure.
+          </p>
+          <p>
+            De cette maison, je garde surtout le bruit : les pas dans l’escalier
+            de bois, les disputes de mes frères, le poste de radio.
+          </p>
+        </div>
+        <p className="mt-6 text-right text-[14px]">9</p>
+      </div>
+      <div className="mt-5 border-t border-[var(--line-soft)] pt-5">
+        <span className="inline-flex min-h-11 items-center rounded-full px-5 text-[16px] font-bold shadow-[inset_0_0_0_1px_var(--line)]">
+          Corriger ce chapitre
+        </span>
+      </div>
+    </div>
   );
 }
