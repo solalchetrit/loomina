@@ -31,8 +31,9 @@ export const OFFER = {
  * Le coupon est créé une fois dans Stripe avec cet identifiant.
  */
 export const DEMO_PROMO = {
-  couponId: "loomina-recit-demo",
-  amountOff: 50,
+  couponId: "loomina-recit-demo-10",
+  /** Réduction en pourcentage (Solal, 18/11/2026 : 10 %). */
+  percentOff: 10,
   days: 14,
 };
 

@@ -219,7 +219,8 @@ function esc(s: string): string {
 export function demoEmail(params: { firstName: string | null; title: string; promo: { code: string; expires: Date } | null }) {
     const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
     const orderUrl = `https://${HOST}/order${params.promo ? `?code=${params.promo.code}` : ''}`;
-    const price = params.promo ? OFFER.price - DEMO_PROMO.amountOff : OFFER.price;
+    const price = params.promo ? Math.round(OFFER.price * (100 - DEMO_PROMO.percentOff)) / 100 : OFFER.price;
+    const euros = (n: number) => `${n.toLocaleString('fr-FR', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })} €`;
     const until = params.promo?.expires.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
     const intro = [
         hello,
@@ -228,9 +229,9 @@ export function demoEmail(params: { firstName: string | null; title: string; pro
     ];
     const ctaTitle = 'Vous souhaitez écrire votre livre ?';
     const ctaText = params.promo
-        ? `Votre réduction de ${DEMO_PROMO.amountOff} € est déjà appliquée sur ce lien : le livre tout compris à ${price} € au lieu de ${OFFER.price} €, jusqu’au ${until}.`
+        ? `Votre réduction de ${DEMO_PROMO.percentOff} % est déjà appliquée sur ce lien : le livre tout compris à ${euros(price)} au lieu de ${euros(OFFER.price)}, jusqu’au ${until}.`
         : `Tout est compris : les appels, les récits à relire, et le livre relié livré chez vous, pour ${OFFER.price} €.`;
-    const button = `Écrire mon livre · ${price} €`;
+    const button = `Écrire mon livre · ${euros(price)}`;
     const outro = ['Pour nous poser une question, répondez simplement à cet e-mail.', 'À très bientôt,\nLoomina'];
 
     const text = [...intro, `${ctaTitle}\n${ctaText}\n${button} : ${orderUrl}`, ...outro].join('\n\n');
