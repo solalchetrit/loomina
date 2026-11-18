@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Payment from "@/components/order/Payment";
 import Icon from "@/components/ui/Icon";
 import { CALL_MINUTES_OPTIONS, DEFAULT_CALL_MINUTES } from "@/lib/loomina/call-length";
@@ -174,10 +175,7 @@ export default function OrderPage() {
           </ol>
 
           <div className="card card-float p-5 sm:p-8">
-            <p className="text-[13px] font-semibold text-[var(--amber-ink)]">
-              Votre livre de vie · {OFFER.price} € tout compris
-            </p>
-            <h1 className="mt-1.5 text-[26px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[30px]">{title}</h1>
+            <h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[30px]">{title}</h1>
 
             {/* Étape 3 : paiement intégré, sans quitter le site */}
             {step === 3 && checkout && (
@@ -202,8 +200,8 @@ export default function OrderPage() {
               <div className="mt-6 grid grid-cols-2 gap-3" role="radiogroup" aria-label="Destinataire">
                 {(
                   [
-                    { key: "me", title: "Pour moi", text: "Je raconte mon histoire.", icon: "user" },
-                    { key: "gift", title: "Pour offrir", text: "Un proche raconte la sienne.", icon: "gift" },
+                    { key: "me", title: "Pour moi", text: "Je raconte mon histoire.", photo: "homme-au-telephone", alt: "Un homme âgé raconte un souvenir au téléphone.", focus: "50% 30%" },
+                    { key: "gift", title: "Pour offrir", text: "Un proche raconte la sienne.", photo: "grand-mere-calin", alt: "Une petite fille serre sa grand-mère dans ses bras.", focus: "50% 35%" },
                   ] as const
                 ).map((o) => {
                   const active = who === o.key;
@@ -214,18 +212,26 @@ export default function OrderPage() {
                       role="radio"
                       aria-checked={active}
                       onClick={() => setWho(o.key)}
-                      className={`press relative flex flex-col items-start gap-3 rounded-[18px] border p-4 text-left transition sm:p-5 ${
+                      className={`press group relative flex flex-col items-stretch overflow-hidden rounded-[18px] border text-left transition ${
                         active ? "border-[var(--ink)] bg-[var(--canvas)] ring-1 ring-[var(--ink)]" : "border-[var(--rule-strong)] bg-white hover:border-[var(--ink)]"
                       }`}
                     >
-                      <span className={`flex h-10 w-10 items-center justify-center rounded-full transition ${active ? "bg-[var(--ink)] text-white" : "bg-[var(--surface-2)] text-[var(--ink-2)]"}`}>
-                        <Icon name={o.icon} size={19} />
+                      <span className={`relative block overflow-hidden transition-all duration-300 ${step === 1 ? "aspect-[4/3]" : "aspect-[16/7]"}`}>
+                        <Image
+                          src={`/photos/${o.photo}.jpg`}
+                          alt={o.alt}
+                          fill
+                          sizes="(min-width: 640px) 300px, 45vw"
+                          priority
+                          className={`object-cover transition duration-500 group-hover:scale-[1.03] ${active || step === 1 ? "" : "opacity-60 grayscale"}`}
+                          style={{ objectPosition: o.focus }}
+                        />
                       </span>
-                      <span>
+                      <span className="block p-3.5 sm:p-4">
                         <span className="block text-[16px] font-bold leading-tight sm:text-[17px]">{o.title}</span>
                         <span className="mt-1 block text-[14px] leading-snug text-[var(--ink-3)]">{o.text}</span>
                       </span>
-                      <span aria-hidden className={`absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-full border transition ${active ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-[var(--rule-strong)]"}`}>
+                      <span aria-hidden className={`absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border shadow-sm transition ${active ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-white/80 bg-white/80 backdrop-blur"}`}>
                         {active && <Icon name="check" size={12} />}
                       </span>
                     </button>
