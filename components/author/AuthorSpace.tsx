@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import LiveBook from "@/components/LiveBook";
 import Button from "@/components/ui/Button";
+import Icon, { type IconName } from "@/components/ui/Icon";
 import { SITE } from "@/config/site";
 import Progress from "./Progress";
 import SuggestTopic from "./SuggestTopic";
@@ -15,15 +16,16 @@ import Welcome from "./Welcome";
 import Shipping from "./Shipping";
 import { formatDate, type Overview } from "./types";
 
-const TABS = [
-  { id: "apercu", label: "Aperçu" },
-  { id: "livre", label: "Mon livre" },
-  { id: "vie", label: "Ma vie" },
-  { id: "appels", label: "Mes appels" },
-  { id: "reglages", label: "Réglages" },
+// `short` : le libellé de la barre du bas, sur téléphone (cinq onglets tiennent sur 320 px).
+const TABS: readonly { id: string; label: string; short: string; icon: IconName }[] = [
+  { id: "apercu", label: "Aperçu", short: "Aperçu", icon: "home" },
+  { id: "livre", label: "Mon livre", short: "Livre", icon: "book" },
+  { id: "vie", label: "Ma vie", short: "Ma vie", icon: "heart" },
+  { id: "appels", label: "Mes appels", short: "Appels", icon: "phone" },
+  { id: "reglages", label: "Réglages", short: "Réglages", icon: "sliders" },
 ] as const;
 
-type Tab = (typeof TABS)[number]["id"];
+type Tab = "apercu" | "livre" | "vie" | "appels" | "reglages";
 
 /** Le prochain appel : le numéro, et le sujet que Loomina a prévu d'aborder. */
 function NextCall({ topic, schedule }: { topic: string | null; schedule?: string | null }) {
@@ -65,7 +67,13 @@ export default function AuthorSpace({
   /** Le numéro connecté n'est celui d'aucun auteur : c'est peut-être celui d'une personne qui a offert un livre. */
   onNotAuthor: () => void;
 }) {
-  const [tab, setTab] = useState<Tab>("apercu");
+  const [tab, setTabState] = useState<Tab>("apercu");
+  // Changer d'onglet ramène en haut : sur téléphone, la barre du bas reste sous le pouce
+  // et la nouvelle rubrique commence à son titre, pas au milieu de la précédente.
+  const setTab = useCallback((next: Tab) => {
+    setTabState(next);
+    if (typeof window !== "undefined" && window.scrollY > 0) window.scrollTo({ top: 0 });
+  }, []);
   const [data, setData] = useState<Overview | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -100,9 +108,12 @@ export default function AuthorSpace({
             <p className="text-[16px] font-semibold text-[var(--ink-3)]">{title}</p>
             <h1 className="t-display mt-2">{data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour"}</h1>
           </div>
-          <Button onClick={onLogout} variant="secondary" className="self-start md:self-auto">
-            Se déconnecter
-          </Button>
+          {/* Sur téléphone, « Se déconnecter » vit en bas des Réglages : le haut de l'écran reste au livre. */}
+          <div className="hidden md:block">
+            <Button onClick={onLogout} variant="secondary">
+              Se déconnecter
+            </Button>
+          </div>
         </header>
 
         {data?.demo && (
@@ -115,14 +126,14 @@ export default function AuthorSpace({
           <Welcome ask={data.welcome} prefs={data.prefs} onDone={load} onUnauthorized={onUnauthorized} />
         )}
 
-        <nav aria-label="Rubriques de l’espace auteur" className="-mx-5 mt-8 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        <nav aria-label="Rubriques de l’espace auteur" className="mt-8 hidden md:block">
           <ul className="flex w-max gap-1 rounded-full bg-white p-1.5 shadow-[inset_0_0_0_1px_var(--line)]">
             {TABS.map((t) => (
               <li key={t.id}>
                 <button
                   type="button"
                   aria-current={tab === t.id ? "page" : undefined}
-                  onClick={() => setTab(t.id)}
+                  onClick={() => setTab(t.id as Tab)}
                   className={`press min-h-11 whitespace-nowrap rounded-full px-5 text-[15px] font-bold ${
                     tab === t.id ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"
                   }`}
@@ -134,7 +145,7 @@ export default function AuthorSpace({
           </ul>
         </nav>
 
-        <div className="mt-6">
+        <div className="mt-6 max-md:mt-8">
           {failed && (
             <p role="alert" className="rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
               Nous n’arrivons pas à charger votre espace pour le moment.{" "}
@@ -212,8 +223,49 @@ export default function AuthorSpace({
               onUnauthorized={onUnauthorized}
             />
           )}
+          {tab === "reglages" && (
+            <div className="mt-8 border-t border-[var(--line-soft)] pt-6 md:hidden">
+              <Button onClick={onLogout} variant="secondary" className="w-full">
+                Se déconnecter
+              </Button>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Téléphone : les rubriques en barre fixe en bas d'écran, à portée de pouce, comme une application.
+          Avant, la rangée d'onglets du haut faisait 543 px pour un écran de 390 : « Mes appels » et
+          « Réglages » sortaient de l'écran sans que rien ne le signale. */}
+      <div aria-hidden="true" className="h-[calc(5.5rem+env(safe-area-inset-bottom))] md:hidden" />
+      <nav
+        aria-label="Rubriques de l’espace auteur"
+        className="fixed inset-x-0 bottom-0 z-[900] border-t border-[var(--line)] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+      >
+        <ul className="mx-auto grid max-w-md grid-cols-5">
+          {TABS.map((t) => {
+            const active = tab === t.id;
+            return (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setTab(t.id as Tab)}
+                  className={`press flex min-h-[4.25rem] w-full flex-col items-center justify-center gap-1 px-1 text-[13px] font-bold leading-none ${
+                    active ? "text-[var(--ink)]" : "text-[var(--ink-3)]"
+                  }`}
+                >
+                  <span
+                    className={`flex h-8 w-14 items-center justify-center rounded-full transition-colors ${active ? "bg-[var(--amber-soft)] text-[var(--amber-deep)]" : ""}`}
+                  >
+                    <Icon name={t.icon} size={22} />
+                  </span>
+                  {t.short}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </div>
   );
 }
