@@ -38,7 +38,9 @@ function smtpConfig(): { host: string; port: number; user: string; pass: string 
     const pass = process.env.SMTP_PASS?.trim();
     if (!pass) return null;
     return {
-        host: process.env.SMTP_HOST?.trim() || 'mail.loomina.eu',
+        // Le serveur d'o2switch qui héberge la boîte (réglages « SSL/TLS » du
+        // compte de messagerie) : son certificat porte ce nom, pas mail.loomina.eu.
+        host: process.env.SMTP_HOST?.trim() || 'epinoche.o2switch.net',
         port: Number(process.env.SMTP_PORT?.trim() || 465),
         user: process.env.SMTP_USER?.trim() || 'contact@loomina.eu',
         pass,
