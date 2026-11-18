@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Payment from "@/components/order/Payment";
 import Icon from "@/components/ui/Icon";
 import { CALL_MINUTES_OPTIONS, DEFAULT_CALL_MINUTES } from "@/lib/loomina/call-length";
-import { formatToE164 } from "@/lib/phone";
+import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
 import CheckoutBar, { CheckoutFooter } from "@/components/order/CheckoutBar";
@@ -45,7 +45,9 @@ export default function OrderPage() {
   const isGift = who === "gift";
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    // Numéro tapé ou collé : remis en paires (« 07 81 31 12 98 »).
+    const value = name === "phone" || name === "giverPhone" ? formatPhoneNumberForDisplay(e.target.value).slice(0, 20) : e.target.value;
     setForm((f) => ({ ...f, [name]: value }));
     setErrors((er) => ({ ...er, [name]: undefined }));
   };
