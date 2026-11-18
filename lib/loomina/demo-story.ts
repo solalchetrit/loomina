@@ -219,14 +219,14 @@ function esc(s: string): string {
 export function demoEmail(params: { firstName: string | null; title: string; promo: { code: string; expires: Date } | null }) {
     const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
     const orderUrl = `https://${HOST}/order${params.promo ? `?code=${params.promo.code}` : ''}`;
-    const until = params.promo?.expires.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
+    const until = params.promo?.expires.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' }).replace(/ /g, '\u00a0');
     const intro = [
         hello,
         `Voici votre récit, « ${params.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page comme il le serait dans votre livre.`,
         `Ce n’était qu’un moment de votre vie. Imaginez-les tous réunis, appel après appel, dans un livre relié à garder et à transmettre.`,
     ];
     // Demande de Solal : un simple bouton, la réduction en pourcentage, jamais le prix réduit.
-    const promoLine = params.promo ? `Votre réduction de ${DEMO_PROMO.percentOff} % est déjà appliquée sur ce lien, jusqu’au ${until}.` : null;
+    const promoLine = params.promo ? `Votre réduction de ${DEMO_PROMO.percentOff}\u00a0% est déjà appliquée sur ce lien, jusqu’au ${until}.` : null;
     const button = 'Écrire mon livre';
     const outro = ['Pour nous poser une question, répondez simplement à cet e-mail.', 'À très bientôt,\nLoomina'];
 
