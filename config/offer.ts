@@ -25,6 +25,17 @@ export const OFFER = {
   withdrawalDays: 14,
 };
 
+/**
+ * La réduction offerte dans l'e-mail du récit de démonstration : un code
+ * personnel, utilisable une fois, créé dans Stripe sur ce coupon.
+ * Le coupon est créé une fois dans Stripe avec cet identifiant.
+ */
+export const DEMO_PROMO = {
+  couponId: "loomina-recit-demo",
+  amountOff: 50,
+  days: 14,
+};
+
 /** Ce qui est inclus, dans l'ordre où le client le vit. */
 export const INCLUDED: { title: string; detail: string }[] = [
   { title: "Les entretiens par téléphone", detail: "autant d’appels qu’il vous faut, quand vous voulez" },

@@ -24,7 +24,8 @@ import { WRITER_SYSTEM, WRITER_MODEL, WRITER_REASONING_EFFORT, WRITER_MAX_TOKENS
 import { tokenUsage } from './usage';
 import { buildRecitPdf } from './recit-pdf';
 import { SITE } from '../../config/site';
-import { OFFER } from '../../config/offer';
+import { OFFER, DEMO_PROMO } from '../../config/offer';
+import { stripe } from '../stripe';
 
 /** Durée de conservation d'un récit de démonstration. */
 export const DEMO_STORY_DAYS = 30;
@@ -43,6 +44,7 @@ export interface DemoStory {
     content: string | null;
     email: string | null;
     email_count: number;
+    promo_code: string | null;
     created_at: string;
 }
 
@@ -166,7 +168,7 @@ export async function getDemoStory(token: string): Promise<DemoStory | null> {
     if (!/^[A-Za-z0-9_-]{16,40}$/.test(token)) return null;
     const { data } = await db()
         .from('demo_stories')
-        .select('id, token, phone, status, first_name, title, content, email, email_count, created_at')
+        .select('id, token, phone, status, first_name, title, content, email, email_count, promo_code, created_at')
         .eq('token', token)
         .maybeSingle();
     return (data as DemoStory | null) ?? null;
@@ -184,26 +186,79 @@ export function storyTeaser(content: string, count = 1): string[] {
 
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+/**
+ * Le code promo personnel de l'e-mail : une utilisation, valable
+ * DEMO_PROMO.days jours. Renvoie null si Stripe refuse (le reste de
+ * l'e-mail part quand même, avec le bouton sans réduction).
+ */
+async function demoPromoCode(story: DemoStory): Promise<{ code: string; expires: Date } | null> {
+    const expires = new Date(Date.now() + DEMO_PROMO.days * 86_400_000);
+    if (story.promo_code) return { code: story.promo_code, expires };
+    const code = `RECIT${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+    try {
+        await stripe().promotionCodes.create({
+            promotion: { type: 'coupon', coupon: DEMO_PROMO.couponId },
+            code,
+            max_redemptions: 1,
+            expires_at: Math.floor(expires.getTime() / 1000),
+            metadata: { source: 'demo', demo_story: story.id },
+        });
+        await db().from('demo_stories').update({ promo_code: code }).eq('id', story.id);
+        return { code, expires };
+    } catch (err) {
+        console.warn('[demo] code promo non créé :', err instanceof Error ? err.message : String(err));
+        return null;
+    }
+}
+
+function esc(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/** Le texte et la mise en page de l'e-mail du récit. */
+export function demoEmail(params: { firstName: string | null; title: string; promo: { code: string; expires: Date } | null }) {
+    const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
+    const orderUrl = `https://${HOST}/order${params.promo ? `?code=${params.promo.code}` : ''}`;
+    const price = params.promo ? OFFER.price - DEMO_PROMO.amountOff : OFFER.price;
+    const until = params.promo?.expires.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
+    const intro = [
+        hello,
+        `Voici votre récit, « ${params.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page comme il le serait dans votre livre.`,
+        `Ce n’était qu’un moment de votre vie. Imaginez-les tous réunis, appel après appel, dans un livre relié à garder et à transmettre.`,
+    ];
+    const ctaTitle = 'Vous souhaitez écrire votre livre ?';
+    const ctaText = params.promo
+        ? `Votre réduction de ${DEMO_PROMO.amountOff} € est déjà appliquée sur ce lien : le livre tout compris à ${price} € au lieu de ${OFFER.price} €, jusqu’au ${until}.`
+        : `Tout est compris : les appels, les récits à relire, et le livre relié livré chez vous, pour ${OFFER.price} €.`;
+    const button = `Écrire mon livre · ${price} €`;
+    const outro = ['Pour nous poser une question, répondez simplement à cet e-mail.', 'À très bientôt,\nLoomina'];
+
+    const text = [...intro, `${ctaTitle}\n${ctaText}\n${button} : ${orderUrl}`, ...outro].join('\n\n');
+    const p = (t: string) => `<p style="margin:0 0 16px">${esc(t).replace(/\n/g, '<br>')}</p>`;
+    const html =
+        '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#161616;max-width:560px">' +
+        intro.map(p).join('') +
+        '<div style="margin:28px 0;padding:24px;border-radius:18px;background:#161616;color:#ffffff">' +
+        `<p style="margin:0 0 8px;font-size:21px;font-weight:800;line-height:1.25">${esc(ctaTitle)}</p>` +
+        `<p style="margin:0 0 20px;color:#dcdcd4">${esc(ctaText)}</p>` +
+        `<a href="${esc(orderUrl)}" style="display:inline-block;padding:14px 26px;border-radius:999px;background:#ee9b2d;color:#161616;font-weight:800;text-decoration:none">${esc(button)}</a>` +
+        '</div>' +
+        outro.map(p).join('') +
+        '</div>';
+    return { text, html, orderUrl };
+}
+
 /** Envoie le récit en PDF à l'adresse donnée sur la page du lien. */
 export async function emailDemoStory(story: DemoStory, email: string): Promise<'sent' | 'limit' | 'failed'> {
     if (story.email_count >= MAX_EMAILS) return 'limit';
     const pdf = await buildRecitPdf({ title: story.title ?? 'Un souvenir', author: story.first_name, content: story.content ?? '', date: new Date(story.created_at) });
-    const hello = story.first_name ? `Bonjour ${story.first_name},` : 'Bonjour,';
-    const text = `${hello}
-
-Voici votre récit, « ${story.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page comme il le serait dans votre livre.
-
-Ce n'était qu'un moment de votre vie. Imaginez-les tous réunis, appel après appel, dans un livre relié à garder et à transmettre : c'est ce que fait Loomina, pour ${OFFER.price} € tout compris.
-
-Pour commencer votre livre : ${HOST}
-Pour nous poser une question, répondez simplement à cet e-mail.
-
-À très bientôt,
-Loomina`;
+    const promo = await demoPromoCode(story);
+    const { text, html } = demoEmail({ firstName: story.first_name, title: story.title ?? 'Un souvenir', promo });
     const ok = await sendEmail({
         to: email,
         subject: `Votre récit : ${story.title}`,
         text,
+        html,
         attachments: [{ filename: `${fileName(story.title ?? 'recit')}.pdf`, content: Buffer.from(pdf), contentType: 'application/pdf' }],
     });
     await db()

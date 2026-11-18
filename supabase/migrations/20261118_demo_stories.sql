@@ -23,6 +23,8 @@ create table if not exists public.demo_stories (
     email         text,
     email_count   integer not null default 0,
     emailed_at    timestamptz,
+    -- Code promo personnel envoyé dans l'e-mail (Stripe, une utilisation).
+    promo_code    text,
     created_at    timestamptz not null default now()
 );
 
