@@ -1,7 +1,7 @@
 /* « De l'appel à la page du livre » : la conversation se déroule, la page s'écrit à mesure. */
 
 .bubble {
-  transition: opacity 0.5s ease-out, transform 0.6s var(--ease-out);
+  transition: opacity 0.35s ease-out, transform 0.45s var(--ease-out);
 }
 .waiting {
   opacity: 0;
@@ -11,8 +11,8 @@
   opacity: 0;
 }
 .writing .w {
-  animation: write 0.5s ease-out forwards;
-  animation-delay: calc(var(--w) * 45ms);
+  animation: write 0.35s ease-out forwards;
+  animation-delay: calc(var(--w) * 22ms);
 }
 .still .w {
   opacity: 1;

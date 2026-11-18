@@ -198,8 +198,8 @@ export default function ExperiencePage() {
                 {p.id === "apres" && (
                   <div className="card mt-6 grid gap-2 p-3 sm:grid-cols-[240px_minmax(0,1fr)] sm:items-center sm:ml-16">
                     <Photo
-                      name="livre-debout"
-                      alt="Le livre Loomina relié, couverture en toile de lin, posé debout."
+                      name="livre-bordeaux-debout"
+                      alt="Le livre Loomina, couverture en toile bordeaux, posé debout."
                       ratio="aspect-[4/3] sm:aspect-[4/5]"
                       sizes="(min-width: 640px) 320px, 100vw"
                       className="!rounded-[18px]"
@@ -209,7 +209,7 @@ export default function ExperiencePage() {
                         Ce que vous recevez
                       </p>
                       <p className="t-heading mt-2">
-                        Votre livre relié, et sa version numérique
+                        Votre livre, et sa version numérique
                       </p>
                       <ul className="mt-4 divide-y divide-[var(--line-soft)]">
                         {[

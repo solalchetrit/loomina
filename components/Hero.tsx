@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import VoiceToBook from "@/components/home/VoiceToBook";
 
-/** Les trois garanties, sur une ligne en bas du premier écran : un titre court, puis la précision. */
+/** Les trois garanties, sous les boutons et la ligne de la démo : un titre court, puis la précision. */
 const REASSURANCE: { title: string; detail: string; href?: string }[] = [
   { title: "Relu par notre équipe", detail: "avant l’impression" },
   {
@@ -28,7 +28,7 @@ export default function Hero() {
           <p className="rise mt-6 max-w-[34rem] text-[clamp(1.15rem,1.6vw,1.4rem)] font-medium leading-[1.45] tracking-[-0.015em] text-[var(--ink)]" style={{ "--i": 1 } as CSSProperties}>
             Vous racontez au téléphone, Loomina écrit le récit de chaque appel et en compose votre livre. Vous le relisez dans votre espace auteur, et le livre arrive chez vous.
           </p>
-          <div className="rise mt-7 flex flex-col gap-3 sm:flex-row" style={{ "--i": 3 } as CSSProperties}>
+          <div className="rise mt-8 flex flex-col gap-3 sm:flex-row" style={{ "--i": 3 } as CSSProperties}>
             <Button href="/order" size="lg">
               Commander · {OFFER.price} €
             </Button>
@@ -43,23 +43,17 @@ export default function Hero() {
             </a>
             , rien n’est enregistré.
           </p>
-        </div>
-
-        <div className="rise mx-auto w-full min-w-0 max-w-[460px] lg:mr-0 lg:max-w-[clamp(340px,calc((100svh-17.5rem)*0.8),460px)]" style={{ "--i": 2 } as CSSProperties}>
-          <VoiceToBook />
-        </div>
-      </div>
-      {/* Le bas du premier écran : les trois garanties sur une ligne, et l'invitation à descendre. */}
-      <div className="rise mx-auto mt-10 w-full max-w-[1240px] px-5 sm:px-6 lg:mt-8" style={{ "--i": 5 } as CSSProperties}>
-        <div className="flex flex-col gap-5 border-t border-[var(--line)] pt-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
-          <ul className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-9 sm:gap-y-2">
+          <ul
+            className="rise mt-7 grid max-w-[41rem] gap-x-5 gap-y-4 border-t border-[var(--line)] pt-6 sm:grid-cols-[auto_auto_auto] sm:justify-between"
+            style={{ "--i": 4 } as CSSProperties}
+          >
             {REASSURANCE.map((r) => (
-              <li key={r.title} className="flex items-center gap-2.5 text-[15px] text-[var(--ink-2)]">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+              <li key={r.title} className="flex gap-3">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
                   <Icon name="check" size={14} />
                 </span>
-                <span>
-                  <b className="text-[var(--ink)]">{r.title}</b>{" "}
+                <p className="text-[15px] leading-snug text-[var(--ink-2)]">
+                  <b className="block whitespace-nowrap text-[16px] text-[var(--ink)]">{r.title}</b>
                   {r.href ? (
                     <a href={r.href} className="link">
                       {r.detail}
@@ -67,21 +61,27 @@ export default function Hero() {
                   ) : (
                     r.detail
                   )}
-                </span>
+                </p>
               </li>
             ))}
           </ul>
-          <a
-            href="#parcours"
-            className="hidden shrink-0 items-center gap-2.5 text-[15px] font-bold text-[var(--ink)] lg:flex"
-          >
-            Comment ça marche
-            <span className="scroll-cue flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] bg-white">
-              <Icon name="arrow" size={16} className="rotate-90" />
-            </span>
-          </a>
+        </div>
+
+        <div className="rise mx-auto w-full min-w-0 max-w-[460px] lg:mr-0 lg:max-w-[clamp(340px,calc((100svh-17.5rem)*0.8),460px)]" style={{ "--i": 2 } as CSSProperties}>
+          <VoiceToBook />
         </div>
       </div>
+      {/* Le haut de page occupe tout l'écran : cette invitation, en bas au milieu, donne la suite. */}
+      <a
+        href="#parcours"
+        className="rise mx-auto mt-6 hidden items-center gap-2.5 rounded-full px-4 py-2 text-[15px] font-bold text-[var(--ink)] lg:flex"
+        style={{ "--i": 5 } as CSSProperties}
+      >
+        Comment ça marche
+        <span className="scroll-cue flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] bg-white">
+          <Icon name="arrow" size={16} className="rotate-90" />
+        </span>
+      </a>
     </section>
   );
 }

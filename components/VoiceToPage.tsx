@@ -47,7 +47,7 @@ const WRITTEN: { kind: "p" | "h"; text: string }[][] = [
  * Le déroulé. Chaque temps dure `ms` avant le suivant :
  * 1 question, 2 réponse, 3 la page s'écrit, 4 question, 5 réponse, 6 la page s'écrit (fin).
  */
-const BEATS = [0, 1700, 1600, 4200, 1600, 1600];
+const BEATS = [0, 900, 800, 2100, 800, 800];
 const END = 6;
 /** Nombre de répliques visibles, et de blocs écrits, à chaque temps. */
 const BUBBLES = [0, 1, 2, 2, 3, 4, 4];
