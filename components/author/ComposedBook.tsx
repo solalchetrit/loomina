@@ -44,6 +44,7 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -85,6 +86,33 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
       setError(err instanceof Error ? err.message : "La composition n’a pas pu démarrer.");
     } finally {
       setStarting(false);
+    }
+  };
+
+  // Le PDF se fabrique à la demande (quelques secondes avec les photos) : on montre l'attente.
+  const download = async () => {
+    setDownloading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/user/book/pdf");
+      if (res.status === 401) return onUnauthorized();
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(typeof body.error === "string" ? body.error : "Le PDF n’a pas pu être préparé.");
+      }
+      const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "Mon-livre.pdf";
+      const url = URL.createObjectURL(await res.blob());
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Le PDF n’a pas pu être préparé.");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -134,6 +162,11 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
               </Button>
             )}
             {!canCompose && <p className="t-small">Votre livre sera composé à partir de deux appels racontés.</p>}
+            {edition && (
+              <Button onClick={download} loading={downloading} variant="secondary">
+                {downloading ? "Préparation du PDF…" : "Télécharger mon livre (PDF)"}
+              </Button>
+            )}
             {edition && (
               <p className="t-small">
                 Composé le {formatDate(edition.at)} à partir de {edition.sourceCount} appels
