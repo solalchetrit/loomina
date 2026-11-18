@@ -8,24 +8,26 @@
 
 /* ================================================================
    LOOMINA — design tokens
-   Fond clair, encre noire, l'ambre de l'étoile du logo.
+   Fond clair, encre bleu nuit (la toile du livre), l'ambre de l'étoile du logo.
    L'ambre vif sert aux surfaces et aux icônes ; en texte, on prend
    --amber-ink (≥ 4.5:1 sur le fond).
    ================================================================ */
 
 :root {
   /* Surfaces */
-  --canvas: #f7f7f4;         /* fond de page */
+  --canvas: #f6f5f1;         /* fond de page */
   --surface: #ffffff;        /* cartes */
-  --surface-2: #f2f1ec;      /* puce d'icône, bande discrète */
-  --line: #e7e6e1;           /* bord de carte */
-  --line-soft: #efeeea;      /* séparateur dans une carte */
+  --surface-2: #eef0f4;      /* puce d'icône, bande discrète */
+  --line: #e3e4e8;           /* bord de carte */
+  --line-soft: #eceef2;      /* séparateur dans une carte */
 
   /* Encre */
-  --ink: #161616;
-  --ink-soft: #2b2b28;
-  --ink-2: #4a4a45;          /* texte secondaire, ≥ 8:1 */
-  --ink-3: #66665f;          /* texte discret, ≥ 5:1 */
+  --ink: #1b2742;            /* bleu nuit : titres, boutons, panneaux sombres */
+  --night: #1b2742;
+  --night-deep: #141d33;     /* pied de page, fond le plus sombre */
+  --ink-soft: #2a3a5e;
+  --ink-2: #434b5e;          /* texte secondaire, ≥ 8:1 */
+  --ink-3: #5c6578;          /* texte discret, ≥ 5:1 */
 
   /* Ambre, la couleur de l'étoile */
   --amber: #ee9b2d;          /* bouton de démo, icônes sur fond sombre */
@@ -43,8 +45,8 @@
   /* Rayons et ombres */
   --radius-card: 24px;
   --radius-btn: 999px;
-  --shadow-float: 0 40px 80px -40px rgba(22, 22, 22, 0.28);
-  --shadow-bar: 0 10px 30px -18px rgba(22, 22, 22, 0.25);
+  --shadow-float: 0 40px 80px -40px rgba(20, 29, 51, 0.32);
+  --shadow-bar: 0 10px 30px -18px rgba(20, 29, 51, 0.28);
 
   /* Anciens noms, pointant vers la nouvelle palette */
   --paper: var(--canvas);
@@ -54,12 +56,25 @@
   --gold-ink: var(--amber-ink);
   --gold-light: var(--amber);
   --rule: var(--line);
-  --rule-strong: #d4d3cc;
+  --rule-strong: #cdd0d8;
 
   /* Courbes */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
+
+/* Un bloc sur fond bleu nuit : les mêmes jetons, retournés pour rester lisibles. */
+.on-night {
+  --ink: #ffffff;
+  --ink-2: rgba(255, 255, 255, 0.82);
+  --ink-3: rgba(255, 255, 255, 0.64);
+  --line: rgba(255, 255, 255, 0.16);
+  --amber-display: var(--amber);
+  --amber-line: rgba(238, 155, 45, 0.55);
+  background: var(--night-deep);
+  color: var(--ink);
+}
+
 
 /* ================================================================
    BASE
@@ -519,7 +534,7 @@ textarea.field {
 
 .lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 24px 40px -28px rgba(22, 22, 22, 0.35);
+  box-shadow: 0 24px 40px -28px rgba(20, 29, 51, 0.35);
 }
 
 /* Accordéon : hauteur animée via grid */
@@ -574,7 +589,7 @@ textarea.field {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(22, 22, 22, 0.15);
+  border: 2px solid rgba(20, 29, 51, 0.15);
   border-top-color: var(--ink);
   animation: loomina-spin 600ms linear infinite;
 }

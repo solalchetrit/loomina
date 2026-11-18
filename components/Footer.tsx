@@ -35,7 +35,7 @@ const COLUMNS = [
 export default function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="w-full border-t border-[var(--line)] bg-white">
+    <footer className="on-night w-full">
       <div className="mx-auto w-full max-w-[1240px] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-16 sm:px-6 md:pt-24">
         {/* La devise de Loomina, en clôture de chaque page. */}
         <p data-reveal className="mb-16 md:mb-24">
@@ -46,7 +46,7 @@ export default function Footer() {
           <div>
             <Link href="/" className="inline-block" aria-label="Loomina, accueil">
               <span className="relative block h-[30px] w-[128px]">
-                <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" sizes="128px" />
+                <Image src="/logo-loomina-blanc.png" alt="" fill className="object-contain object-left" sizes="128px" />
               </span>
             </Link>
             <p className="t-body mt-5 max-w-xs">Vous racontez votre vie au téléphone. Nous en faisons un livre.</p>
