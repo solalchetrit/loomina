@@ -18,6 +18,10 @@ const PAGE: { kind: "par" | "sub"; text: string }[] = [
     kind: "par",
     text: "Le samedi, c’était le jour du pain. J’avais le droit de façonner une petite boule, la mienne, qu’elle marquait d’une croix du bout de son couteau pour qu’on la reconnaisse.",
   },
+  {
+    kind: "par",
+    text: "Le tilleul et le pain chaud se mêlaient alors dans toute la maison. Aujourd’hui encore, il me suffit de passer devant une boulangerie pour retrouver cette cour.",
+  },
 ];
 
 const STEPS = [
