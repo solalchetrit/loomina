@@ -86,7 +86,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
             <Field label="Prénom, nom">{name}</Field>
             <Field label="Prononcé">{profile.first_name_phonetic ?? "comme écrit"}</Field>
             <Field label="Téléphone">{profile.phone_number}</Field>
-            <Field label="E-mail du compte">{profile.email ? <Link className="underline" href={`/admin/mails/nouveau?a=${encodeURIComponent(profile.email)}`}>{profile.email}</Link> : null}</Field>
+            <Field label="E-mail du compte">{profile.email ? <Link className="underline" href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`}>{profile.email}</Link> : null}</Field>
             <Field label="Tu / vous">{profile.politeness_preference}</Field>
             <Field label="Style d’écriture">{profile.writing_style}</Field>
             <Field label="Sujets à éviter">{profile.sensitive_topics || "aucun"}</Field>

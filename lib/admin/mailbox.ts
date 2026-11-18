@@ -1,11 +1,9 @@
 /**
- * La boîte contact@loomina.eu dans l'admin (demande de Solal, 18/11/2026,
- * sur le modèle du webmail de L'Étincelle) : lire, répondre, écrire, mettre
- * à la corbeille. La boîte reste chez l'hébergeur (o2switch) : rien n'est
- * copié dans la base, on la lit en direct (IMAP) et on envoie par elle (SMTP).
- *
- * Mêmes identifiants que l'envoi des e-mails du site : `SMTP_USER`
- * (contact@loomina.eu par défaut) et `SMTP_PASS`.
+ * La boîte contact@loomina.eu dans l'admin, sur le modèle du webmail de
+ * L'Étincelle (demande de Solal, 18/11/2026). La boîte reste chez l'hébergeur
+ * (o2switch) : rien n'est copié dans la base, on la lit en direct (IMAP) et on
+ * envoie par elle (SMTP), avec les mêmes identifiants que les e-mails du site
+ * (`SMTP_USER`, `SMTP_PASS`).
  */
 
 import { ImapFlow } from 'imapflow';
@@ -21,26 +19,45 @@ export const FOLDERS: Array<{ key: Folder; label: string }> = [
 ];
 export const isFolder = (v: unknown): v is Folder => FOLDERS.some((f) => f.key === v);
 
+export interface Address {
+    name: string;
+    address: string;
+}
+
 export interface MailRow {
     uid: number;
-    from: string;
-    to: string;
+    from: Address;
+    to: Address[];
     subject: string;
     date: string;
     seen: boolean;
     answered: boolean;
-    attachments: boolean;
+    flagged: boolean;
+    attach: boolean;
 }
 
-export interface MailFull extends MailRow {
-    fromAddress: string;
-    cc: string;
+export interface MailList {
+    folder: Folder;
+    total: number;
+    unseen: number;
+    messages: MailRow[];
+}
+
+export interface MailFull {
+    uid: number;
+    from: Address[];
+    to: Address[];
+    cc: Address[];
+    replyTo: Address[];
+    subject: string;
+    date: string;
+    flagged: boolean;
     text: string;
-    /** Le message mis en forme, nettoyé de tout script. Affiché dans un cadre isolé. */
-    html: string | null;
+    /** Nettoyé de tout script ; affiché dans un cadre isolé. */
+    html: string;
     messageId: string | null;
     references: string[];
-    files: Array<{ name: string; size: number }>;
+    attachments: Array<{ i: number; filename: string; size: number; contentType: string }>;
 }
 
 export function mailboxUser(): string {
@@ -98,11 +115,21 @@ async function folderPath(client: ImapFlow, folder: Folder): Promise<string | nu
     return found?.path ?? null;
 }
 
-const people = (list?: Array<{ name?: string; address?: string }>): string =>
-    (list ?? []).map((a) => (a.name ? `${a.name} <${a.address ?? ''}>` : a.address ?? '')).filter(Boolean).join(', ');
+async function inFolder<T>(folder: Folder, fn: (client: ImapFlow, path: string) => Promise<T>): Promise<T> {
+    return withImap(async (client) => {
+        const path = await folderPath(client, folder);
+        if (!path) throw new Error('Ce dossier n’existe pas dans la boîte.');
+        const lock = await client.getMailboxLock(path);
+        try {
+            return await fn(client, path);
+        } finally {
+            lock.release();
+        }
+    });
+}
 
-const parsedPeople = (a?: AddressObject | AddressObject[]): string =>
-    (Array.isArray(a) ? a : a ? [a] : []).flatMap((x) => x.value).map((v) => (v.name ? `${v.name} <${v.address ?? ''}>` : v.address ?? '')).filter(Boolean).join(', ');
+const addr = (a?: { name?: string; address?: string }): Address => ({ name: (a?.name ?? '').trim(), address: (a?.address ?? '').toLowerCase() });
+const parsedAddrs = (a?: AddressObject | AddressObject[]): Address[] => (Array.isArray(a) ? a : a ? [a] : []).flatMap((x) => x.value).map(addr).filter((x) => x.address);
 
 function hasAttachment(node: unknown): boolean {
     const n = node as { disposition?: string; childNodes?: unknown[] } | undefined;
@@ -111,38 +138,52 @@ function hasAttachment(node: unknown): boolean {
     return (n.childNodes ?? []).some(hasAttachment);
 }
 
-/** Les messages d'un dossier, du plus récent au plus ancien, par pages. */
-export async function listMails(folder: Folder, page = 1, perPage = 30): Promise<{ total: number; unseen: number; messages: MailRow[]; missing: boolean }> {
+type Fetched = { uid: number; envelope?: { from?: Array<{ name?: string; address?: string }>; to?: Array<{ name?: string; address?: string }>; subject?: string; date?: Date }; flags?: Set<string>; internalDate?: Date | string; bodyStructure?: unknown };
+const row = (m: Fetched): MailRow => ({
+    uid: m.uid,
+    from: addr(m.envelope?.from?.[0]),
+    to: (m.envelope?.to ?? []).map(addr),
+    subject: m.envelope?.subject || '(sans objet)',
+    date: new Date(m.envelope?.date ?? m.internalDate ?? Date.now()).toISOString(),
+    seen: m.flags?.has('\\Seen') ?? false,
+    answered: m.flags?.has('\\Answered') ?? false,
+    flagged: m.flags?.has('\\Flagged') ?? false,
+    attach: hasAttachment(m.bodyStructure),
+});
+const QUERY = { uid: true, envelope: true, flags: true, internalDate: true, bodyStructure: true } as const;
+
+/** Les messages d'un dossier, du plus récent au plus ancien (`offset` : déjà affichés). */
+export async function listMails(folder: Folder, offset = 0, limit = 40): Promise<MailList> {
     return withImap(async (client) => {
         const path = await folderPath(client, folder);
-        if (!path) return { total: 0, unseen: 0, messages: [], missing: true };
+        if (!path) return { folder, total: 0, unseen: 0, messages: [] };
         const lock = await client.getMailboxLock(path);
         try {
             const total = (client.mailbox && client.mailbox.exists) || 0;
-            const status = await client.status(path, { unseen: true }).catch(() => ({ unseen: 0 }));
+            const status = await client.status(path, { unseen: true }).catch(() => null);
             const messages: MailRow[] = [];
-            const offset = (Math.max(1, page) - 1) * perPage;
             if (total > offset) {
                 const to = total - offset;
-                const from = Math.max(1, to - perPage + 1);
-                for await (const m of client.fetch(`${from}:${to}`, { uid: true, envelope: true, flags: true, internalDate: true, bodyStructure: true })) {
-                    messages.push({
-                        uid: m.uid,
-                        from: people(m.envelope?.from),
-                        to: people(m.envelope?.to),
-                        subject: m.envelope?.subject || '(sans objet)',
-                        date: new Date(m.envelope?.date ?? m.internalDate ?? Date.now()).toISOString(),
-                        seen: m.flags?.has('\\Seen') ?? false,
-                        answered: m.flags?.has('\\Answered') ?? false,
-                        attachments: hasAttachment(m.bodyStructure),
-                    });
-                }
+                const from = Math.max(1, to - limit + 1);
+                for await (const m of client.fetch(`${from}:${to}`, QUERY)) messages.push(row(m as Fetched));
             }
             messages.sort((a, b) => b.date.localeCompare(a.date));
-            return { total, unseen: (status && status.unseen) || 0, messages, missing: false };
+            return { folder, total, unseen: (status && status.unseen) || 0, messages };
         } finally {
             lock.release();
         }
+    });
+}
+
+/** Recherche dans l'expéditeur, le destinataire et l'objet. */
+export async function searchMails(folder: Folder, q: string): Promise<MailList> {
+    return inFolder(folder, async (client) => {
+        const found = await client.search({ or: [{ from: q }, { to: q }, { subject: q }] }, { uid: true });
+        const uids = (Array.isArray(found) ? found : []).slice(-100);
+        const messages: MailRow[] = [];
+        if (uids.length) for await (const m of client.fetch(uids.join(','), QUERY, { uid: true })) messages.push(row(m as Fetched));
+        messages.sort((a, b) => b.date.localeCompare(a.date));
+        return { folder, total: messages.length, unseen: 0, messages };
     });
 }
 
@@ -156,35 +197,79 @@ export function sanitizeHtml(html: string): string {
         .replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1="#"');
 }
 
+async function fetchParsed(folder: Folder, uid: number, markSeen: boolean) {
+    return inFolder(folder, async (client) => {
+        const m = await client.fetchOne(String(uid), { uid: true, source: true, flags: true }, { uid: true });
+        if (!m || !m.source) throw new Error('Message introuvable (il a peut-être été déplacé).');
+        if (markSeen) await client.messageFlagsAdd(String(uid), ['\\Seen'], { uid: true }).catch(() => {});
+        return { parsed: await simpleParser(m.source), flags: m.flags };
+    });
+}
+
+/** Les images intégrées (cid:) remplacées par leur contenu, jusqu'à 3 Mo : le message s'affiche tel qu'envoyé. */
+function inlineCids(html: string, attachments: Array<{ cid?: string; contentType: string; content: Buffer; size: number }>): string {
+    let budget = 3 * 1024 * 1024;
+    return html.replace(/(["'(])cid:([^"')\s>]+)/gi, (all, q: string, cid: string) => {
+        const a = attachments.find((x) => x.cid && x.cid.replace(/[<>]/g, '') === cid);
+        if (!a || a.size > budget) return all;
+        budget -= a.size;
+        return `${q}data:${a.contentType};base64,${a.content.toString('base64')}`;
+    });
+}
+
 /** Un message en entier. Le lire le marque comme lu. */
-export async function readMail(folder: Folder, uid: number): Promise<MailFull | null> {
-    return withImap(async (client) => {
+export async function readMail(folder: Folder, uid: number): Promise<MailFull> {
+    const { parsed: p, flags } = await fetchParsed(folder, uid, true);
+    const refs = Array.isArray(p.references) ? p.references : p.references ? [p.references] : [];
+    const html = typeof p.html === 'string' ? sanitizeHtml(inlineCids(p.html, p.attachments)) : '';
+    return {
+        uid,
+        from: parsedAddrs(p.from),
+        to: parsedAddrs(p.to),
+        cc: parsedAddrs(p.cc),
+        replyTo: parsedAddrs(p.replyTo),
+        subject: p.subject || '(sans objet)',
+        date: (p.date ?? new Date()).toISOString(),
+        flagged: flags?.has('\\Flagged') ?? false,
+        text: (p.text ?? '').trim(),
+        html,
+        messageId: p.messageId ?? null,
+        references: refs,
+        attachments: p.attachments
+            .map((a, i) => ({ i, filename: a.filename ?? 'pièce jointe', size: a.size, contentType: a.contentType, inline: a.contentDisposition === 'inline' && !!a.cid }))
+            .filter((a) => !a.inline)
+            .map(({ i, filename, size, contentType }) => ({ i, filename, size, contentType })),
+    };
+}
+
+/** Une pièce jointe, pour la télécharger. */
+export async function readAttachment(folder: Folder, uid: number, index: number): Promise<{ filename: string; contentType: string; content: Buffer } | null> {
+    const { parsed } = await fetchParsed(folder, uid, false);
+    const a = parsed.attachments[index];
+    return a ? { filename: a.filename ?? 'piece-jointe', contentType: a.contentType || 'application/octet-stream', content: a.content } : null;
+}
+
+/** Lu / non lu, suivi : posé ou retiré. */
+export async function setFlag(folder: Folder, uids: number[], flag: 'seen' | 'flagged', value: boolean): Promise<void> {
+    if (!uids.length) return;
+    const name = flag === 'seen' ? '\\Seen' : '\\Flagged';
+    await inFolder(folder, async (client) => {
+        if (value) await client.messageFlagsAdd(uids.join(','), [name], { uid: true });
+        else await client.messageFlagsRemove(uids.join(','), [name], { uid: true });
+    });
+}
+
+/** Met des messages à la corbeille (rien n'est supprimé définitivement). */
+export async function trashMails(folder: Folder, uids: number[]): Promise<void> {
+    if (!uids.length) return;
+    await withImap(async (client) => {
         const path = await folderPath(client, folder);
-        if (!path) return null;
+        const trash = await folderPath(client, 'trash');
+        if (!path || !trash) throw new Error('Dossier introuvable sur le serveur de messagerie.');
+        if (path === trash) throw new Error('Ces messages sont déjà dans la corbeille.');
         const lock = await client.getMailboxLock(path);
         try {
-            const m = await client.fetchOne(String(uid), { uid: true, source: true, flags: true }, { uid: true });
-            if (!m || !m.source) return null;
-            await client.messageFlagsAdd(String(uid), ['\\Seen'], { uid: true }).catch(() => {});
-            const p = await simpleParser(m.source);
-            const refs = Array.isArray(p.references) ? p.references : p.references ? [p.references] : [];
-            return {
-                uid,
-                from: parsedPeople(p.from),
-                fromAddress: p.from?.value?.[0]?.address ?? '',
-                to: parsedPeople(p.to),
-                cc: parsedPeople(p.cc),
-                subject: p.subject || '(sans objet)',
-                date: (p.date ?? new Date()).toISOString(),
-                seen: true,
-                answered: m.flags?.has('\\Answered') ?? false,
-                attachments: p.attachments.length > 0,
-                text: (p.text ?? '').trim(),
-                html: typeof p.html === 'string' ? sanitizeHtml(p.html) : null,
-                messageId: p.messageId ?? null,
-                references: refs,
-                files: p.attachments.map((a) => ({ name: a.filename ?? 'pièce jointe', size: a.size })),
-            };
+            await client.messageMove(uids.join(','), trash, { uid: true });
         } finally {
             lock.release();
         }
@@ -204,14 +289,18 @@ export async function saveToSent(raw: Buffer | string): Promise<void> {
 }
 
 export interface Outgoing {
-    to: string;
+    to: string[];
+    cc: string[];
     subject: string;
     text: string;
-    /** Réponse : le message auquel on répond (pour le fil de discussion et le drapeau « répondu »). */
-    replyTo?: { folder: Folder; uid: number; messageId: string | null; references: string[] };
+    files: Array<{ filename: string; contentType: string; content: Buffer }>;
+    inReplyTo?: string;
+    references?: string[];
+    /** Le message auquel on répond : marqué « répondu ». */
+    answered?: { folder: Folder; uid: number };
 }
 
-/** Envoie un e-mail depuis la boîte, garde la copie dans « Envoyés », marque l'original comme répondu. */
+/** Envoie depuis la boîte, garde la copie dans « Envoyés », marque l'original comme répondu. */
 export async function sendFromMailbox(mail: Outgoing): Promise<void> {
     const c = connection();
     const { createTransport } = await import('nodemailer');
@@ -219,9 +308,11 @@ export async function sendFromMailbox(mail: Outgoing): Promise<void> {
     const message = {
         from: process.env.LOOMINA_MAIL_FROM?.trim() || `Loomina <${c.user}>`,
         to: mail.to,
+        ...(mail.cc.length ? { cc: mail.cc } : {}),
         subject: mail.subject.slice(0, 250),
         text: mail.text,
-        ...(mail.replyTo?.messageId ? { inReplyTo: mail.replyTo.messageId, references: [...mail.replyTo.references, mail.replyTo.messageId] } : {}),
+        attachments: mail.files.map((f) => ({ filename: f.filename, contentType: f.contentType, content: f.content })),
+        ...(mail.inReplyTo ? { inReplyTo: mail.inReplyTo, references: [...(mail.references ?? []), mail.inReplyTo] } : {}),
     };
     const transporter = createTransport({
         host: process.env.SMTP_HOST?.trim() || 'epinoche.o2switch.net',
@@ -230,49 +321,14 @@ export async function sendFromMailbox(mail: Outgoing): Promise<void> {
         auth: { user: c.user, pass: c.pass },
         connectionTimeout: 15_000,
         greetingTimeout: 15_000,
-        socketTimeout: 30_000,
+        socketTimeout: 60_000,
     });
     const info = await transporter.sendMail(message);
 
-    // La copie exacte du message envoyé, pour le dossier « Envoyés ».
     const raw = await new Promise<Buffer>((resolve, reject) =>
         createTransport({ streamTransport: true, buffer: true }).sendMail({ ...message, messageId: info.messageId, date: new Date() }, (err, r) => (err ? reject(err) : resolve(r.message as Buffer)))
     ).catch(() => null);
     if (raw) await saveToSent(raw);
 
-    if (mail.replyTo) {
-        const { folder, uid } = mail.replyTo;
-        await withImap(async (client) => {
-            const path = await folderPath(client, folder);
-            if (!path) return;
-            const lock = await client.getMailboxLock(path);
-            try {
-                await client.messageFlagsAdd(String(uid), ['\\Answered', '\\Seen'], { uid: true });
-            } finally {
-                lock.release();
-            }
-        }).catch(() => {});
-    }
-}
-
-/** Met un message à la corbeille (rien n'est supprimé définitivement). */
-export async function trashMail(folder: Folder, uid: number): Promise<void> {
-    await withImap(async (client) => {
-        const path = await folderPath(client, folder);
-        const trash = await folderPath(client, 'trash');
-        if (!path || !trash) throw new Error('Dossier introuvable sur le serveur de messagerie.');
-        if (path === trash) throw new Error('Ce message est déjà dans la corbeille.');
-        const lock = await client.getMailboxLock(path);
-        try {
-            await client.messageMove(String(uid), trash, { uid: true });
-        } finally {
-            lock.release();
-        }
-    });
-}
-
-/** Le texte cité sous une réponse. */
-export function quote(mail: Pick<MailFull, 'from' | 'date' | 'text'>): string {
-    const when = new Date(mail.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'long', timeStyle: 'short' });
-    return `\n\n\nLe ${when}, ${mail.from} a écrit :\n${mail.text.split('\n').map((l) => `> ${l}`).join('\n')}`;
+    if (mail.answered) await setFlag(mail.answered.folder, [mail.answered.uid], 'seen', true).then(() => inFolder(mail.answered!.folder, (client) => client.messageFlagsAdd(String(mail.answered!.uid), ['\\Answered'], { uid: true }))).catch(() => {});
 }
