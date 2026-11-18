@@ -492,22 +492,22 @@ textarea.field {
 }
 
 /*
- * Apparition au défilement, en CSS pur (animation-timeline) : les enfants directs
- * d'un bloc [data-reveal] montent l'un après l'autre quand le bloc entre à l'écran.
- * Un navigateur qui ne connaît pas les timelines de défilement affiche tout, d'emblée.
+ * Apparition au défilement (components/Reveal.tsx) : les enfants directs d'un bloc
+ * [data-reveal] montent l'un après l'autre, une seule fois, quand le bloc entre à
+ * l'écran. Seuls les blocs que le script attend (data-shown="wait") sont masqués.
  */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    [data-reveal] > * {
-      animation: loomina-rise linear both;
-      animation-timeline: view();
-      animation-range: entry 5% entry 55%;
-    }
-
-    [data-reveal] > :nth-child(2) { animation-range: entry 10% entry 62%; }
-    [data-reveal] > :nth-child(3) { animation-range: entry 15% entry 69%; }
-    [data-reveal] > :nth-child(n + 4) { animation-range: entry 20% entry 76%; }
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal][data-shown="wait"] > * {
+    opacity: 0;
   }
+
+  [data-reveal][data-shown="anim"] > * {
+    animation: loomina-rise 640ms var(--ease-out) both;
+  }
+
+  [data-reveal][data-shown="anim"] > :nth-child(2) { animation-delay: 80ms; }
+  [data-reveal][data-shown="anim"] > :nth-child(3) { animation-delay: 160ms; }
+  [data-reveal][data-shown="anim"] > :nth-child(n + 4) { animation-delay: 240ms; }
 }
 
 /* Barres de voix : elles respirent doucement, comme une conversation. */
@@ -535,10 +535,15 @@ textarea.field {
 }
 
 /* Accordéon : hauteur animée via grid */
+/*
+ * Accordéon : la hauteur s'ouvre (grid 0fr → 1fr) et le texte apparaît en fondu.
+ * min-height: 0 est indispensable : sans lui, la ligne ne se referme pas tout à
+ * fait et l'animation saute à la fin (Safari surtout).
+ */
 .acc-panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 220ms var(--ease-out);
+  transition: grid-template-rows 280ms var(--ease-out);
 }
 
 .acc-panel[data-open="true"] {
@@ -546,7 +551,20 @@ textarea.field {
 }
 
 .acc-panel > div {
+  min-height: 0;
   overflow: hidden;
+}
+
+.acc-panel > div > * {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 180ms ease, transform 280ms var(--ease-out);
+}
+
+.acc-panel[data-open="true"] > div > * {
+  opacity: 1;
+  transform: none;
+  transition-delay: 60ms;
 }
 
 .acc-icon {
