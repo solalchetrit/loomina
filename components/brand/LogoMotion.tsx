@@ -30,7 +30,7 @@ function loadKit(): Promise<Kit> {
 }
 
 /** Le cadre du logo seul, sans marge : il se pose exactement à la place de l'image. */
-export const TIGHT_WORDMARK = "-20 -40 4330 1300";
+export const TIGHT_WORDMARK = "16 2 4257 1215"; // mesuré sur le tracé : mêmes bords que header-logo-trimmed.png (536 × 153)
 
 export type LogoAnimation =
   | "scintille" | "survol" | "fil" | "revelation" | "plume" | "etoilePlume" | "voix" | "pret" | "ecrit"
@@ -74,6 +74,8 @@ export default function LogoMotion({ name, theme = "light", mode = "once", greet
     const playOnce = () => {
       if (!api) return;
       clearTimeout(stop);
+      // L'image fixe ne cède la place qu'au moment où ça bouge : aucun saut à l'arrivée sur la page.
+      setReady(true);
       api.play();
       // Les boucles du kit sont arrêtées au bout d'un tour, revenues au logo d'origine.
       if (api.def.loop) stop = setTimeout(() => api?.seek(0), api.def.duration);
@@ -84,7 +86,7 @@ export default function LogoMotion({ name, theme = "light", mode = "once", greet
       if (!k || cancelled) return;
       api = k.mount(target, name, { theme, vb, paused: true });
       if (align === "left") target.querySelector("svg")?.setAttribute("preserveAspectRatio", "xMinYMid meet");
-      setReady(true);
+      if (mode !== "hover") setReady(true);
       if (mode === "hover") {
         const onEnter = () => playOnce();
         host.addEventListener("pointerenter", onEnter);
@@ -134,7 +136,7 @@ export default function LogoMotion({ name, theme = "light", mode = "once", greet
   return (
     <span ref={box} className={`relative block ${className}`} aria-hidden="true">
       <span className={`absolute inset-0 block ${ready ? "invisible" : ""}`}>{children}</span>
-      <span ref={stage} className="absolute inset-0 block" />
+      <span ref={stage} className={`absolute inset-0 block ${ready ? "" : "invisible"}`} />
     </span>
   );
 }

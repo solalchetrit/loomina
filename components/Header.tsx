@@ -37,8 +37,8 @@ export default function Header() {
         <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-4 rounded-[22px] border border-[var(--line)] bg-white/90 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-md md:h-[68px] md:pl-6">
           <Link href="/" className="relative z-[920] flex shrink-0 items-center" aria-label="Loomina, accueil">
             <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
-              {/* L'étoile tourne une fois à l'arrivée (une fois par visite), puis quand on passe sur le logo. */}
-              <LogoMotion name="survol" mode="hover" greetOnce="loomina-logo-vu" vb={TIGHT_WORDMARK} align="left" className="h-full w-full">
+              {/* L'étoile tourne quand on passe sur le logo. Rien ne bouge à l'arrivée (Solal, 18/11/2026 : ça ressemblait à un bug). */}
+              <LogoMotion name="survol" mode="hover" vb={TIGHT_WORDMARK} align="left" className="h-full w-full">
                 <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
               </LogoMotion>
             </span>
