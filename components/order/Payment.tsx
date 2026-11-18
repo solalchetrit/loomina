@@ -182,12 +182,7 @@ function PaymentForm({ label, installments, onBack }: { label: string; installme
       {/* Carte */}
       {!free && (
         <div className="mt-5">
-          {installments && (
-            <p className="mb-3 flex items-center gap-2 text-[14px] text-[var(--ink-2)]">
-              <span className="pill pill-amber !py-0.5">En 3 ou 4 fois</span>
-              Par carte en une fois, ou en plusieurs fois avec Klarna.
-            </p>
-          )}
+          {installments && <Installments cents={checkout.total.total.minorUnitsAmount} />}
           <PaymentElement
             options={{
               layout: { type: "accordion", defaultCollapsed: false, radios: "if_multiple", spacedAccordionItems: true },
@@ -221,6 +216,38 @@ function PaymentForm({ label, installments, onBack }: { label: string; installme
         <button type="button" onClick={onBack} className="text-[14px] text-[var(--ink-3)] underline underline-offset-2 hover:text-[var(--ink)]">
           ← Modifier les coordonnées
         </button>
+      </p>
+    </div>
+  );
+}
+
+const euros = (cents: number) =>
+  new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(Math.ceil(cents) / 100);
+
+/**
+ * Le paiement en plusieurs fois, mis en avant (demande de Solal, 18/11/2026) :
+ * c'est tout l'intérêt de Klarna. Le montant de chaque échéance est indicatif
+ * (Klarna l'arrondit et affiche l'échéancier exact sur sa page, où le client
+ * est obligatoirement envoyé pour valider).
+ */
+function Installments({ cents }: { cents: number }) {
+  return (
+    <div className="mb-4 rounded-[16px] border border-[var(--amber-line)] bg-[#fdf6ea] p-4">
+      <p className="flex items-center gap-2 text-[15px] font-bold text-[var(--ink)]">
+        Payez en 3 ou 4 fois avec Klarna
+      </p>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        {[3, 4].map((n) => (
+          <div key={n} className="rounded-[12px] bg-white px-3 py-2.5">
+            <p className="text-[13px] text-[var(--ink-3)]">En {n} fois</p>
+            <p className="text-[17px] font-extrabold tracking-[-0.01em] tabular-nums">
+              {n} × {euros(cents / n)}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2.5 text-[13px] leading-relaxed text-[var(--ink-2)]">
+        Choisissez « Klarna » ci-dessous : vous validez l’échéancier sur la page sécurisée de Klarna, puis vous revenez ici.
       </p>
     </div>
   );
