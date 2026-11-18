@@ -41,7 +41,7 @@ export default function Hero() {
             <a href={`tel:${SITE.phone}`} className="link whitespace-nowrap">
               {SITE.phoneDisplay}
             </a>
-            , rien n’est enregistré.
+             : vous recevez votre récit écrit par SMS.
           </p>
           <ul
             className="rise mt-7 grid max-w-[41rem] gap-x-5 gap-y-4 border-t border-[var(--line)] pt-6 sm:grid-cols-[auto_auto_auto] sm:justify-between"

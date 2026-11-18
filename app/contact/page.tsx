@@ -36,7 +36,7 @@ export default function ContactPage() {
               </a>
               <p className="t-body mt-2">
                 Ce numéro est celui de Loomina, l’intelligence artificielle qui mène les entretiens. Elle répond à toute heure, pour un
-                essai de trois minutes ou pour vos appels après la commande. Ce n’est pas un service client.
+                essai de cinq minutes ou pour vos appels après la commande. Ce n’est pas un service client.
               </p>
             </div>
           </div>

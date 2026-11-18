@@ -14,6 +14,7 @@ import {
     buildAssistant,
     buildUnknownCallerAssistant,
     DEMO_MAX_SECONDS,
+    canReceiveSms,
 } from '../../lib/loomina/assistant';
 import { config } from './config.ts';
 import { hardLimitSeconds, normalizeCallMinutes } from '../../lib/loomina/call-length';
@@ -52,19 +53,22 @@ export async function planForCaller(customerNumber: string | null): Promise<Call
     // Les prompts réécrits dans l'admin (relus au plus une fois par minute ; ne lève jamais).
     await refreshPrompts();
 
+    // La démonstration : le récit part par SMS si le numéro est un portable.
+    const demo = () => fromVapiShape(buildUnknownCallerAssistant(serverUrl, { canText: canReceiveSms(customerNumber) }), DEMO_MAX_SECONDS, true, 'demo');
+
     if (!customerNumber) {
-        return fromVapiShape(buildUnknownCallerAssistant(serverUrl), DEMO_MAX_SECONDS, true, 'demo');
+        return demo();
     }
 
     const profile = await findProfileByPhone(customerNumber);
     if (!profile) {
-        return fromVapiShape(buildUnknownCallerAssistant(serverUrl), DEMO_MAX_SECONDS, true, 'demo');
+        return demo();
     }
 
     const project = await findActiveProject(profile.id);
     if (!project) {
         console.warn(`[plan] profil ${profile.id} sans projet actif → démo`);
-        return fromVapiShape(buildUnknownCallerAssistant(serverUrl), DEMO_MAX_SECONDS, true, 'demo');
+        return demo();
     }
 
     const phase = toPhase(project.phase);

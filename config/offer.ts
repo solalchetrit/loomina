@@ -13,7 +13,7 @@ export const OFFER = {
   delay: "6 à 8 semaines",
   /** Impression et acheminement une fois le livre validé. */
   printDelay: "2 à 3 semaines",
-  demoMinutes: 3,
+  demoMinutes: 5,
   /** Thèmes proposés au fil des appels, de l'enfance à aujourd'hui. */
   chapters: 14,
   format: "15 × 23 cm, couverture rigide",
