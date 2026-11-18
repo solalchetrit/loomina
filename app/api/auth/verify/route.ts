@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         // Check for required environment variables
         if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_VERIFY_SERVICE_SID) {
             console.error("[Verify API] Missing Twilio environment variables");
-            return NextResponse.json({ message: "Server configuration error" }, { status: 500 });
+            return NextResponse.json({ message: "L’envoi des codes est indisponible pour le moment. Réessayez un peu plus tard ou écrivez-nous à contact@loomina.eu." }, { status: 500 });
         }
 
         const body = await request.json();
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         // Basic validation
         if (!action || !phone_number) {
             console.error("[Verify API] Validation failed - missing fields");
-            return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+            return NextResponse.json({ message: "Indiquez votre numéro de téléphone." }, { status: 400 });
         }
 
         const formattedPhone = formatToE164(phone_number);
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
                 profile = (await findProfileByPhone(formattedPhone)) ?? ((await findGiftProjects(formattedPhone)).length > 0 ? { giver: true } : null);
             } catch (dbErr) {
                 console.error("[Verify API] DB Error:", dbErr);
-                return NextResponse.json({ message: "Database error during verification check" }, { status: 500 });
+                return NextResponse.json({ message: "Nous n’arrivons pas à vérifier votre numéro pour le moment. Réessayez dans un instant." }, { status: 500 });
             }
 
             if (!profile) {
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
             if (!response.ok) {
                 console.error("[Verify API] Twilio error:", data);
                 return NextResponse.json({
-                    message: "Failed to send verification code",
+                    message: "Le code n’a pas pu être envoyé par SMS. Réessayez dans quelques minutes ; si cela continue, écrivez-nous à contact@loomina.eu.",
                     error: data.message || "Unknown error"
                 }, { status: response.status });
             }
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error("[Verify API] Handler error:", error);
         return NextResponse.json(
-            { message: "Internal server error", error: error instanceof Error ? error.message : String(error) },
+            { message: "Une erreur est survenue. Réessayez dans un instant.", error: error instanceof Error ? error.message : String(error) },
             { status: 500 }
         );
     }
