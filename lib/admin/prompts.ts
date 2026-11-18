@@ -153,7 +153,7 @@ export function aiCatalog(): Ai[] {
             reads: 'Transcript, mémoire du livre, sujets suggérés, sujets à éviter, état de la phase, sujets propres à la personne.',
             writes: 'interviews (résumé, analyse), projects (phase, avancement, mémoire, prochaine question), profiles (tu/vous, style, sujets sensibles), family_members.',
             file: 'lib/loomina/director.ts',
-            prompts: phases.map((p) => ({ title: `Prompt système, phase ${p} (${PHASE_LABELS[p]})`, text: directorSystemPrompt(p) })),
+            prompts: phases.map((p) => ({ title: `Prompt système, phase ${p} (${PHASE_LABELS[p]})`, text: promptText(`directeur.${p}`, directorSystemPrompt(p)) })),
         },
         {
             key: 'ecrivain',
@@ -246,6 +246,7 @@ export function editablePrompts(): EditablePrompt[] {
         { key: 'voix.parler', ai: 'voix', title: 'Comment tu parles, et la fin d’appel', original: VOICE_SPEAK },
         { key: 'voix.rappel', ai: 'voix', title: 'Rappel placé en toute fin du prompt', original: ONE_QUESTION_REMINDER },
         { key: 'demo', ai: 'demo', title: 'Prompt de la démonstration', original: DEMO_SYSTEM },
+        ...phases.map((p) => ({ key: `directeur.${p}`, ai: 'directeur', title: `Prompt du Directeur, phase ${p} (${PHASE_LABELS[p]})`, original: directorSystemPrompt(p) })),
         { key: 'ecrivain', ai: 'ecrivain', title: 'Prompt système de l’Écrivain', original: WRITER_SYSTEM },
         { key: 'correction', ai: 'ecrivain', title: 'Correction demandée par l’auteur sur un récit', original: CORRECTION_SYSTEM },
         { key: 'livre.plan', ai: 'editeur', title: 'Le plan du livre', original: PLAN_SYSTEM },

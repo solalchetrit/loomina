@@ -187,6 +187,8 @@ export interface Overview {
     stuckEditions: Row[];
     /** Livres déclarés complets par leur auteur et pas encore relus par l'équipe. */
     toReview: Array<{ client: string | null; profileId: string | null }>;
+    /** Commandes des sept derniers jours, la plus récente d'abord. */
+    newOrders: Array<{ client: string | null; profileId: string | null; at: string; isGift: boolean }>;
 }
 
 export async function getOverview(): Promise<Overview> {
@@ -194,7 +196,7 @@ export async function getOverview(): Promise<Overview> {
     const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
     const [profiles, projects, interviews, chapters, problems, contacts, editions] = await Promise.all([
         supabase.from('profiles').select('id, first_name, last_name').limit(1000),
-        supabase.from('projects').select('id, user_id, status, project_metadata').limit(1000),
+        supabase.from('projects').select('id, user_id, status, project_metadata, created_at').limit(1000),
         supabase
             .from('interviews')
             .select('id, project_id, created_at, duration_seconds, processing_status, topics_summary, phase')
@@ -238,6 +240,9 @@ export async function getOverview(): Promise<Overview> {
         // La table peut ne pas exister sur une base de test : on ne bloque pas la page.
         contacts: contacts.error ? [] : ((contacts.data ?? []) as Row[]),
         stuckEditions: editions.error ? [] : ((editions.data ?? []) as Row[]),
+        newOrders: J.filter((j) => String(j.created_at) >= weekAgo && (j.project_metadata as Row | null)?.banc !== true)
+            .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+            .map((j) => ({ ...whose(j.id), at: String(j.created_at), isGift: (j.project_metadata as Row | null)?.is_gift === true })),
         toReview: J.filter((j) => j.status === 'completed' && typeof (j.project_metadata as Row | null)?.reviewed_at !== 'string' && typeof (j.project_metadata as Row | null)?.refunded_at !== 'string').map((j) => whose(j.id)),
     };
 }

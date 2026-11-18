@@ -18,6 +18,7 @@
  * anti-invention.
  */
 
+import { promptText, refreshPrompts } from './prompt-store';
 import { tokenUsage } from './usage';
 import type { TokenUsage } from './usage';
 import OpenAI from 'openai';
@@ -335,7 +336,8 @@ ${params.transcript}`;
 }
 
 export async function runDirector(params: DirectorInput): Promise<DirectorResult> {
-    const system = systemPrompt(params.phase);
+    await refreshPrompts();
+    const system = promptText(`directeur.${params.phase}`, systemPrompt(params.phase));
     const user = userPrompt(params);
     let model = params.model ?? DIRECTOR_MODEL;
     let raw: string;
