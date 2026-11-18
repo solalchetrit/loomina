@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import ScrollTop from "@/components/ScrollTop";
+import Reveal from "@/components/Reveal";
 import Analytics from "@/components/Analytics";
 import Footer from "@/components/Footer";
 import MobileCta from "@/components/MobileCta";
@@ -98,6 +99,7 @@ export default function RootLayout({
         className={`${plusJakartaSans.variable} ${newsreader.variable} min-h-screen bg-[var(--canvas)] font-sans text-[var(--ink)] antialiased`}
       >
         <ScrollTop />
+        <Reveal />
         <HideOnAdmin checkout><Header /></HideOnAdmin>
         <main>{children}</main>
         <HideOnAdmin checkout><Footer /><MobileCta /></HideOnAdmin>

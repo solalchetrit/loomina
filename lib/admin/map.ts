@@ -68,7 +68,7 @@ const minutes = CALL_MINUTES_OPTIONS.join(', ');
 
 export const MAP_ROOTS: MapRoot[] = [
     { id: 'r-visiteur', label: 'Une personne découvre Loomina', row: 0, over: ['decouvrir', 'commander', 'auteur', 'famille'], d: 'Par le site, le bouche-à-oreille ou un cadeau reçu.' },
-    { id: 'r-site', label: 'Le site loomina.eu', row: 1, from: 'r-visiteur', over: ['decouvrir', 'commander', 'auteur', 'famille'], d: 'Pages publiques, commande, espace auteur et espace famille. Hébergé sur Vercel.' },
+    { id: 'r-site', label: 'Le site loomina.eu', row: 1, from: 'r-visiteur', over: ['decouvrir', 'commander', 'auteur', 'famille'], d: 'Pages publiques, commande, espace auteur et espace famille. Hébergé sur Vercel. Le 18/11/2026 : les titres apparaissent une fois en entier quand on les atteint (plus de titres restés gris), et les questions de la FAQ s’ouvrent sans à-coup.' },
     { id: 'r-tel', label: `Un appel au ${SITE.phoneDisplay}`, row: 0, over: ['appel', 'apres', 'livre'], d: 'Le numéro Twilio de Loomina. Entrant (la personne appelle) ou sortant (rendez-vous).' },
     { id: 'r-admin', label: 'Vous, sur loomina.eu/admin', row: 1, over: ['admin'], d: 'L’espace réservé à l’équipe, protégé par un mot de passe. Aucun lien n’y mène depuis le site.' },
     { id: 'r-num', label: 'Quel numéro appelle ?', kind: 'q', row: 1, from: 'r-tel', over: ['appel', 'apres', 'livre'], d: 'Le serveur vocal (Render) cherche le numéro dans la base. Connu avec un livre en cours : entretien. Sinon : démonstration.' },
