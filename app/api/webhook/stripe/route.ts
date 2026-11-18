@@ -139,10 +139,25 @@ export async function POST(request: NextRequest) {
         if (styleErr) throw new Error(`défaut writing_style : ${styleErr.message}`);
 
         // ── Le projet ────────────────────────────────────────────────────────
+        // Un seul livre « active » par personne (index projects_one_active_per_user).
+        // Une personne qui recommande alors que son livre est en cours : le
+        // nouveau livre attend (statut « paused » + queued_behind) et prend le relais quand le premier
+        // est terminé (voir findActiveProject). Avant le 18/11/2026, l'insertion
+        // échouait, était prise pour un doublon de Stripe, et la commande payée
+        // ne créait rien.
+        const { data: enCours, error: enCoursErr } = await supabase
+            .from('projects')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('status', 'active')
+            .limit(1);
+        if (enCoursErr) throw new Error(`lecture projet en cours : ${enCoursErr.message}`);
+        const queuedBehind = enCours?.[0]?.id ?? null;
+
         const { error: projetErr } = await supabase.from('projects').insert({
             user_id: userId,
             title: firstName ? `Biographie de ${firstName}` : 'Mon Livre de Vie',
-            status: 'active',
+            status: queuedBehind ? 'paused' : 'active',
             phase: 1,                // 1 = Vue d'ensemble. Un entier, plus de texte libre.
             phase_progress: 0,
             current_topic_id: 1,
@@ -153,12 +168,15 @@ export async function POST(request: NextRequest) {
                 buyer_email: email,
                 call_minutes: normalizeCallMinutes(meta.callMinutes),
                 ...(giver ? { giver } : {}),
+                ...(queuedBehind ? { queued_behind: queuedBehind } : {}),
             },
         });
 
         if (projetErr) {
             // Course entre deux livraisons simultanées du même événement.
-            if (projetErr.code === '23505') {
+            // Seul le doublon de stripe_session_id est une course : toute autre
+            // contrainte est une vraie erreur, que Stripe doit rejouer.
+            if (projetErr.code === '23505' && /stripe_session_id/.test(`${projetErr.message} ${projetErr.details ?? ''}`)) {
                 console.log(`[stripe] course détectée sur ${session.id} — rejeu ignoré`);
                 return NextResponse.json({ received: true, duplicate: true });
             }

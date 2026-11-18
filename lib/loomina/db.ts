@@ -152,7 +152,16 @@ export async function findActiveProject(userId: string): Promise<Project | null>
     // Une commande remboursée depuis l'admin ne donne plus droit à rien :
     // ni entretien, ni espace auteur.
     const open = rows.filter((p) => typeof p.project_metadata?.refunded_at !== 'string');
-    return open.find((p) => p.status !== 'completed') ?? open[0] ?? null;
+    // Un livre commandé alors qu'un autre est en cours attend (statut
+    // « paused » + queued_behind, voir le webhook Stripe) : il ne devient le
+    // livre courant qu'une fois le précédent terminé.
+    const queued = (p: Project) => p.status === 'paused' && typeof p.project_metadata?.queued_behind === 'string';
+    return (
+        open.find((p) => p.status !== 'completed' && !queued(p)) ??
+        open.find(queued) ??
+        open[0] ??
+        null
+    );
 }
 
 /** « +33781311298 » → « ***1298 », pour les journaux et les tables lisibles. */
