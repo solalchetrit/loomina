@@ -250,9 +250,6 @@ export async function getOverview(): Promise<Overview> {
 /** Réglages de production qui méritent une alerte sur la page d'accueil de l'admin. */
 export function configWarnings(): string[] {
     const w: string[] = [];
-    if (process.env.LOOMINA_OPEN_AUTHOR_PROFILE_ID?.trim()) {
-        w.push("LOOMINA_OPEN_AUTHOR_PROFILE_ID est posée : l'espace auteur s'ouvre pour tout visiteur, sans code SMS, sur un profil de test. À retirer avant le premier vrai client.");
-    }
     const need: Array<[string, string]> = [
         ['SUPABASE_SERVICE_ROLE_KEY', 'base de données'],
         ['OPENAI_API_KEY', 'Directeur, Écrivain et livre'],

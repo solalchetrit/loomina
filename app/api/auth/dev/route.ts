@@ -1,26 +1,21 @@
 import { NextResponse } from "next/server";
 import { signSession, SESSION_COOKIE, SESSION_MAX_AGE_S } from "@/lib/loomina/session";
-import { db, maskPhone } from "@/lib/loomina/db";
+import { maskPhone } from "@/lib/loomina/db";
 
 /**
  * Ouverture directe de l'espace auteur, sans code SMS.
  *
- * Deux cas, et seulement ces deux-là (sinon 404) :
- * - poste local : `next dev` avec LOOMINA_DEV_LOGIN=true, session du numéro
- *   LOOMINA_DEV_PHONE (.env.local) ;
- * - en ligne, phase de test : LOOMINA_OPEN_AUTHOR_PROFILE_ID posée sur Vercel.
- *   Tout visiteur qui ouvre l'espace auteur arrive sur CE profil. À retirer
- *   avant le premier vrai client : la variable supprimée, la connexion par
- *   SMS revient d'elle-même.
+ * Seulement sur un poste local (sinon 404) : `next dev` avec
+ * LOOMINA_DEV_LOGIN=true, session du numéro LOOMINA_DEV_PHONE (.env.local).
+ *
+ * L'ouverture en ligne pour la phase de test (LOOMINA_OPEN_AUTHOR_PROFILE_ID)
+ * est retirée le 18/11/2026 à la demande de Solal : en ligne, l'espace auteur
+ * demande toujours le numéro puis un code SMS, même si la variable traîne
+ * encore sur Vercel.
  *
  * Aucun numéro ni identifiant ne vient du navigateur.
  */
 async function openPhone(): Promise<string | null> {
-  const profileId = process.env.LOOMINA_OPEN_AUTHOR_PROFILE_ID;
-  if (profileId) {
-    const { data } = await db().from("profiles").select("phone_number").eq("id", profileId).maybeSingle();
-    return (data?.phone_number as string | null) ?? null;
-  }
   if (process.env.NODE_ENV === "development" && process.env.LOOMINA_DEV_LOGIN === "true") {
     return process.env.LOOMINA_DEV_PHONE ?? null;
   }
