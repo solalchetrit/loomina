@@ -283,7 +283,9 @@ async function findAuthUserIdByEmail(email: string): Promise<string | null> {
 async function handleAbandonedCart(session: Stripe.Checkout.Session): Promise<void> {
     const meta = session.metadata ?? {};
     const email = meta.email?.trim();
-    if (!email || meta.relance_sent === 'true') return;
+    // superseded : le client a changé de moyen de paiement (carte ↔ Klarna),
+    // une autre session a pris le relais.
+    if (!email || meta.relance_sent === 'true' || meta.superseded === 'true') return;
 
     // A-t-elle finalement commandé (autre onglet, autre essai) ?
     const { data: paid } = await db().from('projects').select('id').eq('project_metadata->>buyer_email', email).limit(1);

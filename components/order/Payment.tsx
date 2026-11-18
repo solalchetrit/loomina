@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
 import { CheckoutElementsProvider, PaymentElement, useCheckout } from "@stripe/react-stripe-js/checkout";
@@ -20,6 +20,10 @@ export default function Payment({
   publishableKey,
   label,
   installments = false,
+  method,
+  onSwitch,
+  promo,
+  onPromo,
   onBack,
 }: {
   clientSecret: string;
@@ -28,6 +32,11 @@ export default function Payment({
   label: string;
   /** Klarna est proposé : paiement en 3 ou 4 fois. */
   installments?: boolean;
+  method: "card" | "klarna";
+  /** Crée la session du moyen choisi ; false si impossible. */
+  onSwitch: (method: "card" | "klarna") => Promise<boolean>;
+  promo: string | null;
+  onPromo: (code: string | null) => void;
   onBack: () => void;
 }) {
   const stripePromise = useMemo(() => loadStripe(publishableKey), [publishableKey]);
@@ -61,13 +70,39 @@ export default function Payment({
         },
       }}
     >
-      <PaymentForm label={label} installments={installments} onBack={onBack} />
+      <PaymentForm label={label} installments={installments} method={method} onSwitch={onSwitch} promo={promo} onPromo={onPromo} onBack={onBack} />
     </CheckoutElementsProvider>
   );
 }
 
-function PaymentForm({ label, installments, onBack }: { label: string; installments: boolean; onBack: () => void }) {
+function PaymentForm({
+  label,
+  installments,
+  method,
+  onSwitch,
+  promo,
+  onPromo,
+  onBack,
+}: {
+  label: string;
+  installments: boolean;
+  method: "card" | "klarna";
+  onSwitch: (method: "card" | "klarna") => Promise<boolean>;
+  promo: string | null;
+  onPromo: (code: string | null) => void;
+  onBack: () => void;
+}) {
   const state = useCheckout();
+  const [switching, setSwitching] = useState<"card" | "klarna" | null>(null);
+  const [switchError, setSwitchError] = useState(false);
+
+  // Nouvelle session après un changement de moyen : on y remet le code promo.
+  const reapplied = useRef(false);
+  useEffect(() => {
+    if (state.type !== "success" || reapplied.current || !promo) return;
+    reapplied.current = true;
+    if (!state.checkout.discountAmounts?.length) void state.checkout.applyPromotionCode(promo);
+  }, [state, promo]);
   const [code, setCode] = useState("");
   const [codeOpen, setCodeOpen] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
@@ -106,12 +141,16 @@ function PaymentForm({ label, installments, onBack }: { label: string; installme
     const res = await checkout.applyPromotionCode(value);
     setCodeBusy(false);
     if (res.type === "error") setCodeError("Ce code n’est pas valable. Vérifiez l’orthographe.");
-    else setCode("");
+    else {
+      setCode("");
+      onPromo(value);
+    }
   };
 
   const removeCode = async () => {
     setCodeBusy(true);
     await checkout.removePromotionCode();
+    onPromo(null);
     setCodeBusy(false);
   };
 
@@ -182,7 +221,61 @@ function PaymentForm({ label, installments, onBack }: { label: string; installme
       {/* Carte */}
       {!free && (
         <div className="mt-5">
-          {installments && <Installments cents={checkout.total.total.minorUnitsAmount} />}
+          {installments && (
+            <div className="mb-4 grid gap-2" role="radiogroup" aria-label="Moyen de paiement">
+              {(
+                [
+                  { key: "card", title: "Carte bancaire", sub: "En une fois" },
+                  {
+                    key: "klarna",
+                    title: "Payer en 3 ou 4 fois",
+                    sub: `${3} × ${euros(checkout.total.total.minorUnitsAmount / 3)} ou ${4} × ${euros(checkout.total.total.minorUnitsAmount / 4)}`,
+                  },
+                ] as const
+              ).map((o) => {
+                const active = (switching ?? method) === o.key;
+                return (
+                  <button
+                    key={o.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    disabled={Boolean(switching)}
+                    onClick={async () => {
+                      if (o.key === method) return;
+                      setSwitching(o.key);
+                      setSwitchError(false);
+                      const ok = await onSwitch(o.key);
+                      if (!ok) {
+                        setSwitching(null);
+                        setSwitchError(true);
+                      }
+                    }}
+                    className={`press flex min-h-14 items-center gap-3 rounded-[14px] border px-4 py-3 text-left transition ${
+                      active ? "border-[var(--ink)] ring-1 ring-[var(--ink)]" : "border-[var(--rule-strong)] hover:border-[var(--ink)]"
+                    }`}
+                  >
+                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${active ? "border-[var(--ink)]" : "border-[var(--rule-strong)]"}`}>
+                      {active && <span className="h-2.5 w-2.5 rounded-full bg-[var(--ink)]" />}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-bold leading-tight">{o.title}</span>
+                      <span className="mt-0.5 block text-[13px] text-[var(--ink-3)] tabular-nums">{o.sub}</span>
+                    </span>
+                    {o.key === "klarna" ? (
+                      <span className="rounded-[6px] bg-[#ffb3c7] px-2 py-1 text-[12px] font-extrabold tracking-tight text-[#0b051d]">Klarna.</span>
+                    ) : (
+                      <span className="text-[var(--ink-3)]">
+                        <Icon name="shield" size={18} />
+                      </span>
+                    )}
+                    {switching === o.key && <span className="sr-only">Chargement</span>}
+                  </button>
+                );
+              })}
+              {switchError && <p className="text-[14px] font-medium text-[var(--danger)]">Ce moyen de paiement n’est pas disponible pour le moment. Réessayez, ou payez par carte.</p>}
+            </div>
+          )}
           <PaymentElement
             options={{
               layout: { type: "accordion", defaultCollapsed: false, radios: "if_multiple", spacedAccordionItems: true },
@@ -205,7 +298,7 @@ function PaymentForm({ label, installments, onBack }: { label: string; installme
         className="press mt-5 flex min-h-13 w-full items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-3.5 text-[17px] font-bold text-white transition hover:bg-[var(--ink-soft)] disabled:opacity-50"
       >
         <Icon name="shield" size={18} />
-        {paying ? "Validation…" : free ? "Valider ma commande" : `Payer ${checkout.total.total.amount}`}
+        {paying ? "Validation…" : free ? "Valider ma commande" : method === "klarna" ? "Continuer avec Klarna" : `Payer ${checkout.total.total.amount}`}
       </button>
 
       <p className="mt-3 text-center text-[13px] leading-relaxed text-[var(--ink-3)]">
@@ -223,32 +316,3 @@ function PaymentForm({ label, installments, onBack }: { label: string; installme
 
 const euros = (cents: number) =>
   new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(Math.ceil(cents) / 100);
-
-/**
- * Le paiement en plusieurs fois, mis en avant (demande de Solal, 18/11/2026) :
- * c'est tout l'intérêt de Klarna. Le montant de chaque échéance est indicatif
- * (Klarna l'arrondit et affiche l'échéancier exact sur sa page, où le client
- * est obligatoirement envoyé pour valider).
- */
-function Installments({ cents }: { cents: number }) {
-  return (
-    <div className="mb-4 rounded-[16px] border border-[var(--amber-line)] bg-[#fdf6ea] p-4">
-      <p className="flex items-center gap-2 text-[15px] font-bold text-[var(--ink)]">
-        Payez en 3 ou 4 fois avec Klarna
-      </p>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        {[3, 4].map((n) => (
-          <div key={n} className="rounded-[12px] bg-white px-3 py-2.5">
-            <p className="text-[13px] text-[var(--ink-3)]">En {n} fois</p>
-            <p className="text-[17px] font-extrabold tracking-[-0.01em] tabular-nums">
-              {n} × {euros(cents / n)}
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="mt-2.5 text-[13px] leading-relaxed text-[var(--ink-2)]">
-        Choisissez « Klarna » ci-dessous : vous validez l’échéancier sur la page sécurisée de Klarna, puis vous revenez ici.
-      </p>
-    </div>
-  );
-}

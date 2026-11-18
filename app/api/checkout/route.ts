@@ -7,6 +7,11 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         const { firstName, lastName, phone, email, isGift, callMinutes, giverFirstName, giverPhone } = body;
+        // Moyen choisi sur la page : carte (par défaut) ou Klarna (3 ou 4 fois).
+        // Chaque choix a sa propre session Stripe : c'est ce qui permet d'afficher
+        // nos propres boutons « Carte » et « 3 ou 4 fois » au lieu de la liste de Stripe.
+        const method: "card" | "klarna" = body.method === "klarna" ? "klarna" : "card";
+        const replaces = typeof body.replaces === "string" && /^cs_(live|test)_[A-Za-z0-9]+$/.test(body.replaces) ? body.replaces : null;
 
         // Validation simple
         if (!email || !firstName || !lastName) {
@@ -27,10 +32,9 @@ export async function POST(request: NextRequest) {
         // Après paiement : page de bienvenue, qui ouvre ensuite l'espace (app/bienvenue).
         const welcomeUrl = `${origin}/bienvenue?session_id={CHECKOUT_SESSION_ID}`;
 
-        // Paiement en 3 ou 4 fois (demande de Solal, 18/11/2026) : Klarna, proposé
-        // à côté de la carte dans le formulaire intégré. Il doit être activé dans
-        // Stripe (Paramètres, Moyens de paiement) ; sinon Stripe refuse la
-        // session, et on la recrée avec la carte seule.
+        // Paiement en 3 ou 4 fois (demande de Solal, 18/11/2026) : Klarna, activé
+        // dans Stripe (Paramètres, Moyens de paiement). S'il ne l'était plus, Stripe
+        // refuserait la session Klarna : la page retire alors le bouton.
         const create = (methods: ("card" | "klarna")[]) => stripe().checkout.sessions.create({
             ...(embedded
                 ? { ui_mode: "custom" as const, return_url: welcomeUrl }
@@ -77,19 +81,30 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        let installments = embedded;
+        // Changement de moyen : l'ancienne session ne doit pas déclencher de relance
+        // de panier abandonné (voir app/api/webhook/stripe).
+        if (embedded && replaces) {
+            try {
+                const old = await stripe().checkout.sessions.retrieve(replaces);
+                if (old.metadata?.email === email && old.status === "open") {
+                    await stripe().checkout.sessions.update(replaces, { metadata: { superseded: "true" } });
+                }
+            } catch {
+                /* au pire, une relance de trop */
+            }
+        }
+
         let session;
         try {
-            session = await create(embedded ? ["card", "klarna"] : ["card"]);
+            session = await create(embedded ? [method] : ["card"]);
         } catch (err) {
-            if (!embedded) throw err;
-            console.warn("[checkout] Klarna indisponible, carte seule :", err instanceof Error ? err.message : String(err));
-            installments = false;
-            session = await create(["card"]);
+            if (method !== "klarna") throw err;
+            console.warn("[checkout] Klarna indisponible :", err instanceof Error ? err.message : String(err));
+            return NextResponse.json({ error: "klarna" }, { status: 502 });
         }
 
         if (embedded) {
-            return NextResponse.json({ clientSecret: session.client_secret, publishableKey, installments });
+            return NextResponse.json({ clientSecret: session.client_secret, publishableKey, method, installments: process.env.LOOMINA_KLARNA !== "off" });
         }
         return NextResponse.json({ url: session.url });
 
