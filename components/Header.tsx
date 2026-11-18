@@ -1,5 +1,7 @@
 "use client";
 
+import LogoMotion, { TIGHT_WORDMARK } from "@/components/brand/LogoMotion";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -35,7 +37,10 @@ export default function Header() {
         <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-4 rounded-[22px] border border-[var(--line)] bg-white/90 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-md md:h-[68px] md:pl-6">
           <Link href="/" className="relative z-[920] flex shrink-0 items-center" aria-label="Loomina, accueil">
             <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
-              <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
+              {/* L'étoile tourne quand on passe sur le logo. Rien ne bouge à l'arrivée (Solal, 18/11/2026 : ça ressemblait à un bug). */}
+              <LogoMotion name="survol" mode="hover" vb={TIGHT_WORDMARK} align="left" className="h-full w-full">
+                <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
+              </LogoMotion>
             </span>
           </Link>
 
@@ -64,7 +69,7 @@ export default function Header() {
             </Link>
             <a
               href={`tel:${SITE.phone}`}
-              className="press inline-flex h-12 items-center whitespace-nowrap rounded-[14px] bg-[var(--amber-soft)] px-4 text-[15px] font-bold text-[var(--amber-deep)] hover:bg-[#f9dfb8]"
+              className="press inline-flex h-12 items-center whitespace-nowrap rounded-[14px] bg-[var(--amber-soft)] px-4 text-[15px] font-bold text-[var(--amber-deep)] hover:bg-[var(--amber-line)]"
             >
               Essayer la démo
             </a>

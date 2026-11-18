@@ -22,7 +22,10 @@
   --line-soft: #efeeea;      /* séparateur dans une carte */
 
   /* Encre */
-  --ink: #161616;
+  --ink: #161616;            /* noir : titres, boutons, panneaux sombres */
+  --title: #161616;          /* les titres restent noirs : le bleu est pour les surfaces */
+  --night: #161616;
+  --night-deep: #0e0e0e;     /* pied de page, fond le plus sombre */
   --ink-soft: #2b2b28;
   --ink-2: #4a4a45;          /* texte secondaire, ≥ 8:1 */
   --ink-3: #66665f;          /* texte discret, ≥ 5:1 */
@@ -33,6 +36,7 @@
   --amber-display: #c27610;  /* ambre des grands titres seulement (3.3:1) */
   --amber-soft: #fcebd2;     /* fond de pastille */
   --amber-line: #f6ddb5;
+  --amber-wash: #fdf3e4;     /* fond très clair d'une ligne mise en avant */
   --amber-deep: #6f4005;     /* texte sur --amber-soft */
 
   /* États */
@@ -60,6 +64,25 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
+
+/* Un titre posé dans un panneau sombre (texte blanc) suit le blanc du panneau. */
+.text-white {
+  --title: #ffffff;
+}
+
+/* Un bloc sur fond bleu nuit : les mêmes jetons, retournés pour rester lisibles. */
+.on-night {
+  --ink: #ffffff;
+  --title: #ffffff;
+  --ink-2: rgba(255, 255, 255, 0.82);
+  --ink-3: rgba(255, 255, 255, 0.64);
+  --line: rgba(255, 255, 255, 0.16);
+  --amber-display: var(--amber);
+  --amber-line: color-mix(in srgb, var(--amber) 55%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--night) 55%, var(--night-deep)) 0%, var(--night-deep) 100%);
+  color: var(--ink);
+}
+
 
 /* ================================================================
    BASE
@@ -93,7 +116,7 @@
     font-weight: 800;
     letter-spacing: -0.03em;
     text-wrap: balance;
-    color: var(--ink);
+    color: var(--title);
   }
 
   p {
@@ -342,6 +365,10 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
+  /* Ombre en deux couches à quelques pour cent : la carte se pose sur la page sans qu'on voie l'ombre. */
+  box-shadow:
+    0 1px 2px rgba(22, 22, 22, 0.03),
+    0 6px 12px -4px rgba(22, 22, 22, 0.04);
 }
 
 .card-float {
@@ -612,4 +639,37 @@ textarea.field {
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-cue { animation: none; }
+}
+
+/* ================================================================
+   LUMIÈRE ET OMBRES (Solal, 19/11/2026 : sobre, chic, élégant)
+   Première version trop appuyée. Mesuré sur stripe.com et
+   mercury.com : les fonds sombres sont des aplats, les ombres
+   tiennent en deux ou trois couches à 2–8 % d'opacité, et la seule
+   « brillance » est un filet d'un pixel en haut. On fait pareil :
+   l'effet doit se sentir, pas se voir.
+   Dans @layer components : une classe utilitaire garde le dernier mot.
+   ================================================================ */
+@layer components {
+  /* Toute surface bleu nuit (boutons, pastilles actives) : un filet de lumière d'un pixel, rien d'autre. */
+  .bg-\[var\(--ink\)\] {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  /* Les grands panneaux : l'angle haut-gauche à peine plus clair, et une ombre portée en trois couches. */
+  .bg-\[var\(--ink\)\][class*="rounded-[2"],
+  .bg-\[var\(--ink\)\][class*="rounded-[3"],
+  .bg-\[var\(--ink\)\][class*="radius-card"] {
+    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 55%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 1px 2px rgba(22, 22, 22, 0.06),
+      0 8px 16px -6px rgba(22, 22, 22, 0.08),
+      0 24px 48px -24px rgba(22, 22, 22, 0.16);
+  }
+
+  /* L'ambre : aplat, avec le même filet de lumière. */
+  .bg-\[var\(--amber\)\] {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 1px 2px rgba(110, 64, 5, 0.12);
+  }
 }

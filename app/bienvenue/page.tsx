@@ -1,5 +1,7 @@
 "use client";
 
+import LogoMotion from "@/components/brand/LogoMotion";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
@@ -231,6 +233,7 @@ export default function BienvenuePage() {
   if (state !== "ready" || !info) {
     return (
       <Shell>
+        <LogoMotion name="persoEcrit" mode="loop" className="mb-5 h-24 w-24" />
         <p className="t-eyebrow">Paiement reçu</p>
         <h1 className="t-title mt-3">Nous préparons votre espace…</h1>
         <p className="t-body mt-4 max-w-xl" role="status">
@@ -267,9 +270,14 @@ export default function BienvenuePage() {
       </ol>
 
       <div key={index} className="rise mt-8">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#fdf3e4] text-[var(--amber-ink)]">
-          <Icon name={slide.icon} size={26} />
-        </span>
+        {index === 0 ? (
+          // Premier écran après l'achat : l'Étincelle fête la commande.
+          <LogoMotion name="persoFete" mode="loop" className="h-24 w-24" />
+        ) : (
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--amber-wash)] text-[var(--amber-ink)]">
+            <Icon name={slide.icon} size={26} />
+          </span>
+        )}
         <p className="t-eyebrow mt-6">{slide.eyebrow}</p>
         <h1 className="t-title mt-2">{slide.title}</h1>
         <div className="t-body mt-4 max-w-xl">{slide.body}</div>

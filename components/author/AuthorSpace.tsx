@@ -45,7 +45,7 @@ function NextCall({ topic, schedule }: { topic: string | null; schedule?: string
       <div className="mt-auto pt-8">
         <a
           href={`tel:${SITE.phone}`}
-          className="press inline-flex min-h-14 items-center rounded-full bg-[var(--amber)] px-7 text-[22px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:bg-[#f4ac4b]"
+          className="press inline-flex min-h-14 items-center rounded-full bg-[var(--amber)] px-7 text-[22px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
         >
           {SITE.phoneDisplay}
         </a>

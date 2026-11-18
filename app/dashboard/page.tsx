@@ -178,7 +178,7 @@ export default function DashboardPage() {
             </p>
 
             {justOrdered && loginStep === "phone" && (
-              <div className="mt-8 max-w-md rounded-[20px] border border-[var(--amber-line)] bg-[#fdf3e4] p-6">
+              <div className="mt-8 max-w-md rounded-[20px] border border-[var(--amber-line)] bg-[var(--amber-wash)] p-6">
                 <p className="text-[19px] font-extrabold tracking-[-0.02em]">Merci, votre commande est confirmée.</p>
                 <p className="t-body mt-3">
                   Tout commence par un appel : composez le{" "}

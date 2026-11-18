@@ -68,7 +68,7 @@ export default function Compare() {
                   ["Loomina", r.loomina],
                 ] as const
               ).map(([who, cell]) => (
-                <div key={who} className={`flex gap-3 ${who === "Loomina" ? "rounded-[12px] bg-[#fdf3e4] p-2 -mx-2" : ""}`}>
+                <div key={who} className={`flex gap-3 ${who === "Loomina" ? "rounded-[12px] bg-[var(--amber-wash)] p-2 -mx-2" : ""}`}>
                   <dt className="w-28 shrink-0 font-semibold">{who}</dt>
                   <dd>
                     <Value cell={cell} strong={who === "Loomina"} />
@@ -109,7 +109,7 @@ export default function Compare() {
                 <td className="px-5 py-4">
                   <Value cell={r.biographer} />
                 </td>
-                <td className="bg-[#fdf3e4] px-5 py-4">
+                <td className="bg-[var(--amber-wash)] px-5 py-4">
                   <Value cell={r.loomina} strong />
                 </td>
               </tr>
