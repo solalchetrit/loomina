@@ -4,12 +4,11 @@ import { useEffect, useState } from "react";
 import Payment from "@/components/order/Payment";
 import Icon from "@/components/ui/Icon";
 import { CALL_MINUTES_OPTIONS, DEFAULT_CALL_MINUTES } from "@/lib/loomina/call-length";
-import Link from "next/link";
 import { formatToE164 } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
-import Photo from "@/components/ui/Photo";
-import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
+import CheckoutBar, { CheckoutFooter } from "@/components/order/CheckoutBar";
+import { OFFER } from "@/config/offer";
 import { track } from "@/lib/analytics";
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
@@ -31,7 +30,7 @@ export default function OrderPage() {
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", giverFirstName: "", giverPhone: "" });
   const [callMinutes, setCallMinutes] = useState<number>(DEFAULT_CALL_MINUTES);
   // Paiement intégré : le formulaire Stripe s'affiche ici, à l'étape 3.
-  const [checkout, setCheckout] = useState<{ clientSecret: string; publishableKey: string } | null>(null);
+  const [checkout, setCheckout] = useState<{ clientSecret: string; publishableKey: string; installments: boolean } | null>(null);
 
   // Les boutons « Commencer mon livre » et « Offrir le livre » arrivent ici avec le choix déjà fait.
   useEffect(() => {
@@ -97,7 +96,7 @@ export default function OrderPage() {
       });
       const data = await res.json();
       if (data.clientSecret && data.publishableKey) {
-        setCheckout({ clientSecret: data.clientSecret, publishableKey: data.publishableKey });
+        setCheckout({ clientSecret: data.clientSecret, publishableKey: data.publishableKey, installments: Boolean(data.installments) });
         setSubmitting(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else if (data.url) {
@@ -117,42 +116,47 @@ export default function OrderPage() {
     step === 1 ? "À qui se destine ce livre ?" : step === 3 ? "Paiement" : isGift ? "Qui va raconter son histoire ?" : "Vos coordonnées";
 
   return (
-    <div className="page-top section-b w-full">
-      <div className="mx-auto w-full max-w-[1080px] px-4 sm:px-6">
-        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-6">
-          <div className="card p-5 sm:p-8">
-            {/* Progression */}
-            <ol className="flex items-center gap-2 text-[14px] font-semibold sm:gap-3" aria-label="Étapes de la commande">
-              {STEPS.map((label, i) => {
-                const n = i + 1;
-                const current = n === step;
-                const done = n < step;
-                return (
-                  <li key={label} className="flex items-center gap-2 sm:gap-3">
-                    {i > 0 && <span aria-hidden className={`h-px w-4 sm:w-8 ${done || current ? "bg-[var(--ink)]" : "bg-[var(--rule-strong)]"}`} />}
-                    <span className={`flex items-center gap-2 ${current ? "text-[var(--ink)]" : done ? "text-[var(--ink-2)]" : "text-[var(--ink-3)]"}`} aria-current={current ? "step" : undefined}>
-                      <span
-                        className={`flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-bold ${
-                          current ? "bg-[var(--ink)] text-white" : done ? "bg-[var(--amber-soft)] text-[var(--amber-deep)]" : "border border-[var(--rule-strong)]"
-                        }`}
-                      >
-                        {done ? <Icon name="check" size={13} /> : n}
-                      </span>
-                      <span className={current ? "" : "hidden sm:inline"}>{label}</span>
+    <div className="flex min-h-svh flex-col">
+      <CheckoutBar />
+      <div className="flex-1 px-4 pb-6 sm:px-6">
+        <div className="mx-auto w-full max-w-[640px]">
+          {/* Progression */}
+          <ol className="mb-4 mt-1 flex items-center justify-center sm:mt-6 gap-2 text-[13px] font-semibold sm:gap-3" aria-label="Étapes de la commande">
+            {STEPS.map((label, i) => {
+              const n = i + 1;
+              const current = n === step;
+              const done = n < step;
+              return (
+                <li key={label} className="flex items-center gap-2 sm:gap-3">
+                  {i > 0 && <span aria-hidden className={`h-px w-5 sm:w-10 ${done || current ? "bg-[var(--ink)]" : "bg-[var(--rule-strong)]"}`} />}
+                  <span className={`flex items-center gap-1.5 ${current ? "text-[var(--ink)]" : done ? "text-[var(--ink-2)]" : "text-[var(--ink-3)]"}`} aria-current={current ? "step" : undefined}>
+                    <span
+                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
+                        current ? "bg-[var(--ink)] text-white" : done ? "bg-[var(--amber-soft)] text-[var(--amber-deep)]" : "border border-[var(--rule-strong)]"
+                      }`}
+                    >
+                      {done ? <Icon name="check" size={12} /> : n}
                     </span>
-                  </li>
-                );
-              })}
-            </ol>
+                    <span className={current ? "" : "hidden sm:inline"}>{label}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
 
-            <h1 className="mt-6 text-[26px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[30px]">{title}</h1>
+          <div className="card card-float p-5 sm:p-8">
+            <p className="text-[13px] font-semibold text-[var(--amber-ink)]">
+              Votre livre de vie · {OFFER.price} € tout compris
+            </p>
+            <h1 className="mt-1.5 text-[26px] font-extrabold leading-tight tracking-[-0.03em] sm:text-[30px]">{title}</h1>
 
             {/* Étape 3 : paiement intégré, sans quitter le site */}
             {step === 3 && checkout && (
-              <div className="rise mt-6 max-w-[560px]">
+              <div className="rise mt-6">
                 <Payment
                   clientSecret={checkout.clientSecret}
                   publishableKey={checkout.publishableKey}
+                  installments={checkout.installments}
                   label={isGift && form.firstName.trim() ? `Le livre de ${form.firstName.trim()}` : "Votre livre de vie"}
                   onBack={() => setCheckout(null)}
                 />
@@ -161,11 +165,11 @@ export default function OrderPage() {
 
             {/* Étape 1 */}
             {step !== 3 && (
-              <div className="mt-6 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Destinataire">
+              <div className="mt-6 grid grid-cols-2 gap-3" role="radiogroup" aria-label="Destinataire">
                 {(
                   [
-                    { key: "me", title: "C’est pour moi", text: "Je raconte mon histoire.", icon: "user" },
-                    { key: "gift", title: "C’est pour offrir", text: "Un proche raconte la sienne.", icon: "gift" },
+                    { key: "me", title: "Pour moi", text: "Je raconte mon histoire.", icon: "user" },
+                    { key: "gift", title: "Pour offrir", text: "Un proche raconte la sienne.", icon: "gift" },
                   ] as const
                 ).map((o) => {
                   const active = who === o.key;
@@ -176,16 +180,19 @@ export default function OrderPage() {
                       role="radio"
                       aria-checked={active}
                       onClick={() => setWho(o.key)}
-                      className={`press flex items-center gap-3 rounded-[16px] border px-4 py-3.5 text-left transition ${
+                      className={`press relative flex flex-col items-start gap-3 rounded-[18px] border p-4 text-left transition sm:p-5 ${
                         active ? "border-[var(--ink)] bg-[var(--canvas)] ring-1 ring-[var(--ink)]" : "border-[var(--rule-strong)] bg-white hover:border-[var(--ink)]"
                       }`}
                     >
-                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${active ? "bg-[var(--ink)] text-white" : "bg-[var(--surface-2)] text-[var(--ink-2)]"}`}>
+                      <span className={`flex h-10 w-10 items-center justify-center rounded-full transition ${active ? "bg-[var(--ink)] text-white" : "bg-[var(--surface-2)] text-[var(--ink-2)]"}`}>
                         <Icon name={o.icon} size={19} />
                       </span>
-                      <span className="min-w-0">
-                        <span className="block text-[16px] font-bold leading-tight">{o.title}</span>
-                        <span className="mt-0.5 block text-[14px] text-[var(--ink-3)]">{o.text}</span>
+                      <span>
+                        <span className="block text-[16px] font-bold leading-tight sm:text-[17px]">{o.title}</span>
+                        <span className="mt-1 block text-[14px] leading-snug text-[var(--ink-3)]">{o.text}</span>
+                      </span>
+                      <span aria-hidden className={`absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-full border transition ${active ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-[var(--rule-strong)]"}`}>
+                        {active && <Icon name="check" size={12} />}
                       </span>
                     </button>
                   );
@@ -281,58 +288,33 @@ export default function OrderPage() {
                   </p>
                 )}
 
-                <div className="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-                  <Button type="submit" loading={submitting} className="sm:min-w-[260px]">
+                <div className="mt-6">
+                  <Button type="submit" loading={submitting} className="w-full">
                     {submitting ? "Préparation du paiement…" : "Continuer vers le paiement"}
                   </Button>
-                  <p className="flex items-center gap-1.5 text-[13px] text-[var(--ink-3)]">
-                    <Icon name="shield" size={15} /> Paiement sécurisé, à l’étape suivante.
-                  </p>
                 </div>
               </form>
             )}
           </div>
 
-          {/* Récapitulatif */}
-          <aside className="card order-first p-4 sm:p-5 lg:sticky lg:top-28 lg:order-none" aria-label="Votre commande">
-            <div className="flex items-center gap-4">
-              <Photo
-                name="livre-deux-exemplaires"
-                alt="Le livre Loomina relié."
-                ratio="aspect-square"
-                focus="50% 45%"
-                sizes="80px"
-                className="!w-16 shrink-0 !rounded-[12px] sm:!w-20"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-[15px] font-bold leading-snug">{OFFER.name}</p>
-                <p className="mt-0.5 text-[13px] text-[var(--ink-3)]">Livraison incluse</p>
-              </div>
-              <p className="text-[24px] font-extrabold tracking-[-0.03em]">
-                {OFFER.price}
-                <span className="ml-0.5 text-[15px] font-bold">{OFFER.currencySymbol}</span>
-              </p>
-            </div>
-            <ul className="mt-4 hidden space-y-2 border-t border-[var(--line-soft)] pt-4 sm:block">
-              {INCLUDED.map((i) => (
-                <li key={i.title} className="flex items-start gap-2.5 text-[14px] leading-snug text-[var(--ink-2)]">
-                  <span className="mt-0.5 text-[var(--amber-ink)]">
-                    <Icon name="check" size={15} />
-                  </span>
-                  {i.title}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 hidden rounded-[12px] bg-[var(--canvas)] p-3 text-[13px] leading-relaxed text-[var(--ink-2)] sm:block">{GUARANTEE}</p>
-            <p className="mt-3 hidden text-[13px] text-[var(--ink-3)] sm:block">
-              Une question ?{" "}
-              <Link href="/contact" className="underline underline-offset-2">
-                Écrivez-nous
-              </Link>
-            </p>
-          </aside>
+          {/* Ce qui rassure, en une ligne */}
+          <ul className="mt-5 grid gap-2 text-[13px] text-[var(--ink-3)] sm:grid-cols-3 sm:gap-3">
+            {([
+              { icon: "heart", text: `Remboursé si le premier appel ne vous plaît pas` },
+              { icon: "book", text: "Livre relié livré chez vous, frais inclus" },
+              { icon: "phone", text: "Autant d’appels qu’il vous faut" },
+            ] as const).map((t) => (
+              <li key={t.text} className="flex items-center gap-2 sm:flex-col sm:items-center sm:text-center">
+                <span className="text-[var(--amber-ink)]">
+                  <Icon name={t.icon} size={16} />
+                </span>
+                {t.text}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
+      <CheckoutFooter />
     </div>
   );
 }

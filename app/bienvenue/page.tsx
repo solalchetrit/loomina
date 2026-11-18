@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+import CheckoutBar, { CheckoutFooter } from "@/components/order/CheckoutBar";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
@@ -301,10 +302,14 @@ export default function BienvenuePage() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="page-top section-b min-h-[80svh] w-full">
-      <div className="mx-auto w-full max-w-[860px] px-5 sm:px-6">
-        <div className="card p-6 sm:p-8 md:p-12">{children}</div>
+    <div className="flex min-h-svh flex-col">
+      <CheckoutBar />
+      <div className="flex-1 px-4 pb-6 sm:px-6">
+        <div className="mx-auto w-full max-w-[640px]">
+          <div className="card card-float p-6 sm:p-10">{children}</div>
+        </div>
       </div>
+      <CheckoutFooter />
     </div>
   );
 }

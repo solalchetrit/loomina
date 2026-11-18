@@ -98,9 +98,10 @@ export default function RootLayout({
         className={`${plusJakartaSans.variable} ${newsreader.variable} min-h-screen bg-[var(--canvas)] font-sans text-[var(--ink)] antialiased`}
       >
         <ScrollTop />
-        <HideOnAdmin><Header /></HideOnAdmin>
+        <HideOnAdmin checkout><Header /></HideOnAdmin>
         <main>{children}</main>
-        <HideOnAdmin><Footer /><MobileCta /><Analytics /></HideOnAdmin>
+        <HideOnAdmin checkout><Footer /><MobileCta /></HideOnAdmin>
+        <HideOnAdmin><Analytics /></HideOnAdmin>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
