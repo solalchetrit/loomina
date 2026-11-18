@@ -449,7 +449,7 @@ export function demoNumberBlock(canText: boolean): string {
 export function demoFirstMessage(canText: boolean): string {
     return (
         "Bonjour, ici Loumina, le biographe par téléphone. " +
-        "Au fil de conversations comme celle-ci, j'aide chacun à raconter sa vie, et tout devient un livre relié, à garder et à transmettre. " +
+        "Au téléphone, je vous aide à raconter votre vie, et j'en fais un livre relié, à garder et à transmettre. " +
         (canText
             ? "Je vous propose d'essayer : en cinq minutes, vous me racontez un moment de votre vie, et je vous envoie le récit écrit par SMS juste après. "
             : "Je vous propose d'essayer : en cinq minutes, vous me racontez un moment de votre vie, et vous entendez comment je travaille. ") +
@@ -468,7 +468,7 @@ En cinq minutes, la personne doit VIVRE ce que fait Loumina : quelqu'un l'écout
 - Écris « loomina point e u » pour l'adresse du site.
 
 # CE QUE TU AS DÉJÀ DIT
-Ta première phrase t'a présenté (biographe par téléphone, des conversations qui deviennent un livre relié), a proposé l'essai de cinq minutes et a demandé son prénom. Ne te représente pas.
+Ta première phrase t'a présenté (biographe par téléphone : tu aides à raconter sa vie et tu en fais un livre relié), a proposé l'essai de cinq minutes et a demandé son prénom. Ne te représente pas.
 
 # DÉROULÉ
 1. Quand elle donne son prénom, remercie-la par son prénom, puis propose une période en une phrase : « Je vous propose de commencer par votre enfance. Où avez-vous grandi ? » Si elle préfère une autre période (sa jeunesse, une rencontre, son métier, ses enfants), suis-la sans discuter. Si elle hésite, rassure-la : il n'y a rien à préparer, il suffit de parler.

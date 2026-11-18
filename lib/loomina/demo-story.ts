@@ -245,7 +245,7 @@ export function demoEmail(params: { firstName: string | null; title: string; pro
 /** Envoie le récit en PDF à l'adresse donnée sur la page du lien. */
 export async function emailDemoStory(story: DemoStory, email: string): Promise<'sent' | 'limit' | 'failed'> {
     if (story.email_count >= MAX_EMAILS) return 'limit';
-    const pdf = await buildRecitPdf({ title: story.title ?? 'Un souvenir', author: story.first_name, content: story.content ?? '', date: new Date(story.created_at) });
+    const pdf = await buildRecitPdf({ title: story.title ?? 'Un souvenir', author: story.first_name, content: story.content ?? '', date: new Date(story.created_at), seed: story.token });
     const promo = await demoPromoCode(story);
     const { text, html } = demoEmail({ firstName: story.first_name, title: story.title ?? 'Un souvenir', promo });
     const ok = await sendEmail({

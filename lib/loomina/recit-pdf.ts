@@ -5,7 +5,8 @@
  * v3, d'après la biographie d'exemple) : A5, Times 12 pt, marges de 2 cm,
  * texte justifié, intertitres en gras, numéro de page en bas à droite,
  * « Chapitre 1 » centré et titre en italique. Couverture en toile de lin
- * avec le titre en capitales, le prénom dessous et le logo en bas.
+ * unie (lin, bleu nuit, vert ou bordeaux) avec le titre en capitales, le
+ * prénom dessous et le logo en bas.
  *
  * pdf-lib, sans police à embarquer : les polices Times et Helvetica du
  * standard PDF couvrent le français (accents, guillemets, apostrophes).
@@ -25,8 +26,26 @@ const SIZE = 12;
 const LEAD = SIZE * 1.25;
 const PARA = SIZE * 0.75;
 const INK = rgb(0.078, 0.075, 0.071);
-const CLOTH = rgb(0.796, 0.722, 0.612);
+/**
+ * Les quatre toiles du livre, comme sur les photos du site : lin, bleu nuit,
+ * vert, bordeaux. Couleur unie (demande de Solal, 18/11/2026). Sur les
+ * toiles foncées, le texte et le logo passent en blanc.
+ */
+const CLOTHS = [
+    { name: 'lin', color: rgb(0.796, 0.722, 0.612), dark: false },
+    { name: 'bleu nuit', color: rgb(0.133, 0.188, 0.302), dark: true },
+    { name: 'vert', color: rgb(0.184, 0.29, 0.22), dark: true },
+    { name: 'bordeaux', color: rgb(0.42, 0.122, 0.165), dark: true },
+];
 const COVER_INK = rgb(0.106, 0.098, 0.086);
+const COVER_INK_LIGHT = rgb(0.937, 0.914, 0.875);
+
+/** Une toile au hasard, mais toujours la même pour un même récit (un renvoi garde sa couleur). */
+export function clothFor(seed: string) {
+    let h = 0;
+    for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    return CLOTHS[h % CLOTHS.length];
+}
 
 type Block = { kind: 'p' | 'h'; text: string };
 
@@ -101,7 +120,7 @@ function drawJustified(page: PDFPage, font: PDFFont, words: string[], y: number,
 }
 
 /** Texte centré, avec un espacement des lettres (capitales de couverture). */
-function drawTracked(page: PDFPage, font: PDFFont, size: number, text: string, y: number, tracking: number, color = COVER_INK) {
+function drawTracked(page: PDFPage, font: PDFFont, size: number, text: string, y: number, tracking: number, color: ReturnType<typeof rgb>) {
     const chars = [...text];
     const width = chars.reduce((n, c) => n + font.widthOfTextAtSize(c, size), 0) + tracking * (chars.length - 1);
     let x = (W - width) / 2;
@@ -130,12 +149,12 @@ function centered(page: PDFPage, font: PDFFont, size: number, text: string, y: n
     page.drawText(text, { x: (W - font.widthOfTextAtSize(text, size)) / 2, y, size, font, color });
 }
 
-async function logoBytes(): Promise<Uint8Array | null> {
+async function logoBytes(file = 'header-logo-trimmed.png'): Promise<Uint8Array | null> {
     try {
-        return await fs.readFile(path.join(process.cwd(), 'public', 'header-logo-trimmed.png'));
+        return await fs.readFile(path.join(process.cwd(), 'public', file));
     } catch {
         try {
-            const res = await fetch(`${SITE.url}/header-logo-trimmed.png`, { signal: AbortSignal.timeout(8000) });
+            const res = await fetch(`${SITE.url}/${file}`, { signal: AbortSignal.timeout(8000) });
             return res.ok ? new Uint8Array(await res.arrayBuffer()) : null;
         } catch {
             return null;
@@ -147,7 +166,7 @@ function frenchDate(d: Date): string {
     return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' });
 }
 
-export async function buildRecitPdf(params: { title: string; author: string | null; content: string; date: Date }): Promise<Uint8Array> {
+export async function buildRecitPdf(params: { title: string; author: string | null; content: string; date: Date; seed?: string }): Promise<Uint8Array> {
     const doc = await PDFDocument.create();
     doc.setTitle(params.title);
     doc.setAuthor(params.author ?? 'Loomina');
@@ -162,27 +181,29 @@ export async function buildRecitPdf(params: { title: string; author: string | nu
     const sansLight = await doc.embedFont(StandardFonts.Helvetica);
     const logoData = await logoBytes();
     const logo: PDFImage | null = logoData ? await doc.embedPng(logoData).catch(() => null) : null;
+    const cloth = clothFor(params.seed ?? params.title);
+    const whiteData = cloth.dark ? await logoBytes('logo-loomina-blanc.png') : null;
+    const coverLogo: PDFImage | null = cloth.dark ? (whiteData ? await doc.embedPng(whiteData).catch(() => null) : null) : logo;
+    const coverInk = cloth.dark ? COVER_INK_LIGHT : COVER_INK;
 
     const title = encodable(roman, clean(params.title));
     const author = params.author ? encodable(roman, clean(params.author)) : null;
 
-    // 1. Couverture : toile de lin, titre en capitales, prénom, logo en bas.
+    // 1. Couverture : une des quatre toiles, unie, titre en capitales, prénom, logo en bas.
     const cover = doc.addPage([W, H]);
-    cover.drawRectangle({ x: 0, y: 0, width: W, height: H, color: CLOTH });
-    for (let y = 0; y < H; y += 3) cover.drawLine({ start: { x: 0, y }, end: { x: W, y }, thickness: 0.4, color: rgb(1, 1, 1), opacity: 0.07 });
-    for (let x = 0; x < W; x += 3) cover.drawLine({ start: { x, y: 0 }, end: { x, y: H }, thickness: 0.4, color: rgb(0, 0, 0), opacity: 0.05 });
+    cover.drawRectangle({ x: 0, y: 0, width: W, height: H, color: cloth.color });
     const titleSize = 19;
     const titleLines = wrapTracked(sans, titleSize, encodable(sans, title.toLocaleUpperCase('fr-FR')), W - 2 * 15 * MM, 1.2);
     let cy = H - 0.3 * W - titleSize;
     for (const line of titleLines) {
-        drawTracked(cover, sans, titleSize, line, cy, 1.2);
+        drawTracked(cover, sans, titleSize, line, cy, 1.2, coverInk);
         cy -= titleSize * 1.15;
     }
-    if (author) drawTracked(cover, sansLight, 10, encodable(sansLight, author.toLocaleUpperCase('fr-FR')), cy - 14, 1.6);
-    if (logo) {
+    if (author) drawTracked(cover, sansLight, 10, encodable(sansLight, author.toLocaleUpperCase('fr-FR')), cy - 14, 1.6, coverInk);
+    if (coverLogo) {
         const lw = 0.22 * W;
-        const lh = (lw * logo.height) / logo.width;
-        cover.drawImage(logo, { x: (W - lw) / 2, y: 0.09 * W + 4, width: lw, height: lh });
+        const lh = (lw * coverLogo.height) / coverLogo.width;
+        cover.drawImage(coverLogo, { x: (W - lw) / 2, y: 0.09 * W + 4, width: lw, height: lh });
     }
 
     // 2. Le chapitre : « Chapitre 1 » centré, titre en italique, texte justifié.
