@@ -196,7 +196,7 @@ export default function ExperiencePage() {
               <div>
                 <Timeline steps={p.steps} start={start} />
                 {p.id === "apres" && (
-                  <div className="card mt-6 grid gap-2 p-3 sm:grid-cols-[240px_minmax(0,1fr)] sm:items-center sm:ml-16">
+                  <div className="card mt-4 grid gap-1 p-3 sm:ml-16 sm:grid-cols-[262px_minmax(0,1fr)] sm:items-center">
                     <Photo
                       name="livre-bordeaux-debout"
                       alt="Le livre Loomina, couverture en toile bordeaux, posé debout."
@@ -204,41 +204,33 @@ export default function ExperiencePage() {
                       sizes="(min-width: 640px) 320px, 100vw"
                       className="!rounded-[18px]"
                     />
-                    <div className="flex flex-col justify-center p-4 sm:p-6">
-                      <p className="text-[14px] font-bold text-[var(--amber-ink)]">
-                        Ce que vous recevez
-                      </p>
-                      <p className="t-heading mt-2">
+                    <div className="flex flex-col px-4 pb-4 pt-5 sm:px-6 sm:py-3">
+                      <p className="text-[14px] font-bold text-[var(--amber-ink)]">Ce que vous recevez</p>
+                      <p className="mt-1.5 text-balance text-[22px] font-extrabold leading-[1.2] tracking-[-0.02em] text-[var(--ink)]">
                         Votre livre, et sa version numérique
                       </p>
-                      <ul className="mt-4 divide-y divide-[var(--line-soft)]">
+                      <ul className="mt-5 flex flex-col gap-2.5">
                         {[
-                          OFFER.format.charAt(0).toUpperCase() +
-                            OFFER.format.slice(1),
+                          OFFER.format.charAt(0).toUpperCase() + OFFER.format.slice(1),
                           "Vos photos placées dans le texte",
                           `Version ${OFFER.digital} pour la famille`,
-                          OFFER.delivery,
+                          "Livraison incluse en France métropolitaine",
                         ].map((t) => (
-                          <li
-                            key={t}
-                            className="flex items-center gap-3 py-2.5 text-[16px] text-[var(--ink-2)]"
-                          >
-                            <Icon
-                              name="check"
-                              size={18}
-                              className="shrink-0 text-[var(--amber-ink)]"
-                            />
+                          <li key={t} className="flex items-start gap-2.5 text-[15px] leading-snug text-[var(--ink-2)]">
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                              <Icon name="check" size={12} />
+                            </span>
                             {t}
                           </li>
                         ))}
                       </ul>
-                      <div className="mt-6 flex flex-col items-start gap-2">
-                        <Button href="/order" size="lg">
+                      <div className="mt-6 flex flex-col gap-3">
+                        <Button href="/order" className="w-full justify-center">
                           Commander · {OFFER.price} €
                         </Button>
-                        <Button href={`tel:${SITE.phone}`} variant="ghost">
+                        <a href={`tel:${SITE.phone}`} className="link self-center text-[15px]">
                           Essayer d’abord la démo
-                        </Button>
+                        </a>
                       </div>
                     </div>
                   </div>
