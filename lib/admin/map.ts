@@ -259,7 +259,7 @@ export const MAP_GROUPS: MapGroup[] = [
     {
         key: 'admin',
         label: 'L’admin',
-        about: 'Ce que vous pouvez faire sur loomina.eu/admin. Tout y est en lecture : l’admin montre, elle ne modifie rien.',
+        about: 'Ce que vous pouvez voir et faire sur loomina.eu/admin : suivre les clients, agir (relancer, rembourser), lire vos mails, régler les IA.',
         nodes: [
             { id: 'm-mdp', label: 'Mot de passe', d: 'Un seul mot de passe (ADMIN_PASSWORD, sur Vercel). Aucun lien depuis le site, pages non indexées.', code: 'lib/admin/auth.ts' },
             { id: 'm-session', label: 'Session de 30 jours', kind: 'end', d: 'Changer le mot de passe déconnecte tout le monde.' },
@@ -267,6 +267,7 @@ export const MAP_GROUPS: MapGroup[] = [
             { id: 'm-suivi', label: 'Suivi client', gap: 2, d: 'Où en sont les clients, d’un coup d’œil.', code: 'app/admin/suivi' },
             { id: 'm-clients', label: 'Clients', gap: 2, d: 'La liste de tous les narrateurs, du plus récent au plus ancien.', code: 'app/admin/clients' },
             { id: 'm-fiche', label: 'Fiche d’un client', d: 'Tout ce que Loomina sait d’un client, sur une page.', code: 'app/admin/clients/[id]' },
+            { id: 'm-mails', label: 'Mails', gap: 1, d: 'La boîte contact@loomina.eu dans l’admin, lue en direct chez l’hébergeur : reçus, envoyés, indésirables, corbeille.', code: 'app/admin/mails' },
             { id: 'm-carte', label: 'La carte', gap: 3, d: 'Cette page : tout le projet sur un seul arbre, avec ce qui manque.', code: 'lib/admin/map.ts' },
             { id: 'm-structure', label: 'Structure', d: 'Le schéma « qui parle à qui », le contenu de la base, ce qui tourne tout seul.', code: 'app/admin/structure' },
             { id: 'm-ia', label: 'Les IA', d: 'Les huit IA : modèle, moment, ce qu’elles lisent et écrivent.', code: 'app/admin/ia' },
@@ -281,6 +282,7 @@ export const MAP_GROUPS: MapGroup[] = [
             { id: 'm-memoire', label: 'Mémoire et prochain appel', col: 1, from: 'm-commande', d: 'Ce que Loomina sait de la personne, la question prévue, les sujets en attente, et le prompt exact de son prochain appel.' },
             { id: 'm-appels', label: 'Appels et transcripts', col: 1, from: 'm-memoire', d: 'Chaque appel : durée, résumé, transcript complet, analyse du Directeur.' },
             { id: 'm-recits', label: 'Récits et livre composé', col: 1, from: 'm-appels', d: 'Chaque récit et ses versions, le livre recomposé, et le journal technique des appels.' },
+            { id: 'm-mails-agir', label: 'Lire, répondre, écrire', col: 1, from: 'm-mails', kind: 'end', d: 'Lire un message le marque comme lu, répondre garde le fil de la discussion, « Écrire un mail » part de la même boîte. Une copie va dans « Envoyés », comme pour les e-mails envoyés tout seuls par le site. Les pièces jointes s’ouvrent encore dans le logiciel de messagerie.', code: 'lib/admin/mailbox.ts' },
             { id: 'm-manques', label: 'Ce qui manque', col: 1, from: 'm-carte', d: 'Le filtre « Ce qui manque » de la carte : les cases à faire et à surveiller.' },
             { id: 'm-prompts', label: 'Prompts exacts', col: 1, from: 'm-ia', d: 'Lus directement dans le code : ce qui est affiché est ce qui tourne en ligne.' },
             { id: 'm-actions', label: 'Agir depuis l’admin', col: 2, from: 'm-commande', status: 'partial', d: 'Depuis la fiche d’un client : le relancer, le rembourser, relancer le traitement d’un appel en échec. Reste à faire : recomposer un livre, corriger une fiche.' },

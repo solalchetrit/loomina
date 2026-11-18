@@ -79,14 +79,29 @@ export async function sendEmail(params: { to: string; subject: string; text: str
             greetingTimeout: 15_000,
             socketTimeout: 30_000,
         });
-        await transporter.sendMail({
+        const message = {
             from,
             to: params.to,
             subject: params.subject.slice(0, 200),
             text: params.text,
             html,
             ...(params.replyTo ? { replyTo: params.replyTo } : {}),
-        });
+        };
+        const info = await transporter.sendMail(message);
+        // Une copie dans « Envoyés », pour retrouver dans la boîte (et dans l'admin,
+        // onglet Mails) ce que le site a écrit aux clients. Pas pour les alertes que
+        // la boîte s'envoie à elle-même : elles sont déjà dans « Reçus ».
+        if (params.to.toLowerCase() !== smtp.user.toLowerCase()) {
+            try {
+                const raw = await new Promise<Buffer>((resolve, reject) =>
+                    createTransport({ streamTransport: true, buffer: true }).sendMail({ ...message, messageId: info.messageId, date: new Date() }, (err, r) => (err ? reject(err) : resolve(r.message as Buffer)))
+                );
+                const { saveToSent } = await import('../admin/mailbox');
+                await saveToSent(raw);
+            } catch (err) {
+                console.warn('[mail] copie dans « Envoyés » impossible :', err instanceof Error ? err.message : String(err));
+            }
+        }
         return true;
     } catch (err) {
         console.warn('[mail] échec :', err instanceof Error ? err.message : String(err));

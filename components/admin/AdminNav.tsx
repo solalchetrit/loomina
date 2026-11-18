@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/admin", label: "Vue d’ensemble" },
   { href: "/admin/suivi", label: "Suivi client" },
   { href: "/admin/clients", label: "Clients" },
+  { href: "/admin/mails", label: "Mails" },
   { href: "/admin/parcours", label: "La carte" },
   { href: "/admin/structure", label: "Structure" },
   { href: "/admin/ia", label: "Les IA" },
