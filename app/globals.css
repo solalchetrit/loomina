@@ -23,6 +23,7 @@
 
   /* Encre */
   --ink: #1b2742;            /* bleu nuit : titres, boutons, panneaux sombres */
+  --title: #161616;          /* les titres restent noirs : le bleu est pour les surfaces */
   --night: #1b2742;
   --night-deep: #141d33;     /* pied de page, fond le plus sombre */
   --ink-soft: #2a3a5e;
@@ -66,6 +67,7 @@
 /* Un bloc sur fond bleu nuit : les mêmes jetons, retournés pour rester lisibles. */
 .on-night {
   --ink: #ffffff;
+  --title: #ffffff;
   --ink-2: rgba(255, 255, 255, 0.82);
   --ink-3: rgba(255, 255, 255, 0.64);
   --line: rgba(255, 255, 255, 0.16);
@@ -108,7 +110,7 @@
     font-weight: 800;
     letter-spacing: -0.03em;
     text-wrap: balance;
-    color: var(--ink);
+    color: var(--title);
   }
 
   p {

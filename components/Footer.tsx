@@ -1,3 +1,4 @@
+import LogoMotion, { TIGHT_WORDMARK } from "@/components/brand/LogoMotion";
 import Link from "next/link";
 import Image from "next/image";
 import { SITE } from "@/config/site";
@@ -46,7 +47,10 @@ export default function Footer() {
           <div>
             <Link href="/" className="inline-block" aria-label="Loomina, accueil">
               <span className="relative block h-[30px] w-[128px]">
-                <Image src="/logo-loomina-blanc.png" alt="" fill className="object-contain object-left" sizes="128px" />
+                {/* « Le fil » : la signature de fin, quand le pied de page arrive à l'écran. */}
+                <LogoMotion name="fil" theme="dark" mode="once" vb={TIGHT_WORDMARK} align="left" className="h-full w-full">
+                  <Image src="/logo-loomina-blanc.png" alt="" fill className="object-contain object-left" sizes="128px" />
+                </LogoMotion>
               </span>
             </Link>
             <p className="t-body mt-5 max-w-xs">Vous racontez votre vie au téléphone. Nous en faisons un livre.</p>
