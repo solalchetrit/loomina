@@ -36,6 +36,7 @@
   --amber-display: #c27610;  /* ambre des grands titres seulement (3.3:1) */
   --amber-soft: #fcebd2;     /* fond de pastille */
   --amber-line: #f6ddb5;
+  --amber-wash: #fdf3e4;     /* fond très clair d'une ligne mise en avant */
   --amber-deep: #6f4005;     /* texte sur --amber-soft */
 
   /* États */
@@ -64,6 +65,11 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
+/* Un titre posé dans un panneau sombre (texte blanc) suit le blanc du panneau. */
+.text-white {
+  --title: #ffffff;
+}
+
 /* Un bloc sur fond bleu nuit : les mêmes jetons, retournés pour rester lisibles. */
 .on-night {
   --ink: #ffffff;
@@ -72,7 +78,7 @@
   --ink-3: rgba(255, 255, 255, 0.64);
   --line: rgba(255, 255, 255, 0.16);
   --amber-display: var(--amber);
-  --amber-line: rgba(238, 155, 45, 0.55);
+  --amber-line: color-mix(in srgb, var(--amber) 55%, transparent);
   background: var(--night-deep);
   color: var(--ink);
 }

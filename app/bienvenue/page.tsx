@@ -274,7 +274,7 @@ export default function BienvenuePage() {
           // Premier écran après l'achat : l'Étincelle fête la commande.
           <LogoMotion name="persoFete" mode="loop" className="h-24 w-24" />
         ) : (
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#fdf3e4] text-[var(--amber-ink)]">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--amber-wash)] text-[var(--amber-ink)]">
             <Icon name={slide.icon} size={26} />
           </span>
         )}

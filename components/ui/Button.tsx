@@ -18,7 +18,7 @@ interface ButtonProps {
 const VARIANTS: Record<Variant, string> = {
   primary: "bg-[var(--ink)] text-white hover:bg-[var(--ink-soft)]",
   secondary: "border border-[var(--rule-strong)] bg-white text-[var(--ink)] hover:border-[var(--ink)]",
-  accent: "bg-[var(--amber)] text-[var(--ink)] hover:bg-[#f4ac4b]",
+  accent: "bg-[var(--amber)] text-[var(--ink)] hover:brightness-105",
   ghost: "text-[var(--ink)] underline decoration-[var(--amber-line)] decoration-2 underline-offset-4 hover:decoration-[var(--amber)]",
 };
 
