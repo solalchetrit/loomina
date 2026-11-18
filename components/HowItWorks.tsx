@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { OFFER } from "@/config/offer";
 import { SITE } from "@/config/site";
-import { Section, SectionHead, Steps } from "@/components/ui/Section";
+import { Section, SectionHead } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import Photo from "@/components/ui/Photo";
-import type { IconName } from "@/components/ui/Icon";
+import PrintedPage from "@/components/ui/PrintedPage";
 
 /** Aperçu 1 : un appel en cours. */
 export function CallPreview() {
@@ -24,46 +24,47 @@ export function CallPreview() {
   );
 }
 
-/** Aperçu 2 : un chapitre fraîchement écrit. */
-function ChapterPreview() {
-  return (
-    <div className="w-full max-w-[260px] rounded-[14px] bg-white px-5 py-4 shadow-[var(--shadow-bar)]">
-      <p className="font-serif text-[17px] italic leading-tight">L’été de mes seize ans</p>
-      <div className="mt-3 space-y-1.5">
-        <span className="block h-[5px] w-full rounded bg-[var(--line)]" />
-        <span className="block h-[5px] w-11/12 rounded bg-[var(--line)]" />
-        <span className="block h-[5px] w-4/5 rounded bg-[var(--line)]" />
-      </div>
-      <span className="pill pill-amber mt-3 !py-0.5 !text-[11px]">À relire</span>
-    </div>
-  );
-}
-
-export const STEPS: { icon: IconName; title: string; text: string; preview: React.ReactNode }[] = [
+const STEPS: { title: string; text: string; visual: React.ReactNode }[] = [
   {
-    icon: "phone",
     title: "Vous appelez, quand vous voulez",
     text: "Depuis le numéro donné à la commande, fixe ou portable. Loomina vous reconnaît et reprend là où vous vous étiez arrêté.",
-    preview: <CallPreview />,
+    visual: (
+      <Photo
+        name="homme-au-telephone"
+        alt="Un homme âgé raconte ses souvenirs au téléphone"
+        ratio="aspect-[4/3] md:aspect-[4/5]"
+        focus="50% 30%"
+        sizes="(min-width: 768px) 400px, 100vw"
+      />
+    ),
   },
   {
-    icon: "pen",
-    title: "Le récit de chaque appel",
-    text: "Loomina l’écrit dans vos mots, dans le style que vous avez choisi. Vous le relisez dans votre espace auteur et le corrigez : le livre se construit à deux.",
-    preview: <ChapterPreview />,
+    title: "Loomina écrit le récit de chaque appel",
+    text: "Dans vos mots, dans le style que vous avez choisi. Vous le relisez dans votre espace auteur et le corrigez : le livre se construit à deux.",
+    visual: (
+      <PrintedPage chapter="Chapitre 5" title="L’été de mes seize ans" page="61" sizes="(min-width: 768px) 400px, 100vw">
+        <p>
+          Cet été-là, mon oncle m’a confié la camionnette du marché. Je n’avais pas encore le permis, mais sur les chemins de la
+          vallée, personne ne le demandait.
+        </p>
+        <h4>Les matins de marché</h4>
+        <p>
+          On partait avant le jour, les cageots de pêches calés à l’arrière. Je revois la place encore vide, les bâches qu’on
+          tendait, et le premier café, brûlant, que la boulangère nous apportait sans qu’on le demande.
+        </p>
+        <p>C’est cet été-là que j’ai compris que je ne resterais pas au village.</p>
+      </PrintedPage>
+    ),
   },
   {
-    icon: "book",
     title: "Le livre arrive chez vous",
     text: `Quand votre récit est complet, notre équipe relit le livre, y place vos photos et l’envoie à l’impression. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé.`,
-    preview: (
+    visual: (
       <Photo
         name="livre-debout"
-        alt=""
-        ratio="h-40"
-        sizes="400px"
-        contain="aspect-[4/5]"
-        className="-mx-5 w-[calc(100%+2.5rem)] max-w-none shrink-0 !rounded-none"
+        alt="Le livre relié, couverture en toile de lin, debout"
+        ratio="aspect-[4/5]"
+        sizes="(min-width: 768px) 400px, 100vw"
       />
     ),
   },
@@ -78,8 +79,25 @@ export default function HowItWorks() {
           Le détail, appel par appel
         </Link>
       </div>
-      <Steps items={STEPS} className="head-gap" />
-      <div className="mt-6 flex flex-col items-start gap-4 rounded-[var(--radius-card)] bg-[var(--amber-soft)] p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
+      <ol className="head-gap grid gap-12 md:grid-cols-3 md:gap-6 lg:gap-8" data-reveal>
+        {STEPS.map((step, i) => (
+          <li key={step.title} className="flex flex-col">
+            <div className="relative">
+              {step.visual}
+              <span
+                aria-hidden="true"
+                className="absolute left-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white text-[18px] font-extrabold text-[var(--ink)] shadow-[var(--shadow-bar)]"
+              >
+                {i + 1}
+              </span>
+            </div>
+            <p className="mt-6 text-[14px] font-bold text-[var(--amber-ink)]">Étape {i + 1}</p>
+            <h3 className="t-heading mt-1.5">{step.title}</h3>
+            <p className="t-body mt-2">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-10 flex flex-col items-start gap-4 rounded-[var(--radius-card)] bg-[var(--amber-soft)] p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
         <p className="text-[17px] font-bold text-[var(--amber-deep)]">Le plus simple pour comprendre, c’est d’essayer : {OFFER.demoMinutes} minutes, gratuitement.</p>
         <Button href={`tel:${SITE.phone}`} className="shrink-0">
           Appeler le {SITE.phoneDisplay}

@@ -603,3 +603,13 @@ textarea.field {
     transition-duration: 0ms;
   }
 }
+
+/* L'invitation à faire défiler, en bas du haut de page de l'accueil : la flèche descend doucement. */
+.scroll-cue { animation: scroll-cue 2.2s var(--ease-out) infinite; }
+@keyframes scroll-cue {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue { animation: none; }
+}
