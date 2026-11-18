@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { CALL_MINUTES_OPTIONS, DEFAULT_CALL_MINUTES } from "@/lib/loomina/call-length";
 import Link from "next/link";
 import { formatToE164 } from "@/lib/phone";
@@ -29,6 +31,9 @@ export default function OrderPage() {
   const [errors, setErrors] = useState<Errors>({});
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", giverFirstName: "", giverPhone: "" });
   const [callMinutes, setCallMinutes] = useState<number>(DEFAULT_CALL_MINUTES);
+  // Paiement intégré : le formulaire Stripe s'affiche ici, à l'étape 3.
+  const [checkout, setCheckout] = useState<{ clientSecret: string; publishableKey: string } | null>(null);
+  const stripePromise = useMemo(() => (checkout ? loadStripe(checkout.publishableKey) : null), [checkout]);
 
   // Les boutons « Commencer mon livre » et « Offrir le livre » arrivent ici avec le choix déjà fait.
   useEffect(() => {
@@ -39,7 +44,7 @@ export default function OrderPage() {
     return () => window.clearTimeout(id);
   }, []);
 
-  const step = who ? 2 : 1;
+  const step = checkout ? 3 : who ? 2 : 1;
   const isGift = who === "gift";
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +98,11 @@ export default function OrderPage() {
         }),
       });
       const data = await res.json();
-      if (data.url) {
+      if (data.clientSecret && data.publishableKey) {
+        setCheckout({ clientSecret: data.clientSecret, publishableKey: data.publishableKey });
+        setSubmitting(false);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else if (data.url) {
         window.location.href = data.url;
       } else {
         setSubmitError("Le paiement n’a pas pu démarrer. Réessayez dans un instant, ou écrivez-nous à contact@loomina.eu.");
@@ -130,10 +139,35 @@ export default function OrderPage() {
             </ol>
 
             <h1 className="t-title mt-8">
-              {step === 1 ? "À qui se destine ce livre ?" : isGift ? "Qui va raconter son histoire ?" : "Vos coordonnées"}
+              {step === 1 ? "À qui se destine ce livre ?" : step === 3 ? "Paiement sécurisé" : isGift ? "Qui va raconter son histoire ?" : "Vos coordonnées"}
             </h1>
 
+            {/* Étape 3 : paiement intégré (Stripe), sans quitter le site */}
+            {step === 3 && checkout && stripePromise && (
+              <div className="rise mt-6">
+                <p className="t-body max-w-xl">
+                  {isGift ? `Le livre de ${form.firstName.trim()}` : "Votre livre"}, {OFFER.price} € tout compris. Un code promo ? Saisissez-le dans le formulaire ci-dessous.
+                </p>
+                <div className="mt-6 overflow-hidden rounded-[20px] border border-[var(--line-soft)] bg-white">
+                  <EmbeddedCheckoutProvider stripe={stripePromise} options={{ clientSecret: checkout.clientSecret }}>
+                    <EmbeddedCheckout />
+                  </EmbeddedCheckoutProvider>
+                </div>
+                <button type="button" onClick={() => setCheckout(null)} className="link mt-5 text-[16px]">
+                  Modifier les coordonnées
+                </button>
+                <p className="t-small mt-3">
+                  Paiement par carte, sécurisé par Stripe. En payant, vous acceptez les{" "}
+                  <Link href="/cgv" className="link">
+                    conditions de vente
+                  </Link>
+                  .
+                </p>
+              </div>
+            )}
+
             {/* Étape 1 */}
+            {step !== 3 && (
             <div className="mt-8 grid gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Destinataire">
               {(
                 [
@@ -164,6 +198,7 @@ export default function OrderPage() {
                 );
               })}
             </div>
+            )}
 
             {/* Étape 2 */}
             {step === 2 && (
@@ -260,7 +295,7 @@ export default function OrderPage() {
 
                 <div className="mt-8">
                   <Button type="submit" size="lg" loading={submitting} className="w-full">
-                    {submitting ? "Ouverture du paiement…" : `Payer ${OFFER.price} € sur la page sécurisée`}
+                    {submitting ? "Préparation du paiement…" : `Continuer vers le paiement (${OFFER.price} €)`}
                   </Button>
                   <p className="t-small mt-4">
                     Paiement par carte, sécurisé par Stripe. En payant, vous acceptez les{" "}

@@ -17,8 +17,20 @@ export async function POST(request: NextRequest) {
         // Utilise l'URL de base de la requête ou une variable d'environnement
         const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
+        // Paiement intégré au site (demande de Solal, 18/11/2026) : le formulaire
+        // Stripe s'affiche dans la page de commande au lieu d'une page externe.
+        // Il lui faut la clé publiable (pk_live_…, sans danger côté navigateur),
+        // lue ici à l'exécution. Sans elle, on garde la page Stripe externe.
+        const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY?.trim() || "";
+        const embedded = publishableKey.startsWith("pk_");
+        // Après paiement : page de bienvenue, qui ouvre ensuite l'espace (app/bienvenue).
+        const welcomeUrl = `${origin}/bienvenue?session_id={CHECKOUT_SESSION_ID}`;
+
         // Create Checkout Session
         const session = await stripe().checkout.sessions.create({
+            ...(embedded
+                ? { ui_mode: "embedded" as const, return_url: welcomeUrl }
+                : { success_url: welcomeUrl, cancel_url: `${origin}/order` }),
             payment_method_types: ["card"],
             line_items: [
                 {
@@ -44,8 +56,6 @@ export async function POST(request: NextRequest) {
             // Permet les codes promo (dont un code 100 % réservé aux tests du parcours complet)
             allow_promotion_codes: true,
             customer_email: email, // Pré-remplit l'email dans Stripe
-            success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${origin}/order`,
             metadata: {
                 firstName,
                 lastName,
@@ -61,6 +71,9 @@ export async function POST(request: NextRequest) {
             },
         });
 
+        if (embedded) {
+            return NextResponse.json({ clientSecret: session.client_secret, publishableKey });
+        }
         return NextResponse.json({ url: session.url });
 
     } catch (error) {
