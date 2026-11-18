@@ -102,7 +102,7 @@ export const MAP_GROUPS: MapGroup[] = [
         label: 'Découvrir',
         about: 'Avant d’acheter : le site, la démonstration gratuite, le contact.',
         nodes: [
-            { id: 'd-pages', label: 'Pages du site', d: 'Accueil, Comment ça marche, Le livre et le prix, Questions, Notre histoire, pages légales.' },
+            { id: 'd-pages', label: 'Pages du site', d: 'Accueil, Comment ça marche, Le livre et le prix, Questions, Notre histoire, pages légales. En haut de l’accueil, à droite du titre, la scène « de la voix au livre » en trois temps qui défilent seuls et se cliquent : « Vous racontez » (Jeanne au téléphone), « Loomina écrit » (sa page s’écrit dans le livre ouvert, dans la mise en page du livre imprimé), « Le livre arrive » (le livre se referme puis se présente debout, en photos). Elle remplace la carte « Le livre de Jeanne » depuis le 18/11/2026.', code: 'components/home/VoiceToBook.tsx' },
             { id: 'd-demo', label: 'Essayer la démo', d: `Le bouton appelle le ${SITE.phoneDisplay}.` },
             { id: 'd-inconnu', label: 'Numéro inconnu', kind: 'q', d: 'Le serveur vocal ne trouve pas le numéro parmi les clients.' },
             { id: 'd-5min', label: 'Démonstration de 5 min', d: 'Un souvenir, quatre questions, puis Loomina explique comment commander. Elle répond aussi aux questions sur le prix, le remboursement et le fonctionnement.', code: 'lib/loomina/assistant.ts (DEMO_SYSTEM)' },

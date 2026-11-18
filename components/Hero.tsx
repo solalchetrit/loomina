@@ -3,7 +3,7 @@ import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
-import LiveFeed from "@/components/home/LiveFeed";
+import VoiceToBook from "@/components/home/VoiceToBook";
 
 const REASSURANCE: { text: string; href?: string }[] = [
   { text: "Votre livre relu par notre équipe avant l’impression" },
@@ -11,7 +11,7 @@ const REASSURANCE: { text: string; href?: string }[] = [
   { text: "Paiement sécurisé par Stripe" },
 ];
 
-/** Haut de page, en deux colonnes : à gauche le titre, la promesse et les deux actions ; à droite la carte vivante, à leur hauteur. */
+/** Haut de page, en deux colonnes : à gauche le titre, la promesse et les deux actions ; à droite la scène « de la voix au livre », à leur hauteur. */
 export default function Hero() {
   return (
     <section className="page-top w-full pb-10 md:pb-14">
@@ -63,7 +63,7 @@ export default function Hero() {
         </div>
 
         <div className="rise mx-auto w-full min-w-0 max-w-[460px] lg:mr-0" style={{ "--i": 2 } as CSSProperties}>
-          <LiveFeed />
+          <VoiceToBook />
         </div>
       </div>
     </section>
