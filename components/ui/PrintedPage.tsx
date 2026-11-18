@@ -26,7 +26,7 @@ export default function PrintedPage({
     <div className={`${s.frame} ${className}`}>
       <Image src="/photos/accueil-livre-ouvert.jpg" alt="" fill sizes={sizes} className={s.shot} />
       <div className={s.ink} lang="fr">
-        <p className={s.chapter}>{chapter}</p>
+        {chapter && <p className={s.chapter}>{chapter}</p>}
         <p className={s.title}>{title}</p>
         <div className={s.body}>{children}</div>
         <p className={s.pageNumber}>{page}</p>

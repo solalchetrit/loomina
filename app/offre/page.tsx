@@ -3,43 +3,12 @@ import Image from "next/image";
 import { Section, SectionHead } from "@/components/ui/Section";
 import { SITE } from "@/config/site";
 import Accordion from "@/components/ui/Accordion";
-import Icon, { type IconName } from "@/components/ui/Icon";
+import Icon from "@/components/ui/Icon";
 import Button from "@/components/ui/Button";
 import WhatYouGet from "@/components/home/WhatYouGet";
 import Compare from "@/components/home/Compare";
 import Closing from "@/components/Closing";
 import { OFFER, GUARANTEE } from "@/config/offer";
-
-const DETAILS: { icon: IconName; title: string; items: string[] }[] = [
-  {
-    icon: "phone",
-    title: "Les appels",
-    items: [
-      "Autant d’appels qu’il vous faut, avec ou sans rendez-vous",
-      `${OFFER.chapters} thèmes proposés pour vous guider`,
-      "Depuis un fixe ou un portable, au prix d’un appel normal",
-    ],
-  },
-  {
-    icon: "pen",
-    title: "L’écriture",
-    items: [
-      "Le récit de chaque appel, écrit dans vos mots",
-      "Vos corrections, autant que nécessaire",
-      "Votre livre relu par notre équipe avant l’impression",
-    ],
-  },
-  {
-    icon: "book",
-    title: "Le livre",
-    items: [
-      `Relié, ${OFFER.format}`,
-      "Vos photos placées dans le texte",
-      `Version numérique (${OFFER.digital}) pour la famille`,
-      OFFER.delivery,
-    ],
-  },
-];
 
 const FAQ = [
   {
@@ -130,61 +99,7 @@ export default function OffrePage() {
         ]}
       />
 
-      <Section id="detail">
-        <SectionHead title="Ce que couvre le prix, en détail" />
-        <div className="head-gap grid gap-4 md:grid-cols-3">
-          {DETAILS.map((g) => (
-            <div key={g.title} className="card p-7 md:p-8">
-              <span className="chip-icon">
-                <Icon name={g.icon} />
-              </span>
-              <h3 className="t-heading mt-6">{g.title}</h3>
-              <ul className="mt-4 space-y-3">
-                {g.items.map((it) => (
-                  <li key={it} className="t-body flex gap-3">
-                    <Icon name="check" size={20} className="mt-[3px] shrink-0 text-[var(--amber-ink)]" />
-                    <span>{it}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </Section>
-
       <Compare />
-
-      <Section>
-        <ul className="grid gap-4 md:grid-cols-3">
-          <li className="card p-7">
-            <span className="chip-icon">
-              <Icon name="shield" />
-            </span>
-            <h3 className="t-heading mt-5">Votre récit vous appartient</h3>
-            <p className="t-body mt-2">Vous gardez tous les droits sur votre histoire. Vos récits restent privés, et vous pouvez les faire supprimer à tout moment.</p>
-          </li>
-          <li className="card p-7">
-            <span className="chip-icon">
-              <Icon name="book" />
-            </span>
-            <h3 className="t-heading mt-5">D’autres exemplaires</h3>
-            <p className="t-body mt-2">Pour la famille, écrivez-nous après réception : un devis d’impression, sans marge sur le texte.</p>
-          </li>
-          <li className="card p-7">
-            <span className="chip-icon">
-              <Icon name="check" />
-            </span>
-            <h3 className="t-heading mt-5">Des conditions claires</h3>
-            <p className="t-body mt-2">
-              Tout est écrit dans nos{" "}
-              <Link href="/cgv" className="link">
-                conditions générales de vente
-              </Link>
-              .
-            </p>
-          </li>
-        </ul>
-      </Section>
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">

@@ -1,8 +1,8 @@
 import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
-import { BookPage } from "@/components/VoiceToPage";
-import { Contents } from "@/components/home/Themes";
+import PrintedPage from "@/components/ui/PrintedPage";
+import ThemeBook from "@/components/experience/ThemeBook";
 import Photo from "@/components/ui/Photo";
 import { CallPreview } from "@/components/HowItWorks";
 import Closing from "@/components/Closing";
@@ -205,28 +205,22 @@ export default function ExperiencePage() {
               text="Loomina ne romance pas. Elle garde votre façon de dire les choses, ordonne, et quand un détail manque, elle vous le demande au prochain appel plutôt que de l’inventer."
             />
           </div>
-          <BookPage chapter="Chapitre 7" title="La maison de famille" page="112">
+          <PrintedPage chapter="Chapitre 7" title="La maison de famille" page="112" className="mx-auto w-full max-w-[520px]">
             <p>
-              <span className="dropcap">L</span>a maison n’était pas grande, mais elle avait deux escaliers, et c’est ce qui faisait toute sa
-              grandeur à nos yeux d’enfants. Celui de devant, pour les visites. Celui de derrière, pour nous.
+              La maison n’était pas grande, mais elle avait deux escaliers, et c’est ce qui faisait toute sa grandeur à nos yeux
+              d’enfants. Celui de devant, pour les visites. Celui de derrière, pour nous.
             </p>
+            <h4>La cloche de midi</h4>
             <p>
-              Ma mère y montait avec le linge, et nous, nous y descendions en courant quand la cloche de midi sonnait au bout du village.
+              Ma mère y montait avec le linge, et nous, nous y descendions en courant quand la cloche de midi sonnait au bout du
+              village.
             </p>
-          </BookPage>
+            <p>Je crois que j’entends encore le bruit de nos galoches sur les marches, et sa voix qui nous disait de ne pas courir.</p>
+          </PrintedPage>
         </div>
       </Section>
 
-      <Section id="chapitres">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-          <SectionHead
-            title="Des thèmes pour vous guider, jamais imposés"
-            text="Loomina propose ces thèmes au fil des appels. Vous pouvez en sauter, en approfondir, en ajouter : c’est votre récit."
-          />
-          <Photo name="panier-de-photos" alt="Un panier rempli de vieilles photos de famille." ratio="aspect-[16/10]" />
-        </div>
-        <Contents className="head-gap" />
-      </Section>
+      <ThemeBook />
 
       <Closing title="Essayez d’abord, commandez ensuite" />
     </>

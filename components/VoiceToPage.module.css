@@ -1,0 +1,36 @@
+/* « De l'appel à la page du livre » : la conversation se déroule, la page s'écrit à mesure. */
+
+.bubble {
+  transition: opacity 0.5s ease-out, transform 0.6s var(--ease-out);
+}
+.waiting {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.w {
+  opacity: 0;
+}
+.writing .w {
+  animation: write 0.5s ease-out forwards;
+  animation-delay: calc(var(--w) * 45ms);
+}
+.still .w {
+  opacity: 1;
+}
+@keyframes write {
+  to { opacity: 1; }
+}
+.bar {
+  transform-origin: center;
+  transition: transform 0.4s ease-out;
+}
+.speaking .bar {
+  animation: speak 1s ease-in-out infinite;
+}
+@keyframes speak {
+  50% { transform: scaleY(0.35); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubble { transition: none; }
+  .speaking .bar { animation: none; }
+}
