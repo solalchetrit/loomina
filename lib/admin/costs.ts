@@ -98,7 +98,8 @@ export async function callCosts(interviews: InterviewRow[]): Promise<Map<string,
             const line = real ?? eur(minutes * COSTS.lineFallbackPerMinute);
             if (real == null) estimated = true;
 
-            const voice = eur(minutes * COSTS.conversationRelayPerMinute);
+            // La voix (ConversationRelay), plus l'enregistrement quand l'appel en a un.
+            const voice = eur(minutes * COSTS.conversationRelayPerMinute + (event?.recorded ? Math.ceil(minutes) * COSTS.recordingPerMinute : 0));
 
             let conversation = 0;
             if (event && (event.prompt || event.completion)) {
