@@ -13,10 +13,9 @@ export default function OfferCard({
     <div className="grid gap-4 lg:grid-cols-[1fr_1.15fr]" data-reveal>
       <div className="card flex flex-col p-3">
         <Photo
-          name="livre-deux-exemplaires"
-          alt="Deux exemplaires du livre relié, couverture en toile de lin"
-          ratio="aspect-[16/10]"
-          focus="50% 58%"
+          name="livre-a-plat-lunettes"
+          alt="Le livre relié, couverture en toile de lin, posé à côté d’une paire de lunettes et de vieilles photos de famille"
+          ratio="aspect-[3/2]"
           sizes="(min-width: 1024px) 520px, 100vw"
           className="!rounded-[18px]"
         />

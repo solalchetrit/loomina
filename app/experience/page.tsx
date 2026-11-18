@@ -1,8 +1,7 @@
-import { Section, SectionHead, PageHeader } from "@/components/ui/Section";
+import { Section, PageHeader } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
-import PrintedPage from "@/components/ui/PrintedPage";
-import ThemeBook from "@/components/experience/ThemeBook";
+import ThemePicker from "@/components/home/ThemePicker";
 import Photo from "@/components/ui/Photo";
 import { CallPreview } from "@/components/HowItWorks";
 import Closing from "@/components/Closing";
@@ -49,7 +48,15 @@ const AFTER = [
 
 type Step = { title: string; text: string };
 
-const PHASES: { id: string; icon: IconName; label: string; title: string; text: string; duration: string; steps: Step[] }[] = [
+const PHASES: {
+  id: string;
+  icon: IconName;
+  label: string;
+  title: string;
+  text: string;
+  duration: string;
+  steps: Step[];
+}[] = [
   {
     id: "avant",
     icon: "gift",
@@ -88,7 +95,12 @@ function Timeline({ steps, start }: { steps: Step[]; start: number }) {
         const last = i === steps.length - 1;
         return (
           <li key={st.title} className="relative pb-4 pl-12 last:pb-0 sm:pl-16">
-            {!last && <span aria-hidden="true" className="absolute bottom-0 left-[17px] top-11 w-[2px] rounded bg-[var(--line)] sm:left-[21px] sm:top-12" />}
+            {!last && (
+              <span
+                aria-hidden="true"
+                className="absolute bottom-0 left-[17px] top-11 w-[2px] rounded bg-[var(--line)] sm:left-[21px] sm:top-12"
+              />
+            )}
             <span
               aria-hidden="true"
               className="absolute left-0 top-2 flex h-9 w-9 items-center justify-center rounded-full border-2 sm:h-11 sm:w-11 border-[var(--ink)] bg-white text-[16px] font-extrabold"
@@ -110,7 +122,9 @@ function Timeline({ steps, start }: { steps: Step[]; start: number }) {
 }
 
 /** Numéro de la première étape de chaque temps, pour une numérotation continue de 1 à 7. */
-const STARTS = PHASES.map((_, i) => 1 + PHASES.slice(0, i).reduce((n, p) => n + p.steps.length, 0));
+const STARTS = PHASES.map(
+  (_, i) => 1 + PHASES.slice(0, i).reduce((n, p) => n + p.steps.length, 0),
+);
 
 export default function ExperiencePage() {
   return (
@@ -126,7 +140,10 @@ export default function ExperiencePage() {
           </>
         }
         text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
-        photo={{ name: "mains-telephone", alt: "Les mains d’une personne âgée tiennent un téléphone." }}
+        photo={{
+          name: "mains-telephone",
+          alt: "Les mains d’une personne âgée tiennent un téléphone.",
+        }}
         badge={
           <div className="w-[230px]">
             <CallPreview />
@@ -135,7 +152,11 @@ export default function ExperiencePage() {
         actions={
           <>
             <ul className="flex flex-col gap-2.5 text-[17px] text-[var(--ink-2)]">
-              {["Depuis un fixe ou un portable", "À votre rythme, quand vous voulez", `En général ${OFFER.delay} jusqu’au livre validé`].map((t) => (
+              {[
+                "Depuis un fixe ou un portable",
+                "À votre rythme, quand vous voulez",
+                `En général ${OFFER.delay} jusqu’au livre validé`,
+              ].map((t) => (
                 <li key={t} className="flex items-center gap-3">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
                     <Icon name="check" size={16} />
@@ -159,7 +180,11 @@ export default function ExperiencePage() {
       {PHASES.map((p, idx) => {
         const start = STARTS[idx];
         return (
-          <Section key={p.id} id={p.id} className={idx % 2 === 1 ? "bg-white" : ""}>
+          <Section
+            key={p.id}
+            id={p.id}
+            className={idx % 2 === 1 ? "bg-white" : ""}
+          >
             <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
               <div className="lg:sticky lg:top-32 lg:self-start">
                 <span className="pill pill-amber">
@@ -171,18 +196,47 @@ export default function ExperiencePage() {
               <div>
                 <Timeline steps={p.steps} start={start} />
                 {p.id === "apres" && (
-                  <div className="mt-6 grid items-center gap-6 rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white sm:grid-cols-[160px_1fr] md:p-9">
-                    <Photo name="livre-debout" alt="Le livre Loomina relié, posé debout." ratio="aspect-[4/5]" sizes="160px" className="w-full max-w-[160px] !rounded-[16px]" />
-                    <div>
-                      <p className="text-[15px] font-bold text-[var(--amber)]">Ce que vous recevez</p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-tight tracking-[-0.02em]">
-                        Un livre relié, {OFFER.format}, et sa version {OFFER.digital}
+                  <div className="card mt-6 grid gap-2 p-3 sm:grid-cols-[240px_minmax(0,1fr)] sm:items-center sm:ml-16">
+                    <Photo
+                      name="livre-debout"
+                      alt="Le livre Loomina relié, couverture en toile de lin, posé debout."
+                      ratio="aspect-[4/3] sm:aspect-[4/5]"
+                      sizes="(min-width: 640px) 320px, 100vw"
+                      className="!rounded-[18px]"
+                    />
+                    <div className="flex flex-col justify-center p-4 sm:p-6">
+                      <p className="text-[14px] font-bold text-[var(--amber-ink)]">
+                        Ce que vous recevez
                       </p>
-                      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                        <Button href="/order" variant="accent" size="lg">
+                      <p className="t-heading mt-2">
+                        Votre livre relié, et sa version numérique
+                      </p>
+                      <ul className="mt-4 divide-y divide-[var(--line-soft)]">
+                        {[
+                          OFFER.format.charAt(0).toUpperCase() +
+                            OFFER.format.slice(1),
+                          "Vos photos placées dans le texte",
+                          `Version ${OFFER.digital} pour la famille`,
+                          OFFER.delivery,
+                        ].map((t) => (
+                          <li
+                            key={t}
+                            className="flex items-center gap-3 py-2.5 text-[16px] text-[var(--ink-2)]"
+                          >
+                            <Icon
+                              name="check"
+                              size={18}
+                              className="shrink-0 text-[var(--amber-ink)]"
+                            />
+                            {t}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-6 flex flex-col items-start gap-2">
+                        <Button href="/order" size="lg">
                           Commander · {OFFER.price} €
                         </Button>
-                        <Button href={`tel:${SITE.phone}`} variant="ghost" className="!text-white !decoration-white/40 hover:!decoration-white">
+                        <Button href={`tel:${SITE.phone}`} variant="ghost">
                           Essayer d’abord la démo
                         </Button>
                       </div>
@@ -197,30 +251,7 @@ export default function ExperiencePage() {
 
       <AuthorShowcase />
 
-      <Section className="bg-white">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <SectionHead
-              title="Vos mots, mis en page"
-              text="Loomina ne romance pas. Elle garde votre façon de dire les choses, ordonne, et quand un détail manque, elle vous le demande au prochain appel plutôt que de l’inventer."
-            />
-          </div>
-          <PrintedPage chapter="Chapitre 7" title="La maison de famille" page="112" className="mx-auto w-full max-w-[520px]">
-            <p>
-              La maison n’était pas grande, mais elle avait deux escaliers, et c’est ce qui faisait toute sa grandeur à nos yeux
-              d’enfants. Celui de devant, pour les visites. Celui de derrière, pour nous.
-            </p>
-            <h4>La cloche de midi</h4>
-            <p>
-              Ma mère y montait avec le linge, et nous, nous y descendions en courant quand la cloche de midi sonnait au bout du
-              village.
-            </p>
-            <p>Je crois que j’entends encore le bruit de nos galoches sur les marches, et sa voix qui nous disait de ne pas courir.</p>
-          </PrintedPage>
-        </div>
-      </Section>
-
-      <ThemeBook />
+      <ThemePicker />
 
       <Closing title="Essayez d’abord, commandez ensuite" />
     </>
