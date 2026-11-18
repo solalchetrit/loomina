@@ -69,7 +69,7 @@ function CookieBanner() {
     >
       <div className="mx-auto flex max-w-2xl flex-col gap-4 rounded-[22px] border border-[var(--line)] bg-white p-5 shadow-[var(--shadow-bar)] sm:flex-row sm:items-center">
         <p className="flex-1 text-[15px] leading-snug text-[var(--ink-2)]">
-          Nous aimerions mesurer la fréquentation du site (Google Analytics) pour l’améliorer. Rien n’est mesuré sans votre accord.{" "}
+          Nous utilisons des cookies pour améliorer votre expérience et mesurer l’audience du site. Vous pouvez les accepter ou les refuser.{" "}
           <Link href="/legal#cookies" className="link">
             En savoir plus
           </Link>
