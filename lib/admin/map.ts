@@ -154,7 +154,7 @@ export const MAP_GROUPS: MapGroup[] = [
         about: 'Ce que le narrateur fait sur le site, entre deux appels.',
         nodes: [
             { id: 'a-num', label: 'Tape son numéro', code: 'app/api/auth/verify' },
-            { id: 'a-code', label: 'Code reçu par SMS', d: 'Envoyé par Twilio Verify.' },
+            { id: 'a-code', label: 'Code reçu par SMS', d: 'Envoyé par Twilio Verify. Si l’envoi échoue (compte Twilio coupé, par exemple), un message en français invite à réessayer ou à écrire à contact@loomina.eu (avant le 18/11/2026 : « Failed to send verification code »).' },
             { id: 'a-session', label: 'Session de 30 jours', kind: 'end', d: 'L’auteur reste connecté 30 jours sans redemander de code.' },
             { id: 'a-mobile', label: 'Sur téléphone : barre du bas', d: 'Les cinq rubriques (Aperçu, Livre, Ma vie, Appels, Réglages) sont dans une barre fixe en bas de l’écran, à portée de pouce. « Se déconnecter » est en bas des Réglages. Avant (jusqu’au 18/11/2026), la rangée d’onglets dépassait de l’écran et cachait « Mes appels » et « Réglages ».', code: 'components/author/AuthorSpace.tsx' },
             { id: 'a-accueil', label: 'Accueil : ses préférences', d: 'Au premier passage, avant tout appel : tu ou vous, sujets à éviter, durée des appels. « Plus tard » le ferme. Si un appel a déjà eu lieu, Loomina a déjà la réponse et ne redemande rien.', code: 'components/author/Welcome.tsx' },
