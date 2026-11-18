@@ -31,7 +31,7 @@
   --ink-3: #5c6578;          /* texte discret, ≥ 5:1 */
 
   /* Ambre, la couleur de l'étoile */
-  --amber: #ee9b2d;          /* bouton de démo, icônes sur fond sombre */
+  --amber: #f1a843;          /* bouton de démo, icônes sur fond sombre (un ton plus clair que l'étoile, Solal 19/11/2026) */
   --amber-ink: #95580a;      /* ambre lisible en texte courant (5:1) */
   --amber-display: #c27610;  /* ambre des grands titres seulement (3.3:1) */
   --amber-soft: #fcebd2;     /* fond de pastille */
@@ -79,7 +79,11 @@
   --line: rgba(255, 255, 255, 0.16);
   --amber-display: var(--amber);
   --amber-line: color-mix(in srgb, var(--amber) 55%, transparent);
-  background: var(--night-deep);
+  background:
+    radial-gradient(70% 55% at 85% 0%, color-mix(in srgb, var(--amber) 9%, transparent), transparent 70%),
+    radial-gradient(90% 70% at 0% 0%, rgba(120, 150, 220, 0.14), transparent 65%),
+    linear-gradient(180deg, var(--night) 0%, var(--night-deep) 60%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   color: var(--ink);
 }
 
@@ -365,6 +369,11 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
+  /* Un filet de lumière en haut, une ombre très douce dessous : la carte se détache à peine. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(20, 29, 51, 0.04),
+    0 14px 32px -22px rgba(20, 29, 51, 0.16);
 }
 
 .card-float {
@@ -635,4 +644,43 @@ textarea.field {
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-cue { animation: none; }
+}
+
+/* ================================================================
+   REFLETS ET OMBRES (Solal, 19/11/2026 : sobre, chic, élégant)
+   Les surfaces bleu nuit et ambre ne sont plus des aplats : une
+   lumière douce vient d'en haut, le bas se creuse un peu. Tout est
+   posé en voile par-dessus la couleur, donc les survols continuent
+   de marcher. Dans @layer components : une classe utilitaire posée
+   sur un élément garde le dernier mot.
+   ================================================================ */
+@layer components {
+  /* Toute surface bleu nuit : boutons, pastilles actives, panneaux. */
+  .bg-\[var\(--ink\)\] {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 42%, rgba(8, 12, 26, 0.22) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  /* Les grands panneaux : un halo de lumière en haut à gauche, une lueur ambre très légère à l'opposé, et une ombre portée. */
+  .bg-\[var\(--ink\)\][class*="rounded-[2"],
+  .bg-\[var\(--ink\)\][class*="rounded-[3"],
+  .bg-\[var\(--ink\)\][class*="radius-card"] {
+    background-image:
+      radial-gradient(85% 70% at 8% 0%, rgba(140, 170, 240, 0.2), transparent 62%),
+      radial-gradient(60% 55% at 100% 100%, color-mix(in srgb, var(--amber) 10%, transparent), transparent 70%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 40%, rgba(8, 12, 26, 0.28) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 2px 4px rgba(20, 29, 51, 0.08),
+      0 36px 64px -36px rgba(20, 29, 51, 0.55);
+  }
+
+  /* L'ambre : un doré qui prend la lumière, avec une lueur chaude dessous. */
+  .bg-\[var\(--amber\)\] {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0) 55%, rgba(150, 80, 0, 0.14) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      0 10px 24px -12px color-mix(in srgb, var(--amber) 70%, transparent);
+  }
 }
