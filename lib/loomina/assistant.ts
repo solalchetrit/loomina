@@ -448,8 +448,7 @@ export function demoNumberBlock(canText: boolean): string {
 /** La première phrase de la démonstration, dite dès que la personne décroche. */
 export function demoFirstMessage(canText: boolean): string {
     return (
-        "Bonjour, ici Loumina, le biographe par téléphone. " +
-        "Au téléphone, je vous aide à raconter votre vie, et j'en fais un livre relié, à garder et à transmettre. " +
+        "Bonjour, ici Loumina. Je suis biographe : au téléphone, je vous aide à raconter votre vie, et j'en fais un livre relié, à garder et à transmettre. " +
         (canText
             ? "Je vous propose d'essayer : en cinq minutes, vous me racontez un moment de votre vie, et je vous envoie le récit écrit par SMS juste après. "
             : "Je vous propose d'essayer : en cinq minutes, vous me racontez un moment de votre vie, et vous entendez comment je travaille. ") +
