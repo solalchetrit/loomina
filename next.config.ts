@@ -17,6 +17,11 @@ const forArtifact = process.env.ARTIFACT === "1";
 
 const nextConfig: NextConfig = {
   ...(forArtifact ? { distDir: ".next-artifact", images: { unoptimized: true }, turbopack: { resolveAlias: { "@/lib/loomina/artifact-hook": "./lib/loomina/artifact-api.ts" } } } : {}),
+  // Le PDF du livre lit ses polices et le logo sur le disque : on les joint à ces fonctions.
+  outputFileTracingIncludes: {
+    "/api/user/book/pdf": ["./lib/fonts/**/*", "./public/header-logo-trimmed.png", "./public/logo-loomina-blanc.png"],
+    "/api/admin/clients/*/livre-pdf": ["./lib/fonts/**/*", "./public/header-logo-trimmed.png", "./public/logo-loomina-blanc.png"],
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
