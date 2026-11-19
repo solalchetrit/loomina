@@ -59,7 +59,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "Qui est Mémo, le petit éléphant de l’espace auteur ?",
-        a: "Mémo est le compagnon de votre livre. Comme tous les éléphants, il n’oublie rien. Il grandit à mesure que vous racontez : tout petit au début, il se lève, prend la plume, met ses lunettes, et finit par tenir votre livre. Il n’y a ni points ni niveaux à gagner : il montre simplement où en est votre récit, et vous pouvez jouer avec lui.",
+        a: "Mémo est le petit éléphant de votre espace auteur. Il retient chaque souvenir que vous racontez, et il grandit quand votre livre avance : tout petit au début, il se lève, prend la plume, met ses lunettes, puis tient votre livre. Il n’y a ni points ni niveaux : Mémo montre où en est votre livre.",
       },
     ],
   },

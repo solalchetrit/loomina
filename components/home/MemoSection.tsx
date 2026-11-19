@@ -61,9 +61,9 @@ export default function MemoSection({ id = "memo" }: { id?: string }) {
   return (
     <Section id={id}>
       <SectionHead
-        eyebrow="Votre compagnon d’écriture"
+        eyebrow="Dans votre espace auteur"
         title={"Voici Mémo. Il grandit avec votre livre."}
-        text="Dans votre espace auteur, un petit éléphant vous accompagne. Comme tous les éléphants, il n’oublie rien. À chaque souvenir que vous racontez, il grandit, jusqu’au jour où il tient votre livre."
+        text="Mémo est le petit éléphant de votre espace auteur. Il retient chaque souvenir que vous racontez. À chaque souvenir, il grandit, et votre livre avance."
       />
 
       <div ref={root} className="head-gap grid items-stretch gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10" data-reveal>
@@ -109,7 +109,7 @@ export default function MemoSection({ id = "memo" }: { id?: string }) {
       </div>
 
       <p className="mt-6 max-w-2xl text-[16px] text-[var(--ink-3)]" data-reveal>
-        Pas de points, pas de niveaux, rien à réussir : Mémo avance au rythme de vos appels, et il vous attend entre deux.
+        Pas de points, pas de niveaux. Mémo grandit quand vous racontez, à votre rythme.
       </p>
     </Section>
   );

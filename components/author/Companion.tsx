@@ -11,7 +11,7 @@ import s from "./Companion.module.css";
 const WORDS_PER_PAGE = 250;
 
 /** Ce que Mémo dit quand on joue avec lui. */
-const WORDS = ["Je n’oublie rien !", "Encore un souvenir ?", "J’ai hâte de connaître la suite.", "Racontez-moi encore."];
+const WORDS = ["Je n’oublie rien.", "Un autre souvenir ?", "Racontez-moi la suite."];
 
 /** Les prises qu'il enchaîne quand on le touche. */
 const TAPS: MemoClip[] = ["joy", "act", "laugh"];
@@ -28,7 +28,7 @@ interface Heart {
  * l'avancée réelle du livre (lib/loomina/memo.ts). On peut jouer avec lui :
  * le toucher (il saute, s'occupe, rit), le caresser (des cœurs s'envolent).
  */
-export default function Companion({ project, demo = false }: { project: ProjectOverview; demo?: boolean }) {
+export default function Companion({ project, demo = false, skipIntro = false }: { project: ProjectOverview; demo?: boolean; skipIntro?: boolean }) {
   const state = useMemo(
     () =>
       memoState({
@@ -60,8 +60,8 @@ export default function Companion({ project, demo = false }: { project: ProjectO
   const memories = useMemo(() => {
     const out: string[] = [];
     for (const c of project.calls) if (c.title) out.push(`Je me souviens : « ${c.title} ».`);
-    for (const f of project.family) out.push(`${f.name}… je n’oublie pas.`);
-    for (const t of project.timeline) if (t.year && t.event.length <= 46) out.push(`${t.year} : ${t.event}. C’est noté !`);
+    for (const f of project.family) out.push(`Je n’oublie pas ${f.name}.`);
+    for (const t of project.timeline) if (t.year && t.event.length <= 46) out.push(`${t.year}. ${t.event}. Je m’en souviens.`);
     return out;
   }, [project]);
   const taps = useRef(0);
@@ -89,6 +89,8 @@ export default function Companion({ project, demo = false }: { project: ProjectO
     }
     const grew = Boolean(seen && seen.age < state.age);
     const moved = Boolean(seen && seen.age === state.age && seen.told < state.told);
+    // Nouvel auteur : l'accueil de l'espace (Onboarding) vient de le présenter.
+    if (!seen && skipIntro) return;
     if (!seen || grew) {
       // Première visite : on le présente. Il a grandi : on le fête.
       const id = window.setTimeout(() => setGrowth({ age: state.age, intro: !seen }), 600);
@@ -104,7 +106,7 @@ export default function Companion({ project, demo = false }: { project: ProjectO
       }
     }, 700);
     return () => window.clearTimeout(id);
-  }, [demo, state]);
+  }, [skipIntro, state]);
 
   // Tout seul, de temps en temps, il s'occupe.
   useEffect(() => {
@@ -147,7 +149,7 @@ export default function Companion({ project, demo = false }: { project: ProjectO
     if (home === "rest" && state.mood === "asleep") {
       // Il dort : on le réveille un instant.
       setClip("laugh");
-      say("Oh… bonjour !");
+      say("Bonjour !");
       return;
     }
     const n = taps.current++;
@@ -201,7 +203,7 @@ export default function Companion({ project, demo = false }: { project: ProjectO
                 ))}
               </span>
               <span className="text-[13px] font-bold text-[var(--ink-2)] underline decoration-[var(--amber-line)] decoration-2 underline-offset-4 group-hover:decoration-[var(--amber)]">
-                {details ? "Fermer" : `${state.told} souvenir${state.told > 1 ? "s" : ""} sur ${state.total} · voir lesquels`}
+                {details ? "Fermer" : `${state.told} souvenir${state.told > 1 ? "s racontés" : " raconté"} sur ${state.total} · voir lesquels`}
               </span>
             </button>
           )}
@@ -311,7 +313,7 @@ function Growth({ age, intro, onClose }: { age: MemoAge; intro: boolean; onClose
           <span className={s.growthHalo} aria-hidden="true" />
           <Memo age={age} clip={clip} size={240} onEnd={() => setClip("idle")} />
         </div>
-        <p className="text-[14px] font-bold text-[var(--amber-ink)]">{intro ? "Votre compagnon de route" : `Mémo a grandi · ${meta.stage}`}</p>
+        <p className="text-[14px] font-bold text-[var(--amber-ink)]">{intro ? "Il grandit avec votre livre" : "Mémo a grandi"}</p>
         <h2 id="memo-grandit" className="mt-1 text-[clamp(1.5rem,4vw,1.9rem)] font-extrabold leading-tight tracking-[-0.03em]">
           {intro ? first.event : meta.event}
         </h2>

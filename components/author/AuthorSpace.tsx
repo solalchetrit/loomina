@@ -13,7 +13,7 @@ import LifeStory from "./LifeStory";
 import Calls from "./Calls";
 import Settings from "./Settings";
 import Photos from "./Photos";
-import Welcome from "./Welcome";
+import Onboarding from "./Onboarding";
 import Shipping from "./Shipping";
 import { formatDate, type Overview } from "./types";
 
@@ -69,6 +69,7 @@ export default function AuthorSpace({
   onNotAuthor: () => void;
 }) {
   const [tab, setTabState] = useState<Tab>("apercu");
+  const [replay, setReplay] = useState(false);
   // Changer d'onglet ramène en haut : sur téléphone, la barre du bas reste sous le pouce
   // et la nouvelle rubrique commence à son titre, pas au milieu de la précédente.
   const setTab = useCallback((next: Tab) => {
@@ -173,8 +174,9 @@ export default function AuthorSpace({
           {tab === "apercu" && <p className="text-[15px] font-semibold text-[var(--ink-3)]">{title}</p>}
         </header>
 
-        {data?.welcome && tab === "apercu" && (
-          <Welcome ask={data.welcome} prefs={data.prefs} onDone={load} onUnauthorized={onUnauthorized} />
+        {data?.welcome && <Onboarding ask={data.welcome} prefs={data.prefs} firstName={data.firstName} onDone={load} onUnauthorized={onUnauthorized} />}
+        {data && replay && (
+          <Onboarding ask={{ politeness: true, topics: true }} prefs={data.prefs} firstName={data.firstName} preview onDone={() => setReplay(false)} onUnauthorized={onUnauthorized} />
         )}
 
         <div className={tab === "apercu" ? "mt-4" : "mt-5"}>
@@ -197,7 +199,7 @@ export default function AuthorSpace({
           {data && tab === "apercu" && (
             <div className="flex flex-col gap-3">
               {project?.completed && <Shipping saved={data.shipping ?? null} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
-              {project && (project.weave ? <Companion project={project} demo={data.demo} /> : <Progress project={project} />)}
+              {project && (project.weave ? <Companion project={project} demo={data.demo} skipIntro={Boolean(data.welcome)} /> : <Progress project={project} />)}
               <div className="grid gap-3 lg:grid-cols-[1fr_1.2fr]">
                 <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />
                 {project ? (
@@ -224,6 +226,12 @@ export default function AuthorSpace({
                   {lastCall.title && <span className="mt-1 block text-[17px] font-bold leading-snug">{lastCall.title}</span>}
                   <span className={`line-clamp-2 text-[15px] leading-normal ${lastCall.title ? "mt-0.5 text-[var(--ink-2)]" : "mt-1"}`}>{lastCall.summary ?? "Appel enregistré."}</span>
                   <span className="link mt-1.5 inline-block text-[14px]">Tous vos appels</span>
+                </button>
+              )}
+              {data.demo && (
+                // Livre d'exemple seulement : revoir l'accueil que découvre un nouvel auteur.
+                <button type="button" onClick={() => setReplay(true)} className="link self-center text-[14px]">
+                  Revoir l’accueil d’un nouvel auteur
                 </button>
               )}
             </div>
