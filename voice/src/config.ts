@@ -44,7 +44,9 @@ export const config = {
 
     voice: {
         /** Format Twilio/ElevenLabs : voiceId[-modèle][-vitesse_stabilité_similarité] */
-        ttsVoice: optional('VOICE_TTS_VOICE', 'Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.5_0.75'),
+        // Stabilité 0,6 au lieu de 0,5 (19/11/2026) : une voix plus régulière,
+        // moins de petits accrocs entendus à la démo.
+        ttsVoice: optional('VOICE_TTS_VOICE', 'Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.6_0.75'),
         language: optional('VOICE_LANGUAGE', 'fr-FR'),
         sttModel: optional('VOICE_STT_MODEL', 'nova-3-general'),
     },

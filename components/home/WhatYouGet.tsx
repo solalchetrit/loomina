@@ -5,7 +5,7 @@ import { OFFER } from "@/config/offer";
 import Photo from "@/components/ui/Photo";
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
-  { icon: "book", title: "Un vrai livre relié", text: `${OFFER.format}, imprimé et livré chez vous.` },
+  { icon: "book", title: "Un vrai livre", text: `${OFFER.format}, imprimé et livré chez vous.` },
   { icon: "image", title: "Vos photos dedans", text: "Ajoutez-les dans votre espace auteur ou envoyez-les par e-mail." },
   { icon: "check", title: "Relu par notre équipe", text: "Votre livre est relu avant l’impression." },
   { icon: "heart", title: "À partager en famille", text: `La version ${OFFER.digital}, pour ceux qui sont loin.` },
@@ -54,14 +54,14 @@ export default function WhatYouGet({
         {photo === "collection" ? (
           <Photo
             name="collection-de-livres"
-            alt="Quatre livres Loomina reliés, aux couvertures en toile beige, bleue, verte et bordeaux."
+            alt="Quatre livres Loomina, aux couvertures en toile beige, bleue, verte et bordeaux."
             ratio="aspect-[4/3]"
             sizes="(min-width: 1024px) 640px, 100vw"
           />
         ) : (
           <Photo
             name="livre-bleu-dans-les-mains"
-            alt="Deux mains tiennent un livre Loomina relié, à la couverture en toile bleu nuit."
+            alt="Deux mains tiennent un livre Loomina, à la couverture en toile bleu nuit."
             ratio="aspect-[4/5]"
             sizes="(min-width: 1024px) 480px, 100vw"
             className="mx-auto w-full max-w-[480px]"

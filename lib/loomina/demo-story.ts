@@ -18,7 +18,7 @@ import crypto from 'node:crypto';
 import OpenAI from 'openai';
 import { db } from './db';
 import { sendSms } from './sms';
-import { sendEmail } from './notify';
+import { brandEmailHtml, sendEmail } from './notify';
 import { promptText, refreshPrompts } from './prompt-store';
 import { WRITER_SYSTEM, WRITER_MODEL, WRITER_REASONING_EFFORT, WRITER_MAX_TOKENS, countWords } from './writer';
 import { tokenUsage } from './usage';
@@ -223,22 +223,21 @@ export function demoEmail(params: { firstName: string | null; title: string; pro
     const intro = [
         hello,
         `Voici votre récit, « ${params.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page comme il le serait dans votre livre.`,
-        `Ce n’était qu’un moment de votre vie. Imaginez-les tous réunis, appel après appel, dans un livre relié à garder et à transmettre.`,
+        `Ce n’était qu’un moment de votre vie. Imaginez-les tous réunis, appel après appel, dans un livre à garder et à transmettre.`,
     ];
     // Demande de Solal : un simple bouton, la réduction en pourcentage, jamais le prix réduit.
     const promoLine = params.promo ? `Votre réduction de ${DEMO_PROMO.percentOff}\u00a0% est déjà appliquée sur ce lien, jusqu’au ${until}.` : null;
     const button = 'Écrire mon livre';
-    const outro = ['Pour nous poser une question, répondez simplement à cet e-mail.', 'À très bientôt,\nLoomina'];
+    const outro = ['Pour nous poser une question, répondez simplement à cet e\u2011mail.', 'À très bientôt,\nLoomina'];
 
     const text = [...intro, ...(promoLine ? [promoLine] : []), `${button} : ${orderUrl}`, ...outro].join('\n\n');
     const p = (t: string) => `<p style="margin:0 0 16px">${esc(t).replace(/\n/g, '<br>')}</p>`;
-    const html =
-        '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#161616;max-width:560px">' +
+    const html = brandEmailHtml(
         intro.map(p).join('') +
         (promoLine ? p(promoLine) : '') +
         `<p style="margin:8px 0 28px"><a href="${esc(orderUrl)}" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#161616;color:#ffffff;font-weight:800;text-decoration:none">${esc(button)}</a></p>` +
-        outro.map(p).join('') +
-        '</div>';
+        outro.map(p).join('')
+    );
     return { text, html, orderUrl };
 }
 

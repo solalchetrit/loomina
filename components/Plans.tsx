@@ -29,7 +29,7 @@ const ROWS: { label: string; values: Cell[] }[] = [
   { label: "Récit de chaque appel, à relire et corriger", values: [true, TBD, TBD] },
   { label: "Relecture par notre équipe", values: [true, TBD, TBD] },
   { label: "Vos photos dans le livre", values: [true, TBD, TBD] },
-  { label: "Livre relié", values: [OFFER.format, TBD, TBD] },
+  { label: "Livre imprimé", values: [OFFER.format, TBD, TBD] },
   { label: "Exemplaires imprimés", values: ["1 exemplaire", TBD, TBD] },
   { label: "Version numérique", values: [OFFER.digital, TBD, TBD] },
   { label: "Livraison", values: [OFFER.delivery, TBD, TBD] },

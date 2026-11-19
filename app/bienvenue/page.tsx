@@ -160,7 +160,7 @@ export default function BienvenuePage() {
           title: "Le livre arrive chez vous",
           body: (
             <>
-              Quand l’histoire est complète, chaque page est relue par une personne de l’équipe, puis le livre relié ({OFFER.format}) est imprimé et livré. Une version numérique l’accompagne.
+              Quand l’histoire est complète, chaque page est relue par une personne de l’équipe, puis le livre ({OFFER.format}) est imprimé et livré. Une version numérique l’accompagne.
             </>
           ),
         },
@@ -202,7 +202,7 @@ export default function BienvenuePage() {
           title: "Votre livre arrive chez vous",
           body: (
             <>
-              Une personne de l’équipe relit chaque page, puis le livre relié ({OFFER.format}) est imprimé et livré chez vous, avec sa version numérique. Dans votre espace, commencez par dire à Loomina comment vous parler : tutoiement ou vouvoiement, sujets à éviter.
+              Une personne de l’équipe relit chaque page, puis le livre ({OFFER.format}) est imprimé et livré chez vous, avec sa version numérique. Dans votre espace, commencez par dire à Loomina comment vous parler : tutoiement ou vouvoiement, sujets à éviter.
             </>
           ),
         },

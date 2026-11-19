@@ -1,5 +1,5 @@
 /**
- * L'adresse où envoyer le livre relié.
+ * L'adresse où envoyer le livre.
  *
  * Demandée dans l'espace auteur une fois le livre terminé (choix de Solal,
  * 17/11/2026 : pas à la commande). Gardée dans

@@ -26,7 +26,9 @@ const END_MARKER = '##END_CALL##';
  * alors que le narrateur n'avait pas fini. S'il reprend pendant ce délai,
  * sa suite est ajoutée à la même réplique et l'attente recommence.
  */
-const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 800);
+// 1,2 s (demande de Solal, 19/11/2026, après la démo de sa mère) : un peu
+// plus de temps pour réfléchir avant que Loomina reprenne. Était 0,8 s.
+const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 1200);
 /**
  * Le modèle est interrogé tout de suite : l'attente ci-dessus et le temps
  * de réflexion du modèle (environ 1 s) se chevauchent au lieu de
@@ -36,6 +38,17 @@ const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 800);
  */
 function holdFor(text: string): number {
     return /\?\s*$/.test(text) ? 0 : REPLY_DELAY_MS;
+}
+
+/**
+ * Durée estimée de la voix pour un texte. La voix (ElevenLabs, vitesse 0,9)
+ * lit environ 12 caractères par seconde en français. Avant (19/11/2026) on
+ * comptait 60 ms par caractère avec un plafond de 12 s : la clôture de la
+ * démo (environ 560 caractères, 40 s de voix) était coupée net au bout de
+ * 12 s, et l'appel raccrochait au milieu d'une phrase.
+ */
+function speechMs(text: string): number {
+    return 2000 + text.length * 75;
 }
 
 /** Délai sans premier mot au bout duquel la question est reposée à OpenAI, une fois. */
@@ -117,7 +130,9 @@ export class CallSession {
         this.maxTimer = setTimeout(() => {
             console.info(`[${this.callSid}] durée maximale atteinte`);
             const goodbye = this.plan.demo
-                ? "Je dois vous laisser, merci pour ce beau moment. Tout est expliqué sur loomina point e u. À bientôt !"
+                ? this.plan.metadata.can_text === true
+                    ? "Nous arrivons au bout des cinq minutes. Merci pour ce beau moment : je vais écrire votre récit, et vous le recevrez par SMS dans quelques minutes. À bientôt !"
+                    : "Nous arrivons au bout des cinq minutes. Merci pour ce beau moment. Tout est expliqué sur loomina point e u. À bientôt !"
                 : "Nous avons bien travaillé aujourd'hui. Reprenons la prochaine fois. À bientôt !";
             void this.sayAndEnd(goodbye, 'max-duration');
         }, this.plan.maxSeconds * 1000);
@@ -279,6 +294,26 @@ export class CallSession {
             spoken += out;
             this.spokenSoFar = spoken;
         };
+        // La voix reçoit des bouts de phrase entiers, pas des morceaux de mot :
+        // envoyés mot à mot, ElevenLabs hachait la voix (« achures » entendues
+        // à la démo du 19/11/2026). On envoie jusqu'à la dernière ponctuation,
+        // ou par blocs de mots quand la phrase est longue.
+        let voiceBuf = '';
+        const queue = (text: string, flush: boolean) => {
+            voiceBuf += text;
+            if (flush) {
+                say(voiceBuf);
+                voiceBuf = '';
+                return;
+            }
+            let cut = -1;
+            const re = /[.!?;:,…»)](?=\s)/g;
+            for (let m = re.exec(voiceBuf); m; m = re.exec(voiceBuf)) cut = m.index + 1;
+            if (cut < 0 && voiceBuf.length > 90) cut = voiceBuf.lastIndexOf(' ');
+            if (cut <= 0) return;
+            say(voiceBuf.slice(0, cut));
+            voiceBuf = voiceBuf.slice(cut);
+        };
         this.spokenSoFar = '';
         // Ne rien dire avant `releaseAt` (voir holdFor). La lecture du flux
         // est suspendue pendant ce temps ; les morceaux attendent.
@@ -355,7 +390,7 @@ export class CallSession {
                             const before = pending.slice(0, idx);
                             await hold();
                             if (controller.signal.aborted) return;
-                            say(before);
+                            queue(before, true);
                             pending = '';
                             break;
                         }
@@ -366,7 +401,7 @@ export class CallSession {
                             await hold();
                             if (controller.signal.aborted) return;
                         }
-                        say(emit);
+                        queue(emit, false);
                         pending = pending.slice(pending.length - keep);
                     }
                     if (!stalled) break;
@@ -386,7 +421,7 @@ export class CallSession {
             if (controller.signal.aborted) return;
             await hold();
             if (controller.signal.aborted) return;
-            if (pending && !pending.includes('#')) say(pending);
+            queue(pending && !pending.includes('#') ? pending : '', true);
             this.sendText('', true);
         } catch (err) {
             if (controller.signal.aborted) return;
@@ -407,12 +442,12 @@ export class CallSession {
             this.turns.push({ role: 'bot', message: spoken.trim(), time: Date.now() });
             // Le silence se compte à partir de la fin de la voix de Loomina,
             // pas de la dernière phrase du narrateur (~60 ms par caractère).
-            if (!this.endRequested) this.armSilenceTimer(spoken.length * 60);
+            if (!this.endRequested) this.armSilenceTimer(speechMs(spoken));
         }
 
         if (this.endRequested) {
             // Laisser la voix finir la phrase d'au revoir avant de couper.
-            const ms = Math.min(12000, 1500 + spoken.length * 60);
+            const ms = Math.min(90_000, speechMs(spoken));
             setTimeout(() => void this.end('assistant-ended-call'), ms);
         }
     }
@@ -477,7 +512,7 @@ export class CallSession {
         this.abortGeneration();
         this.sendText(text, true);
         this.turns.push({ role: 'bot', message: text, time: Date.now() });
-        setTimeout(() => void this.end(reason), 1500 + text.length * 60);
+        setTimeout(() => void this.end(reason), speechMs(text));
     }
 
     private async end(reason: string): Promise<void> {

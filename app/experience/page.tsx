@@ -42,7 +42,7 @@ const AFTER = [
   },
   {
     title: "Le livre arrive chez vous",
-    text: `Relié, ${OFFER.format}, avec sa version ${OFFER.digital} pour la famille. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé, puis ${OFFER.printDelay} d’impression et d’acheminement.`,
+    text: `Imprimé en ${OFFER.format}, avec sa version ${OFFER.digital} pour la famille. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé, puis ${OFFER.printDelay} d’impression et d’acheminement.`,
   },
 ];
 

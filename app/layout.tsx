@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     default: "Loomina | Écrivez votre autobiographie par téléphone",
     template: "%s | Loomina"
   },
-  description: `Racontez votre vie au téléphone, Loomina en fait un livre relié. Le récit de chaque appel écrit pour vous, votre livre relu par notre équipe. Démo gratuite au ${SITE.phoneDisplay}.`,
+  description: `Racontez votre vie au téléphone, Loomina en fait un livre. Le récit de chaque appel écrit pour vous, votre livre relu par notre équipe. Démo gratuite au ${SITE.phoneDisplay}.`,
   alternates: {
     canonical: "/",
   },
@@ -61,14 +61,14 @@ export const metadata: Metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Quatre livres Loomina reliés en toile',
+        alt: 'Quatre livres Loomina en toile',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
     title: "Loomina : votre vie, racontée au téléphone",
-    description: "Racontez votre vie au téléphone, nous en faisons un livre relié.",
+    description: "Racontez votre vie au téléphone, nous en faisons un livre.",
     images: ['/og-image.jpg'],
   },
   robots: {
