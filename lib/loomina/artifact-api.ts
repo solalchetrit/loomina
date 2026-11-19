@@ -97,6 +97,8 @@ function answerSnapshot(snap: Snapshot, path: string, method: string, init?: Req
     return null;
 }
 
+let welcomed = false;
+
 function answer(path: string, method: string, init?: RequestInit): Promise<Response> | null {
     const snap = (window as unknown as { __LOOMINA_SNAPSHOT__?: Snapshot }).__LOOMINA_SNAPSHOT__;
     if (snap && path.startsWith('/api/user/')) {
@@ -106,9 +108,11 @@ function answer(path: string, method: string, init?: RequestInit): Promise<Respo
     if (path === '/api/auth/dev') return reply({ phone: '+33600000000' });
     if (path === '/api/auth/logout') return reply({ ok: true });
     if (path === '/api/auth/verify') return reply({ message: 'Connexion par SMS indisponible dans cette copie.' }, 501);
-    if (path === '/api/user/overview') return reply(demoOverview());
+    // L'accueil d'un nouvel auteur s'ouvre de lui-même à l'arrivée dans la copie, une fois.
+    if (path === '/api/user/overview') return reply({ ...demoOverview(), welcome: welcomed ? null : { politeness: true, topics: true } });
     if (path === '/api/user/stories') return reply(demoStories());
     if (path === '/api/user/preferences') {
+        welcomed = true;
         demoSavePrefs(bodyOf(init));
         return reply({ saved: true });
     }
