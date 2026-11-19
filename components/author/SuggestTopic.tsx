@@ -48,19 +48,19 @@ export default function SuggestTopic({
   };
 
   return (
-    <section className="card p-6 md:p-8" aria-labelledby="suggerer">
-      <h2 id="suggerer" className="t-heading">
+    <section className="card p-6" aria-labelledby="suggerer">
+      <h2 id="suggerer" className="text-[19px] font-extrabold tracking-[-0.02em]">
         Suggérer un sujet
       </h2>
-      <p className="t-body mt-1">Un souvenir à ne pas oublier, une question de la famille : Loomina l’abordera au prochain appel.</p>
+      <p className="mt-0.5 text-[15px] text-[var(--ink-2)]">Un souvenir à ne pas oublier, une question de la famille : Loomina l’abordera au prochain appel.</p>
 
-      <form onSubmit={submit} className="mt-5">
+      <form onSubmit={submit} className="mt-3">
         <label htmlFor="sujet" className="sr-only">
           Votre question
         </label>
         <textarea
           id="sujet"
-          rows={3}
+          rows={2}
           maxLength={280}
           value={text}
           onChange={(e) => {
@@ -68,16 +68,16 @@ export default function SuggestTopic({
             setStatus("idle");
           }}
           placeholder="Par exemple : raconte-nous ton premier voyage à l’étranger"
-          className="field !min-h-[96px]"
+          className="field !min-h-[64px] !py-2.5"
         />
         <div className="mt-2 flex flex-wrap gap-2">
           {IDEAS.map((idea) => (
-            <button key={idea} type="button" onClick={() => setText(idea)} className="press rounded-full bg-[var(--surface-2)] px-3 py-1.5 text-[14px] font-semibold hover:bg-[var(--line)]">
+            <button key={idea} type="button" onClick={() => setText(idea)} className="press rounded-full bg-[var(--surface-2)] px-3 py-1 text-[13px] font-semibold hover:bg-[var(--line)]">
               {idea}
             </button>
           ))}
         </div>
-        <div className="mt-4 flex flex-wrap items-center gap-4">
+        <div className="mt-3 flex flex-wrap items-center gap-4">
           <Button type="submit" loading={status === "saving"} disabled={text.trim().length < 5}>
             Ajouter au prochain appel
           </Button>
@@ -89,11 +89,11 @@ export default function SuggestTopic({
       </form>
 
       {questions.length > 0 && (
-        <div className="mt-6 border-t border-[var(--line-soft)] pt-5">
-          <p className="text-[15px] font-bold text-[var(--ink-3)]">Ce que Loomina garde en tête</p>
-          <ul className="mt-3 space-y-2">
+        <div className="mt-4 border-t border-[var(--line-soft)] pt-3">
+          <p className="text-[14px] font-bold text-[var(--ink-3)]">Ce que Loomina garde en tête</p>
+          <ul className="mt-2 space-y-1">
             {questions.map((q) => (
-              <li key={q} className="flex gap-3 text-[16px]">
+              <li key={q} className="flex gap-3 text-[15px]">
                 <span aria-hidden="true" className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[var(--amber)]" />
                 {q}
               </li>

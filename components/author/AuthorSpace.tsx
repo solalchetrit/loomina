@@ -31,26 +31,26 @@ type Tab = "apercu" | "livre" | "vie" | "appels" | "reglages";
 /** Le prochain appel : le numéro, et le sujet que Loomina a prévu d'aborder. */
 function NextCall({ topic, schedule }: { topic: string | null; schedule?: string | null }) {
   return (
-    <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white md:p-8" aria-labelledby="prochain-appel">
+    <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white" aria-labelledby="prochain-appel">
       <h2 id="prochain-appel" className="text-[15px] font-bold tracking-normal text-[var(--amber)]">
         Votre prochain appel
       </h2>
       {topic ? (
         <>
-          <p className="mt-3 text-[15px] text-[#cfcfc8]">Loomina a prévu de commencer par :</p>
-          <p className="mt-2 font-serif text-[clamp(1.3rem,2.1vw,1.6rem)] leading-snug text-white">« {topic} »</p>
+          <p className="mt-2 text-[14px] text-[#cfcfc8]">Loomina a prévu de commencer par :</p>
+          <p className="mt-1.5 font-serif text-[clamp(1.15rem,1.6vw,1.3rem)] leading-snug text-white">« {topic} »</p>
         </>
       ) : (
-        <p className="mt-3 text-[clamp(1.3rem,2.2vw,1.6rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
+        <p className="mt-2 text-[clamp(1.15rem,1.7vw,1.35rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
       )}
-      <div className="mt-auto pt-8">
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
         <a
           href={`tel:${SITE.phone}`}
-          className="press inline-flex min-h-14 items-center rounded-full bg-[var(--amber)] px-7 text-[22px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
+          className="press inline-flex min-h-12 shrink-0 items-center rounded-full bg-[var(--amber)] px-6 text-[19px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
         >
           {SITE.phoneDisplay}
         </a>
-        <p className="mt-3 text-[15px] text-[#cfcfc8]">
+        <p className="min-w-[12rem] flex-1 text-[14px] leading-snug text-[#cfcfc8]">
           {schedule ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.` : "Depuis le numéro de votre commande, quand vous voulez."}
         </p>
       </div>
@@ -110,7 +110,7 @@ export default function AuthorSpace({
   const lastCall = project?.calls[0];
 
   return (
-    <div className="section-b w-full pt-[5.75rem] md:pt-[7.25rem]">
+    <div className="w-full pb-10 pt-[5.5rem] md:pt-[6.5rem]">
       {/* Le menu de l'espace auteur : la même barre flottante que le site, avec ses rubriques.
           Le logo ramène au site grand public (Solal, 19/11/2026). */}
       <header className="fixed inset-x-0 top-0 z-[1000] px-3 pt-3 sm:px-4 sm:pt-4">
@@ -120,7 +120,7 @@ export default function AuthorSpace({
               <Image src="/header-logo-bleu.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
             </span>
             <span className="hidden rounded-full bg-[var(--amber-soft)] px-2.5 py-1 text-[12px] font-extrabold uppercase tracking-[0.06em] text-[var(--amber-deep)] sm:max-md:inline xl:inline">
-              Espace auteur
+              Auteur
             </span>
           </Link>
 
@@ -164,18 +164,16 @@ export default function AuthorSpace({
       </header>
 
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
-        <header>
+        <header className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5">
+          <h1 className="text-[clamp(1.6rem,2.6vw,2rem)] font-extrabold leading-[1.1] tracking-[-0.03em]">{data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour"}</h1>
           <p className="text-[15px] font-semibold text-[var(--ink-3)]">{title}</p>
-          <h1 className="mt-1 text-[clamp(1.9rem,3.6vw,2.6rem)] font-extrabold leading-[1.08] tracking-[-0.035em]">
-            {data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour"}
-          </h1>
         </header>
 
         {data?.welcome && tab === "apercu" && (
           <Welcome ask={data.welcome} prefs={data.prefs} onDone={load} onUnauthorized={onUnauthorized} />
         )}
 
-        <div className="mt-6">
+        <div className="mt-4">
           {failed && (
             <p role="alert" className="rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
               Nous n’arrivons pas à charger votre espace pour le moment.{" "}
@@ -193,10 +191,10 @@ export default function AuthorSpace({
           )}
 
           {data && tab === "apercu" && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {project?.completed && <Shipping saved={data.shipping ?? null} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
               {project && (project.weave ? <Companion project={project} demo={data.demo} /> : <Progress project={project} />)}
-              <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
+              <div className="grid gap-3 lg:grid-cols-[1fr_1.2fr]">
                 <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />
                 {project ? (
                   <SuggestTopic
@@ -217,11 +215,11 @@ export default function AuthorSpace({
                 )}
               </div>
               {lastCall && (
-                <button type="button" onClick={() => setTab("appels")} className="card lift press p-6 text-left md:p-8">
-                  <span className="text-[15px] font-bold text-[var(--ink-3)]">Dernier appel · {formatDate(lastCall.date, false)}</span>
-                  {lastCall.title && <span className="mt-2 block text-[19px] font-bold leading-snug">{lastCall.title}</span>}
-                  <span className={`block text-[17px] leading-relaxed ${lastCall.title ? "mt-1 text-[var(--ink-2)]" : "mt-2"}`}>{lastCall.summary ?? "Appel enregistré."}</span>
-                  <span className="link mt-3 inline-block text-[15px]">Tous vos appels</span>
+                <button type="button" onClick={() => setTab("appels")} className="card lift press px-6 py-4 text-left">
+                  <span className="text-[14px] font-bold text-[var(--ink-3)]">Dernier appel · {formatDate(lastCall.date, false)}</span>
+                  {lastCall.title && <span className="mt-1 block text-[17px] font-bold leading-snug">{lastCall.title}</span>}
+                  <span className={`line-clamp-2 text-[15px] leading-normal ${lastCall.title ? "mt-0.5 text-[var(--ink-2)]" : "mt-1"}`}>{lastCall.summary ?? "Appel enregistré."}</span>
+                  <span className="link mt-1.5 inline-block text-[14px]">Tous vos appels</span>
                 </button>
               )}
             </div>

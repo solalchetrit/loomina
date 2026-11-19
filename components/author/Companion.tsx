@@ -139,7 +139,7 @@ export default function Companion({ project, demo = false }: { project: ProjectO
         <button ref={scene} type="button" className={s.scene} onClick={onTap} onPointerMove={onMove} onPointerLeave={onLeave} aria-label="Jouer avec Mémo">
           <span className={s.halo} aria-hidden="true" />
           <span ref={lean} className={s.lean}>
-            <Memo age={age} clip={busy ? clip : home} size={200} onEnd={() => setClip(home)} />
+            <Memo age={age} clip={busy ? clip : home} size={130} onEnd={() => setClip(home)} />
           </span>
           {hearts.map((h) => (
             <span key={h.id} className={s.heart} style={{ left: `${h.x}%` }} onAnimationEnd={() => setHearts((all) => all.filter((x) => x.id !== h.id))} aria-hidden="true">
@@ -154,13 +154,12 @@ export default function Companion({ project, demo = false }: { project: ProjectO
         </button>
 
         <div className={s.words}>
-          <p className="text-[13px] font-bold text-[var(--amber-deep)] md:text-[14px]">Mémo grandit avec votre livre</p>
-          <h2 id="memo" className="mt-1 text-[clamp(1.1rem,2vw,1.55rem)] font-extrabold leading-[1.18] tracking-[-0.025em]" aria-live="polite">
+          <h2 id="memo" className="text-[clamp(1.05rem,1.65vw,1.3rem)] font-extrabold leading-[1.2] tracking-[-0.02em]" aria-live="polite">
             {headline}
           </h2>
-          <p className="mt-1.5 text-[14px] text-[var(--ink-3)] md:text-[15px]">
-            {shown && (news || state.note) ? <span className="block font-semibold text-[var(--amber-deep)]">{news || state.note}</span> : null}
-            <span className="block whitespace-nowrap">
+          <p className="mt-1 text-[14px] leading-snug text-[var(--ink-3)]">
+            {shown && (news || state.note) ? <span className="font-semibold text-[var(--amber-deep)]">{news || state.note} </span> : null}
+            <span className="whitespace-nowrap">
               <b className="font-extrabold text-[var(--ink)] tabular-nums">≈ {pages}</b> {pages > 1 ? "pages" : "page"}
               <span className="mx-1.5" aria-hidden="true">
                 ·
@@ -182,7 +181,7 @@ export default function Companion({ project, demo = false }: { project: ProjectO
                   {/* eslint-disable-next-line @next/next/no-img-element -- petit dessin détouré, déjà à sa taille */}
                   <img src={memoSrc(x.age)} alt="" className={`${s.mini} ${reached ? "" : s.later}`} />
                 </span>
-                <span className={`mt-1.5 block text-[12px] font-bold leading-tight ${x.age === age ? "text-[var(--ink)]" : "text-[var(--ink-3)]"}`}>{x.name}</span>
+                <span className={`mt-1 block text-[11.5px] font-bold leading-tight ${x.age === age ? "text-[var(--ink)]" : "text-[var(--ink-3)]"}`}>{x.name}</span>
               </>
             );
             return (
