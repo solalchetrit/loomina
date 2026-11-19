@@ -30,7 +30,7 @@
   }
 }
 
-/* Le dessin en haut des deux premiers écrans : même hauteur, pour que la feuille ne saute pas. */
+/* Mémo en haut de ses deux écrans : même hauteur, pour que la feuille ne saute pas. */
 .visual {
   position: relative;
   display: flex;
@@ -47,6 +47,12 @@
   transform: translateY(-1.5rem);
 }
 
+/* Quand il grandit jusqu'à son dernier âge, il doit tenir dans la feuille. */
+.memoGrow {
+  width: 12.5rem;
+  transform: translateY(-0.25rem);
+}
+
 .halo {
   position: absolute;
   left: 50%;
@@ -56,6 +62,79 @@
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(241, 168, 67, 0.24), rgba(241, 168, 67, 0));
+}
+
+/* Les trois temps du livre : ils arrivent l'un après l'autre. */
+.how {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.howRow {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  border-radius: 18px;
+  background: var(--canvas);
+  animation: row 520ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.howIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(20, 24, 34, 0.08);
+}
+
+/* Les cinq étapes sous Mémo : une ligne de points qui se remplit. */
+.ages {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.age {
+  display: block;
+  width: 2rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: var(--line);
+  transition: background 400ms ease;
+}
+
+/* Une zone de toucher confortable autour du trait. */
+.age::before {
+  content: "";
+  display: block;
+  height: 2.25rem;
+  transform: translateY(-0.95rem);
+}
+
+.ageOn {
+  background: var(--amber);
+}
+
+.stage {
+  margin: 0.7rem 0 1.1rem;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--amber-ink);
+  animation: veil 400ms ease both;
+}
+
+@keyframes row {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
 }
 
 @keyframes veil {
@@ -73,7 +152,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .veil,
-  .sheet {
+  .sheet,
+  .howRow,
+  .stage {
     animation: none;
   }
 }
