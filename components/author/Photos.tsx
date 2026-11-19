@@ -107,14 +107,37 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
     }
   };
 
-  return (
-    <section className="card p-7" aria-labelledby="photos-titre">
-      <h2 id="photos-titre" className="text-[17px] font-bold">
-        Vos photos
-      </h2>
-      <p className="t-body mt-2">Envoyez une photo : Loomina vous posera une question dessus au prochain appel.</p>
+  const [open, setOpen] = useState(false);
 
-      <form onSubmit={send} className="mt-4 space-y-3">
+  return (
+    <section className="card px-5 py-4" aria-labelledby="photos-titre">
+      <div className="flex items-center justify-between gap-3">
+        <h2 id="photos-titre" className="text-[14px] font-bold text-[var(--ink-3)]">
+          Vos photos{photos.length > 0 ? ` · ${photos.length}` : ""}
+        </h2>
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+          className="press inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-3.5 text-[14px] font-bold text-[var(--ink-2)] hover:bg-[var(--line)] hover:text-[var(--ink)]"
+        >
+          {open ? (
+            "Fermer"
+          ) : (
+            <>
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Ajouter
+            </>
+          )}
+        </button>
+      </div>
+      {!open && photos.length === 0 && <p className="mt-1 text-[14px] leading-snug text-[var(--ink-3)]">Envoyez une photo : Loomina vous posera une question dessus au prochain appel.</p>}
+
+      {open && (
+      <form onSubmit={send} className="mt-3 space-y-2.5">
+        <p className="text-[14px] leading-snug text-[var(--ink-3)]">Loomina vous posera une question sur cette photo au prochain appel.</p>
         <label htmlFor="photo-fichier" className="sr-only">
           Choisir une photo
         </label>
@@ -127,7 +150,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
             setFile(e.target.files?.[0] ?? null);
             setStatus("idle");
           }}
-          className="block w-full text-[15px] file:mr-3 file:min-h-11 file:rounded-full file:border-0 file:bg-[var(--surface-2)] file:px-4 file:font-bold"
+          className="block w-full text-[14px] file:mr-3 file:min-h-10 file:rounded-full file:border-0 file:bg-[var(--surface-2)] file:px-4 file:font-bold"
         />
         <label htmlFor="photo-legende" className="field-label">
           Un titre pour cette photo (facultatif)
@@ -155,27 +178,28 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
             </select>
           </>
         )}
-        <Button type="submit" loading={status === "sending"} disabled={!file}>
+        <Button type="submit" loading={status === "sending"} disabled={!file} className="!min-h-11 w-full !text-[15px]">
           Envoyer la photo
         </Button>
-        <p role="status" className="text-[15px] font-semibold">
+        <p role="status" className="text-[14px] font-semibold">
           {status === "sent" && <span className="text-[var(--success)]">Reçue. Loomina vous en parlera au prochain appel.</span>}
           {status === "error" && <span className="text-[var(--danger)]">{error}</span>}
         </p>
       </form>
+      )}
 
       {photos.length > 0 && (
-        <ul className="mt-5 grid grid-cols-2 gap-3 border-t border-[var(--line-soft)] pt-5">
+        <ul className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-3">
           {photos.map((p) => (
             <li key={p.id} className="min-w-0">
               {p.url ? (
                 // eslint-disable-next-line @next/next/no-img-element -- lien signé temporaire, hors optimisation Next
-                <img src={p.url} alt={p.caption ?? "Photo envoyée"} className="aspect-square w-full rounded-[12px] object-cover" />
+                <img src={p.url} alt={p.caption ?? "Photo envoyée"} className="aspect-square w-full rounded-[10px] object-cover" />
               ) : (
-                <div className="aspect-square w-full rounded-[12px] bg-[var(--surface-2)]" />
+                <div className="aspect-square w-full rounded-[10px] bg-[var(--surface-2)]" />
               )}
-              <p className="t-small mt-1 line-clamp-2">{p.caption ?? p.question}</p>
-              {p.chapter && <p className="mt-0.5 line-clamp-1 text-[13px] font-semibold text-[var(--amber-ink)]">{p.chapter}</p>}
+              <p className="mt-1 line-clamp-1 text-[12.5px] leading-tight text-[var(--ink-3)]">{p.caption ?? p.question}</p>
+              
             </li>
           ))}
         </ul>

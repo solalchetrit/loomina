@@ -110,17 +110,19 @@ export default function AuthorSpace({
   const lastCall = project?.calls[0];
 
   return (
-    <div className="w-full pb-10 pt-[5.5rem] md:pt-[6.5rem]">
+    <div className="author-space w-full pb-10 pt-[5.25rem] md:pt-[6.5rem]">
       {/* Le menu de l'espace auteur : la même barre flottante que le site, avec ses rubriques.
           Le logo ramène au site grand public (Solal, 19/11/2026). */}
       <header className="fixed inset-x-0 top-0 z-[1000] px-3 pt-3 sm:px-4 sm:pt-4">
         <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-3 rounded-[22px] border border-white/70 bg-white/80 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-xl backdrop-saturate-150 md:h-[68px] md:pl-6">
-          <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="Loomina, retour au site">
+          {/* Le repère de l'espace : « Loomina | auteur », le mot écrit comme un titre de chapitre du livre. */}
+          <Link href="/" className="flex shrink-0 items-center" aria-label="Loomina, espace auteur. Retour au site">
             <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
               <Image src="/header-logo-bleu.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
             </span>
-            <span className="hidden rounded-full bg-[var(--amber-soft)] px-2.5 py-1 text-[12px] font-extrabold uppercase tracking-[0.06em] text-[var(--amber-deep)] sm:max-md:inline xl:inline">
-              Auteur
+            <span aria-hidden="true" className="ml-3.5 flex items-center gap-3 md:max-lg:hidden">
+              <span className="h-6 w-px bg-[var(--rule-strong)]" />
+              <span className="translate-y-[1px] font-serif text-[20px] italic leading-none tracking-normal text-[var(--ink-2)] md:text-[21px]">auteur</span>
             </span>
           </Link>
 
@@ -226,12 +228,7 @@ export default function AuthorSpace({
           )}
 
           {data && tab === "livre" && (
-            <div className="grid gap-4 lg:grid-cols-[1.9fr_1fr]">
-              <LiveBook onUnauthorized={onUnauthorized} />
-              <aside className="flex flex-col gap-4 lg:sticky lg:top-32 lg:self-start">
-                <Photos onUnauthorized={onUnauthorized} />
-              </aside>
-            </div>
+            <LiveBook onUnauthorized={onUnauthorized} aside={<Photos onUnauthorized={onUnauthorized} />} />
           )}
 
           {data && tab === "vie" &&
