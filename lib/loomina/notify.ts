@@ -231,6 +231,47 @@ export async function notifyNewOrder(order: Order): Promise<void> {
 }
 
 // ------------------------------------------------------------
+// Le livre est terminé : on le dit à l'auteur (demande de Solal, 20/11/2026)
+// ------------------------------------------------------------
+
+/** Délai annoncé pour la première version complète du livre. */
+export const FIRST_VERSION_DELAY = 'une semaine';
+
+export function bookCompleteTexts(author: { first_name: string | null; politeness_preference?: string | null }): { subject: string; email: string; sms: string } {
+    const tu = author.politeness_preference === 'tu';
+    const name = author.first_name?.trim();
+    const hello = name ? `Bonjour ${name}` : 'Bonjour';
+    const where = `${HOST}/dashboard`;
+    return {
+        subject: tu ? 'Ton livre est terminé' : 'Votre livre est terminé',
+        sms: tu
+            ? `${hello}, ton livre est terminé, bravo. Nous le relisons : sa première version complète t'attendra d'ici ${FIRST_VERSION_DELAY} sur ${where}, et par e-mail. Loomina`
+            : `${hello}, votre livre est terminé, bravo. Nous le relisons : sa première version complète vous attendra d'ici ${FIRST_VERSION_DELAY} sur ${where}, et par e-mail. Loomina`,
+        email: tu
+            ? `${hello},\n\nTu l'as dit au téléphone : ton livre est terminé. Merci pour tout ce que tu as raconté.\n\nNotre équipe le relit maintenant en entier et le met en page. D'ici ${FIRST_VERSION_DELAY}, tu recevras sa première version complète par e-mail, et tu pourras aussi la lire sur ${where}, en te connectant avec ton numéro de téléphone.\n\nUn souvenir te revient entre-temps ? Appelle le ${SITE.phoneDisplay}, il rejoindra le livre.\n\nL'équipe Loomina`
+            : `${hello},\n\nVous l'avez dit au téléphone : votre livre est terminé. Merci pour tout ce que vous avez raconté.\n\nNotre équipe le relit maintenant en entier et le met en page. D'ici ${FIRST_VERSION_DELAY}, vous recevrez sa première version complète par e-mail, et vous pourrez aussi la lire sur ${where}, en vous connectant avec votre numéro de téléphone.\n\nUn souvenir vous revient entre-temps ? Appelez le ${SITE.phoneDisplay}, il rejoindra le livre.\n\nL'équipe Loomina`,
+    };
+}
+
+/** Prévient l'auteur, par SMS et par e-mail, que son livre est terminé. Ne lève jamais. */
+export async function notifyAuthorBookComplete(author: {
+    first_name: string | null;
+    politeness_preference?: string | null;
+    phone_number?: string | null;
+    email?: string | null;
+}): Promise<void> {
+    try {
+        const t = bookCompleteTexts(author);
+        await Promise.allSettled([
+            author.phone_number ? sendSms(author.phone_number, t.sms) : Promise.resolve(false),
+            author.email ? sendEmail({ to: author.email, subject: t.subject, text: t.email }) : Promise.resolve(false),
+        ]);
+    } catch (e) {
+        console.error('[notify] livre terminé, auteur non prévenu', e);
+    }
+}
+
+// ------------------------------------------------------------
 // Nouvelles à la famille (la personne qui a offert le livre)
 // ------------------------------------------------------------
 
