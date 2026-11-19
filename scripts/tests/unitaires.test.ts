@@ -486,3 +486,25 @@ test('Mémo : récit complet, il tient le livre', () => {
     assert.equal(m.mood, 'done');
     assert.equal(m.path, 1);
 });
+
+test('livre terminé : la voix annonce la fin, et l\'auteur reçoit SMS et e-mail avec le délai', async () => {
+    const { phaseCheck } = await import('../../lib/loomina/assistant');
+    const { bookCompleteTexts } = await import('../../lib/loomina/notify');
+    const { PHASE_AXES } = await import('../../lib/loomina/phase-plan');
+    const project = {
+        id: 'p', user_id: 'u', title: null, status: 'active', phase: 4, context: {}, global_context: 'Jeanne a raconté son enfance à Rennes.',
+        project_metadata: { prefs_set_at: 'x', phase_state: { phase: 4, covered: PHASE_AXES[4].map((a: { key: string }) => a.key), skipped: [], check: 'to_ask' } },
+    } as never;
+    const c = phaseCheck(project, { first_name: 'Jeanne', politeness_preference: 'vous' });
+    assert.ok(c, 'pas de point à faire en fin de livre');
+    assert.match(c.block, /son livre est terminé/);
+    assert.match(c.block, /d'ici une semaine/);
+    assert.match(c.block, /Dis au revoir/);
+    for (const pref of ['vous', 'tu']) {
+        const t = bookCompleteTexts({ first_name: 'Jeanne', politeness_preference: pref });
+        assert.match(t.sms, /livre est terminé/);
+        assert.match(t.sms, /une semaine/);
+        assert.match(t.email, /première version complète/);
+        assert.doesNotMatch(t.sms + t.email, /reli[ée]/);
+    }
+});
