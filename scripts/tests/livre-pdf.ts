@@ -32,7 +32,7 @@ async function photo(w: number, h: number, caption: string | null, chapter: stri
     return { bytes: new Uint8Array(bytes), kind: 'jpg', caption, chapter };
 }
 
-async function check(name: string, book: PrintBook) {
+async function check(name: string, book: PrintBook): Promise<number> {
     const t0 = Date.now();
     const print = await buildPrintPdfs(book);
     const reading = await buildReadingPdf(book);
@@ -53,8 +53,11 @@ async function check(name: string, book: PrintBook) {
     const c = cover.getPage(0);
     assert.equal(mm(c.getTrimBox().width), Math.round((296 + print.spineMm) * 10) / 10, `${name} : largeur couverture`);
     const read = await PDFDocument.load(reading.bytes);
-    assert.equal(read.getPageCount(), print.pages + 1, `${name} : lecture = couverture + intérieur`);
+    // La lecture se referme sur la 4e de couverture quand elle a un texte.
+    const back = book.pieces?.back_cover?.trim() ? 1 : 0;
+    assert.equal(read.getPageCount(), print.pages + 1 + back, `${name} : lecture = couverture + intérieur${back ? ' + 4e de couverture' : ''}`);
     console.log(`✓ ${name} : ${print.pages} pages, dos ${print.spineMm} mm, ${(print.interior.length / 1024).toFixed(0)} Ko, ${ms} ms`);
+    return print.pages;
 }
 
 async function main() {
@@ -85,6 +88,26 @@ async function main() {
             await photo(1000, 1250, 'Bernard et Suzanne, le jour de leur mariage.', null),
         ],
     });
+
+    // Le même livre avec ses pièces : sous-titre, dédicace, avant-propos, remerciements, texte du dos.
+    const plain = await check('suzanne-sans-pieces', { title: 'Chez Marguerite, près de la fenêtre', author: 'Suzanne', year, chapters });
+    const withPieces = await check('suzanne-pieces', {
+        title: 'Chez Marguerite, près de la fenêtre',
+        author: 'Suzanne',
+        year,
+        chapters: chapters.map((c, i) => (i === 0 ? { ...c, content: `## La place d'Armes\n\n${c.content.split('\n\n').slice(0, 3).join('\n\n')}\n\n## Le chemin de l'école\n\n${c.content.split('\n\n').slice(3).join('\n\n')}` } : c)),
+        cloth: 'bordeaux',
+        pieces: {
+            subtitle: 'Souvenirs d’une institutrice du Cantal',
+            dedication: 'À mes petits-enfants,\npour qu’ils sachent d’où ils viennent.',
+            preface:
+                'Suzanne est née à Saint-Flour, dans le Cantal, au-dessus de la place d’Armes. Elle y a grandi entre la boutique de sa mère et la ferme de ses grands-parents.\n\nCe livre suit le fil de sa vie : l’école de Lavastrie où elle a enseigné, Bernard, rencontré un soir de bal, les enfants, la maison de la rue des Lacs. On y croise Marguerite, sa grand-mère, qui disait : « On ne gaspille pas le pain. »\n\nElle l’a raconté pour ceux qui viennent après elle.',
+            thanks: 'Je remercie ma fille Hélène, qui m’a offert ce livre, et mon amie Paulette, qui se souvient de tout mieux que moi.',
+            back_cover:
+                '« On ne gaspille pas le pain. » Chez Marguerite, près de la fenêtre, une petite fille de Saint-Flour apprend à lire, à coudre et à regarder les gens.\n\nSuzanne raconte ici son enfance dans le Cantal, ses années d’institutrice à Lavastrie, sa rencontre avec Bernard et la maison où ils ont élevé leurs enfants. Une vie simple, dite avec ses mots.',
+        },
+    });
+    assert.ok(withPieces >= plain, 'les pièces ajoutent des pages, jamais moins');
 
     await check('court', {
         title: 'Une vie',

@@ -14,7 +14,7 @@ import { voicePromptTemplate, VOICE_INTRO, VOICE_SPEAK, PHASE_OBJECTIVES } from 
 import { REVIEW_SYSTEM } from '@/lib/loomina/book-review';
 import { directorSystemPrompt, DIRECTOR_MODEL, DIRECTOR_FALLBACK_MODEL } from '@/lib/loomina/director';
 import { WRITER_SYSTEM, WRITER_MODEL, CORRECTION_SYSTEM } from '@/lib/loomina/writer';
-import { PLAN_SYSTEM, WRITE_SYSTEM, CARRY_SYSTEM, BOOK_MODEL } from '@/lib/loomina/book';
+import { PLAN_SYSTEM, WRITE_SYSTEM, CARRY_SYSTEM, POLISH_SYSTEM, PIECES_SYSTEM, BOOK_MODEL } from '@/lib/loomina/book';
 import { BOOK_PLAN_SYSTEM, BOOK_PLAN_MODEL } from '@/lib/loomina/book-plan';
 import { timeNote } from '@/lib/loomina/call-length';
 import { promptText } from '@/lib/loomina/prompt-store';
@@ -70,7 +70,17 @@ function sampleProject(phase: Phase, firstCall: boolean): Project {
                   last_call: { summary: "La ferme de ses grands-parents, l'été des moissons." },
               },
         next_question_strategy: firstCall ? null : 'Reprendre sur la ferme des grands-parents : qui travaillait avec eux aux moissons ?',
-        project_metadata: { call_minutes: 20 },
+        project_metadata: firstCall
+            ? { call_minutes: 20 }
+            : {
+                  call_minutes: 20,
+                  // Ce que le Directeur a noté aux appels précédents, pour voir les blocs du prompt remplis.
+                  book_told: [
+                      { axis: 'maison', what: 'La ferme des grands-parents à Sébazac : la cuisine, la grande table, le chien Pataud' },
+                      { axis: 'quotidien', what: "Les moissons d'août, toute la famille aux champs" },
+                  ],
+                  book_deepen: [{ id: 1, label: 'Le jour où le grand-père a vendu les bêtes : dit en une phrase, sans détail', status: 'open' }],
+              },
         global_context: null,
     };
 }
@@ -102,7 +112,7 @@ export function aiCatalog(): Ai[] {
             model: `${voiceModel} (OpenAI), sur le serveur vocal Render. Oreille : Deepgram nova-3. Voix : ElevenLabs, via Twilio.`,
             where: 'Serveur vocal (Render)',
             when: 'Pendant chaque appel, à chaque réplique du narrateur.',
-            reads: "Profil (prénom, tu/vous, sujets à éviter), projet (phase, mémoire, où reprendre, sujets suggérés, sujets propres à la personne), durée souhaitée.",
+            reads: "Profil (prénom, tu/vous, sujets à éviter), projet (phase, mémoire, où reprendre, sujets suggérés, sujets propres à la personne, scènes déjà racontées, scènes fortes à approfondir, sujets entamés à enrichir), durée souhaitée.",
             writes: 'Rien en base pendant l’appel. À la fin : le rapport d’appel (transcript, durée, mesures) envoyé au site.',
             file: 'lib/loomina/voice-prompt.ts, lib/loomina/assistant.ts, voice/src/session.ts',
             prompts: [
@@ -151,12 +161,12 @@ export function aiCatalog(): Ai[] {
         {
             key: 'directeur',
             name: 'Le Directeur',
-            role: "Analyse l'appel qui vient de finir et pilote la suite : met à jour la mémoire du livre, coche les sujets, décide de la phase, prépare la question du prochain appel, repère les proches et les préférences.",
+            role: "Analyse l'appel qui vient de finir et pilote la suite : met à jour la mémoire du livre, note chaque scène racontée et son sujet (c'est le code qui compte les scènes et coche un sujet quand il y en a assez), repère les scènes fortes à approfondir et ce que la personne veut pour son livre (titre, dédicace, remerciements, fin), prépare la question du prochain appel, repère les proches et les préférences.",
             model: `${DIRECTOR_MODEL} (OpenAI, raisonnement léger), repli ${DIRECTOR_FALLBACK_MODEL} s'il échoue.`,
             where: 'Site (Vercel), en arrière-plan après le raccroché',
             when: 'Une fois par appel de plus de 60 s et 200 caractères de transcript.',
-            reads: 'Transcript, mémoire du livre, sujets suggérés, sujets à éviter, état de la phase, sujets propres à la personne.',
-            writes: 'interviews (résumé, analyse), projects (phase, avancement, mémoire, prochaine question), profiles (tu/vous, style, sujets sensibles), family_members.',
+            reads: 'Transcript, mémoire du livre, sujets suggérés, sujets à éviter, état de la phase, sujets propres à la personne, scènes déjà racontées (avec le compte par sujet), scènes à approfondir en attente.',
+            writes: 'interviews (résumé, analyse), projects (phase, avancement, mémoire, prochaine question, scènes racontées, scènes à approfondir, souhaits pour le livre), profiles (tu/vous, style, sujets sensibles), family_members.',
             file: 'lib/loomina/director.ts',
             prompts: phases.map((p) => ({ title: `Prompt système, phase ${p} (${PHASE_LABELS[p]})`, text: promptText(`directeur.${p}`, directorSystemPrompt(p)) })),
         },
@@ -178,16 +188,18 @@ export function aiCatalog(): Ai[] {
         {
             key: 'editeur',
             name: "L'Éditeur du livre",
-            role: "Recompose le livre à partir de tous les récits : décide du plan (chapitres dans l'ordre de la vie, sans redites), puis écrit les chapitres un par un.",
+            role: "Recompose le livre en quatre temps : le plan (chapitres dans l'ordre de la vie, sans redites, en gardant le plan précédent tant qu'il tient), l'écriture des chapitres un par un à partir des récits ET des paroles d'origine (un chapitre dont les scènes n'ont pas changé est repris mot pour mot), une relecture du livre entier (redites, noms, raccords), puis les pièces du livre (titre, dédicace, avant-propos, remerciements, quatrième de couverture).",
             model: `${BOOK_MODEL} (OpenAI, raisonnement moyen).`,
-            where: 'Site (Vercel), par étapes (une étape = le plan ou un chapitre)',
+            where: 'Site (Vercel), par étapes (une étape = le plan, un chapitre, la relecture ou les pièces)',
             when: "Automatiquement après chaque nouveau récit (dès 2 récits), ou quand l'auteur clique « recomposer ».",
-            reads: 'Tous les récits, la mémoire du livre, les sujets à éviter.',
-            writes: 'book_editions (plan, chapitres, état).',
+            reads: "Tous les récits, les paroles d'origine des appels (transcripts, sauf pour un récit que l'auteur a corrigé), la mémoire du livre, les sujets à éviter, les souhaits de la personne pour son livre, l'édition précédente.",
+            writes: 'book_editions (plan, chapitres, état, et dans « extras » : retouches de la relecture, pièces du livre).',
             file: 'lib/loomina/book.ts, lib/loomina/book-edition.ts',
             prompts: [
                 { title: 'Le plan du livre', text: promptText('livre.plan', PLAN_SYSTEM) },
                 { title: "L'écriture d'un chapitre du livre", text: promptText('livre.ecriture', WRITE_SYSTEM) },
+                { title: 'La relecture du livre entier (retouches appliquées par le code)', text: promptText('livre.finition', POLISH_SYSTEM) },
+                { title: 'Les pièces du livre : titre, dédicace, avant-propos, remerciements, quatrième de couverture', text: promptText('livre.pieces', PIECES_SYSTEM) },
                 { title: "Report d'une correction de l'auteur dans le livre composé", text: promptText('livre.report', CARRY_SYSTEM) },
             ],
         },
@@ -256,6 +268,8 @@ export function editablePrompts(): EditablePrompt[] {
         { key: 'correction', ai: 'ecrivain', title: 'Correction demandée par l’auteur sur un récit', original: CORRECTION_SYSTEM },
         { key: 'livre.plan', ai: 'editeur', title: 'Le plan du livre', original: PLAN_SYSTEM },
         { key: 'livre.ecriture', ai: 'editeur', title: 'L’écriture d’un chapitre du livre', original: WRITE_SYSTEM },
+        { key: 'livre.finition', ai: 'editeur', title: 'La relecture du livre entier', original: POLISH_SYSTEM },
+        { key: 'livre.pieces', ai: 'editeur', title: 'Les pièces du livre (titre, dédicace, avant-propos, remerciements, dos)', original: PIECES_SYSTEM },
         { key: 'livre.report', ai: 'editeur', title: 'Report d’une correction de l’auteur dans le livre composé', original: CARRY_SYSTEM },
         { key: 'avis', ai: 'editeur', title: 'L’avis de lecture sur le livre entier', original: REVIEW_SYSTEM },
         { key: 'rangement', ai: 'periodes', title: 'Le rangement par périodes', original: BOOK_PLAN_SYSTEM },

@@ -119,6 +119,17 @@ export interface PrintBook {
     photos?: PrintPhoto[];
     year?: number;
     cloth?: Cloth;
+    /** Ce qui entoure les chapitres ; chaque pièce absente est simplement sautée. */
+    pieces?: PrintPieces | null;
+}
+
+/** Les pièces du livre (voir BookPieces dans book.ts) ; le titre, lui, est dans `title`. */
+export interface PrintPieces {
+    subtitle?: string | null;
+    dedication?: string | null;
+    preface?: string | null;
+    thanks?: string | null;
+    back_cover?: string | null;
 }
 
 export interface BookPdfs {
@@ -545,6 +556,14 @@ async function buildInterior(book: PrintBook, opts: { bleed: number; withCover: 
     const logos = await embedLogos(doc);
     const ctx: Ctx = { doc, f, bleed: opts.bleed };
     const year = book.year ?? new Date().getFullYear();
+    const piece = (v?: string | null) => (v?.trim() ? v.trim() : null);
+    const pieces = {
+        subtitle: piece(book.pieces?.subtitle) && frenchTypography(piece(book.pieces?.subtitle)!),
+        dedication: piece(book.pieces?.dedication),
+        preface: piece(book.pieces?.preface),
+        thanks: piece(book.pieces?.thanks),
+        back_cover: piece(book.pieces?.back_cover),
+    };
 
     if (opts.withCover) drawFront(ctx, newPage(ctx), book, logos, 0);
 
@@ -562,6 +581,13 @@ async function buildInterior(book: PrintBook, opts: { bleed: number; withCover: 
         centered(ctx, tp, l, ty, f.italic, 4.3 * CQ);
         ty -= 4.3 * CQ * 1.3;
     }
+    if (pieces.subtitle) {
+        ty -= 1.5 * CQ;
+        for (const l of wrapPlain(f.roman, 2.9 * CQ, pieces.subtitle, TEXT_W * 0.85)) {
+            centered(ctx, tp, l, ty, f.roman, 2.9 * CQ, INK_SOFT);
+            ty -= 2.9 * CQ * 1.35;
+        }
+    }
     if (logos.black) {
         const lw = 24 * CQ;
         const lh = (lw * logos.black.height) / logos.black.width;
@@ -573,6 +599,29 @@ async function buildInterior(book: PrintBook, opts: { bleed: number; withCover: 
     add(verso);
     centered(ctx, verso, `© Loomina, Paris, ${year}`, M_BOTTOM + SMALL * 1.6, f.roman, SIZE);
     centered(ctx, verso, `Écrit à partir des souvenirs de ${author}`, M_BOTTOM, f.roman, SMALL, INK_SOFT);
+
+    // Les pages sans numéro : titre, mention, dédicace, pages blanches.
+    const bare = new Set<PDFPage>([tp, verso]);
+    const blank = () => {
+        const p = newPage(ctx);
+        add(p);
+        bare.add(p);
+    };
+
+    // 2 bis. La dédicace, seule sur une belle page, en italique ; son verso reste blanc.
+    if (pieces.dedication) {
+        const dp = newPage(ctx);
+        add(dp);
+        bare.add(dp);
+        let dy = H * 0.68;
+        for (const para of pieces.dedication.split(/\n+/)) {
+            for (const l of wrapPlain(f.italic, SIZE, frenchTypography(para.trim()), TEXT_W * 0.72)) {
+                centered(ctx, dp, l, dy, f.italic, SIZE);
+                dy -= LEAD * 1.15;
+            }
+        }
+        blank();
+    }
 
     // 3. Les chapitres.
     const photos = book.photos ?? [];
@@ -589,21 +638,41 @@ async function buildInterior(book: PrintBook, opts: { bleed: number; withCover: 
 
     const toc: { title: string; page: number }[] = [];
     const flow = new Flow(ctx, add);
-    book.chapters.forEach((ch, i) => {
+    /** Ouvre une page : la mention centrée (« Chapitre N », « Avant-propos »), le titre en italique dessous s'il y en a un (maquette : .chap .head). */
+    const open = (head: string, sub: string | null) => {
         const opener = newPage(ctx);
         add(opener);
-        toc.push({ title: frenchTypography(ch.title), page: pageNo(opener) });
-
-        // « Chapitre N » centré, le titre en italique dessous (maquette : .chap .head).
+        toc.push({ title: sub ?? head, page: pageNo(opener) });
         let y = H - M_TOP - 6 * CQ - OPEN_SIZE;
-        centered(ctx, opener, `Chapitre ${i + 1}`, y, f.roman, OPEN_SIZE);
-        y -= 3 * CQ + OPEN_SIZE;
-        for (const l of wrapPlain(f.italic, OPEN_SIZE, frenchTypography(ch.title), TEXT_W * 0.85)) {
-            centered(ctx, opener, l, y, f.italic, OPEN_SIZE);
-            y -= OPEN_SIZE * 1.3;
-        }
+        centered(ctx, opener, head, y, f.roman, OPEN_SIZE);
+        if (sub) {
+            y -= 3 * CQ + OPEN_SIZE;
+            for (const l of wrapPlain(f.italic, OPEN_SIZE, sub, TEXT_W * 0.85)) {
+                centered(ctx, opener, l, y, f.italic, OPEN_SIZE);
+                y -= OPEN_SIZE * 1.3;
+            }
+        } else y -= OPEN_SIZE * 0.3;
         y -= 9 * CQ - OPEN_SIZE * 0.3;
         flow.start(opener, y);
+    };
+    /** Un texte sans photo, sous une mention seule (avant-propos, remerciements). */
+    const plain = (head: string, content: string) => {
+        open(head, null);
+        for (const b of toBlocks(content)) {
+            if (b.kind === 'h') flow.heading(b.text);
+            else flow.paragraph(setParagraph(f, b.words, TEXT_W));
+        }
+        flow.finish();
+    };
+
+    // 2 ter. L'avant-propos ; le premier chapitre s'ouvre ensuite sur une belle page.
+    if (pieces.preface) {
+        plain('Avant-propos', pieces.preface);
+        if (pages.length % 2 === 1) blank();
+    }
+
+    book.chapters.forEach((ch, i) => {
+        open(`Chapitre ${i + 1}`, frenchTypography(ch.title));
 
         const blocks = toBlocks(ch.content);
         const paras = blocks.map((b, j) => (b.kind === 'p' ? j : -1)).filter((j) => j >= 0);
@@ -623,6 +692,9 @@ async function buildInterior(book: PrintBook, opts: { bleed: number; withCover: 
         for (const p of after.get(-1) ?? []) flow.photo(p.img, p.caption);
         flow.finish();
     });
+
+    // 3 bis. Les remerciements, après le dernier chapitre.
+    if (pieces.thanks) plain('Remerciements', pieces.thanks);
 
     // 4. Les photos sans chapitre : une par page, centrées, légende dessous (maquette : .fullphoto).
     for (const p of loose) {
@@ -685,8 +757,11 @@ async function buildInterior(book: PrintBook, opts: { bleed: number; withCover: 
     // Numéros de page : sur les pages de texte des chapitres, pas sur les pages de titre, blanches ou de fin.
     pages.forEach((p, k) => {
         const n = k + 1;
-        if (n > 2 && n <= lastText) folio(ctx, p, n);
+        if (n > 2 && n <= lastText && !bare.has(p)) folio(ctx, p, n);
     });
+
+    // La lecture à l'écran se referme sur la quatrième de couverture, quand elle a un texte.
+    if (opts.withCover && pieces.back_cover) drawBack(ctx, newPage(ctx), book, logos, 0);
 
     return { bytes: await doc.save(), pages: pages.length };
 }
@@ -746,6 +821,36 @@ function drawFront(ctx: Ctx, page: PDFPage, book: PrintBook, logos: { black: PDF
     }
 }
 
+/** La 4e de couverture, dans un cadre A5 dont le bord gauche est à `x0` : la toile, le texte s'il y en a un, le logo discret en bas. */
+function drawBack(ctx: Ctx, page: PDFPage, book: PrintBook, logos: { black: PDFImage | null; white: PDFImage | null }, x0: number, fill = true) {
+    const cloth = CLOTHS[book.cloth ?? 'lin'];
+    const ink = cloth.dark ? COVER_INK_LIGHT : COVER_INK;
+    if (fill) page.drawRectangle({ x: 0, y: 0, width: page.getWidth(), height: page.getHeight(), color: cloth.color });
+    const cx = x0 + W / 2;
+    const back = book.pieces?.back_cover?.trim();
+    if (back) {
+        // Le texte : Times 11, en colonne étroite, ferré à gauche, dans le haut de la toile.
+        const size = 11;
+        const lead = size * 1.42;
+        const width = W - 44 * CQ;
+        const font = ctx.f.roman;
+        let y = H - 34 * CQ;
+        for (const para of back.split(/\n+/)) {
+            for (const l of wrapPlain(font, size, frenchTypography(stripMarks(para.trim())), width)) {
+                page.drawText(encodable(font, l), { x: cx - width / 2 + ctx.bleed, y: y + ctx.bleed, size, font, color: ink });
+                y -= lead;
+            }
+            y -= lead * 0.55;
+        }
+    }
+    const logo = cloth.dark ? logos.white : logos.black;
+    if (logo) {
+        const lw = 14 * CQ;
+        const lh = (lw * logo.height) / logo.width;
+        page.drawImage(logo, { x: cx - lw / 2 + ctx.bleed, y: 9 * CQ + ctx.bleed, width: lw, height: lh });
+    }
+}
+
 export function spineMm(pages: number): number {
     return Math.round((pages * PRINT.spineMmPerPage + PRINT.spineExtraMm) * 10) / 10;
 }
@@ -773,13 +878,8 @@ async function buildCover(book: PrintBook, pages: number): Promise<Uint8Array> {
     // 1re de couverture, à droite.
     drawFront(ctx, page, book, logos, W + spine, false);
 
-    // 4e de couverture : la toile seule, le logo discret en bas.
-    const logo = cloth.dark ? logos.white : logos.black;
-    if (logo) {
-        const lw = 14 * CQ;
-        const lh = (lw * logo.height) / logo.width;
-        page.drawImage(logo, { x: W / 2 - lw / 2 + BLEED, y: 9 * CQ + BLEED, width: lw, height: lh });
-    }
+    // 4e de couverture, à gauche : la toile, le texte s'il y en a un, le logo discret en bas.
+    drawBack(ctx, page, book, logos, 0, false);
 
     // Le dos : titre et prénom, de bas en haut (usage français), s'il est assez épais.
     if (spineMm(pages) >= PRINT.spineTextMinMm) {
