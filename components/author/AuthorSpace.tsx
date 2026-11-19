@@ -110,19 +110,19 @@ export default function AuthorSpace({
   const lastCall = project?.calls[0];
 
   return (
-    <div className="author-space w-full pb-10 pt-[5.25rem] md:pt-[6.5rem]">
+    <div className="author-space w-full pb-10 pt-[5.9rem] md:pt-[6.5rem]">
       {/* Le menu de l'espace auteur : la même barre flottante que le site, avec ses rubriques.
           Le logo ramène au site grand public (Solal, 19/11/2026). */}
       <header className="fixed inset-x-0 top-0 z-[1000] px-3 pt-3 sm:px-4 sm:pt-4">
         <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-3 rounded-[22px] border border-white/70 bg-white/80 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-xl backdrop-saturate-150 md:h-[68px] md:pl-6">
-          {/* Le repère de l'espace : « Loomina | auteur », le mot écrit comme un titre de chapitre du livre. */}
-          <Link href="/" className="flex shrink-0 items-center" aria-label="Loomina, espace auteur. Retour au site">
-            <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
-              <Image src="/header-logo-bleu.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
+          {/* Le repère de l'espace : le logo, signé « AUTEUR » dessous, comme une maison signe une collection. */}
+          <Link href="/" className="flex shrink-0 flex-col" aria-label="Loomina, espace auteur. Retour au site">
+            <span className="relative block h-[26px] w-[91px] md:h-[28px] md:w-[98px]">
+              <Image src="/header-logo-bleu.png" alt="" fill className="object-contain object-left" priority sizes="98px" />
             </span>
-            <span aria-hidden="true" className="ml-3.5 flex items-center gap-3 md:max-lg:hidden">
-              <span className="h-6 w-px bg-[var(--rule-strong)]" />
-              <span className="translate-y-[1px] font-serif text-[20px] italic leading-none tracking-normal text-[var(--ink-2)] md:text-[21px]">auteur</span>
+            <span aria-hidden="true" className="mt-[5px] flex items-center gap-2">
+              <span className="h-px flex-1 bg-[var(--amber)]" />
+              <span className="-mr-[0.32em] text-[9.5px] font-bold uppercase leading-none tracking-[0.32em] text-[var(--amber-ink)]">Auteur</span>
             </span>
           </Link>
 
@@ -167,15 +167,17 @@ export default function AuthorSpace({
 
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
         <header className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5">
-          <h1 className="text-[clamp(1.6rem,2.6vw,2rem)] font-extrabold leading-[1.1] tracking-[-0.03em]">{data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour"}</h1>
-          <p className="text-[15px] font-semibold text-[var(--ink-3)]">{title}</p>
+          <h1 className="text-[clamp(1.6rem,2.6vw,2rem)] font-extrabold leading-[1.1] tracking-[-0.03em]">
+            {tab === "apercu" ? (data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour") : TABS.find((t) => t.id === tab)?.label}
+          </h1>
+          {tab === "apercu" && <p className="text-[15px] font-semibold text-[var(--ink-3)]">{title}</p>}
         </header>
 
         {data?.welcome && tab === "apercu" && (
           <Welcome ask={data.welcome} prefs={data.prefs} onDone={load} onUnauthorized={onUnauthorized} />
         )}
 
-        <div className="mt-4">
+        <div className={tab === "apercu" ? "mt-4" : "mt-5"}>
           {failed && (
             <p role="alert" className="rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
               Nous n’arrivons pas à charger votre espace pour le moment.{" "}

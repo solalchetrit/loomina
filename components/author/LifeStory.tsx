@@ -107,68 +107,62 @@ export default function LifeStory({
   onUnauthorized: () => void;
 }) {
 
-  const head = "text-[18px] font-extrabold leading-tight tracking-[-0.02em]";
+  const head = "text-[19px] font-extrabold leading-tight tracking-[-0.02em]";
   return (
-    <div className="grid gap-3 lg:grid-cols-[1.55fr_1fr] lg:items-start">
-      <section className="card px-5 py-4 md:px-6 md:py-5" aria-labelledby="frise">
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-          <h2 id="frise" className={head}>
-            Votre frise de vie
-          </h2>
-          <p className="text-[14px] text-[var(--ink-3)]">Une date fausse ? Corrigez-la au prochain appel.</p>
-        </div>
+    <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr] lg:items-start lg:gap-5">
+      <section className="card p-6 md:p-7" aria-labelledby="frise">
+        <h2 id="frise" className={head}>
+          Votre frise
+        </h2>
         {project.timeline.length ? (
-          <ol className="mt-3 gap-x-8 sm:columns-2">
+          <ol className="mt-5 gap-x-10 sm:columns-2">
             {project.timeline.map((t, i) => (
-              <li key={i} className="grid break-inside-avoid grid-cols-[3.1rem_minmax(0,1fr)] items-baseline gap-x-2 border-t border-[var(--line-soft)] py-2">
-                <b className="text-[14px] font-extrabold tabular-nums text-[var(--amber-ink)]">{t.year ?? "?"}</b>
-                <span className="text-[15px] leading-snug">{t.event}</span>
+              <li key={i} className="mb-4 grid break-inside-avoid grid-cols-[3.25rem_minmax(0,1fr)] items-baseline gap-x-2 last:mb-0">
+                <b className="text-[15px] font-extrabold tabular-nums text-[var(--amber-ink)]">{t.year ?? "?"}</b>
+                <span className="text-[16px] leading-snug">{t.event}</span>
               </li>
             ))}
           </ol>
         ) : (
-          <p className="mt-3 text-[14px] text-[var(--ink-3)]">Pas encore de dates : elles viendront au fil des appels.</p>
+          <p className="mt-3 text-[15px] text-[var(--ink-3)]">Les dates viendront au fil des appels.</p>
         )}
       </section>
 
-      <div className="flex flex-col gap-3">
-        <section className="card px-5 py-4 md:px-6 md:py-5" aria-labelledby="proches">
+      <div className="flex flex-col gap-4 lg:gap-5">
+        <section className="card p-6 md:p-7" aria-labelledby="proches">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 id="proches" className={`${head} min-w-0 flex-1 basis-0`}>
-              Les personnes de votre histoire
+              Les personnes
             </h2>
             <AddPerson onAdded={onPersonAdded} onUnauthorized={onUnauthorized} />
           </div>
           {project.family.length ? (
-            <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2.5">
+            <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4">
               {project.family.map((f) => (
-                <li key={f.name} className="flex min-w-0 items-center gap-2.5">
-                  <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[14px] font-extrabold text-[var(--amber-deep)]">
+                <li key={f.name} className="flex min-w-0 items-center gap-3">
+                  <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[15px] font-extrabold text-[var(--amber-deep)]">
                     {f.name.charAt(0).toUpperCase()}
                   </span>
                   <span className="min-w-0">
-                    <b className="block truncate text-[15px] leading-tight">{f.name}</b>
-                    <span className="block truncate text-[13px] leading-tight text-[var(--ink-3)]">
-                      {f.relation}
-                      {f.deceased ? " · disparu(e)" : ""}
-                    </span>
+                    <b className="block truncate text-[15.5px] leading-tight">{f.name}</b>
+                    <span className="mt-0.5 block truncate text-[13.5px] leading-tight text-[var(--ink-3)]">{f.relation.split(",")[0]}</span>
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-2 text-[14px] leading-snug text-[var(--ink-3)]">Elles apparaîtront quand vous les évoquerez. Vous pouvez aussi en ajouter une vous-même.</p>
+            <p className="mt-3 text-[15px] leading-snug text-[var(--ink-3)]">Elles apparaîtront au fil des appels.</p>
           )}
         </section>
 
         {project.themes.length > 0 && (
-          <section className="card px-5 py-4 md:px-6 md:py-5" aria-labelledby="themes-abordes">
+          <section className="card p-6 md:p-7" aria-labelledby="themes-abordes">
             <h2 id="themes-abordes" className={head}>
               Déjà racontés
             </h2>
-            <ul className="mt-2.5 flex flex-wrap gap-1.5">
+            <ul className="mt-4 flex flex-wrap gap-2">
               {project.themes.map((t) => (
-                <li key={t} className="rounded-full bg-[var(--surface-2)] px-3 py-1 text-[13.5px] font-semibold">
+                <li key={t} className="rounded-full bg-[var(--surface-2)] px-3.5 py-1.5 text-[14px] font-semibold">
                   {t}
                 </li>
               ))}

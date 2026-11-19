@@ -110,9 +110,9 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
   const [open, setOpen] = useState(false);
 
   return (
-    <section className="card px-5 py-4" aria-labelledby="photos-titre">
+    <section className="card p-5" aria-labelledby="photos-titre">
       <div className="flex items-center justify-between gap-3">
-        <h2 id="photos-titre" className="text-[14px] font-bold text-[var(--ink-3)]">
+        <h2 id="photos-titre" className="text-[16px] font-extrabold tracking-[-0.01em]">
           Vos photos{photos.length > 0 ? ` · ${photos.length}` : ""}
         </h2>
         <button
@@ -133,7 +133,6 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
           )}
         </button>
       </div>
-      {!open && photos.length === 0 && <p className="mt-1 text-[14px] leading-snug text-[var(--ink-3)]">Envoyez une photo : Loomina vous posera une question dessus au prochain appel.</p>}
 
       {open && (
       <form onSubmit={send} className="mt-3 space-y-2.5">
@@ -189,7 +188,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
       )}
 
       {photos.length > 0 && (
-        <ul className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-3">
+        <ul className="mt-4 grid grid-cols-4 gap-2.5 sm:grid-cols-6 lg:grid-cols-3">
           {photos.map((p) => (
             <li key={p.id} className="min-w-0">
               {p.url ? (

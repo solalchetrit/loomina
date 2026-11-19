@@ -9,9 +9,9 @@ import { useState, type ReactNode } from "react";
  */
 export function ReaderLayout({ side, children }: { side: ReactNode; children: ReactNode }) {
   return (
-    <div className="grid gap-3 lg:grid-cols-[19rem_minmax(0,1fr)] lg:items-start">
-      <aside className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-[5.75rem] lg:max-h-[calc(100dvh-6.75rem)] lg:overflow-y-auto lg:pb-1">{side}</aside>
-      <div className="min-w-0 space-y-3">{children}</div>
+    <div className="grid gap-4 lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start lg:gap-5">
+      <aside className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-[5.75rem] lg:max-h-[calc(100dvh-6.75rem)] lg:overflow-y-auto lg:pb-1">{side}</aside>
+      <div className="min-w-0 space-y-4 lg:space-y-5">{children}</div>
     </div>
   );
 }
@@ -26,7 +26,7 @@ export function Toc({ parts, label = "Sommaire" }: { parts: TocPart[]; label?: s
   const [open, setOpen] = useState(false);
   const count = parts.reduce((n, p) => n + p.items.length, 0);
   return (
-    <nav aria-label={label} className="card px-5 py-3 lg:py-4">
+    <nav aria-label={label} className="mt-4 border-t border-[var(--line-soft)] pt-2 lg:pt-4">
       <button
         type="button"
         aria-expanded={open}
@@ -54,14 +54,14 @@ export function Toc({ parts, label = "Sommaire" }: { parts: TocPart[]; label?: s
       <div className={open ? "pt-1" : "hidden lg:block"}>
         {parts.map((part) => (
           <div key={part.title ?? "tous"}>
-            {part.title && <p className="mt-2.5 text-[13px] font-bold text-[var(--amber-ink)]">{part.title}</p>}
+            {part.title && <p className="mt-3 text-[13px] font-bold text-[var(--amber-ink)]">{part.title}</p>}
             <ol className="mt-1">
               {part.items.map((c) => (
                 <li key={c.href}>
                   <a
                     href={c.href}
                     onClick={() => setOpen(false)}
-                    className="-mx-2 flex items-baseline gap-2.5 rounded-[10px] px-2 py-1.5 text-[14.5px] font-semibold leading-snug text-[var(--ink)] hover:bg-[var(--canvas)]"
+                    className="-mx-2 flex items-baseline gap-2.5 rounded-[10px] px-2 py-2 text-[15px] font-semibold leading-snug text-[var(--ink)] hover:bg-[var(--canvas)]"
                   >
                     <span className="w-5 shrink-0 text-[13px] font-bold tabular-nums text-[var(--amber-ink)]">{c.number}</span>
                     <span className="min-w-0 flex-1">{c.title}</span>
@@ -73,6 +73,16 @@ export function Toc({ parts, label = "Sommaire" }: { parts: TocPart[]; label?: s
         ))}
       </div>
     </nav>
+  );
+}
+
+/** Une explication qu'on n'impose pas : elle s'ouvre si on la demande. */
+export function More({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <details className="mt-3">
+      <summary className="link inline cursor-pointer list-none text-[14px] [&::-webkit-details-marker]:hidden">{label}</summary>
+      <p className="mt-2 text-[14px] leading-relaxed text-[var(--ink-2)]">{children}</p>
+    </details>
   );
 }
 
@@ -106,6 +116,6 @@ export function Segmented<T extends string>({
 }
 
 /** Une page du livre : même carte pour un récit d'appel et pour un chapitre. */
-export const PAGE = "card scroll-mt-28 px-5 py-7 sm:px-10 sm:py-9";
+export const PAGE = "card scroll-mt-28 px-6 py-9 sm:px-12 sm:py-12";
 export const PAGE_TITLE = "mt-1 text-center font-serif text-[clamp(1.4rem,2.2vw,1.75rem)] font-normal italic leading-tight tracking-normal text-[var(--ink)]";
 export const PAGE_KICKER = "text-center text-[13px] font-bold text-[var(--amber-ink)]";

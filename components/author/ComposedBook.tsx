@@ -5,7 +5,7 @@ import LogoMotion from "@/components/brand/LogoMotion";
 import { Fragment, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import Button from "@/components/ui/Button";
-import { PAGE, PAGE_KICKER, PAGE_TITLE, ReaderLayout, Toc } from "./Reader";
+import { More, PAGE, PAGE_KICKER, PAGE_TITLE, ReaderLayout, Toc } from "./Reader";
 
 interface BookChapter {
   number: number;
@@ -65,7 +65,7 @@ function inline(text: string): ReactNode[] {
 
 function BookText({ text }: { text: string }) {
   return (
-    <div className="book-text mx-auto mt-5 max-w-[38rem]" lang="fr">
+    <div className="book-text mx-auto mt-7 max-w-[38rem]" lang="fr">
       {blocks(text).map((b, i) =>
         b.kind === "h" ? (
           <h4 key={i} className="mb-2 mt-8 text-left font-serif text-[1.14rem] font-bold leading-snug tracking-normal text-[var(--ink)] first:mt-0" style={{ hyphens: "manual" }}>
@@ -200,20 +200,18 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
       side={
         <>
           {top}
-          <div className="card px-5 py-4">
-            <p className="text-[13px] font-bold text-[var(--amber-ink)]">Votre livre</p>
-            {pieces && (
+          <div className="card p-5">
+            {pieces ? (
               <>
-                <h2 className="mt-0.5 font-serif text-[1.45rem] font-normal italic leading-tight tracking-normal text-[var(--ink)]">{pieces.title}</h2>
-                {pieces.subtitle && <p className="mt-0.5 font-serif text-[15px] text-[var(--ink-3)]">{pieces.subtitle}</p>}
+                <h2 className="font-serif text-[1.5rem] font-normal italic leading-tight tracking-normal text-[var(--ink)]">{pieces.title}</h2>
+                {pieces.subtitle && <p className="mt-1 font-serif text-[15px] text-[var(--ink-3)]">{pieces.subtitle}</p>}
               </>
+            ) : (
+              <h2 className="text-[19px] font-extrabold leading-tight tracking-[-0.02em]">Votre livre</h2>
             )}
-            <p className="mt-1.5 text-[14px] leading-snug text-[var(--ink-3)]">
-              Vos souvenirs, rangés dans l’ordre de votre vie et sans redites. Rien n’est ajouté. Le livre se met à jour tout seul après chaque appel.
-            </p>
 
             {running ? (
-              <p className="mt-3 flex items-center gap-3 text-[14px] font-semibold leading-snug text-[var(--ink-2)]" role="status">
+              <p className="mt-4 flex items-center gap-3 text-[14px] font-semibold leading-snug text-[var(--ink-2)]" role="status">
                 {/* L'Étincelle écrit : l'attente devient un moment (le rond qui tourne reste si le kit ne charge pas). */}
                 <LogoMotion name="persoEcrit" mode="loop" className="h-12 w-12 shrink-0">
                   <span className="flex h-full w-full items-center justify-center">
@@ -222,12 +220,12 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
                 </LogoMotion>
                 {running.total
                   ? running.done >= running.total
-                    ? "Loomina relit votre livre d’un bout à l’autre pour les dernières retouches. Vous pouvez fermer cette page, il continuera."
-                    : `Loomina écrit votre livre : chapitre ${Math.min(running.done + 1, running.total)} sur ${running.total}. Vous pouvez fermer cette page, il continuera.`
-                  : "Loomina relit tous vos appels et prépare le plan du livre. Comptez quelques minutes."}
+                    ? "Loomina relit votre livre pour les dernières retouches."
+                    : `Loomina écrit votre livre : chapitre ${Math.min(running.done + 1, running.total)} sur ${running.total}.`
+                  : "Loomina prépare le plan du livre. Comptez quelques minutes."}
               </p>
             ) : (
-              <div className="mt-3 space-y-2">
+              <div className="mt-4 space-y-2.5">
                 {data?.failed && canCompose && (
                   <Button onClick={compose} loading={starting} className="!min-h-11 w-full !text-[15px]">
                     Réessayer
@@ -236,26 +234,29 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
                 {!canCompose && <p className={small}>Votre livre sera composé à partir de deux appels racontés.</p>}
                 {edition && (
                   <Button onClick={download} loading={downloading} variant="secondary" className="!min-h-11 w-full !px-4 !text-[15px]">
-                    {downloading ? "Préparation du PDF…" : "Télécharger mon livre (PDF)"}
+                    {downloading ? "Préparation du PDF…" : "Télécharger en PDF"}
                   </Button>
                 )}
                 {edition && (
                   <p className={small}>
-                    Composé le {formatDate(edition.at)} à partir de {edition.sourceCount} appels
-                    {newCalls > 0 ? ` · ${newCalls === 1 ? "le dernier appel y sera ajouté" : `les ${newCalls} derniers appels y seront ajoutés`} dans quelques minutes` : ""}.
+                    Mis à jour le {formatDate(edition.at)}
+                    {newCalls > 0 ? ` · ${newCalls === 1 ? "le dernier appel arrive" : `les ${newCalls} derniers appels arrivent`} dans quelques minutes` : ""}
                   </p>
                 )}
               </div>
             )}
-            {data?.failed && !running && <p className="mt-2 text-[14px] font-semibold text-[var(--danger)]">La dernière mise à jour du livre n’a pas abouti. Vous pouvez la relancer.</p>}
+            {data?.failed && !running && <p className="mt-2 text-[14px] font-semibold text-[var(--danger)]">La dernière mise à jour n’a pas abouti. Vous pouvez la relancer.</p>}
             {error && (
               <p role="alert" className="mt-2 text-[14px] font-semibold text-[var(--danger)]">
                 {error}
               </p>
             )}
-            {edition && <p className={`${small} mt-2`}>Pour corriger un passage, corrigez-le dans « Appel par appel » : le reste du livre ne change pas.</p>}
+            <More label="Comment ce livre est composé ?">
+              Loomina relit tout ce que vous avez raconté, range vos souvenirs dans l’ordre de votre vie et ne garde qu’une fois ce qui a été dit plusieurs fois. Rien n’est ajouté. Le
+              livre se met à jour tout seul après chaque appel. Pour corriger un passage, corrigez-le dans « Appel par appel » : le reste ne change pas.
+            </More>
+            {edition && <Toc label="Sommaire" parts={toc} />}
           </div>
-          {edition && <Toc label="Sommaire du livre" parts={toc} />}
           {aside}
         </>
       }

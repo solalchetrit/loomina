@@ -185,21 +185,17 @@ export default function LiveBook({ onUnauthorized, aside }: { onUnauthorized: ()
       side={
         <>
           {tabs}
-          <div className="card px-5 py-4">
-            <p className="text-[13px] font-bold text-[var(--amber-ink)]">Vos récits, appel par appel</p>
-            <h2 className="mt-0.5 text-[19px] font-extrabold leading-tight tracking-[-0.02em]">{book.title}</h2>
-            <p className="mt-1.5 text-[14px] leading-snug text-[var(--ink-3)]">
-              {chapters.length === 1 ? "Un récit" : `${chapters.length} récits`}, un par appel : la matière de votre livre. Pour corriger un passage, « Corriger ce récit » sous le
-              récit, ou dites-le à Loomina.
-            </p>
+          <div className="card p-5">
+            <h2 className="font-serif text-[1.5rem] font-normal italic leading-tight tracking-normal text-[var(--ink)]">{book.title}</h2>
+            <p className="mt-1 text-[14px] text-[var(--ink-3)]">{chapters.length === 1 ? "Un récit" : `${chapters.length} récits`}, un par appel</p>
             {chapters.length >= 2 && (
-              <div className="mt-3 space-y-2">
+              <div className="mt-4 space-y-2">
                 <Segmented
                   label="Ordre des récits"
                   value={byPeriod ? "periodes" : "appels"}
                   onChange={(v) => (v === "appels" ? setByPeriod(false) : plan ? setByPeriod(true) : arrange())}
                   options={[
-                    { id: "appels", label: "Ordre des appels" },
+                    { id: "appels", label: "Dans l’ordre" },
                     { id: "periodes", label: "Par périodes" },
                   ]}
                 />
@@ -214,11 +210,10 @@ export default function LiveBook({ onUnauthorized, aside }: { onUnauthorized: ()
                   </p>
                 )}
                 {planStatus === "error" && <p className="text-[14px] font-semibold text-[var(--danger)]">{planError}</p>}
-                {byPeriod && <p className="text-[13px] leading-snug text-[var(--ink-3)]">Le texte des récits ne change pas : seul l’ordre suit votre vie.</p>}
               </div>
             )}
+            <Toc parts={sections.map((x) => ({ title: x.title, items: x.chapters.map((c) => ({ href: `#chapitre-${c.number}`, number: c.number, title: c.title })) }))} />
           </div>
-          <Toc parts={sections.map((x) => ({ title: x.title, items: x.chapters.map((c) => ({ href: `#chapitre-${c.number}`, number: c.number, title: c.title })) }))} />
           {aside}
         </>
       }
@@ -238,7 +233,7 @@ export default function LiveBook({ onUnauthorized, aside }: { onUnauthorized: ()
               {c.date ? ` · ${formatDate(c.date)}` : ""}
             </p>
             <h3 className={PAGE_TITLE}>{c.title}</h3>
-            <div className="book-text mx-auto mt-5 max-w-[38rem]" lang="fr">
+            <div className="book-text mx-auto mt-7 max-w-[38rem]" lang="fr">
               {paragraphs(c.content).map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
