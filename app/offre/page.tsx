@@ -18,7 +18,7 @@ const FAQ = [
   },
   {
     q: "Puis-je modifier le texte ?",
-    a: "Oui, autant de fois que vous le souhaitez. Vous relisez le récit de chaque appel dans votre espace auteur et vous dites à Loomina, au prochain appel, ce qu’il faut changer.",
+    a: "Oui, autant de fois que vous le souhaitez. Vous relisez le récit de chaque appel dans votre espace auteur : vous corrigez un passage vous-même, ou vous dites à Loomina, au prochain appel, ce qu’il faut changer.",
   },
   {
     q: "Puis-je l’offrir ?",

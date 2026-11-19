@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CGVPage() {
   return (
-    <LegalPage title="Ce à quoi nous nous engageons" updated="12 novembre 2026">
+    <LegalPage title="Ce à quoi nous nous engageons" updated="19 novembre 2026">
       <h2>1. Objet</h2>
       <p>
         Les présentes conditions générales de vente (CGV) régissent les relations entre <strong>Loomina</strong>, projet en
@@ -39,8 +39,8 @@ export default function CGVPage() {
 
       <h2>4. Prix et paiement</h2>
       <p>
-        Le prix du service est de <strong>{OFFER.price} € TTC</strong>, tout compris. Il se règle en une fois, par carte
-        bancaire, via la plateforme sécurisée Stripe. Loomina ne conserve aucune donnée bancaire. Le prix applicable est celui
+        Le prix du service est de <strong>{OFFER.price} € TTC</strong>, tout compris. Il se règle par carte bancaire, en une fois, ou en trois
+        ou quatre fois avec Klarna, via la plateforme sécurisée Stripe. Loomina ne conserve aucune donnée bancaire. Le prix applicable est celui
         affiché au moment de la validation de la commande.
       </p>
 
@@ -61,7 +61,7 @@ export default function CGVPage() {
       </p>
       <p>
         Le remboursement porte sur la totalité du prix payé. Il est effectué par le même moyen de paiement que la commande, au
-        plus tard 14 jours après la demande. Les chapitres déjà écrits sont alors supprimés, sauf si le Client demande à les
+        plus tard 14 jours après la demande. Les récits déjà écrits sont alors supprimés, sauf si le Client demande à les
         recevoir. Passé ce délai de {OFFER.guaranteeDays} jours, seul le droit de rétractation prévu à l’article 5 s’applique.
       </p>
 

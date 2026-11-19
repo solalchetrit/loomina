@@ -8,7 +8,7 @@ import { OFFER, GUARANTEE } from "@/config/offer";
 /**
  * Chaque réponse ne promet que ce que le service fait aujourd'hui
  * et que les CGV couvrent. Pas de délai de réponse, pas de spécification
- * d'impression, pas de paiement en plusieurs fois.
+ * d'impression. Le paiement en 3 ou 4 fois (Klarna) est proposé à la commande.
  */
 const FAQ_CATEGORIES = [
   {
@@ -29,7 +29,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "Combien de temps dure un appel ?",
-        a: "Le temps que vous voulez : dix minutes ou une heure. Vous pouvez dire « on s’arrête là » à tout moment. Au prochain appel, Loomina reprend là où vous en étiez.",
+        a: "Vous choisissez la durée qui vous convient, d’un quart d’heure à trois quarts d’heure, et vous pouvez la changer quand vous voulez. Loomina laisse toujours finir le souvenir en cours, et vous pouvez dire « on s’arrête là » à tout moment. Au prochain appel, Loomina reprend là où vous en étiez.",
       },
       {
         q: "Faut-il prendre rendez-vous ?",
@@ -55,7 +55,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "Puis-je relire et modifier le texte ?",
-        a: "Oui, c’est même la règle. Le récit de chaque appel apparaît dans votre espace auteur quelques minutes après. Vous dites à Loomina, au prochain appel, ce qu’il faut changer, et vous avez le dernier mot avant l’impression.",
+        a: "Oui, c’est même la règle. Le récit de chaque appel apparaît dans votre espace auteur quelques minutes après. Vous corrigez un passage vous-même, ou vous dites à Loomina, au prochain appel, ce qu’il faut changer. Vous avez le dernier mot avant l’impression.",
       },
     ],
   },
@@ -69,7 +69,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "Comment se passe le paiement ?",
-        a: "En une fois, par carte bancaire, sur une page de paiement sécurisée (Stripe). Loomina ne conserve aucune donnée bancaire.",
+        a: "Par carte bancaire, en une fois, ou en 3 ou 4 fois avec Klarna. Le paiement est sécurisé par Stripe, et Loomina ne conserve aucune donnée bancaire.",
       },
       {
         q: "Y a-t-il une garantie ?",
