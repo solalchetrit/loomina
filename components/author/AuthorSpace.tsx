@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { SITE } from "@/config/site";
 import Progress from "./Progress";
+import Loom from "./Loom";
 import SuggestTopic from "./SuggestTopic";
 import LifeStory from "./LifeStory";
 import Calls from "./Calls";
@@ -165,7 +166,7 @@ export default function AuthorSpace({
           {data && tab === "apercu" && (
             <div className="flex flex-col gap-4">
               {project?.completed && <Shipping saved={data.shipping ?? null} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
-              {project && <Progress project={project} />}
+              {project && (project.weave ? <Loom project={project} title={title} author={data.firstName} demo={data.demo} /> : <Progress project={project} />)}
               <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
                 <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />
                 {project ? (

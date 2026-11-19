@@ -8,6 +8,8 @@ import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
 import { readGiver, sharesWithGiver } from '@/lib/loomina/giver';
 import { readShipping } from '@/lib/loomina/shipping';
+import { readPhaseState } from '@/lib/loomina/phase-plan';
+import { buildWeave } from '@/lib/loomina/weave';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,6 +68,9 @@ export async function GET(request: NextRequest) {
         const titleOf = new Map(chapters.data.filter((c) => c.latest_interview_id).map((c) => [c.latest_interview_id as string, (c.title as string | null) ?? null]));
         const phase = toPhase(project.phase);
 
+        const completed = project.status === 'completed';
+        const words = chapters.data.reduce((n, c) => n + ((c.word_count as number) ?? 0), 0);
+
         return NextResponse.json({
             firstName: profile.first_name,
             prefs,
@@ -75,11 +80,22 @@ export async function GET(request: NextRequest) {
                 phase,
                 phaseLabel: PHASE_LABELS[phase],
                 progress: Math.max(0, Math.min(100, project.phase_progress ?? 0)),
-                completed: project.status === 'completed',
+                completed,
                 nextTopic: project.next_question_strategy,
                 scheduleText: describeSchedule(prefs.callSchedule),
                 chapters: chapters.data.length,
-                words: chapters.data.reduce((n, c) => n + ((c.word_count as number) ?? 0), 0),
+                words,
+                // La toile du livre : un rang par sujet raconté (lib/loomina/weave.ts).
+                weave: buildWeave({
+                    phase,
+                    completed,
+                    state: readPhaseState(pmeta, phase),
+                    calls: interviews.data.length,
+                    words,
+                    photos: Array.isArray(pmeta.photos) ? pmeta.photos.length : 0,
+                    hasTitle: Boolean(project.title?.trim()),
+                    hasSchedule: prefs.callSchedule.active,
+                }),
                 timeline: context.timeline,
                 family: context.family.map(({ name, relation, deceased }) => ({ name, relation, deceased })),
                 themes: context.key_themes,

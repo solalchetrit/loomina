@@ -7,6 +7,8 @@
  * Les réglages et les sujets suggérés sont gardés en mémoire jusqu'au redémarrage.
  */
 
+import { buildWeave } from './weave';
+
 export const DEMO_DATA = process.env.NODE_ENV === 'development' && process.env.LOOMINA_DEMO_DATA === 'true';
 
 const CHAPTERS: { title: string; date: string; content: string }[] = [
@@ -150,6 +152,16 @@ export function demoOverview() {
             scheduleText: state.prefs.callSchedule.active ? 'chaque mardi à 15 h' : null,
             chapters: CHAPTERS.length,
             words: CHAPTERS.reduce((n, c) => n + words(c.content), 0),
+            weave: buildWeave({
+                phase: 3,
+                completed: false,
+                state: { covered: ['metier', 'couple', 'enfants', 'passions'], skipped: [] },
+                calls: CALLS.length,
+                words: CHAPTERS.reduce((n, c) => n + words(c.content), 0),
+                photos: 1,
+                hasTitle: Boolean(state.prefs.title),
+                hasSchedule: state.prefs.callSchedule.active,
+            }),
             timeline: [
                 { year: 1948, event: 'Naissance à Rennes, rue des Tilleuls' },
                 { year: 1956, event: 'Apprend à nager à Saint-Malo avec son père' },
