@@ -32,7 +32,7 @@ export default function Photo({
   className?: string;
 }) {
   return (
-    <div className={`relative overflow-hidden rounded-[28px] bg-[var(--line)] ${ratio} ${className}`}>
+    <div className={`relative overflow-hidden rounded-[var(--radius-card)] bg-[var(--line)] ${ratio} ${className}`}>
       {contain ? (
         <>
           {/* Le fond : la première et la dernière colonne de la photo, étirées jusqu'aux bords du cadre. */}

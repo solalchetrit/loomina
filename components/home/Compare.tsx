@@ -58,7 +58,7 @@ export default function Compare() {
       />
       <ul className="head-gap space-y-3 md:hidden">
         {ROWS.map((r) => (
-          <li key={r.label} className="rounded-[20px] border border-[var(--line)] p-5">
+          <li key={r.label} className="rounded-[20px] border border-[var(--line)] bg-white p-5">
             <p className="text-[15px] font-bold text-[var(--ink-3)]">{r.label}</p>
             <dl className="mt-3 space-y-2 text-[16px]">
               {(
@@ -68,7 +68,7 @@ export default function Compare() {
                   ["Loomina", r.loomina],
                 ] as const
               ).map(([who, cell]) => (
-                <div key={who} className={`flex gap-3 ${who === "Loomina" ? "rounded-[12px] bg-[var(--amber-wash)] p-2 -mx-2" : ""}`}>
+                <div key={who} className={`flex gap-3 ${who === "Loomina" ? "rounded-[12px] bg-[var(--canvas)] p-2 -mx-2" : ""}`}>
                   <dt className="w-28 shrink-0 font-semibold">{who}</dt>
                   <dd>
                     <Value cell={cell} strong={who === "Loomina"} />
@@ -109,7 +109,7 @@ export default function Compare() {
                 <td className="px-5 py-4">
                   <Value cell={r.biographer} />
                 </td>
-                <td className="bg-[var(--amber-wash)] px-5 py-4">
+                <td className="bg-[var(--canvas)] px-5 py-4">
                   <Value cell={r.loomina} strong />
                 </td>
               </tr>

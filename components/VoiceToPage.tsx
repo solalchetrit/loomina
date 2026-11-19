@@ -119,7 +119,7 @@ export default function VoiceToPage() {
       </div>
 
       <div ref={stage} className="head-gap grid items-stretch gap-4 lg:grid-cols-2">
-        <figure className="flex flex-col rounded-[28px] bg-[var(--canvas)] p-5 sm:p-8">
+        <figure className="flex flex-col rounded-[var(--radius-card)] bg-[var(--canvas)] p-5 sm:p-8">
           <figcaption className="flex items-center gap-3 text-[15px] font-bold">
             <span className="chip-icon !h-9 !w-9 !rounded-[12px]">
               <Icon name="phone" size={18} />

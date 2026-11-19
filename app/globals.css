@@ -46,7 +46,7 @@
   --danger: #a8402f;
 
   /* Rayons et ombres */
-  --radius-card: 24px;
+  --radius-card: 28px;      /* un seul arrondi pour cartes, photos et panneaux */
   --radius-btn: 999px;
   --shadow-float: 0 40px 80px -40px rgba(20, 24, 34, 0.32);
   --shadow-bar: 0 10px 30px -18px rgba(20, 24, 34, 0.28);
@@ -758,4 +758,40 @@ textarea.field {
    (hauteur d'un .t-title + l'écart mt-6 de l'accordéon). Solal, 19/11/2026. */
 @media (min-width: 1024px) {
   .faq-nav { margin-top: calc(clamp(1.9rem, 3.4vw, 2.75rem) * 1.08 + 1.5rem); }
+}
+
+/* ================================================================
+   FINITIONS (Solal, 19/11/2026 : « fais-moi kiffer »)
+   ================================================================ */
+
+/* Le point ambre qui remplace les encadrés pêche : l'ambre devient un détail précieux. */
+.accent-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--amber);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber) 18%, transparent);
+}
+
+/* Les photos en noir et blanc : un ton chaud à peine visible, comme les tirages d'un même album. */
+img[src*="photos/album-photo"],
+img[src*="photos/famille-album"],
+img[src*="photos/grand-mere-calin"],
+img[src*="photos/grand-pere-petite-fille"],
+img[src*="photos/homme-au-telephone"],
+img[src*="photos/mains-telephone"],
+img[src*="photos/panier-de-photos"],
+img[src*="photos/petit-dejeuner"],
+img[src*="photos/photos-de-famille"] {
+  filter: sepia(0.16) saturate(1.1) contrast(1.03) brightness(1.01);
+}
+
+/* Boutons : au survol, ils montent d'un demi-pixel et prennent une ombre courte. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  a.press:hover:not(:active),
+  button.press:hover:not(:active):not(:disabled) {
+    transform: translateY(-1px);
+  }
 }

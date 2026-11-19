@@ -34,7 +34,7 @@ export default function Header() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-[1000] px-3 pt-3 sm:px-4 sm:pt-4">
-        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-4 rounded-[22px] border border-[var(--line)] bg-white/90 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-md md:h-[68px] md:pl-6">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-4 rounded-[22px] border border-white/70 bg-white/70 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-xl backdrop-saturate-150 md:h-[68px] md:pl-6">
           <Link href="/" className="relative z-[920] flex shrink-0 items-center" aria-label="Loomina, accueil">
             <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
               {/* L'étoile tourne quand on passe sur le logo. Rien ne bouge à l'arrivée (Solal, 18/11/2026 : ça ressemblait à un bug). */}
