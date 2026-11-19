@@ -35,13 +35,22 @@
   pointer-events: none;
 }
 
-.body {
+.lean {
   position: relative;
   z-index: 1;
   display: block;
   max-width: 78%;
   transform-origin: 50% 100%;
-  animation: breathe 4.2s ease-in-out infinite;
+  transform: translate(var(--shift, 0px), var(--lift, 0px)) rotate(var(--lean, 0deg));
+  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.body {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform-origin: 50% 100%;
+  animation: breathe 3.6s ease-in-out infinite;
 }
 
 .sprite {
@@ -62,13 +71,24 @@
   background: radial-gradient(closest-side, rgba(23, 29, 43, 0.2), rgba(23, 29, 43, 0));
 }
 
+.groundJump {
+  animation: shadow 900ms ease-in-out both;
+}
+
+@keyframes shadow {
+  40% {
+    transform: translateX(-50%) scale(0.6);
+    opacity: 0.5;
+  }
+}
+
 @keyframes breathe {
   0%,
   100% {
-    transform: scale(1, 1);
+    transform: translateY(0) scale(1, 1);
   }
   50% {
-    transform: scale(1.012, 0.985);
+    transform: translateY(-1.2%) scale(1.018, 0.98);
   }
 }
 
@@ -78,45 +98,278 @@
   }
 }
 
-/* Le saut de joie : il se tasse, saute, retombe. */
+/* Le saut de joie : il se tasse, saute haut, retombe et rebondit. */
 .hop {
-  animation: hop 820ms cubic-bezier(0.3, 0, 0.3, 1) both;
+  animation: hop 900ms cubic-bezier(0.3, 0, 0.3, 1) both;
 }
 
 @keyframes hop {
   0% {
     transform: translateY(0) scale(1, 1);
   }
-  18% {
-    transform: translateY(0) scale(1.06, 0.92);
+  16% {
+    transform: translateY(0) scale(1.1, 0.86);
   }
-  45% {
-    transform: translateY(-13%) scale(0.97, 1.04);
+  42% {
+    transform: translateY(-24%) scale(0.94, 1.08);
   }
-  72% {
-    transform: translateY(0) scale(1.05, 0.94);
+  66% {
+    transform: translateY(0) scale(1.09, 0.9);
+  }
+  80% {
+    transform: translateY(-5%) scale(0.99, 1.02);
   }
   100% {
     transform: translateY(0) scale(1, 1);
   }
 }
 
-/* Il grandit : il apparaît d'un coup plus grand, avec un petit rebond. */
+/* La pirouette : il tourne sur lui-même. */
+.spin {
+  animation: spin 950ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes spin {
+  0% {
+    transform: translateY(0) scaleX(1);
+  }
+  15% {
+    transform: translateY(0) scale(1.06, 0.92);
+  }
+  35% {
+    transform: translateY(-10%) scaleX(-1);
+  }
+  55% {
+    transform: translateY(-12%) scaleX(1);
+  }
+  75% {
+    transform: translateY(-6%) scaleX(-1);
+  }
+  100% {
+    transform: translateY(0) scaleX(1);
+  }
+}
+
+/* La danse : il se balance d'un pied sur l'autre. */
+.dance {
+  animation: dance 1300ms ease-in-out both;
+}
+
+@keyframes dance {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  12% {
+    transform: translate(-7%, -5%) rotate(-11deg);
+  }
+  28% {
+    transform: translate(7%, 0) rotate(11deg);
+  }
+  44% {
+    transform: translate(-7%, -5%) rotate(-11deg);
+  }
+  60% {
+    transform: translate(7%, 0) rotate(11deg);
+  }
+  78% {
+    transform: translate(0, -9%) rotate(0) scale(1.05);
+  }
+}
+
+/* Le grand saut : un tour complet en l'air. */
+.flip {
+  animation: flip 1100ms cubic-bezier(0.35, 0, 0.25, 1) both;
+  transform-origin: 50% 55%;
+}
+
+@keyframes flip {
+  0% {
+    transform: translateY(0) rotate(0) scale(1, 1);
+  }
+  14% {
+    transform: translateY(4%) rotate(0) scale(1.12, 0.84);
+  }
+  50% {
+    transform: translateY(-32%) rotate(180deg) scale(0.96);
+  }
+  82% {
+    transform: translateY(0) rotate(360deg) scale(1.08, 0.9);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg) scale(1, 1);
+  }
+}
+
+/* Le salut : il s'incline deux fois. */
+.nod {
+  animation: nod 900ms ease-in-out both;
+}
+
+@keyframes nod {
+  0%,
+  100% {
+    transform: rotate(0) scale(1, 1);
+  }
+  25% {
+    transform: rotate(9deg) scale(1.03, 0.95);
+  }
+  50% {
+    transform: rotate(-3deg) scale(1, 1);
+  }
+  75% {
+    transform: rotate(8deg) scale(1.03, 0.96);
+  }
+}
+
+/* La caresse : il ronronne. */
+.purr {
+  animation: purr 700ms ease-in-out both;
+}
+
+@keyframes purr {
+  0%,
+  100% {
+    transform: scale(1, 1) rotate(0);
+  }
+  20% {
+    transform: scale(1.07, 0.93) rotate(-2deg);
+  }
+  40% {
+    transform: scale(1.05, 0.95) rotate(2deg);
+  }
+  60% {
+    transform: scale(1.07, 0.93) rotate(-2deg);
+  }
+  80% {
+    transform: scale(1.03, 0.97) rotate(1deg);
+  }
+}
+
+/* Tout seul : il regarde à gauche, à droite. */
+.peek {
+  animation: peek 1800ms ease-in-out both;
+}
+
+@keyframes peek {
+  0%,
+  100% {
+    transform: rotate(0) translateX(0);
+  }
+  25% {
+    transform: rotate(-6deg) translateX(-3%);
+  }
+  50% {
+    transform: rotate(0) translateX(0);
+  }
+  75% {
+    transform: rotate(6deg) translateX(3%);
+  }
+}
+
+/* Tout seul : il se dandine. */
+.shimmy {
+  animation: shimmy 900ms ease-in-out both;
+}
+
+@keyframes shimmy {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  20% {
+    transform: translateY(0) scale(1.05, 0.94);
+  }
+  45% {
+    transform: translateY(-7%) scale(0.98, 1.03);
+  }
+  70% {
+    transform: translateY(0) scale(1.04, 0.95);
+  }
+}
+
+/* Il grandit : il apparaît d'un coup plus grand, avec un rebond. */
 .grow {
-  animation: grow 900ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  animation: grow 950ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
 
 @keyframes grow {
   0% {
-    transform: scale(0.6);
-    opacity: 0.4;
+    transform: scale(0.45) rotate(-8deg);
+    opacity: 0.3;
   }
-  60% {
-    transform: scale(1.07);
+  55% {
+    transform: scale(1.12) rotate(3deg);
     opacity: 1;
+  }
+  78% {
+    transform: scale(0.97) rotate(0);
   }
   100% {
     transform: scale(1);
+  }
+}
+
+/* Les étoiles et les cœurs qui s'envolent. */
+.spark {
+  position: absolute;
+  z-index: 2;
+  color: var(--amber);
+  line-height: 1;
+  pointer-events: none;
+  animation: spark 900ms cubic-bezier(0.15, 0.7, 0.3, 1) both;
+}
+
+.heart {
+  color: #e8607a;
+  animation-duration: 1300ms;
+}
+
+@keyframes spark {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2) rotate(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(140deg);
+    opacity: 0;
+  }
+}
+
+/* Ce qu'il dit. */
+.bubble {
+  position: absolute;
+  z-index: 3;
+  top: 7%;
+  left: 50%;
+  max-width: 86%;
+  padding: 0.5rem 0.95rem;
+  border-radius: 1rem;
+  background: #fff;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(23, 29, 43, 0.12);
+  animation: bubble 2400ms ease both;
+}
+
+@keyframes bubble {
+  0% {
+    transform: translate(-50%, 8px) scale(0.8);
+    opacity: 0;
+  }
+  10%,
+  85% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -6px) scale(0.96);
+    opacity: 0;
   }
 }
 
@@ -205,10 +458,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .body,
-  .hop,
-  .grow,
-  .sprite {
+  .sprite,
+  .spark,
+  .groundJump {
     animation: none;
+  }
+  .lean {
+    transition: none;
   }
   .railFill {
     transition: none;
