@@ -25,7 +25,7 @@ export default function PrintedPage({
 }) {
   return (
     <div className={`${s.frame} ${className}`}>
-      <Image src="/photos/accueil-livre-ouvert.jpg" alt="" fill sizes={sizes} className={s.shot} {...blurOf("accueil-livre-ouvert")} />
+      <Image src="/photos/accueil-livre-ouvert-bleu.jpg" alt="" fill sizes={sizes} className={s.shot} {...blurOf("accueil-livre-ouvert-bleu")} />
       <div className={s.ink} lang="fr">
         {chapter && <p className={s.chapter}>{chapter}</p>}
         <p className={s.title}>{title}</p>

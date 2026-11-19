@@ -58,11 +58,11 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
     text: `Quand votre récit est complet, notre équipe relit le livre, y place vos photos et l’envoie à l’impression. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé.`,
     preview: (
       <Photo
-        name="livre-debout"
+        name="livre-arrive-chez-vous"
         alt=""
         ratio="h-40"
         sizes="400px"
-        contain="aspect-[4/5]"
+        focus="50% 42%"
         className="-mx-5 w-[calc(100%+2.5rem)] max-w-none shrink-0 !rounded-none"
       />
     ),
