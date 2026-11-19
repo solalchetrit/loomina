@@ -7,9 +7,6 @@ import { MEMO_AGES, memoState } from "@/lib/loomina/memo";
 import type { ProjectOverview } from "./types";
 import s from "./Companion.module.css";
 
-/** Une page imprimée compte environ 250 mots : un ordre de grandeur, affiché comme tel. */
-const WORDS_PER_PAGE = 250;
-
 /** Ce que Mémo dit quand on joue avec lui. */
 const WORDS = ["Je n’oublie rien.", "Un autre souvenir ?", "Racontez-moi la suite."];
 
@@ -162,7 +159,6 @@ export default function Companion({ project, demo = false, skipIntro = false }: 
   const meta = MEMO_AGES[age - 1];
   const headline = shown ? state.headline : meta.text;
   const fill = (shown ? state.path : (age - 1) / 4) * 100;
-  const pages = Math.max(project.chapters ? 1 : 0, Math.round(project.words / WORDS_PER_PAGE));
   const stage = shown && !project.completed ? project.weave!.rows.filter((r) => r.phase === project.phase) : [];
 
   return (
@@ -194,29 +190,36 @@ export default function Companion({ project, demo = false, skipIntro = false }: 
             <button
               type="button"
               aria-expanded={details}
+              aria-label={`${state.told} souvenir${state.told > 1 ? "s racontés" : " raconté"} sur ${state.total}. Voir lesquels`}
               onClick={() => setDetails((d) => !d)}
-              className="press group mt-1.5 flex max-w-full flex-wrap items-center gap-x-2.5 gap-y-1 text-left"
+              className="press mt-2.5 flex max-w-full items-center gap-2.5 text-left"
             >
               <span className="flex gap-1" aria-hidden="true">
-                {stage.map((r) => (
-                  <span key={r.key} className={`h-2 w-2 rounded-full ${r.state === "woven" ? "bg-[var(--amber)]" : "bg-[var(--line)]"}`} />
+                {stage.map((r, i) => (
+                  <span key={r.key} className={`h-2 w-2 rounded-full ${i < state.told ? "bg-[var(--amber)]" : "bg-[var(--line)]"}`} />
                 ))}
               </span>
-              <span className="text-[13px] font-bold text-[var(--ink-2)] underline decoration-[var(--amber-line)] decoration-2 underline-offset-4 group-hover:decoration-[var(--amber)]">
-                {details ? "Fermer" : `${state.told} souvenir${state.told > 1 ? "s racontés" : " raconté"} sur ${state.total} · voir lesquels`}
+              <span className="text-[13px] font-bold tabular-nums text-[var(--ink-3)]">
+                {state.told} sur {state.total}
               </span>
+              <svg
+                aria-hidden="true"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`text-[var(--ink-3)] transition-transform ${details ? "rotate-180" : ""}`}
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </button>
           )}
-          <p className="mt-1.5 text-[14px] leading-snug text-[var(--ink-3)]">
-            {shown && (news || state.note) ? <span className="font-semibold text-[var(--amber-deep)]">{news || state.note} </span> : null}
-            <span className="whitespace-nowrap">
-              <b className="font-extrabold text-[var(--ink)] tabular-nums">≈ {pages}</b> {pages > 1 ? "pages" : "page"}
-              <span className="mx-1.5" aria-hidden="true">
-                ·
-              </span>
-              <b className="font-extrabold text-[var(--ink)] tabular-nums">{project.chapters}</b> {project.chapters > 1 ? "appels" : "appel"}
-            </span>
-          </p>
+          {/* Une seule ligne de plus, et seulement quand il y a du nouveau (Solal, 19/11/2026 : carte trop chargée). */}
+          {shown && (news || state.mood === "fresh") && <p className="mt-2 text-[14px] font-semibold leading-snug text-[var(--amber-deep)]">{news || state.note}</p>}
         </div>
 
         <ol className={s.path} aria-label="Les âges de Mémo">
