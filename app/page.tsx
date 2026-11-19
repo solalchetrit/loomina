@@ -6,6 +6,7 @@ import WhatYouGet from "@/components/home/WhatYouGet";
 import ThemePicker from "@/components/home/ThemePicker";
 import Compare from "@/components/home/Compare";
 import HowItWorks from "@/components/HowItWorks";
+import MemoSection from "@/components/home/MemoSection";
 import AuthorShowcase from "@/components/AuthorShowcase";
 import VoiceToPage from "@/components/VoiceToPage";
 import Closing from "@/components/Closing";
@@ -68,6 +69,9 @@ export default function Home() {
       </div>
 
       <AuthorShowcase />
+
+      {/* Mémo, le compagnon de l’espace auteur (Solal, 19/11/2026). */}
+      <MemoSection />
       <div>
         <Audiences />
       </div>

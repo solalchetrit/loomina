@@ -57,6 +57,10 @@ const FAQ_CATEGORIES = [
         q: "Puis-je relire et modifier le texte ?",
         a: "Oui, c’est même la règle. Le récit de chaque appel apparaît dans votre espace auteur quelques minutes après. Vous corrigez un passage vous-même, ou vous dites à Loomina, au prochain appel, ce qu’il faut changer. Vous avez le dernier mot avant l’impression.",
       },
+      {
+        q: "Qui est Mémo, le petit éléphant de l’espace auteur ?",
+        a: "Mémo est le compagnon de votre livre. Comme tous les éléphants, il n’oublie rien. Il grandit à mesure que vous racontez : tout petit au début, il se lève, prend la plume, met ses lunettes, et finit par tenir votre livre. Il n’y a ni points ni niveaux à gagner : il montre simplement où en est votre récit, et vous pouvez jouer avec lui.",
+      },
     ],
   },
   {

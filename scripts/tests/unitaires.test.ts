@@ -446,3 +446,43 @@ test('démo : un récit en échec est retenté avec un délai croissant, cinq fo
     assert.equal(demoRetryDue({ error: 'essai 5 : 429', created_at: at(800) }), false); // plus d'essai
     assert.equal(demoRetryDue({ error: 'essai 4 : 429', created_at: at(25 * 60) }), false); // plus de 24 h
 });
+
+// ───────── Mémo, l'éléphant de l'espace auteur ─────────
+
+import { memoState } from '../../lib/loomina/memo';
+import { buildWeave } from '../../lib/loomina/weave';
+
+const memoWeave = (phase: 1 | 2 | 3 | 4, covered: string[], completed = false) =>
+    buildWeave({ phase, completed, state: { covered, skipped: [] }, calls: 1, words: 0, photos: 0, hasTitle: false, hasSchedule: false });
+
+test('Mémo : avant le premier appel, il est tout petit et il dort', () => {
+    const m = memoState({ phase: 1, completed: false, weave: memoWeave(1, []), calls: [] });
+    assert.equal(m.age, 1);
+    assert.equal(m.mood, 'asleep');
+});
+
+test('Mémo : son âge suit l’étape du livre, et il compte les souvenirs qui restent dans l’étape', () => {
+    const now = new Date('2026-11-19T12:00:00Z');
+    const m = memoState({ phase: 3, completed: false, weave: memoWeave(3, ['metier', 'couple', 'enfants', 'passions']), calls: [{ date: '2026-11-12T10:00:00Z' }], now });
+    assert.equal(m.age, 3);
+    assert.equal(m.mood, 'steady');
+    assert.equal(m.total - m.told, 5);
+    assert.match(m.headline, /Encore 5 souvenirs et Mémo met ses lunettes/);
+    assert.ok(m.path > 0.5 && m.path < 0.75);
+});
+
+test('Mémo : joyeux après un appel récent, il attend après deux semaines sans appel, jamais de reproche', () => {
+    const now = new Date('2026-11-19T12:00:00Z');
+    const w = memoWeave(2, ['heritage']);
+    assert.equal(memoState({ phase: 2, completed: false, weave: w, calls: [{ date: '2026-11-18T18:00:00Z' }], now }).mood, 'fresh');
+    const waiting = memoState({ phase: 2, completed: false, weave: w, calls: [{ date: '2026-10-20T18:00:00Z' }], now });
+    assert.equal(waiting.mood, 'waiting');
+    assert.doesNotMatch(`${waiting.headline} ${waiting.note}`, /retard|perdu|oubli[ée]/i);
+});
+
+test('Mémo : récit complet, il tient le livre', () => {
+    const m = memoState({ phase: 4, completed: true, weave: memoWeave(4, [], true), calls: [{ date: '2026-11-01T10:00:00Z' }] });
+    assert.equal(m.age, 5);
+    assert.equal(m.mood, 'done');
+    assert.equal(m.path, 1);
+});

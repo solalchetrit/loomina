@@ -6,6 +6,7 @@ import Photo from "@/components/ui/Photo";
 import { CallPreview } from "@/components/HowItWorks";
 import Closing from "@/components/Closing";
 import AuthorShowcase from "@/components/AuthorShowcase";
+import MemoSection from "@/components/home/MemoSection";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
@@ -242,6 +243,8 @@ export default function ExperiencePage() {
       })}
 
       <AuthorShowcase />
+
+      <MemoSection />
 
       <ThemePicker />
 
