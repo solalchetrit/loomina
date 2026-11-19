@@ -46,7 +46,11 @@ export const config = {
         /** Format Twilio/ElevenLabs : voiceId[-modèle][-vitesse_stabilité_similarité] */
         // Stabilité 0,6 au lieu de 0,5 (19/11/2026) : une voix plus régulière,
         // moins de petits accrocs entendus à la démo.
-        ttsVoice: optional('VOICE_TTS_VOICE', 'Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.6_0.75'),
+        // « Martin » (bibliothèque ElevenLabs : voix française grave, calme,
+        // conversationnelle, faite pour le téléphone) depuis le 20/11/2026.
+        // Avant : « Olivier » (Qrl71rx6Yg8RvyPYRGCQ), choisie vite il y a un an.
+        // Vitesse 0,88 : un rien plus lente, pour une oreille âgée.
+        ttsVoice: optional('VOICE_TTS_VOICE', 'b0Ev8lcOOXx2o9ZcF46H-flash_v2_5-0.88_0.6_0.8'),
         language: optional('VOICE_LANGUAGE', 'fr-FR'),
         sttModel: optional('VOICE_STT_MODEL', 'nova-3-general'),
     },
