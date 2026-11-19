@@ -96,6 +96,7 @@ Le transcript vient d'une reconnaissance vocale au téléphone : les noms propre
 - Les « Corrections de l'auteur » du contexte l'emportent sur le transcript : si le narrateur dit « Rosa » et qu'une correction dit « Rose, pas Rosa », écris « Rose ».
 - Quand le narrateur épelle un nom dans le transcript, reconstitue l'orthographe épelée et utilise-la ; ne raconte pas l'épellation elle-même.
 - Un mot isolé qui n'a aucun sens dans la phrase est un artefact de transcription : ignore-le.
+- Un nom de lieu écorché mais reconnaissable (« Cour de voix » pour Courbevoie, « Chatoux » pour Chatou, « Levaloir » pour Levallois) : écris le vrai nom quand le contexte le rend évident (la région, les autres villes citées, un département). Dans le doute, garde ce qui a été entendu.
 
 # NE TE RÉPÈTE PAS
 Les chapitres précédents te sont fournis. Tu ne dois PAS reraconter ce qui y figure déjà.

@@ -33,6 +33,42 @@ function escapeHtml(s: string): string {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/**
+ * L'habillage commun des e-mails Loomina (demande de Solal, 19/11/2026 :
+ * « un peu plus de branding, déjà le logo, quelque chose de soft »).
+ * Un fond crème du site, une carte blanche, le vrai logo en tête (fichier
+ * public/header-logo-trimmed.png, servi par le site), un filet ambre de la
+ * couleur de l'étoile, et un pied de page discret. Des tableaux et des
+ * styles en ligne : c'est ce que lisent Gmail, Outlook et Apple Mail.
+ */
+export function brandEmailHtml(innerHtml: string): string {
+    const site = SITE.url.replace(/\/$/, '');
+    return (
+        '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"></head>' +
+        '<body style="margin:0;padding:0;background:#f7f7f4">' +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f7f7f4">' +
+        '<tr><td align="center" style="padding:32px 16px">' +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px">' +
+        `<tr><td style="padding:0 8px 20px"><a href="${site}" style="text-decoration:none"><img src="${site}/header-logo-trimmed.png" width="128" height="37" alt="Loomina" style="display:block;border:0;width:128px;height:auto"></a></td></tr>` +
+        '<tr><td style="background:#ffffff;border:1px solid #e7e6e1;border-radius:20px;padding:36px 32px 28px">' +
+        '<div style="width:32px;height:3px;border-radius:3px;background:#ee9b2d;margin:0 0 24px;font-size:0;line-height:0">&nbsp;</div>' +
+        '<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.65;color:#161616">' +
+        innerHtml +
+        '</div></td></tr>' +
+        '<tr><td style="padding:20px 8px 0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:#66665f">' +
+        `Loomina, votre vie racontée au téléphone, jusqu’au livre relié.<br>${SITE.phoneDisplay} · <a href="${site}" style="color:#66665f;text-decoration:underline">${HOST}</a>` +
+        '</td></tr></table></td></tr></table></body></html>'
+    );
+}
+
+/** Le texte brut d'un e-mail en paragraphes HTML, pour l'habillage ci-dessus. */
+export function paragraphsHtml(text: string): string {
+    return text
+        .split(/\n{2,}/)
+        .map((p) => `<p style="margin:0 0 16px">${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+        .join('');
+}
+
 /** La boîte d'envoi : celle de contact@loomina.eu, chez l'hébergeur du domaine. */
 function smtpConfig(): { host: string; port: number; user: string; pass: string } | null {
     const pass = process.env.SMTP_PASS?.trim();
@@ -68,14 +104,7 @@ export async function sendEmail(params: {
         return false;
     }
     const from = process.env.LOOMINA_MAIL_FROM?.trim() || `Loomina <${smtp.user}>`;
-    const html =
-        params.html ??
-        '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.6;color:#161616;max-width:560px">' +
-        params.text
-            .split(/\n{2,}/)
-            .map((p) => `<p style="margin:0 0 16px">${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
-            .join('') +
-        '</div>';
+    const html = params.html ?? brandEmailHtml(paragraphsHtml(params.text));
     try {
         // Chargé à la demande : le serveur vocal n'envoie pas d'e-mail et n'a pas ce paquet.
         const { createTransport } = await import('nodemailer');
