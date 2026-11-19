@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { blurOf } from "@/lib/photo-blur";
 
 /**
  * Photo en noir et blanc, aux coins arrondis comme les cartes.
@@ -36,19 +37,19 @@ export default function Photo({
         <>
           {/* Le fond : la première et la dernière colonne de la photo, étirées jusqu'aux bords du cadre. */}
           <div aria-hidden className="absolute inset-y-0 left-0 w-1/2 overflow-hidden">
-            <Image src={`/photos/${name}.jpg`} alt="" fill sizes="200px" className="!w-[20000%] !max-w-none object-fill" />
+            <Image src={`/photos/${name}.jpg`} alt="" fill sizes={sizes} className="!w-[20000%] !max-w-none object-fill" />
           </div>
           <div aria-hidden className="absolute inset-y-0 right-0 w-1/2 overflow-hidden">
-            <Image src={`/photos/${name}.jpg`} alt="" fill sizes="200px" className="!left-auto !right-0 !w-[20000%] !max-w-none object-fill" />
+            <Image src={`/photos/${name}.jpg`} alt="" fill sizes={sizes} className="!left-auto !right-0 !w-[20000%] !max-w-none object-fill" />
           </div>
           <div
             className={`absolute inset-y-0 left-1/2 -translate-x-1/2 ${contain}`}
           >
-            <Image src={`/photos/${name}.jpg`} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
+            <Image src={`/photos/${name}.jpg`} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" {...blurOf(name)} />
           </div>
         </>
       ) : (
-        <Image src={`/photos/${name}.jpg`} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" style={{ objectPosition: focus }} />
+        <Image src={`/photos/${name}.jpg`} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" {...blurOf(name)} style={{ objectPosition: focus }} />
       )}
     </div>
   );

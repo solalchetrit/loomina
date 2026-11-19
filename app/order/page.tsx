@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { blurOf } from "@/lib/photo-blur";
 import Payment from "@/components/order/Payment";
 import Icon from "@/components/ui/Icon";
 import { CALL_MINUTES_OPTIONS, DEFAULT_CALL_MINUTES } from "@/lib/loomina/call-length";
@@ -236,6 +237,7 @@ export default function OrderPage() {
                           fill
                           sizes="(min-width: 640px) 300px, 45vw"
                           priority
+                          {...blurOf(o.photo)}
                           className={`object-cover transition duration-500 group-hover:scale-[1.03] ${active || step === 1 ? "" : "opacity-60 grayscale"}`}
                           style={{ objectPosition: o.focus }}
                         />

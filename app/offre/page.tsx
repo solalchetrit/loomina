@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { blurOf } from "@/lib/photo-blur";
 import { Section, SectionHead } from "@/components/ui/Section";
 import { SITE } from "@/config/site";
 import Accordion from "@/components/ui/Accordion";
@@ -80,6 +81,7 @@ export default function OffrePage() {
                   priority
                   sizes="(min-width: 1024px) 640px, 100vw"
                   className="object-cover"
+                  {...blurOf("collection-de-livres")}
                 />
               </div>
             </div>
