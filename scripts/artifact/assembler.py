@@ -57,7 +57,7 @@ for d, _, fs in os.walk(OUT + "/n"):
             s = read(q).replace("/_next/", "./n/")
             if f.endswith(".js"):
                 s = s.replace("�", "\\uFFFD")
-                s = re.sub(r'"/(photos/|toile/|espace-auteur/|header-logo|hero-book|icon\.png|og-image)', r'"./\1', s)
+                s = re.sub(r'"/(photos/|compagnon/|espace-auteur/|header-logo|hero-book|icon\.png|og-image)', r'"./\1', s)
             write(q, s)
 
 files = {}
