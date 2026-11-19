@@ -75,7 +75,7 @@ export default function VoiceToBook() {
   let word = 0;
 
   return (
-    <figure className="w-full min-w-0" aria-label="De l’appel au livre : vous racontez au téléphone, Loomina écrit la page, le livre relié arrive chez vous.">
+    <figure className="w-full min-w-0" aria-label="De l’appel au livre : vous racontez au téléphone, Loomina écrit la page, le livre arrive chez vous.">
       <div className={s.stage} data-act={shown + 1}>
         <div aria-hidden="true">
           <div className={s.open}>

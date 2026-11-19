@@ -26,7 +26,7 @@ export default function CGVPage() {
         <li>l’écriture du récit de chaque entretien, à partir des seules paroles du Client, puis la composition du livre à partir de ces récits ;</li>
         <li>la relecture de l’ensemble par une personne de l’équipe avant l’impression ;</li>
         <li>l’intégration des photographies fournies par le Client ;</li>
-        <li>la mise en page et l’impression d’un exemplaire relié ({OFFER.format}) ;</li>
+        <li>la mise en page et l’impression d’un exemplaire du livre ({OFFER.format}) ;</li>
         <li>une version numérique ({OFFER.digital}) ;</li>
         <li>la livraison en France métropolitaine.</li>
       </ul>

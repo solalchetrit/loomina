@@ -56,7 +56,7 @@ export function brandEmailHtml(innerHtml: string): string {
         innerHtml +
         '</div></td></tr>' +
         '<tr><td style="padding:20px 8px 0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:#66665f">' +
-        `Loomina, votre vie racontée au téléphone, jusqu’au livre relié.<br>${SITE.phoneDisplay} · <a href="${site}" style="color:#66665f;text-decoration:underline">${HOST}</a>` +
+        `Loomina, votre vie racontée au téléphone, jusqu’au livre.<br>${SITE.phoneDisplay} · <a href="${site}" style="color:#66665f;text-decoration:underline">${HOST}</a>` +
         '</td></tr></table></td></tr></table></body></html>'
     );
 }

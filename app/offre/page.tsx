@@ -76,7 +76,7 @@ export default function OffrePage() {
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[20px] lg:aspect-[4/3]">
                 <Image
                   src="/photos/collection-de-livres.jpg"
-                  alt="Quatre livres Loomina reliés, aux couvertures en toile beige, bleue, verte et bordeaux."
+                  alt="Quatre livres Loomina, aux couvertures en toile beige, bleue, verte et bordeaux."
                   fill
                   priority
                   sizes="(min-width: 1024px) 640px, 100vw"
@@ -97,7 +97,7 @@ export default function OffrePage() {
           { icon: "phone", title: "Autant d’appels qu’il vous faut", text: "Les entretiens par téléphone, quand vous voulez." },
           { icon: "pen", title: "Le récit de chaque appel", text: "Écrit dans vos mots, à relire et corriger." },
           { icon: "check", title: "Relu par notre équipe", text: "Votre livre est relu, et vos photos placées, avant l’impression." },
-          { icon: "book", title: "Le livre relié, livré chez vous", text: `${OFFER.format}, avec sa version ${OFFER.digital}.` },
+          { icon: "book", title: "Le livre imprimé, livré chez vous", text: `${OFFER.format}, avec sa version ${OFFER.digital}.` },
         ]}
       />
 

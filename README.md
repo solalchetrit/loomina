@@ -1,6 +1,6 @@
 # Loomina
 
-Biographe par téléphone : l'auteur raconte sa vie au fil d'appels, un chapitre est écrit après chaque appel, et il reçoit un livre relié.
+Biographe par téléphone : l'auteur raconte sa vie au fil d'appels, un chapitre est écrit après chaque appel, et il reçoit un livre imprimé.
 
 Next.js 16 (App Router) sur Vercel, Supabase (`loomina-v2`), Vapi pour la voix, OpenAI pour l'analyse et l'écriture, Stripe pour le paiement, Twilio Verify pour la connexion par SMS.
 
