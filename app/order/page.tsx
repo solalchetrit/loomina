@@ -356,7 +356,7 @@ export default function OrderPage() {
           <ul className="mt-5 grid gap-2 text-[13px] text-[var(--ink-3)] sm:grid-cols-3 sm:gap-3">
             {([
               { icon: "heart", text: `Remboursé si le premier appel ne vous plaît pas` },
-              { icon: "book", text: "Livre relié livré chez vous, frais inclus" },
+              { icon: "book", text: "Livre imprimé, livré chez vous, frais inclus" },
               { icon: "phone", text: "Autant d’appels qu’il vous faut" },
             ] as const).map((t) => (
               <li key={t.text} className="flex items-center gap-2 sm:flex-col sm:items-center sm:text-center">

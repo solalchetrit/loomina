@@ -14,7 +14,7 @@ export default function OfferCard({
       <div className="card flex flex-col p-3">
         <Photo
           name="livre-a-plat-lunettes"
-          alt="Le livre relié, couverture en toile de lin, posé à côté d’une paire de lunettes et de vieilles photos de famille"
+          alt="Le livre, couverture en toile de lin, posé à côté d’une paire de lunettes et de vieilles photos de famille"
           ratio="aspect-[3/2]"
           sizes="(min-width: 1024px) 520px, 100vw"
           className="!rounded-[18px]"

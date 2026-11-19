@@ -43,7 +43,7 @@ const FAQ_CATEGORIES = [
     questions: [
       {
         q: "À quoi ressemble le livre ?",
-        a: `Un livre relié, ${OFFER.format}, avec vos photos placées dans le texte. Vous recevez aussi une version numérique (${OFFER.digital}) à partager avec la famille.`,
+        a: `Un livre imprimé, ${OFFER.format}, avec vos photos placées dans le texte. Vous recevez aussi une version numérique (${OFFER.digital}) à partager avec la famille.`,
       },
       {
         q: "Combien de pages fait-il ?",

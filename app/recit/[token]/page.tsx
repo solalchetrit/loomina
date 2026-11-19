@@ -103,7 +103,7 @@ export default async function RecitPage({ params }: { params: Promise<{ token: s
             <div className="max-w-xl">
               <h2 className="t-banner text-white">Et si c’était toute votre vie ?</h2>
               <p className="mt-3 text-[17px] leading-relaxed text-[#cfcfc8]">
-                Appel après appel, à votre rythme, chaque souvenir devient un chapitre, puis un livre relié à transmettre.
+                Appel après appel, à votre rythme, chaque souvenir devient un chapitre, puis un livre à transmettre.
               </p>
             </div>
             <Button href="/order" size="lg" className="!bg-[var(--amber)] !text-[var(--ink)]">

@@ -266,7 +266,7 @@ export async function buildRecitPdf(params: { title: string; author: string | nu
         ey -= 15;
     }
     ey -= 22;
-    for (const l of ['Toute une vie, racontée ainsi,', 'devient un livre relié à transmettre.']) {
+    for (const l of ['Toute une vie, racontée ainsi,', 'devient un livre à transmettre.']) {
         centered(end, roman, 12, encodable(roman, l), ey);
         ey -= 16;
     }

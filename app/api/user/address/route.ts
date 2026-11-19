@@ -8,7 +8,7 @@ import { alertTeam } from '@/lib/loomina/notify';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/** L'auteur indique où envoyer son livre relié (espace auteur, une fois le livre terminé). */
+/** L'auteur indique où envoyer son livre (espace auteur, une fois le livre terminé). */
 export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
     const shipping = parseShipping(body);
