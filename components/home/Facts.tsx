@@ -5,7 +5,7 @@ const FACTS: { value: string; label: string }[] = [
   { value: "0", label: "ligne à écrire vous-même" },
   { value: `${OFFER.chapters}`, label: "thèmes pour guider vos souvenirs" },
   { value: OFFER.delay.replace(" à ", "–").replace(" semaines", " sem."), label: "du premier appel au livre validé" },
-  { value: `${OFFER.price} €`, label: "à partir de, tout compris et livré chez vous" },
+  { value: `${OFFER.price} €`, label: "tout compris et livré chez vous" },
 ];
 
 export default function Facts() {

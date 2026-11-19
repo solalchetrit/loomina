@@ -18,7 +18,8 @@ export const OFFER = {
   chapters: 14,
   /** Le format du PDF d'impression (lib/loomina/book-pdf.ts) : A5. */
   format: "14,8 × 21 cm, couverture rigide",
-  digital: "PDF et EPUB",
+  /** Solal, 19/11/2026 : seulement le PDF, l'EPUB n'existe pas. */
+  digital: "PDF",
   delivery: "France métropolitaine, livraison incluse",
   /** Garantie : remboursement intégral si demandé sous 7 jours après le premier appel. */
   guaranteeDays: 7,
