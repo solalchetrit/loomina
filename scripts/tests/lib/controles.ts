@@ -9,7 +9,7 @@ import type { Processed } from './pile';
 import type { Expectation } from '../scenarios';
 import { normalizeContext, renderContext } from '../../../lib/loomina/context';
 import { countWords } from '../../../lib/loomina/writer';
-import { readPhaseState, readTopics, openTopics, coverage, PHASE_AXES } from '../../../lib/loomina/phase-plan';
+import { readPhaseState, readTopics, readTold, openTopics, coverage, PHASE_AXES } from '../../../lib/loomina/phase-plan';
 import { toPhase } from '../../../lib/loomina/phases';
 
 export type Gravite = 'bloquant' | 'important' | 'mineur';
@@ -185,7 +185,7 @@ export function dbChecks(params: {
     B(pa === pb || (pa === pb + 1 && stateBefore.check === 'to_ask' && log.phase_answer === 'advance'), `phase ${pb} → ${pa} (question « on passe à la suite ? » ${stateBefore.check === 'to_ask' ? 'à poser' : 'pas à poser'}, réponse lue : ${log.phase_answer})`);
     const topics = readTopics(after.project.project_metadata);
     const topicsBefore = readTopics(before.project.project_metadata);
-    B(after.project.phase_progress === coverage(pa, stateAfter, topics), `progression = sujets traités (${after.project.phase_progress} % ; de base : ${stateAfter.covered.join(', ') || 'aucun'}${stateAfter.skipped.length ? ` ; sans objet : ${stateAfter.skipped.join(', ')}` : ''} ; propres à la personne encore ouverts dans cette phase : ${openTopics(topics, pa).length})`, 'important');
+    B(after.project.phase_progress === coverage(pa, stateAfter, topics, readTold(after.project.project_metadata)), `progression = sujets traités (${after.project.phase_progress} % ; de base : ${stateAfter.covered.join(', ') || 'aucun'}${stateAfter.skipped.length ? ` ; sans objet : ${stateAfter.skipped.join(', ')}` : ''} ; propres à la personne encore ouverts dans cette phase : ${openTopics(topics, pa).length})`, 'important');
     if (pa === pb) B(stateBefore.covered.every((k) => stateAfter.covered.includes(k)), 'un sujet coché reste coché');
     B(topicsBefore.every((t) => topics.some((x) => x.id === t.id && (t.status === 'open' || x.status === t.status))), 'les sujets propres à la personne sont conservés, et un sujet raconté le reste');
     B(stateAfter.check !== 'to_ask' || (PHASE_AXES[pa].every((a) => stateAfter.covered.includes(a.key) || stateAfter.skipped.includes(a.key)) && openTopics(topics, pa).length === 0), 'la question « on passe à la suite ? » n\'est prévue que si tous les sujets sont traités');

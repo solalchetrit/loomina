@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useSyncExternalStore, type CSSProperties } from "react";
 import Image from "next/image";
+import { blurOf } from "@/lib/photo-blur";
 import s from "./VoiceToBook.module.css";
 
-/** Ce que Jeanne dit au téléphone. Exemple écrit pour illustrer la méthode, le même que plus bas sur la page. */
+/** Ce que Jeanne dit au téléphone. Exemple écrit pour illustrer la méthode : la même Jeanne que dans les autres exemples du site. */
 const SPOKEN = "« Oh, le tilleul. Un grand tilleul, énorme… Ma grand-mère faisait sécher les fleurs dessous, sur des draps. »";
 
 /** La page que Loomina en tire, dans la mise en page du livre imprimé. */
@@ -55,7 +56,6 @@ export default function VoiceToBook() {
   // Change à chaque passage : relance les animations du temps affiché, même quand on reclique dessus.
   const [run, setRun] = useState(0);
   const still = useSyncExternalStore(watchMotion, () => window.matchMedia(REDUCED).matches, () => false);
-  const [seconds, setSeconds] = useState(724);
   const shown = still ? STEPS.length - 1 : act;
 
   useEffect(() => {
@@ -66,12 +66,6 @@ export default function VoiceToBook() {
     }, STEPS[act].ms);
     return () => window.clearTimeout(id);
   }, [act, run, still]);
-
-  useEffect(() => {
-    if (still) return;
-    const id = window.setInterval(() => setSeconds((v) => v + 1), 1000);
-    return () => window.clearInterval(id);
-  }, [still]);
 
   const go = (i: number) => {
     setAct(i);
@@ -85,7 +79,7 @@ export default function VoiceToBook() {
       <div className={s.stage} data-act={shown + 1}>
         <div aria-hidden="true">
           <div className={s.open}>
-            <Image src="/photos/accueil-livre-ouvert.jpg" alt="" fill sizes={PHOTO_SIZES} className={s.shot} />
+            <Image src="/photos/accueil-livre-ouvert.jpg" alt="" fill sizes={PHOTO_SIZES} priority className={s.shot} {...blurOf("accueil-livre-ouvert")} />
             <div className={s.ink} lang="fr">
               <p className={`${s.chapter} ${s.w}`} style={w(-6)}>
                 Chapitre 2
@@ -110,8 +104,8 @@ export default function VoiceToBook() {
               </p>
             </div>
           </div>
-          <Image src="/photos/accueil-livre-ferme.jpg" alt="" fill sizes={PHOTO_SIZES} className={`${s.shot} ${s.closed}`} />
-          <Image src="/photos/accueil-livre-debout.jpg" alt="" fill sizes={PHOTO_SIZES} className={`${s.shot} ${s.standing}`} />
+          <Image src="/photos/accueil-livre-ferme.jpg" alt="" fill sizes={PHOTO_SIZES} loading="eager" className={`${s.shot} ${s.closed}`} />
+          <Image src="/photos/accueil-livre-debout.jpg" alt="" fill sizes={PHOTO_SIZES} loading="eager" className={`${s.shot} ${s.standing}`} />
         </div>
 
         <div className={s.call} aria-hidden="true">
@@ -120,9 +114,7 @@ export default function VoiceToBook() {
               <span className={s.dot} />
               Jeanne, au téléphone
             </span>
-            <span className={s.timer}>
-              {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}
-            </span>
+            <CallTimer still={still} />
           </div>
           <p className={s.said} key={run}>
             {SPOKEN.split(" ").map((t, i) => (
@@ -156,5 +148,23 @@ export default function VoiceToBook() {
         ))}
       </div>
     </figure>
+  );
+}
+
+/**
+ * La durée de l'appel, qui avance chaque seconde. À part : seule cette ligne se redessine,
+ * pas toute la page du livre et ses centaines de mots.
+ */
+function CallTimer({ still }: { still: boolean }) {
+  const [seconds, setSeconds] = useState(724);
+  useEffect(() => {
+    if (still) return;
+    const id = window.setInterval(() => setSeconds((v) => v + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [still]);
+  return (
+    <span className={s.timer}>
+      {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}
+    </span>
   );
 }

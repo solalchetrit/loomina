@@ -84,6 +84,27 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
         </div>
       </Panel>
 
+      <Panel icon="book" title="Le livre à imprimer">
+        <p className="text-[15px] text-[var(--ink-2)]">
+          Les fichiers à envoyer à l’imprimeur : l’intérieur (A5, 3 mm de fonds perdus, polices embarquées, nombre de pages multiple de 4) et la couverture à plat (4e de couverture, dos, 1re), toile lin. Fabriqués à la demande depuis la dernière version du livre, photos comprises.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {[
+            { part: "interieur", label: "Intérieur (PDF imprimeur)", dark: true },
+            { part: "couverture", label: "Couverture à plat", dark: false },
+            { part: "lecture", label: "Version à lire (celle de l’auteur)", dark: false },
+          ].map((b) =>
+            book ? (
+              <a key={b.part} href={`/api/admin/clients/${id}/livre-pdf?part=${b.part}`} className={`press inline-flex h-11 items-center rounded-[14px] px-4 text-[15px] font-bold ${b.dark ? "bg-[var(--ink)] text-white" : "bg-white text-[var(--ink)] shadow-[0_0_0_1px_var(--line)]"}`}>
+                {b.label}
+              </a>
+            ) : (
+              <span key={b.part} aria-disabled="true" className="inline-flex h-11 items-center rounded-[14px] bg-white px-4 text-[15px] font-bold text-[var(--ink)] opacity-40 shadow-[0_0_0_1px_var(--line)]">{b.label}</span>
+            )
+          )}
+        </div>
+      </Panel>
+
       {!book ? (
         <Panel icon="book" title="Le livre"><Empty>Rien à lire pour l’instant.</Empty></Panel>
       ) : (

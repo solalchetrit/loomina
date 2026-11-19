@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { blurOf } from "@/lib/photo-blur";
 import { Section, SectionHead } from "@/components/ui/Section";
 import { SITE } from "@/config/site";
 import Accordion from "@/components/ui/Accordion";
@@ -17,7 +18,7 @@ const FAQ = [
   },
   {
     q: "Puis-je modifier le texte ?",
-    a: "Oui, autant de fois que vous le souhaitez. Vous relisez le récit de chaque appel dans votre espace auteur et vous dites à Loomina, au prochain appel, ce qu’il faut changer.",
+    a: "Oui, autant de fois que vous le souhaitez. Vous relisez le récit de chaque appel dans votre espace auteur : vous corrigez un passage vous-même, ou vous dites à Loomina, au prochain appel, ce qu’il faut changer.",
   },
   {
     q: "Puis-je l’offrir ?",
@@ -80,6 +81,7 @@ export default function OffrePage() {
                   priority
                   sizes="(min-width: 1024px) 640px, 100vw"
                   className="object-cover"
+                  {...blurOf("collection-de-livres")}
                 />
               </div>
             </div>

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { loadStripe } from "@stripe/stripe-js";
+// « /pure » : le script de Stripe ne se charge qu'à l'ouverture du paiement, pas sur toutes les pages du site.
+import { loadStripe } from "@stripe/stripe-js/pure";
 import { CheckoutElementsProvider, PaymentElement, useCheckout } from "@stripe/react-stripe-js/checkout";
 import Icon from "@/components/ui/Icon";
 

@@ -16,7 +16,15 @@ const securityHeaders = [
 const forArtifact = process.env.ARTIFACT === "1";
 
 const nextConfig: NextConfig = {
+  // Photos optimisées gardées un mois dans le navigateur et chez Vercel : elles ne changent
+  // que si on remplace le fichier (dans ce cas, le renommer pour forcer la mise à jour).
+  images: { minimumCacheTTL: 2678400 },
   ...(forArtifact ? { distDir: ".next-artifact", images: { unoptimized: true }, turbopack: { resolveAlias: { "@/lib/loomina/artifact-hook": "./lib/loomina/artifact-api.ts" } } } : {}),
+  // Le PDF du livre lit ses polices et le logo sur le disque : on les joint à ces fonctions.
+  outputFileTracingIncludes: {
+    "/api/user/book/pdf": ["./lib/fonts/**/*", "./public/header-logo-trimmed.png", "./public/logo-loomina-blanc.png"],
+    "/api/admin/clients/*/livre-pdf": ["./lib/fonts/**/*", "./public/header-logo-trimmed.png", "./public/logo-loomina-blanc.png"],
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
@@ -26,6 +34,8 @@ const nextConfig: NextConfig = {
       { source: "/mission", destination: "/about", permanent: true },
       { source: "/offres", destination: "/offre", permanent: true },
       { source: "/accompagnement", destination: "/experience", permanent: true },
+      // L'adresse affichée sur les captures de l'accueil (« loomina.eu/espace-auteur »).
+      { source: "/espace-auteur", destination: "/dashboard", permanent: false },
     ];
   },
 };

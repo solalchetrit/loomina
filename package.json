@@ -15,12 +15,15 @@
     "test:implementations": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/implementations.ts",
     "test:relance": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/relance.ts",
     "test:livre": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/livre.ts",
-    "test:semer": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/semer-livre.ts"
+    "test:semer": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/semer-livre.ts",
+    "test:livre-pdf": "voice/node_modules/.bin/tsx --tsconfig tsconfig.json scripts/tests/livre-pdf.ts"
   },
   "dependencies": {
+    "@pdf-lib/fontkit": "1.1.1",
     "@stripe/react-stripe-js": "7.0.1",
     "@stripe/stripe-js": "10.2.1",
     "@supabase/supabase-js": "^2.87.1",
+    "hyphen": "1.14.1",
     "imapflow": "^2.12.1",
     "jose": "^6.1.3",
     "mailparser": "^3.14.5",
@@ -30,6 +33,7 @@
     "pdf-lib": "1.17.1",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "sharp": "0.35.5",
     "stripe": "^20.2.0"
   },
   "devDependencies": {

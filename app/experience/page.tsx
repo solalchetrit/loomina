@@ -12,7 +12,7 @@ import { OFFER } from "@/config/offer";
 const BEFORE = [
   {
     title: "Vous commandez, pour vous ou pour un proche",
-    text: "Vous indiquez le prénom et le numéro de téléphone de la personne qui racontera. C’est ce numéro que Loomina reconnaîtra. Le paiement se fait en une fois, par carte, sur une page sécurisée.",
+    text: "Vous indiquez le prénom et le numéro de téléphone de la personne qui racontera. C’est ce numéro que Loomina reconnaîtra. Le paiement est sécurisé, par carte, en une fois ou en 3 ou 4 fois avec Klarna.",
   },
   {
     title: "Vous appelez quand vous êtes prêt",
@@ -23,7 +23,7 @@ const BEFORE = [
 const DURING = [
   {
     title: "Une question à la fois",
-    text: "Loomina se présente, puis vous demande par où vous aimeriez commencer. Souvent l’enfance. Elle écoute, relance, et vous laisse le temps de chercher vos souvenirs. Vous n’avez rien à préparer.",
+    text: "Loomina se présente, puis commence par vos premiers souvenirs : l’endroit où vous avez grandi. Ensuite, Loomina écoute, relance, et vous laisse le temps de chercher vos souvenirs. Vous n’avez rien à préparer.",
   },
   {
     title: "Vous choisissez la durée de vos appels",

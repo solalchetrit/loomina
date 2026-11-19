@@ -5,8 +5,29 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { stepPhase, mergeTopics, coverage, readPhaseState, readTopics, openTopics, pendingAxes, PHASE_AXES } from '../../lib/loomina/phase-plan';
-import type { PhaseState, Topic } from '../../lib/loomina/phase-plan';
+import {
+    stepPhase,
+    mergeTopics,
+    coverage,
+    readPhaseState,
+    readTopics,
+    openTopics,
+    pendingAxes,
+    PHASE_AXES,
+    mergeTold,
+    readTold,
+    axesCoveredByScenes,
+    mergeDeepen,
+    openDeepen,
+    mergeWishes,
+    readWishes,
+    shallowAxes,
+    untouchedAxes,
+    axisDepth,
+} from '../../lib/loomina/phase-plan';
+import type { PhaseState, Topic, ToldScene } from '../../lib/loomina/phase-plan';
+import { applyPolish, chapterSignature, renderBook } from '../../lib/loomina/book';
+import { bookTitle } from '../../lib/loomina/book-print';
 import { toPhase } from '../../lib/loomina/phases';
 import { remainingSuggestions, normalizeContext } from '../../lib/loomina/context';
 import { phoneVariants } from '../../lib/loomina/db';
@@ -22,7 +43,7 @@ test('une phase incomplète ne propose pas de passer à la suite', () => {
     const s = stepPhase(empty(2), { covered: ['maison', 'ecole'] }, 'none');
     assert.equal(s.nextPhase, 2);
     assert.equal(s.state.check, null);
-    assert.equal(s.progress, 33); // 2 sujets sur 6
+    assert.equal(s.progress, 29); // 2 sujets sur 7
 });
 
 test('un sujet coché le reste, même si le modèle ne le renvoie plus', () => {
@@ -70,7 +91,7 @@ test('phase 4 : « le livre est complet » termine le livre sans changer de phas
 });
 
 test('un sujet sans objet ne bloque pas la phase', () => {
-    const s = stepPhase(empty(3), { covered: ['metier', 'lieux_adulte', 'passions', 'epreuves'], skipped: ['couple'] }, 'none');
+    const s = stepPhase(empty(3), { covered: all(3).filter((k) => k !== 'couple'), skipped: ['couple'] }, 'none');
     assert.equal(s.state.check, 'to_ask');
     assert.equal(s.progress, 100);
 });
@@ -85,7 +106,7 @@ test('un sujet propre encore ouvert empêche de proposer la suite', () => {
     const topics: Topic[] = [{ id: 1, phase: 3, label: 'La crêperie', status: 'open' }];
     const s = stepPhase(empty(3), { covered: all(3) }, 'none', topics);
     assert.equal(s.state.check, null);
-    assert.equal(s.progress, 83);
+    assert.equal(s.progress, 90); // 9 sujets sur 10
     const done = stepPhase(empty(3), { covered: all(3) }, 'none', [{ ...topics[0], status: 'done' }]);
     assert.equal(done.state.check, 'to_ask');
 });
@@ -119,7 +140,7 @@ test('lecture tolérante de l\'état enregistré', () => {
     const s = readPhaseState({ phase_state: { phase: 2, covered: ['maison', 'inconnu', 'maison'], skipped: 'x', check: 'bizarre' } }, 2);
     assert.deepEqual(s, { phase: 2, covered: ['maison'], skipped: [], check: null });
     assert.deepEqual(readTopics({ book_topics: [{ id: 1, phase: 3, label: 'A' }, { id: 'x', phase: 3, label: 'B' }, null] }), [{ id: 1, phase: 3, label: 'A', status: 'open' }]);
-    assert.equal(pendingAxes({ ...empty(3), covered: ['metier'], skipped: ['couple'] }).length, 3);
+    assert.equal(pendingAxes({ ...empty(3), covered: ['metier'], skipped: ['couple'] }).length, PHASE_AXES[3].length - 2);
     assert.equal(coverage(1, { covered: [], skipped: [] }), 0);
 });
 
@@ -177,8 +198,169 @@ test('voix : sujets propres de la phase en cours seulement, et sujets dont on ne
     assert.ok(!p.includes('La chorale'));
     assert.ok(!p.includes('Le voilier'));
     assert.ok(p.includes('CE DONT ON NE SAIT ENCORE RIEN'));
-    assert.ok(p.includes('Les passions, les voyages'));
-    assert.ok(!p.includes('La vie affective et familiale : les personnes aimées'));
+    assert.ok(p.includes('Les passions, les activités, les voyages'));
+    assert.ok(!p.includes('La vie affective : les personnes aimées'));
+});
+
+// ------------------------------------------------------------
+// Scènes racontées, scènes à approfondir, souhaits pour le livre (19/11/2026)
+// ------------------------------------------------------------
+
+const scenes = (axis: string, n: number, from = 0): ToldScene[] => Array.from({ length: n }, (_, i) => ({ axis, what: `Scène ${axis} ${from + i + 1}` }));
+
+test('scènes : une seule scène ne suffit plus à cocher un sujet des phases 2 et 3', () => {
+    assert.equal(axisDepth('maison'), 3);
+    assert.deepEqual(axesCoveredByScenes(2, scenes('maison', 1), []), []);
+    assert.deepEqual(axesCoveredByScenes(2, scenes('maison', 2), []), []);
+    assert.deepEqual(axesCoveredByScenes(2, scenes('maison', 3), []), ['maison']);
+    // Les sujets où l'on n'insiste pas se cochent plus tôt.
+    assert.deepEqual(axesCoveredByScenes(3, scenes('epreuves', 1), []), ['epreuves']);
+    assert.deepEqual(axesCoveredByScenes(3, scenes('amis', 2), []), ['amis']);
+});
+
+test('scènes : un narrateur qui a tout dit sur un sujet n\'est pas bloqué', () => {
+    assert.deepEqual(axesCoveredByScenes(2, scenes('ecole', 1), ['ecole', 'inconnu']), ['ecole']);
+});
+
+test('scènes : pas de doublon, sujet inconnu gardé sans compter, entrées malformées ignorées', () => {
+    const first = mergeTold([], [{ axis: 'maison', what: 'La cuisine de la ferme' }, { axis: 'maison', what: 'la cuisine de la ferme' }, { axis: 'pas_un_sujet', what: 'Le chien Pataud' }, { what: '' }, null, 'x']);
+    assert.equal(first.length, 2);
+    assert.deepEqual(axesCoveredByScenes(2, first, []), []);
+    const again = mergeTold(first, [{ axis: 'maison', what: 'La cuisine de la ferme' }, { axis: 'maison', what: 'Le grenier' }]);
+    assert.equal(again.length, 3);
+    assert.deepEqual(readTold({ book_told: again }), again);
+    assert.deepEqual(readTold({ book_told: 'x' }), []);
+});
+
+test('scènes : l\'avancement compte un sujet entamé pour sa part, et ne dit 100 % que si tout est couvert', () => {
+    const none = coverage(2, { covered: [], skipped: [] }, [], []);
+    const one = coverage(2, { covered: [], skipped: [] }, [], scenes('maison', 1));
+    const two = coverage(2, { covered: [], skipped: [] }, [], scenes('maison', 2));
+    assert.equal(none, 0);
+    assert.ok(one > none && two > one);
+    // Toutes les scènes y sont, mais le code n'a pas encore coché : jamais 100 par arrondi.
+    const full = PHASE_AXES[2].flatMap((a) => scenes(a.key, 3));
+    assert.equal(coverage(2, { covered: [], skipped: [] }, [], full), 99);
+    assert.equal(coverage(2, { covered: all(2), skipped: [] }, [], full), 100);
+});
+
+test('scènes : un appel riche fait avancer la phase par les scènes, pas par l\'avis du modèle', () => {
+    const told = PHASE_AXES[2].flatMap((a) => scenes(a.key, axisDepth(a.key)));
+    const covered = axesCoveredByScenes(2, told, []);
+    assert.deepEqual(covered, all(2));
+    const s = stepPhase(empty(2), { covered }, 'none', [], told);
+    assert.equal(s.state.check, 'to_ask');
+    assert.equal(s.progress, 100);
+});
+
+test('voix : sujets entamés à enrichir, sujets vierges, et ce qui est déjà raconté', () => {
+    const state = { ...empty(2) };
+    const told = [...scenes('maison', 1), ...scenes('ecole', 3)];
+    assert.deepEqual(shallowAxes(state, told).map((a) => a.key), ['maison']);
+    assert.ok(!untouchedAxes(state, told).some((a) => a.key === 'maison' || a.key === 'ecole'));
+    const p = prompt(
+        project({
+            project_metadata: {
+                phase_state: { phase: 2, covered: ['ecole'], skipped: [], check: null },
+                book_told: [{ axis: 'maison', what: 'La cuisine de la ferme à Sébazac' }],
+                book_deepen: [{ id: 1, label: 'Le jour où le père a vendu les bêtes, dit en une phrase', status: 'open' }, { id: 2, label: 'Le bal du 14 juillet', status: 'done' }],
+            },
+        })
+    );
+    assert.ok(p.includes('SCÈNES FORTES À APPROFONDIR'));
+    assert.ok(p.includes('Le jour où le père a vendu les bêtes'));
+    assert.ok(!p.includes('Le bal du 14 juillet'));
+    assert.ok(p.includes('SUJETS ENTAMÉS, À ENRICHIR'));
+    assert.ok(p.includes('CE QUI EST DÉJÀ RACONTÉ'));
+    assert.ok(p.includes('La cuisine de la ferme à Sébazac'));
+    assert.ok(p.includes('CREUSER COMME UN BIOGRAPHE'));
+});
+
+test('voix : au premier appel, aucun de ces blocs', () => {
+    const p = prompt(project({ phase: 1, context: {}, next_question_strategy: null, project_metadata: {} }));
+    assert.ok(!p.includes('SCÈNES FORTES À APPROFONDIR'));
+    assert.ok(!p.includes('CE QUI EST DÉJÀ RACONTÉ'));
+});
+
+test('scènes à approfondir : trois au plus par appel, pas de doublon, une scène approfondie le reste', () => {
+    const first = mergeDeepen([], { add: ['A la gare', 'B le bal', 'C la ferme', 'D de trop', 'a la gare'] });
+    assert.deepEqual(first.map((d) => d.label), ['A la gare', 'B le bal', 'C la ferme']);
+    const later = mergeDeepen(first, { done: [1], add: ['A la gare'] });
+    assert.deepEqual(openDeepen(later).map((d) => d.id), [2, 3]);
+    assert.equal(openDeepen(mergeDeepen(later, {})).length, 2);
+});
+
+test('souhaits pour le livre : gardés avec les mots de la personne, jamais effacés par un champ vide', () => {
+    const w = mergeWishes({}, { title: ' La 2 CV jaune ', dedication: 'À mes petits-enfants', thanks: '', ending: 'null' });
+    assert.deepEqual(w, { title: 'La 2 CV jaune', dedication: 'À mes petits-enfants' });
+    assert.deepEqual(mergeWishes(w, { title: '', thanks: 'Merci à Paulette' }), { ...w, thanks: 'Merci à Paulette' });
+    assert.deepEqual(readWishes({ book_wishes: w }), w);
+    assert.deepEqual(readWishes(null), {});
+});
+
+// ------------------------------------------------------------
+// Le livre : relecture finale, chapitres repris, pièces (lib/loomina/book.ts)
+// ------------------------------------------------------------
+
+test('relecture du livre : une retouche s\'applique seulement si le passage est unique, et jamais sur une citation', () => {
+    const chapters = [
+        { content: 'Ma mère disait toujours « on ne gaspille pas le pain ». La maison sentait la soupe et le feu de bois.' },
+        { content: 'La maison sentait la soupe et le feu de bois. Nous partions à pied à l\'école, et le chemin était long. Et le chemin était long.' },
+    ];
+    const done = applyPolish(chapters, [
+        // Une redite retirée du second chapitre.
+        { chapter: 2, find: 'La maison sentait la soupe et le feu de bois. ', replace: '', why: 'redite' },
+        // Passage introuvable : ignoré.
+        { chapter: 1, find: 'Un passage qui n\'existe pas du tout', replace: 'x', why: '' },
+        // Citation modifiée : refusée.
+        { chapter: 1, find: 'Ma mère disait toujours « on ne gaspille pas le pain ».', replace: 'Ma mère disait toujours « ne gaspille pas ».', why: '' },
+        // Remplacement nettement plus long : refusé (une retouche n'écrit pas).
+        { chapter: 1, find: 'La maison sentait la soupe', replace: 'La maison sentait la soupe' + ', et mille autres choses inventées'.repeat(4), why: '' },
+        // Chapitre inexistant : ignoré.
+        { chapter: 9, find: 'La maison sentait la soupe', replace: '', why: '' },
+    ]);
+    assert.equal(done.applied, 1);
+    assert.equal(done.chapters[0].content, chapters[0].content);
+    assert.ok(done.chapters[1].content.startsWith('Nous partions à pied'));
+    // L'original n'est pas modifié.
+    assert.ok(chapters[1].content.startsWith('La maison'));
+    // Un chapitre repris de l'édition précédente (déjà lu par l'auteur) n'est jamais retouché.
+    const locked = applyPolish(chapters, [{ chapter: 2, find: 'La maison sentait la soupe et le feu de bois. ', replace: '', why: 'redite' }], [2]);
+    assert.equal(locked.applied, 0);
+    assert.equal(locked.chapters[1].content, chapters[1].content);
+});
+
+test('livre : un chapitre dont les scènes n\'ont pas changé garde la même empreinte', () => {
+    const a = { title: 'La ferme de Sébazac', part: 'L’enfance', summary: 'x', scenes: [{ what: 'Les moissons', sources: [2, 1] }] };
+    const same = { title: 'La ferme de sébazac ', part: 'Autre partie', summary: 'y', scenes: [{ what: 'les moissons', sources: [1, 2] }] };
+    const more = { ...a, scenes: [...a.scenes, { what: 'Le chien Pataud', sources: [3] }] };
+    assert.equal(chapterSignature(a), chapterSignature(same));
+    assert.notEqual(chapterSignature(a), chapterSignature(more));
+});
+
+test('livre : les pièces entourent les chapitres, et les intertitres descendent d\'un cran', () => {
+    const text = renderBook({
+        chapters: [{ number: 1, title: 'La ferme', part: 'L’enfance', content: '## La cuisine\n\nTexte.', sources: [1], words: 1 }],
+        plan: [],
+        dropped: [],
+        source_count: 1,
+        model: 'x',
+        at: 'x',
+        pieces: { title: 'La 2 CV jaune', subtitle: null, dedication: 'À mes petits-enfants', preface: 'Suzanne est née à Rodez.', thanks: null, back_cover: null },
+    } as never);
+    assert.ok(text.startsWith('# La 2 CV jaune'));
+    assert.ok(text.indexOf('À mes petits-enfants') < text.indexOf('Avant-propos'));
+    assert.ok(text.indexOf('Avant-propos') < text.indexOf('## La ferme'));
+    assert.ok(text.includes('### La cuisine'));
+    assert.ok(!text.includes('Remerciements'));
+});
+
+test('livre : le titre trouvé dans le livre remplace « Biographie de… », jamais un titre choisi', () => {
+    assert.equal(bookTitle({ title: 'Biographie de Suzanne' }, 'Suzanne', 'La 2 CV jaune'), 'La 2 CV jaune');
+    assert.equal(bookTitle({ title: 'Mon Livre de Vie' }, 'Suzanne', 'La 2 CV jaune'), 'La 2 CV jaune');
+    assert.equal(bookTitle({ title: 'Chez Marguerite' }, 'Suzanne', 'La 2 CV jaune'), 'Chez Marguerite');
+    assert.equal(bookTitle({ title: 'Biographie de Suzanne' }, 'Suzanne', null), 'Biographie de Suzanne');
+    assert.equal(bookTitle(null, 'Suzanne'), 'Biographie de Suzanne');
 });
 
 test('voix : règles toujours présentes (une question, sujets sensibles, ne rien présumer)', () => {

@@ -208,10 +208,22 @@ export function personTopic(name: string, relation: string) {
 /** Le livre composé de l'exemple : les récits rangés par périodes de vie. */
 const PARTS = ['L’enfance', 'L’enfance', 'L’enfance', 'La jeunesse', 'La jeunesse', 'La vie de famille', 'La vie de famille', 'Le travail', 'Les voyages'];
 
+/** Les pièces du livre de l'exemple, tirées de ses seuls chapitres. */
+const PIECES = {
+    title: 'Les saisons de Jeanne',
+    subtitle: 'De la rue des Tilleuls au Québec',
+    dedication: null,
+    preface:
+        'Jeanne est née en 1948 à Rennes, dans une maison étroite de la rue des Tilleuls, la troisième d’une fratrie de quatre. Son père était cheminot ; le dimanche, il emmenait ses enfants voir passer les trains depuis le pont de la gare.\n\nCe livre la suit de la cuisine de son enfance aux remparts de Saint-Malo, de l’école de Mademoiselle Le Goff à la poste de la rue Haute, à Paris, puis jusqu’au Québec, avec Pierre.',
+    thanks: null,
+    back_cover:
+        'Une maison étroite à Rennes, la radio qui chante dans la cuisine, un père cheminot qui connaît chaque train par son heure.\n\nJeanne raconte son enfance rue des Tilleuls, les dimanches à Saint-Malo, Paris et la poste de la rue Haute, Pierre, les enfants, et un voyage au Québec.',
+};
+
 export function demoEdition() {
     const chapters = CHAPTERS.map((c, i) => ({ number: i + 1, title: c.title, part: PARTS[i] ?? 'Souvenirs', content: c.content, sources: [i + 1] }));
     return {
-        edition: { id: 'demo', status: 'ready', chapters, done: chapters.length, total: chapters.length, sourceCount: CHAPTERS.length, at: CHAPTERS[CHAPTERS.length - 1].date },
+        edition: { id: 'demo', status: 'ready', chapters, done: chapters.length, total: chapters.length, sourceCount: CHAPTERS.length, at: CHAPTERS[CHAPTERS.length - 1].date, pieces: PIECES },
         running: null,
         failed: false,
         sourceCount: CHAPTERS.length,
