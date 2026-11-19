@@ -51,14 +51,14 @@ function Value({ cell, strong = false }: { cell: Cell; strong?: boolean }) {
 
 export default function Compare() {
   return (
-    <Section id="comparer" className="bg-white">
+    <Section id="comparer">
       <SectionHead
         title="Écrire seul, un biographe, ou Loomina ?"
         text="Trois façons d’obtenir le livre d’une vie. Ligne par ligne, voici ce qui change pour vous."
       />
       <ul className="head-gap space-y-3 md:hidden">
         {ROWS.map((r) => (
-          <li key={r.label} className="rounded-[20px] border border-[var(--line)] p-5">
+          <li key={r.label} className="rounded-[20px] border border-[var(--line)] bg-white p-5">
             <p className="text-[15px] font-bold text-[var(--ink-3)]">{r.label}</p>
             <dl className="mt-3 space-y-2 text-[16px]">
               {(
@@ -68,7 +68,7 @@ export default function Compare() {
                   ["Loomina", r.loomina],
                 ] as const
               ).map(([who, cell]) => (
-                <div key={who} className={`flex gap-3 ${who === "Loomina" ? "rounded-[12px] bg-[var(--amber-wash)] p-2 -mx-2" : ""}`}>
+                <div key={who} className={`flex gap-3 ${who === "Loomina" ? "rounded-[12px] bg-[var(--canvas)] p-2 -mx-2" : ""}`}>
                   <dt className="w-28 shrink-0 font-semibold">{who}</dt>
                   <dd>
                     <Value cell={cell} strong={who === "Loomina"} />
@@ -79,7 +79,7 @@ export default function Compare() {
           </li>
         ))}
       </ul>
-      <div className="head-gap hidden overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] md:block">
+      <div className="head-gap hidden overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-white md:block">
         <table className="w-full border-collapse text-left text-[16px]">
           <caption className="sr-only">Écrire seul, un biographe ou Loomina</caption>
           <thead>
@@ -109,7 +109,7 @@ export default function Compare() {
                 <td className="px-5 py-4">
                   <Value cell={r.biographer} />
                 </td>
-                <td className="bg-[var(--amber-wash)] px-5 py-4">
+                <td className="bg-[var(--canvas)] px-5 py-4">
                   <Value cell={r.loomina} strong />
                 </td>
               </tr>

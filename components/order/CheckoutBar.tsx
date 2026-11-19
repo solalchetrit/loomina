@@ -7,7 +7,7 @@ export default function CheckoutBar() {
   return (
     <div className="mx-auto flex h-16 w-full max-w-[640px] items-center justify-between px-4 sm:h-20 sm:px-0">
       <Link href="/" aria-label="Loomina, accueil" className="relative block h-7 w-[118px] sm:h-8 sm:w-[134px]">
-        <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" priority sizes="134px" />
+        <Image src="/header-logo-bleu.png" alt="" fill className="object-contain object-left" priority sizes="134px" />
       </Link>
       <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[var(--ink-3)]">
         <Icon name="shield" size={15} /> Paiement sécurisé

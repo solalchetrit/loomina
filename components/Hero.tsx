@@ -20,8 +20,8 @@ const REASSURANCE: { title: string; detail: string; href?: string }[] = [
 /** Haut de page, en deux colonnes : à gauche le titre, la promesse et les deux actions ; à droite la scène « de la voix au livre », à leur hauteur. */
 export default function Hero() {
   return (
-    <section className="page-top flex w-full flex-col pb-8 lg:min-h-[100svh] lg:pb-6 lg:!pt-[7.25rem]">
-      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center gap-10 lg:my-auto lg:items-stretch px-5 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14">
+    <section className="page-top flex w-full flex-col pb-8 lg:pb-4 lg:!pt-[7.25rem]">
+      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center gap-10 lg:items-stretch px-5 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14">
         <div className="flex min-w-0 flex-col lg:justify-between lg:py-1">
           <div>
           <h1 className="rise t-hero text-balance" style={{ "--i": 0 } as CSSProperties}>
@@ -76,8 +76,8 @@ export default function Hero() {
           <VoiceToBook />
         </div>
       </div>
-      {/* Le haut de page occupe tout l'écran : cette invitation, en bas au milieu, donne la suite. */}
-      <ScrollCue target="parcours" label="Comment ça marche" style={{ "--i": 5 } as CSSProperties} />
+      {/* La flèche, juste sous le haut de page (plus de grand vide : Solal, 19/11/2026), mène aux trois étapes. */}
+      <ScrollCue target="parcours" label="Voir les trois étapes" style={{ "--i": 5 } as CSSProperties} />
     </section>
   );
 }

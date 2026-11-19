@@ -58,7 +58,7 @@ export default function ThemePicker() {
         </div>
 
         <div className="lg:sticky lg:top-32" data-reveal>
-          <div className="rounded-[32px] bg-[var(--ink)] p-8 text-white md:p-12">
+          <div className="card p-8 md:p-12">
             <div className="flex items-center gap-3">
               <span aria-hidden="true" className="flex h-8 items-end gap-[3px]">
                 {[12, 24, 16, 30, 20, 10, 26].map((h, i) => (
@@ -69,9 +69,9 @@ export default function ThemePicker() {
                   />
                 ))}
               </span>
-              <p className="text-[15px] font-bold text-[var(--amber)]">Loomina pourrait vous demander</p>
+              <p className="text-[15px] font-bold text-[var(--amber-ink)]">Loomina pourrait vous demander</p>
             </div>
-            <p key={current} aria-live="polite" className="rise mt-6 min-h-[5.5em] font-serif text-[clamp(1.6rem,2.6vw,2.2rem)] leading-[1.3] text-white">
+            <p key={current} aria-live="polite" className="rise mt-6 min-h-[5.5em] font-serif text-[clamp(1.6rem,2.6vw,2.2rem)] leading-[1.3] text-[var(--ink)]">
               « {QUESTIONS[current]} »
             </p>
           </div>

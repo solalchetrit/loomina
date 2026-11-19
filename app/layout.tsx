@@ -32,7 +32,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f7f7f4",
+  themeColor: "#f2f5f8",
 };
 
 export const metadata: Metadata = {
@@ -100,9 +100,9 @@ export default function RootLayout({
       >
         <ScrollTop />
         <Reveal />
-        <HideOnAdmin checkout><Header /></HideOnAdmin>
+        <HideOnAdmin checkout><div className="site-chrome"><Header /></div></HideOnAdmin>
         <main>{children}</main>
-        <HideOnAdmin checkout><Footer /><MobileCta /></HideOnAdmin>
+        <HideOnAdmin checkout><div className="site-chrome"><Footer /><MobileCta /></div></HideOnAdmin>
         <HideOnAdmin><Analytics /></HideOnAdmin>
         <script
           type="application/ld+json"

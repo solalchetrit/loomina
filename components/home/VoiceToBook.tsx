@@ -79,7 +79,7 @@ export default function VoiceToBook() {
       <div className={s.stage} data-act={shown + 1}>
         <div aria-hidden="true">
           <div className={s.open}>
-            <Image src="/photos/accueil-livre-ouvert.jpg" alt="" fill sizes={PHOTO_SIZES} priority className={s.shot} {...blurOf("accueil-livre-ouvert")} />
+            <Image src="/photos/accueil-livre-ouvert-bleu.jpg" alt="" fill sizes={PHOTO_SIZES} priority className={s.shot} {...blurOf("accueil-livre-ouvert-bleu")} />
             <div className={s.ink} lang="fr">
               <p className={`${s.chapter} ${s.w}`} style={w(-6)}>
                 Chapitre 2
@@ -104,8 +104,8 @@ export default function VoiceToBook() {
               </p>
             </div>
           </div>
-          <Image src="/photos/accueil-livre-ferme.jpg" alt="" fill sizes={PHOTO_SIZES} loading="eager" className={`${s.shot} ${s.closed}`} />
-          <Image src="/photos/accueil-livre-debout.jpg" alt="" fill sizes={PHOTO_SIZES} loading="eager" className={`${s.shot} ${s.standing}`} />
+          <Image src="/photos/accueil-livre-ferme-bleu.jpg" alt="" fill sizes={PHOTO_SIZES} loading="eager" className={`${s.shot} ${s.closed}`} />
+          <Image src="/photos/accueil-livre-debout-bleu.jpg" alt="" fill sizes={PHOTO_SIZES} loading="eager" className={`${s.shot} ${s.standing}`} />
         </div>
 
         <div className={s.call} aria-hidden="true">

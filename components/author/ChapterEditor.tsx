@@ -75,7 +75,7 @@ export default function ChapterEditor({
   const id = `correction-${number}`;
 
   return (
-    <div className="mx-auto mt-8 max-w-[38rem] border-t border-[var(--line-soft)] pt-6">
+    <div className="mx-auto mt-5 max-w-[38rem] border-t border-[var(--line-soft)] pt-4">
       {step === "closed" && (
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="secondary" onClick={() => setStep("describe")}>

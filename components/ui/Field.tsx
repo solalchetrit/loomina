@@ -19,7 +19,7 @@ export function Input({ label, hint, error, id, className = "", ...rest }: Base 
         {...rest}
       />
       {(error || hint) && (
-        <p id={descId} className={`mt-2 font-sans text-[15px] leading-snug ${error ? "font-medium text-[var(--danger)]" : "text-[var(--ink-3)]"}`}>
+        <p id={descId} className={`field-hint mt-2 font-sans text-[15px] leading-snug ${error ? "font-medium text-[var(--danger)]" : "text-[var(--ink-3)]"}`}>
           {error ?? hint}
         </p>
       )}
@@ -43,7 +43,7 @@ export function Textarea({ label, hint, error, id, className = "", ...rest }: Ba
         {...rest}
       />
       {(error || hint) && (
-        <p id={descId} className={`mt-2 font-sans text-[15px] leading-snug ${error ? "font-medium text-[var(--danger)]" : "text-[var(--ink-3)]"}`}>
+        <p id={descId} className={`field-hint mt-2 font-sans text-[15px] leading-snug ${error ? "font-medium text-[var(--danger)]" : "text-[var(--ink-3)]"}`}>
           {error ?? hint}
         </p>
       )}

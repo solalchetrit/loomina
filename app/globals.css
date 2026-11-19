@@ -8,30 +8,31 @@
 
 /* ================================================================
    LOOMINA — design tokens
-   Fond clair, encre noire, l'ambre de l'étoile du logo.
+   Fond clair, encre bleu nuit discret (entre le noir et la toile du livre), l'ambre de l'étoile du logo.
    L'ambre vif sert aux surfaces et aux icônes ; en texte, on prend
    --amber-ink (≥ 4.5:1 sur le fond).
    ================================================================ */
 
 :root {
   /* Surfaces */
-  --canvas: #f7f7f4;         /* fond de page */
+  --canvas: #f2f5f8;         /* fond de tout le site : bleuté naturel (Solal, 19/11/2026) ; aussi les panneaux dans les cartes */
   --surface: #ffffff;        /* cartes */
-  --surface-2: #f2f1ec;      /* puce d'icône, bande discrète */
-  --line: #e7e6e1;           /* bord de carte */
-  --line-soft: #efeeea;      /* séparateur dans une carte */
+  --mist: var(--canvas);           /* fond d'une section sur deux : brume bleutée, l'écho du bleu nuit */
+  --surface-2: #eff1f4;      /* puce d'icône, bande discrète */
+  --line: #e4e7ec;           /* bord de carte */
+  --line-soft: #edeff3;      /* séparateur dans une carte */
 
   /* Encre */
-  --ink: #161616;            /* noir : titres, boutons, panneaux sombres */
+  --ink: #171d2b;            /* bleu nuit : titres, boutons, panneaux sombres */
   --title: #161616;          /* les titres restent noirs : le bleu est pour les surfaces */
-  --night: #161616;
-  --night-deep: #0e0e0e;     /* pied de page, fond le plus sombre */
-  --ink-soft: #2b2b28;
-  --ink-2: #4a4a45;          /* texte secondaire, ≥ 8:1 */
-  --ink-3: #66665f;          /* texte discret, ≥ 5:1 */
+  --night: #171d2b;
+  --night-deep: #10141e;     /* pied de page, fond le plus sombre */
+  --ink-soft: #283044;
+  --ink-2: #474b55;          /* texte secondaire, ≥ 8:1 */
+  --ink-3: #61656e;          /* texte discret, ≥ 5:1 */
 
   /* Ambre, la couleur de l'étoile */
-  --amber: #ee9b2d;          /* bouton de démo, icônes sur fond sombre */
+  --amber: #f1a843;          /* bouton de démo, icônes sur fond sombre (un ton plus clair que l'étoile, Solal 19/11/2026) */
   --amber-ink: #95580a;      /* ambre lisible en texte courant (5:1) */
   --amber-display: #c27610;  /* ambre des grands titres seulement (3.3:1) */
   --amber-soft: #fcebd2;     /* fond de pastille */
@@ -45,10 +46,10 @@
   --danger: #a8402f;
 
   /* Rayons et ombres */
-  --radius-card: 24px;
+  --radius-card: 28px;      /* un seul arrondi pour cartes, photos et panneaux */
   --radius-btn: 999px;
-  --shadow-float: 0 40px 80px -40px rgba(22, 22, 22, 0.28);
-  --shadow-bar: 0 10px 30px -18px rgba(22, 22, 22, 0.25);
+  --shadow-float: 0 40px 80px -40px rgba(20, 24, 34, 0.32);
+  --shadow-bar: 0 10px 30px -18px rgba(20, 24, 34, 0.28);
 
   /* Anciens noms, pointant vers la nouvelle palette */
   --paper: var(--canvas);
@@ -58,7 +59,7 @@
   --gold-ink: var(--amber-ink);
   --gold-light: var(--amber);
   --rule: var(--line);
-  --rule-strong: #d4d3cc;
+  --rule-strong: #cfd3da;
 
   /* Courbes */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -171,7 +172,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --gap: 5.5rem;
+    --gap: 4.5rem;  /* resserré (Solal, 19/11/2026 : « un grand espace pour rien ») */
     --page-top: 8.5rem;
     --head-gap: 2.75rem;
   }
@@ -367,8 +368,8 @@
   border-radius: var(--radius-card);
   /* Ombre en deux couches à quelques pour cent : la carte se pose sur la page sans qu'on voie l'ombre. */
   box-shadow:
-    0 1px 2px rgba(22, 22, 22, 0.03),
-    0 6px 12px -4px rgba(22, 22, 22, 0.04);
+    0 1px 2px rgba(20, 24, 34, 0.03),
+    0 6px 12px -4px rgba(20, 24, 34, 0.04);
 }
 
 .card-float {
@@ -468,6 +469,31 @@ textarea.field {
   color: var(--ink);
 }
 
+/* Espace auteur : format compact (Solal, 19/11/2026). Les champs gardent 16 px pour rester lisibles et ne pas faire zoomer l'iPhone. */
+.author-space .field {
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.author-space textarea.field {
+  min-height: 64px;
+  padding: 10px 14px;
+}
+
+.author-space .field-label {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.author-space .field-hint,
+.author-space .t-small {
+  margin-top: 6px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
 /* Retour tactile immédiat */
 .press {
   transition:
@@ -546,7 +572,7 @@ textarea.field {
 
 .lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 24px 40px -28px rgba(22, 22, 22, 0.35);
+  box-shadow: 0 24px 40px -28px rgba(20, 24, 34, 0.35);
 }
 
 /* Accordéon : hauteur animée via grid */
@@ -601,7 +627,7 @@ textarea.field {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(22, 22, 22, 0.15);
+  border: 2px solid rgba(20, 24, 34, 0.15);
   border-top-color: var(--ink);
   animation: loomina-spin 600ms linear infinite;
 }
@@ -663,9 +689,9 @@ textarea.field {
     background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 55%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      0 1px 2px rgba(22, 22, 22, 0.06),
-      0 8px 16px -6px rgba(22, 22, 22, 0.08),
-      0 24px 48px -24px rgba(22, 22, 22, 0.16);
+      0 1px 2px rgba(20, 24, 34, 0.06),
+      0 8px 16px -6px rgba(20, 24, 34, 0.08),
+      0 24px 48px -24px rgba(20, 24, 34, 0.16);
   }
 
   /* L'ambre : aplat, avec le même filet de lumière. */
@@ -673,3 +699,133 @@ textarea.field {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 1px 2px rgba(110, 64, 5, 0.12);
   }
 }
+
+/* ================================================================
+   FONDS DE SECTION ET MOUVEMENTS LÉGERS (Solal, 19/11/2026)
+   Une section sur deux est bleutée (brume), les autres blanches. Sur
+   la brume, une lueur très douce dérive lentement. Les photos se
+   posent en entrant à l'écran, le bandeau bleu nuit reçoit un reflet
+   qui passe une seule fois, et les cartes se soulèvent d'un cheveu
+   au survol. Tout s'arrête si l'appareil demande moins de mouvement.
+   ================================================================ */
+.bg-\[var\(--mist\)\] {
+  position: relative;
+  isolation: isolate;
+  overflow: clip; /* pas hidden : l'aperçu collant de l'espace auteur doit rester collant */
+}
+
+.bg-\[var\(--mist\)\]::before {
+  content: "";
+  position: absolute;
+  inset: -20% -10%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 50% at 20% 20%, rgba(255, 255, 255, 0.5), transparent 70%),
+    radial-gradient(35% 45% at 85% 75%, rgba(255, 255, 255, 0.3), transparent 70%);
+}
+
+@keyframes loomina-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(4%, 3%, 0); }
+}
+
+@keyframes loomina-settle {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
+
+@keyframes loomina-pass {
+  from { transform: translateX(-120%) skewX(-18deg); }
+  to { transform: translateX(320%) skewX(-18deg); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bg-\[var\(--mist\)\]::before {
+    animation: loomina-drift 28s ease-in-out infinite;
+  }
+
+  /* Les photos se posent : un léger recul de l'image quand le bloc apparaît. */
+  [data-reveal][data-shown="anim"] .overflow-hidden > img.object-cover,
+  [data-reveal][data-shown="anim"] .overflow-hidden > span > img.object-cover {
+    animation: loomina-settle 1600ms var(--ease-out) both;
+  }
+
+  /* Le bandeau bleu nuit : un reflet passe une fois, à son arrivée. */
+  ul[data-reveal].bg-\[var\(--ink\)\] {
+    position: relative;
+    overflow: hidden;
+  }
+  ul[data-reveal][data-shown="anim"].bg-\[var\(--ink\)\]::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 30%;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    animation: loomina-pass 1800ms 300ms var(--ease-out) both;
+  }
+
+  .card {
+    transition: transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
+  }
+  @media (hover: hover) {
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 1px 2px rgba(20, 24, 34, 0.04),
+        0 14px 28px -12px rgba(20, 24, 34, 0.10);
+    }
+  }
+}
+
+/* Questions : sur ordinateur, les thèmes à gauche s'alignent sur la première question, pas sur le titre « Le service »
+   (hauteur d'un .t-title + l'écart mt-6 de l'accordéon). Solal, 19/11/2026. */
+@media (min-width: 1024px) {
+  .faq-nav { margin-top: calc(clamp(1.9rem, 3.4vw, 2.75rem) * 1.08 + 1.5rem); }
+}
+
+/* ================================================================
+   FINITIONS (Solal, 19/11/2026 : « fais-moi kiffer »)
+   ================================================================ */
+
+/* Le point ambre qui remplace les encadrés pêche : l'ambre devient un détail précieux. */
+.accent-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--amber);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber) 18%, transparent);
+}
+
+/* Les photos en noir et blanc : un ton chaud à peine visible, comme les tirages d'un même album. */
+img[src*="photos/album-photo"],
+img[src*="photos/famille-album"],
+img[src*="photos/grand-mere-calin"],
+img[src*="photos/grand-pere-petite-fille"],
+img[src*="photos/homme-au-telephone"],
+img[src*="photos/mains-telephone"],
+img[src*="photos/panier-de-photos"],
+img[src*="photos/petit-dejeuner"],
+img[src*="photos/photos-de-famille"] {
+  filter: sepia(0.16) saturate(1.1) contrast(1.03) brightness(1.01);
+}
+
+/* Boutons : au survol, ils montent d'un demi-pixel et prennent une ombre courte. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  a.press:hover:not(:active),
+  button.press:hover:not(:active):not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+/* ================================================================
+   ESPACE AUTEUR
+   Une fois connecté, l'auteur a son propre menu (Solal, 19/11/2026) :
+   le menu, le pied de page et le bouton mobile du site s'effacent.
+   components/author/AuthorSpace.tsx pose data-space="auteur" sur <html>.
+   ================================================================ */
+.site-chrome { display: contents; }
+html[data-space="auteur"] .site-chrome { display: none; }

@@ -2,17 +2,18 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import LiveBook from "@/components/LiveBook";
-import Button from "@/components/ui/Button";
+import Image from "next/image";
+import ComposedBook from "./ComposedBook";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { SITE } from "@/config/site";
 import Progress from "./Progress";
+import Companion from "./Companion";
 import SuggestTopic from "./SuggestTopic";
 import LifeStory from "./LifeStory";
 import Calls from "./Calls";
 import Settings from "./Settings";
 import Photos from "./Photos";
-import Welcome from "./Welcome";
+import Onboarding from "./Onboarding";
 import Shipping from "./Shipping";
 import { formatDate, type Overview } from "./types";
 
@@ -30,26 +31,26 @@ type Tab = "apercu" | "livre" | "vie" | "appels" | "reglages";
 /** Le prochain appel : le numéro, et le sujet que Loomina a prévu d'aborder. */
 function NextCall({ topic, schedule }: { topic: string | null; schedule?: string | null }) {
   return (
-    <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white md:p-8" aria-labelledby="prochain-appel">
-      <h2 id="prochain-appel" className="text-[15px] font-bold tracking-normal text-[var(--amber)]">
+    <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white md:p-7" aria-labelledby="prochain-appel">
+      <h2 id="prochain-appel" className="text-[17px] font-bold tracking-normal text-[var(--amber)]">
         Votre prochain appel
       </h2>
       {topic ? (
         <>
-          <p className="mt-3 text-[15px] text-[#cfcfc8]">Loomina a prévu de commencer par :</p>
-          <p className="mt-2 font-serif text-[clamp(1.3rem,2.1vw,1.6rem)] leading-snug text-white">« {topic} »</p>
+          <p className="mt-3 text-[16px] text-[#cfcfc8]">Loomina a prévu de commencer par :</p>
+          <p className="mt-2 font-serif text-[clamp(1.4rem,2.1vw,1.75rem)] leading-[1.3] text-white">« {topic} »</p>
         </>
       ) : (
-        <p className="mt-3 text-[clamp(1.3rem,2.2vw,1.6rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
+        <p className="mt-3 text-[clamp(1.4rem,2.1vw,1.7rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
       )}
-      <div className="mt-auto pt-8">
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
         <a
           href={`tel:${SITE.phone}`}
-          className="press inline-flex min-h-14 items-center rounded-full bg-[var(--amber)] px-7 text-[22px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
+          className="press inline-flex min-h-12 shrink-0 items-center rounded-full bg-[var(--amber)] px-6 text-[21px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
         >
           {SITE.phoneDisplay}
         </a>
-        <p className="mt-3 text-[15px] text-[#cfcfc8]">
+        <p className="min-w-[12rem] flex-1 text-[15px] leading-snug text-[#cfcfc8]">
           {schedule ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.` : "Depuis le numéro de votre commande, quand vous voulez."}
         </p>
       </div>
@@ -68,6 +69,7 @@ export default function AuthorSpace({
   onNotAuthor: () => void;
 }) {
   const [tab, setTabState] = useState<Tab>("apercu");
+  const [replay, setReplay] = useState(false);
   // Changer d'onglet ramène en haut : sur téléphone, la barre du bas reste sous le pouce
   // et la nouvelle rubrique commence à son titre, pas au milieu de la précédente.
   const setTab = useCallback((next: Tab) => {
@@ -96,56 +98,88 @@ export default function AuthorSpace({
     load();
   }, [load]);
 
+  // Tant que l'espace auteur est ouvert, le menu et le pied de page du site s'effacent (voir globals.css).
+  useEffect(() => {
+    document.documentElement.dataset.space = "auteur";
+    return () => {
+      delete document.documentElement.dataset.space;
+    };
+  }, []);
+
   const project = data?.project ?? null;
   const title = data?.prefs.title || (data?.firstName ? `L’histoire de ${data.firstName}` : "Votre livre");
   const lastCall = project?.calls[0];
 
   return (
-    <div className="page-top section-b w-full">
+    <div className="author-space w-full pb-10 pt-[5.9rem] md:pt-[6.5rem]">
+      {/* Le menu de l'espace auteur : la même barre flottante que le site, avec ses rubriques.
+          Le logo ramène au site grand public (Solal, 19/11/2026). */}
+      <header className="fixed inset-x-0 top-0 z-[1000] px-3 pt-3 sm:px-4 sm:pt-4">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-3 rounded-[22px] border border-white/70 bg-white/80 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-xl backdrop-saturate-150 md:h-[68px] md:pl-6">
+          {/* Le repère de l'espace : le logo, signé « AUTEUR » dessous, comme une maison signe une collection. */}
+          <Link href="/" className="flex shrink-0 flex-col" aria-label="Loomina, espace auteur. Retour au site">
+            <span className="relative block h-[26px] w-[91px] md:h-[28px] md:w-[98px]">
+              <Image src="/header-logo-bleu.png" alt="" fill className="object-contain object-left" priority sizes="98px" />
+            </span>
+            <span aria-hidden="true" className="mt-[5px] flex items-center gap-2">
+              <span className="h-px flex-1 bg-[var(--amber)]" />
+              <span className="-mr-[0.32em] text-[9.5px] font-bold uppercase leading-none tracking-[0.32em] text-[var(--amber-ink)]">Auteur</span>
+            </span>
+          </Link>
+
+          <nav aria-label="Rubriques de l’espace auteur" className="hidden md:block">
+            <ul className="flex items-center gap-0.5">
+              {TABS.map((t) => {
+                const active = tab === t.id;
+                return (
+                  <li key={t.id}>
+                    <button
+                      type="button"
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => setTab(t.id as Tab)}
+                      className={`press inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-[14px] px-3 text-[15px] font-bold transition-colors duration-150 lg:px-3.5 ${
+                        active ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:bg-[var(--canvas)] hover:text-[var(--ink)]"
+                      }`}
+                    >
+                      <Icon name={t.icon} size={18} className={active ? "text-[var(--amber)]" : ""} />
+                      {t.label}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          <button
+            type="button"
+            onClick={onLogout}
+            aria-label="Se déconnecter"
+            className="press inline-flex h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-[14px] px-3 text-[15px] font-bold text-[var(--ink)] hover:bg-[var(--canvas)]"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="M16 17l5-5-5-5" />
+              <path d="M21 12H9" />
+            </svg>
+            <span className="hidden lg:inline">Se déconnecter</span>
+          </button>
+        </div>
+      </header>
+
       <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
-        <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-[16px] font-semibold text-[var(--ink-3)]">{title}</p>
-            <h1 className="t-display mt-2">{data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour"}</h1>
-          </div>
-          {/* Sur téléphone, « Se déconnecter » vit en bas des Réglages : le haut de l'écran reste au livre. */}
-          <div className="hidden md:block">
-            <Button onClick={onLogout} variant="secondary">
-              Se déconnecter
-            </Button>
-          </div>
+        <header className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5">
+          <h1 className="text-[clamp(1.6rem,2.6vw,2rem)] font-extrabold leading-[1.1] tracking-[-0.03em]">
+            {tab === "apercu" ? (data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour") : TABS.find((t) => t.id === tab)?.label}
+          </h1>
+          {tab === "apercu" && <p className="text-[15px] font-semibold text-[var(--ink-3)]">{title}</p>}
         </header>
 
-        {data?.demo && (
-          <p className="mt-6 rounded-[14px] bg-[var(--amber-soft)] px-4 py-3 text-[15px] font-semibold text-[var(--amber-deep)]">
-            Démonstration : livre d’exemple de Jeanne, rien n’est lu ni écrit en base.
-          </p>
+        {data?.welcome && <Onboarding ask={data.welcome} prefs={data.prefs} firstName={data.firstName} onDone={load} onUnauthorized={onUnauthorized} />}
+        {data && replay && (
+          <Onboarding ask={{ politeness: true, topics: true }} prefs={data.prefs} firstName={data.firstName} preview onDone={() => setReplay(false)} onUnauthorized={onUnauthorized} />
         )}
 
-        {data?.welcome && tab === "apercu" && (
-          <Welcome ask={data.welcome} prefs={data.prefs} onDone={load} onUnauthorized={onUnauthorized} />
-        )}
-
-        <nav aria-label="Rubriques de l’espace auteur" className="mt-8 hidden md:block">
-          <ul className="flex w-max gap-1 rounded-full bg-white p-1.5 shadow-[inset_0_0_0_1px_var(--line)]">
-            {TABS.map((t) => (
-              <li key={t.id}>
-                <button
-                  type="button"
-                  aria-current={tab === t.id ? "page" : undefined}
-                  onClick={() => setTab(t.id as Tab)}
-                  className={`press min-h-11 whitespace-nowrap rounded-full px-5 text-[15px] font-bold ${
-                    tab === t.id ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="mt-6 max-md:mt-8">
+        <div className={tab === "apercu" ? "mt-4" : "mt-5"}>
           {failed && (
             <p role="alert" className="rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
               Nous n’arrivons pas à charger votre espace pour le moment.{" "}
@@ -163,10 +197,10 @@ export default function AuthorSpace({
           )}
 
           {data && tab === "apercu" && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {project?.completed && <Shipping saved={data.shipping ?? null} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
-              {project && <Progress project={project} />}
-              <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
+              {project && (project.weave ? <Companion project={project} demo={data.demo} skipIntro={Boolean(data.welcome)} /> : <Progress project={project} />)}
+              <div className="grid gap-3 lg:grid-cols-[1fr_1.2fr]">
                 <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />
                 {project ? (
                   <SuggestTopic
@@ -187,23 +221,24 @@ export default function AuthorSpace({
                 )}
               </div>
               {lastCall && (
-                <button type="button" onClick={() => setTab("appels")} className="card lift press p-6 text-left md:p-8">
-                  <span className="text-[15px] font-bold text-[var(--ink-3)]">Dernier appel · {formatDate(lastCall.date, false)}</span>
-                  {lastCall.title && <span className="mt-2 block text-[19px] font-bold leading-snug">{lastCall.title}</span>}
-                  <span className={`block text-[17px] leading-relaxed ${lastCall.title ? "mt-1 text-[var(--ink-2)]" : "mt-2"}`}>{lastCall.summary ?? "Appel enregistré."}</span>
-                  <span className="link mt-3 inline-block text-[15px]">Tous vos appels</span>
+                <button type="button" onClick={() => setTab("appels")} className="card lift press px-6 py-4 text-left">
+                  <span className="text-[14px] font-bold text-[var(--ink-3)]">Dernier appel · {formatDate(lastCall.date, false)}</span>
+                  {lastCall.title && <span className="mt-1 block text-[17px] font-bold leading-snug">{lastCall.title}</span>}
+                  <span className={`line-clamp-2 text-[15px] leading-normal ${lastCall.title ? "mt-0.5 text-[var(--ink-2)]" : "mt-1"}`}>{lastCall.summary ?? "Appel enregistré."}</span>
+                  <span className="link mt-1.5 inline-block text-[14px]">Tous vos appels</span>
+                </button>
+              )}
+              {data.demo && (
+                // Livre d'exemple seulement : revoir l'accueil que découvre un nouvel auteur.
+                <button type="button" onClick={() => setReplay(true)} className="link self-center text-[14px]">
+                  Revoir l’accueil d’un nouvel auteur
                 </button>
               )}
             </div>
           )}
 
           {data && tab === "livre" && (
-            <div className="grid gap-4 lg:grid-cols-[1.9fr_1fr]">
-              <LiveBook onUnauthorized={onUnauthorized} />
-              <aside className="flex flex-col gap-4 lg:sticky lg:top-32 lg:self-start">
-                <Photos onUnauthorized={onUnauthorized} />
-              </aside>
-            </div>
+            <ComposedBook onUnauthorized={onUnauthorized} aside={<Photos onUnauthorized={onUnauthorized} />} />
           )}
 
           {data && tab === "vie" &&
@@ -214,7 +249,7 @@ export default function AuthorSpace({
                 onUnauthorized={onUnauthorized}
               />
             ) : null)}
-          {data && tab === "appels" && (project ? <Calls project={project} /> : null)}
+          {data && tab === "appels" && (project ? <Calls project={project} onUnauthorized={onUnauthorized} /> : null)}
           {data && tab === "reglages" && (
             <Settings
               prefs={data.prefs}
@@ -222,13 +257,6 @@ export default function AuthorSpace({
               onSaved={(prefs) => setData((d) => (d ? { ...d, prefs } : d))}
               onUnauthorized={onUnauthorized}
             />
-          )}
-          {tab === "reglages" && (
-            <div className="mt-8 border-t border-[var(--line-soft)] pt-6 md:hidden">
-              <Button onClick={onLogout} variant="secondary" className="w-full">
-                Se déconnecter
-              </Button>
-            </div>
           )}
         </div>
       </div>

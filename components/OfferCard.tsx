@@ -52,7 +52,7 @@ export default function OfferCard({
       <div className="card p-6 md:p-9">
         <p className="text-[16px] font-bold">Ce qui est compris</p>
         <CheckList items={INCLUDED} className="mt-3" />
-        <p className="mt-5 rounded-[18px] bg-[var(--amber-soft)] px-5 py-4 text-[16px] leading-relaxed text-[var(--amber-deep)]">
+        <p className="mt-5 rounded-[14px] border-l-[3px] border-[var(--amber)] bg-[var(--canvas)] px-5 py-4 text-[16px] leading-relaxed text-[var(--ink-2)] [&>b]:text-[var(--ink)]">
           <b>Satisfait ou remboursé.</b> {GUARANTEE}
         </p>
       </div>

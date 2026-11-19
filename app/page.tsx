@@ -6,9 +6,9 @@ import WhatYouGet from "@/components/home/WhatYouGet";
 import ThemePicker from "@/components/home/ThemePicker";
 import Compare from "@/components/home/Compare";
 import HowItWorks from "@/components/HowItWorks";
+import MemoSection from "@/components/home/MemoSection";
 import AuthorShowcase from "@/components/AuthorShowcase";
 import VoiceToPage from "@/components/VoiceToPage";
-import OfferCard from "@/components/OfferCard";
 import Closing from "@/components/Closing";
 import Accordion from "@/components/ui/Accordion";
 import { Section, SectionHead } from "@/components/ui/Section";
@@ -42,35 +42,52 @@ const QUESTIONS = [
 export default function Home() {
   return (
     <>
-      <Hero />
-
-      {/* Une respiration sous le haut de page : ce que le livre fait vivre en famille. */}
-      <div className="section-b mx-auto w-full max-w-[1240px] px-5 sm:px-6" data-reveal>
-        <Photo
-          name="famille-album"
-          alt="Trois générations d’une même famille regardent ensemble un album de photos."
-          ratio="aspect-[3/2] sm:aspect-[3/1]"
-          focus="50% 22%"
-          sizes="(min-width: 1240px) 1200px, 100vw"
-        />
+      {/* Fond (Solal, 19/11/2026) : le même bleuté naturel partout (--canvas), seul le pied de page reste bleu nuit. */}
+      <div>
+        <Hero />
       </div>
 
-      <Facts />
-      <HowItWorks />
-      <AuthorShowcase className="bg-white" />
-      <Audiences />
-      <VoiceToPage />
-      <ThemePicker />
-      <WhatYouGet />
+      <div>
+        <HowItWorks />
+      </div>
 
-      <Section id="offre">
-        <SectionHead title="Un prix, tout compris" text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Rien à payer en plus." />
-        <div className="head-gap">
-          <OfferCard />
+            <div>
+        <Facts />
+      </div>
+
+      {/* Une respiration : ce que le livre fait vivre en famille (placée sous les trois étapes, Solal 19/11/2026). */}
+      <div>
+        <div className="section-y mx-auto w-full max-w-[1240px] px-5 sm:px-6" data-reveal>
+          <Photo
+            name="famille-album"
+            alt="Trois générations d’une même famille regardent ensemble un album de photos."
+            ratio="aspect-[3/2] sm:aspect-[3/1]"
+            focus="50% 22%"
+            sizes="(min-width: 1240px) 1200px, 100vw"
+          />
         </div>
-      </Section>
+      </div>
 
-      <Compare />
+      <AuthorShowcase />
+
+      {/* Mémo, le compagnon de l’espace auteur (Solal, 19/11/2026). */}
+      <MemoSection />
+      <div>
+        <Audiences />
+      </div>
+      <div>
+        <VoiceToPage />
+      </div>
+      <div>
+        <ThemePicker />
+      </div>
+      <div>
+        <WhatYouGet />
+      </div>
+
+      <div>
+        <Compare />
+      </div>
 
       {/* Le mot du fondateur, à la place d'avis clients que nous n'avons pas encore. */}
       <Section>
@@ -95,6 +112,7 @@ export default function Home() {
         </figure>
       </Section>
 
+            <div>
       <Section id="questions">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
           <div>
@@ -128,6 +146,7 @@ export default function Home() {
       </Section>
 
       <Closing />
+      </div>
     </>
   );
 }

@@ -107,14 +107,46 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
     }
   };
 
-  return (
-    <section className="card p-7" aria-labelledby="photos-titre">
-      <h2 id="photos-titre" className="text-[17px] font-bold">
-        Vos photos
-      </h2>
-      <p className="t-body mt-2">Envoyez une photo : Loomina vous posera une question dessus au prochain appel.</p>
+  const [open, setOpen] = useState(false);
 
-      <form onSubmit={send} className="mt-4 space-y-3">
+  // Dans la carte du livre : les photos en petite rangée, puis une tuile « + » pour en ajouter.
+  return (
+    <section aria-labelledby="photos-titre">
+      <h3 id="photos-titre" className="text-[13px] font-bold text-[var(--ink-3)]">
+        {photos.length > 0 ? `Vos photos · ${photos.length}` : "Vos photos"}
+      </h3>
+      <ul className="mt-2 flex flex-wrap items-center gap-2">
+        {photos.slice(0, 9).map((p) => (
+          <li key={p.id}>
+            {p.url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- lien signé temporaire, hors optimisation Next
+              <img src={p.url} alt={p.caption ?? "Photo envoyée"} title={p.caption ?? p.question} className="h-12 w-12 rounded-[12px] object-cover" />
+            ) : (
+              <div className="h-12 w-12 rounded-[12px] bg-[var(--surface-2)]" title={p.caption ?? p.question} />
+            )}
+          </li>
+        ))}
+        <li className={photos.length ? "" : "w-full"}>
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-label={open ? "Fermer" : "Ajouter une photo"}
+            onClick={() => setOpen((o) => !o)}
+            className={`press flex h-12 items-center justify-center gap-2 rounded-[12px] border border-dashed border-[var(--rule-strong)] text-[15px] font-bold text-[var(--ink-2)] hover:border-[var(--ink-3)] hover:bg-[var(--canvas)] hover:text-[var(--ink)] ${
+              photos.length ? "w-12" : "w-full"
+            }`}
+          >
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className={`transition-transform ${open ? "rotate-45" : ""}`}>
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            {!photos.length && (open ? "Fermer" : "Ajouter une photo")}
+          </button>
+        </li>
+      </ul>
+
+      {open && (
+      <form onSubmit={send} className="mt-3 space-y-2.5">
+        <p className="text-[14px] leading-snug text-[var(--ink-3)]">Loomina vous posera une question sur cette photo au prochain appel.</p>
         <label htmlFor="photo-fichier" className="sr-only">
           Choisir une photo
         </label>
@@ -127,7 +159,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
             setFile(e.target.files?.[0] ?? null);
             setStatus("idle");
           }}
-          className="block w-full text-[15px] file:mr-3 file:min-h-11 file:rounded-full file:border-0 file:bg-[var(--surface-2)] file:px-4 file:font-bold"
+          className="block w-full text-[14px] file:mr-3 file:min-h-10 file:rounded-full file:border-0 file:bg-[var(--surface-2)] file:px-4 file:font-bold"
         />
         <label htmlFor="photo-legende" className="field-label">
           Un titre pour cette photo (facultatif)
@@ -155,30 +187,14 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
             </select>
           </>
         )}
-        <Button type="submit" loading={status === "sending"} disabled={!file}>
+        <Button type="submit" loading={status === "sending"} disabled={!file} className="!min-h-11 w-full !text-[15px]">
           Envoyer la photo
         </Button>
-        <p role="status" className="text-[15px] font-semibold">
+        <p role="status" className="text-[14px] font-semibold">
           {status === "sent" && <span className="text-[var(--success)]">Reçue. Loomina vous en parlera au prochain appel.</span>}
           {status === "error" && <span className="text-[var(--danger)]">{error}</span>}
         </p>
       </form>
-
-      {photos.length > 0 && (
-        <ul className="mt-5 grid grid-cols-2 gap-3 border-t border-[var(--line-soft)] pt-5">
-          {photos.map((p) => (
-            <li key={p.id} className="min-w-0">
-              {p.url ? (
-                // eslint-disable-next-line @next/next/no-img-element -- lien signé temporaire, hors optimisation Next
-                <img src={p.url} alt={p.caption ?? "Photo envoyée"} className="aspect-square w-full rounded-[12px] object-cover" />
-              ) : (
-                <div className="aspect-square w-full rounded-[12px] bg-[var(--surface-2)]" />
-              )}
-              <p className="t-small mt-1 line-clamp-2">{p.caption ?? p.question}</p>
-              {p.chapter && <p className="mt-0.5 line-clamp-1 text-[13px] font-semibold text-[var(--amber-ink)]">{p.chapter}</p>}
-            </li>
-          ))}
-        </ul>
       )}
     </section>
   );

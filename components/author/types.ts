@@ -1,3 +1,5 @@
+import type { Weave } from "@/lib/loomina/weave";
+
 /** Ce que renvoie /api/user/overview. */
 export interface Prefs {
   title: string | null;
@@ -27,6 +29,8 @@ export interface ProjectOverview {
   scheduleText?: string | null;
   chapters: number;
   words: number;
+  /** La toile du livre : un rang par sujet raconté (absent d'un ancien instantané). */
+  weave?: Weave;
   timeline: { year: number | null; event: string }[];
   family: { name: string; relation: string; deceased?: boolean }[];
   themes: string[];

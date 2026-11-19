@@ -50,7 +50,7 @@ function Value({ cell, muted }: { cell: Cell; muted?: boolean }) {
 
 export default function Plans() {
   return (
-    <Section id="formules" className="bg-white">
+    <Section id="formules">
       <SectionHead title="Comparez les formules" text="Ce que chaque formule comprend, ligne par ligne." />
 
       {/* Téléphone : une carte par formule. */}

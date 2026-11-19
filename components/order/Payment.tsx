@@ -52,8 +52,8 @@ export default function Payment({
           appearance: {
             theme: "stripe",
             variables: {
-              colorPrimary: "#161616",
-              colorText: "#161616",
+              colorPrimary: "#171d2b",
+              colorText: "#171d2b",
               colorTextSecondary: "#4a4a45",
               colorDanger: "#a8402f",
               colorBackground: "#ffffff",
@@ -64,7 +64,7 @@ export default function Payment({
             },
             rules: {
               ".Input": { border: "1px solid #d4d3cc", boxShadow: "none", padding: "13px 14px" },
-              ".Input:focus": { border: "1px solid #161616", boxShadow: "0 0 0 3px #fcebd2" },
+              ".Input:focus": { border: "1px solid #171d2b", boxShadow: "0 0 0 3px #fcebd2" },
               ".Label": { fontWeight: "600", fontSize: "14px", marginBottom: "6px" },
             },
           },

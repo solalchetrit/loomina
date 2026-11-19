@@ -5,6 +5,7 @@ import LogoMotion from "@/components/brand/LogoMotion";
 import { Fragment, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import Button from "@/components/ui/Button";
+import { More, PAGE, PAGE_KICKER, PAGE_TITLE, ReaderLayout, Toc } from "./Reader";
 
 interface BookChapter {
   number: number;
@@ -64,7 +65,7 @@ function inline(text: string): ReactNode[] {
 
 function BookText({ text }: { text: string }) {
   return (
-    <div className="book-text mx-auto mt-8 max-w-[38rem]" lang="fr">
+    <div className="book-text mx-auto mt-7 max-w-[38rem]" lang="fr">
       {blocks(text).map((b, i) =>
         b.kind === "h" ? (
           <h4 key={i} className="mb-2 mt-8 text-left font-serif text-[1.14rem] font-bold leading-snug tracking-normal text-[var(--ink)] first:mt-0" style={{ hyphens: "manual" }}>
@@ -85,7 +86,7 @@ const formatDate = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", { 
  * tout ce qui a été raconté, range les souvenirs dans l'ordre de la vie et
  * ne garde qu'une fois ce qui a été dit plusieurs fois.
  */
-export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () => void }) {
+export default function ComposedBook({ onUnauthorized, top, aside }: { onUnauthorized: () => void; top?: ReactNode; aside?: ReactNode }) {
   const [data, setData] = useState<Payload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -164,10 +165,12 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
 
   if (!data && !error) {
     return (
-      <p className="t-body flex items-center gap-3" role="status">
-        <span className="spinner" aria-hidden="true" />
-        Nous ouvrons votre livre…
-      </p>
+      <ReaderLayout side={<>{top}{aside}</>}>
+        <p className="flex items-center gap-3 text-[15px] text-[var(--ink-2)]" role="status">
+          <span className="spinner" aria-hidden="true" />
+          Nous ouvrons votre livre…
+        </p>
+      </ReaderLayout>
     );
   }
 
@@ -185,135 +188,127 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
     else parts.push({ title: c.part, chapters: [c] });
   }
 
-  return (
-    <div>
-      <div className="card p-7 md:p-10">
-        <p className="t-eyebrow">Votre livre</p>
-        {pieces && (
-          <div className="mt-3">
-            <h2 className="font-serif text-[clamp(1.7rem,3.4vw,2.4rem)] font-normal italic leading-tight tracking-normal text-[var(--ink)]">{pieces.title}</h2>
-            {pieces.subtitle && <p className="mt-1 font-serif text-[1.14rem] text-[var(--ink-3)]">{pieces.subtitle}</p>}
-          </div>
-        )}
-        <p className="t-body mt-3">
-          Ici, les chapitres ne suivent pas vos appels. Loomina relit tout ce que vous avez raconté, range vos souvenirs dans l’ordre de
-          votre vie et ne garde qu’une fois ce qui a été dit plusieurs fois. Rien n’est ajouté. Le livre se met à jour tout seul après
-          chaque appel.
-        </p>
+  const small = "text-[13.5px] leading-snug text-[var(--ink-3)]";
+  const toc = [
+    ...(pieces?.preface ? [{ title: null, items: [{ href: "#livre-avant-propos", number: "·", title: "Avant-propos" }] }] : []),
+    ...parts.map((part) => ({ title: part.title, items: part.chapters.map((c) => ({ href: `#livre-${c.number}`, number: c.number, title: c.title })) })),
+    ...(pieces?.thanks ? [{ title: " ", items: [{ href: "#livre-remerciements", number: "·", title: "Remerciements" }] }] : []),
+  ];
 
-        {running ? (
-          <p className="t-body mt-5 flex items-center gap-3 font-semibold" role="status">
-            {/* L'Étincelle écrit : l'attente devient un moment (le rond qui tourne reste si le kit ne charge pas). */}
-            <LogoMotion name="persoEcrit" mode="loop" className="h-16 w-16 shrink-0">
-              <span className="flex h-full w-full items-center justify-center">
-                <span className="spinner" />
-              </span>
-            </LogoMotion>
-            {running.total
-              ? running.done >= running.total
-                ? "Loomina relit votre livre d’un bout à l’autre pour les dernières retouches. Vous pouvez fermer cette page, il continuera."
-                : `Loomina écrit votre livre : chapitre ${Math.min(running.done + 1, running.total)} sur ${running.total}. Vous pouvez fermer cette page, il continuera.`
-              : "Loomina relit tous vos appels et prépare le plan du livre. Comptez quelques minutes."}
-          </p>
-        ) : (
-          <div className="mt-5 flex flex-wrap items-center gap-4">
-            {data?.failed && canCompose && (
-              <Button onClick={compose} loading={starting}>
-                Réessayer
-              </Button>
+  return (
+    <ReaderLayout
+      side={
+        <>
+          {top}
+          <div className="card p-5">
+            {pieces ? (
+              <>
+                <h2 className="font-serif text-[1.5rem] font-normal italic leading-tight tracking-normal text-[var(--ink)]">{pieces.title}</h2>
+                {pieces.subtitle && <p className="mt-1 font-serif text-[15px] text-[var(--ink-3)]">{pieces.subtitle}</p>}
+              </>
+            ) : (
+              <h2 className="text-[19px] font-extrabold leading-tight tracking-[-0.02em]">Votre livre</h2>
             )}
-            {!canCompose && <p className="t-small">Votre livre sera composé à partir de deux appels racontés.</p>}
-            {edition && (
-              <Button onClick={download} loading={downloading} variant="secondary">
-                {downloading ? "Préparation du PDF…" : "Télécharger mon livre (PDF)"}
-              </Button>
+
+            {aside && <div className="mt-5">{aside}</div>}
+
+            {running ? (
+              <p className="mt-4 flex items-center gap-3 text-[14px] font-semibold leading-snug text-[var(--ink-2)]" role="status">
+                {/* L'Étincelle écrit : l'attente devient un moment (le rond qui tourne reste si le kit ne charge pas). */}
+                <LogoMotion name="persoEcrit" mode="loop" className="h-12 w-12 shrink-0">
+                  <span className="flex h-full w-full items-center justify-center">
+                    <span className="spinner" />
+                  </span>
+                </LogoMotion>
+                {running.total
+                  ? running.done >= running.total
+                    ? "Loomina relit votre livre pour les dernières retouches."
+                    : `Loomina écrit votre livre : chapitre ${Math.min(running.done + 1, running.total)} sur ${running.total}.`
+                  : "Loomina prépare le plan du livre. Comptez quelques minutes."}
+              </p>
+            ) : (
+              <div className="mt-4 space-y-2.5">
+                {data?.failed && canCompose && (
+                  <Button onClick={compose} loading={starting} className="!min-h-11 w-full !text-[15px]">
+                    Réessayer
+                  </Button>
+                )}
+                {!canCompose && <p className={small}>Votre livre sera composé à partir de deux appels racontés.</p>}
+                {edition && (
+                  <Button onClick={download} loading={downloading} variant="secondary" className="!min-h-11 w-full !px-4 !text-[15px]">
+                    {!downloading && (
+                      <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
+                      </svg>
+                    )}
+                    {downloading ? "Préparation du PDF…" : "Télécharger en PDF"}
+                  </Button>
+                )}
+                {edition && (
+                  <p className={small}>
+                    Mis à jour le {formatDate(edition.at)}
+                    {newCalls > 0 ? ` · ${newCalls === 1 ? "le dernier appel arrive" : `les ${newCalls} derniers appels arrivent`} dans quelques minutes` : ""}
+                  </p>
+                )}
+              </div>
             )}
-            {edition && (
-              <p className="t-small">
-                Composé le {formatDate(edition.at)} à partir de {edition.sourceCount} appels
-                {newCalls > 0 ? ` · ${newCalls === 1 ? "le dernier appel y sera ajouté" : `les ${newCalls} derniers appels y seront ajoutés`} dans quelques minutes` : ""}.
+            {data?.failed && !running && <p className="mt-2 text-[14px] font-semibold text-[var(--danger)]">La dernière mise à jour n’a pas abouti. Vous pouvez la relancer.</p>}
+            {error && (
+              <p role="alert" className="mt-2 text-[14px] font-semibold text-[var(--danger)]">
+                {error}
               </p>
             )}
-          </div>
-        )}
-        {data?.failed && !running && (
-          <p className="mt-4 text-[15px] font-semibold text-[var(--danger)]">La dernière mise à jour du livre n’a pas abouti. Vous pouvez la relancer.</p>
-        )}
-        {error && (
-          <p role="alert" className="mt-4 text-[15px] font-semibold text-[var(--danger)]">
-            {error}
-          </p>
-        )}
-        {edition && (
-          <p className="t-small mt-4">Pour corriger un passage, corrigez-le dans « Appel par appel » : la correction est reportée dans le livre, le reste ne change pas.</p>
-        )}
-
-        {edition && (
-          <nav aria-label="Sommaire du livre" className="mt-8 border-t border-[var(--line-soft)] pt-6">
-            <p className="text-[15px] font-bold text-[var(--ink-3)]">Sommaire</p>
-            {parts.map((part) => (
-              <div key={part.title}>
-                <p className="mt-4 text-[15px] font-bold text-[var(--amber-ink)]">{part.title}</p>
-                <ol className="mt-2 divide-y divide-[var(--line-soft)]">
-                  {part.chapters.map((c) => (
-                    <li key={c.number}>
-                      <a href={`#livre-${c.number}`} className="flex items-baseline gap-4 py-3 text-[17px] font-semibold text-[var(--ink)] underline-offset-4 hover:underline">
-                        <span className="w-8 shrink-0 font-bold text-[var(--amber-ink)]">{c.number}</span>
-                        <span className="flex-1">{c.title}</span>
-                      </a>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            ))}
-          </nav>
-        )}
-      </div>
-
-      {edition && (
-        <>
-          <div className="mt-4 space-y-4">
-            {pieces?.dedication && (
-              <section aria-label="Dédicace" className="card px-6 py-12 sm:px-12 md:py-16">
-                <p className="mx-auto max-w-[30rem] whitespace-pre-line text-center font-serif text-[1.2rem] italic leading-relaxed text-[var(--ink-2)]">{pieces.dedication}</p>
-              </section>
-            )}
-            {pieces?.preface && (
-              <article id="livre-avant-propos" className="card scroll-mt-32 px-6 py-12 sm:px-12 md:py-16">
-                <h3 className="text-center font-serif text-[clamp(1.6rem,3vw,2.2rem)] font-normal leading-tight tracking-normal text-[var(--ink)]">Avant-propos</h3>
-                <BookText text={pieces.preface} />
-              </article>
-            )}
-            {parts.flatMap((part) => [
-              <h3 key={`partie-${part.title}`} className="pt-6 text-center font-serif text-[clamp(1.4rem,2.6vw,1.9rem)] italic text-[var(--ink-2)]">
-                {part.title}
-              </h3>,
-              ...part.chapters.map((c) => (
-                <article key={c.number} id={`livre-${c.number}`} className="card scroll-mt-32 px-6 py-12 sm:px-12 md:py-16">
-                  <p className="text-center text-[14px] font-bold text-[var(--amber-ink)]">Chapitre {c.number}</p>
-                  <h3 className="mt-2 text-center font-serif text-[clamp(1.6rem,3vw,2.2rem)] font-normal italic leading-tight tracking-normal text-[var(--ink)]">{c.title}</h3>
-                  <BookText text={c.content} />
-                  <p className="t-small mt-8 text-center">
-                    Tiré de {c.sources.length === 1 ? `l’appel ${c.sources[0]}` : `vos appels ${c.sources.slice(0, -1).join(", ")} et ${c.sources[c.sources.length - 1]}`}
-                  </p>
-                </article>
-              )),
-            ])}
-            {pieces?.thanks && (
-              <article id="livre-remerciements" className="card scroll-mt-32 px-6 py-12 sm:px-12 md:py-16">
-                <h3 className="text-center font-serif text-[clamp(1.6rem,3vw,2.2rem)] font-normal leading-tight tracking-normal text-[var(--ink)]">Remerciements</h3>
-                <BookText text={pieces.thanks} />
-              </article>
-            )}
-            {pieces?.back_cover && (
-              <section aria-label="Au dos de votre livre" className="card px-6 py-12 sm:px-12 md:py-16">
-                <p className="text-center text-[14px] font-bold text-[var(--amber-ink)]">Au dos de votre livre</p>
-                <BookText text={pieces.back_cover} />
-              </section>
-            )}
+            <More label="Comment ce livre est composé ?">
+              Loomina relit tout ce que vous avez raconté, range vos souvenirs dans l’ordre de votre vie et ne garde qu’une fois ce qui a été dit plusieurs fois. Rien n’est ajouté. Le
+              livre se met à jour tout seul après chaque appel. Pour corriger un passage, ouvrez l’appel concerné dans « Mes appels » : le reste ne change pas.
+            </More>
+            {edition && <Toc label="Sommaire" parts={toc} />}
           </div>
         </>
+      }
+    >
+      {edition && (
+        <>
+          {pieces?.dedication && (
+            <section aria-label="Dédicace" className={PAGE}>
+              <p className="mx-auto max-w-[30rem] whitespace-pre-line text-center font-serif text-[1.14rem] italic leading-relaxed text-[var(--ink-2)]">{pieces.dedication}</p>
+            </section>
+          )}
+          {pieces?.preface && (
+            <article id="livre-avant-propos" className={PAGE}>
+              <h3 className={PAGE_TITLE.replace("italic ", "")}>Avant-propos</h3>
+              <BookText text={pieces.preface} />
+            </article>
+          )}
+          {parts.flatMap((part) => [
+            <h3 key={`partie-${part.title}`} className="pt-3 text-center font-serif text-[clamp(1.25rem,2vw,1.5rem)] italic text-[var(--ink-2)]">
+              {part.title}
+            </h3>,
+            ...part.chapters.map((c) => (
+              <article key={c.number} id={`livre-${c.number}`} className={PAGE}>
+                <p className={PAGE_KICKER}>Chapitre {c.number}</p>
+                <h3 className={PAGE_TITLE}>{c.title}</h3>
+                <BookText text={c.content} />
+                <p className="mt-5 text-center text-[13.5px] text-[var(--ink-3)]">
+                  Tiré de {c.sources.length === 1 ? `l’appel ${c.sources[0]}` : `vos appels ${c.sources.slice(0, -1).join(", ")} et ${c.sources[c.sources.length - 1]}`}
+                </p>
+              </article>
+            )),
+          ])}
+          {pieces?.thanks && (
+            <article id="livre-remerciements" className={PAGE}>
+              <h3 className={PAGE_TITLE.replace("italic ", "")}>Remerciements</h3>
+              <BookText text={pieces.thanks} />
+            </article>
+          )}
+          {pieces?.back_cover && (
+            <section aria-label="Au dos de votre livre" className={PAGE}>
+              <p className={PAGE_KICKER}>Au dos de votre livre</p>
+              <BookText text={pieces.back_cover} />
+            </section>
+          )}
+        </>
       )}
-    </div>
+    </ReaderLayout>
   );
 }

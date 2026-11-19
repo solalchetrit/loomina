@@ -6,6 +6,7 @@ import Photo from "@/components/ui/Photo";
 import { CallPreview } from "@/components/HowItWorks";
 import Closing from "@/components/Closing";
 import AuthorShowcase from "@/components/AuthorShowcase";
+import MemoSection from "@/components/home/MemoSection";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
@@ -183,7 +184,7 @@ export default function ExperiencePage() {
           <Section
             key={p.id}
             id={p.id}
-            className={idx % 2 === 1 ? "bg-white" : ""}
+            className=""
           >
             <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
               <div className="lg:sticky lg:top-32 lg:self-start">
@@ -242,6 +243,8 @@ export default function ExperiencePage() {
       })}
 
       <AuthorShowcase />
+
+      <MemoSection />
 
       <ThemePicker />
 

@@ -58,11 +58,11 @@ export const STEPS: { icon: IconName; title: string; text: string; preview: Reac
     text: `Quand votre récit est complet, notre équipe relit le livre, y place vos photos et l’envoie à l’impression. Comptez en général ${OFFER.delay} entre le premier appel et le livre validé.`,
     preview: (
       <Photo
-        name="livre-debout"
+        name="livre-arrive-chez-vous"
         alt=""
         ratio="h-40"
         sizes="400px"
-        contain="aspect-[4/5]"
+        focus="50% 52%"
         className="-mx-5 w-[calc(100%+2.5rem)] max-w-none shrink-0 !rounded-none"
       />
     ),
@@ -79,8 +79,9 @@ export default function HowItWorks() {
         </Link>
       </div>
       <Steps items={STEPS} className="head-gap" />
-      <div className="mt-6 flex flex-col items-start gap-4 rounded-[var(--radius-card)] bg-[var(--amber-soft)] p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
-        <p className="text-[17px] font-bold text-[var(--amber-deep)]">Le plus simple pour comprendre, c’est d’essayer : {OFFER.demoMinutes} minutes, gratuitement.</p>
+      {/* Encadré blanc, l'ambre en simple point (Solal, 19/11/2026 : plus de blocs pêche sur le fond bleuté). */}
+      <div className="card mt-6 flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
+        <p className="flex items-center gap-3 text-[17px] font-bold text-[var(--ink)]"><span aria-hidden="true" className="accent-dot" />Le plus simple pour comprendre, c’est d’essayer : {OFFER.demoMinutes} minutes, gratuitement.</p>
         <Button href={`tel:${SITE.phone}`} className="shrink-0">
           Appeler le {SITE.phoneDisplay}
         </Button>

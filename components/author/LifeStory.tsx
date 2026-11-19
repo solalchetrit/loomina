@@ -67,7 +67,7 @@ function AddPerson({ onAdded, onUnauthorized }: { onAdded: (family: Family, open
       {(open || message) && (
         <div className="basis-full">
           {open && (
-            <form onSubmit={submit} className="mt-4 space-y-3 rounded-[18px] bg-[var(--canvas)] p-4">
+            <form onSubmit={submit} className="mt-3 space-y-2.5 rounded-[16px] bg-[var(--canvas)] p-3.5">
               <div>
                 <label htmlFor="personne-prenom" className="field-label">
                   Prénom
@@ -86,7 +86,7 @@ function AddPerson({ onAdded, onUnauthorized }: { onAdded: (family: Family, open
             </form>
           )}
           {message && (
-            <p role="status" className={`mt-3 text-[15px] font-semibold ${message.ok ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>
+            <p role="status" className={`mt-2 text-[14px] font-semibold ${message.ok ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>
               {message.text}
             </p>
           )}
@@ -107,13 +107,13 @@ export default function LifeStory({
   onUnauthorized: () => void;
 }) {
 
+  const head = "text-[19px] font-extrabold leading-tight tracking-[-0.02em]";
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-      <section className="card p-6 md:p-8" aria-labelledby="frise">
-        <h2 id="frise" className="t-heading">
+    <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-start lg:gap-5">
+      <section className="card p-6 md:p-7" aria-labelledby="frise">
+        <h2 id="frise" className={head}>
           Votre frise de vie
         </h2>
-        <p className="t-body mt-1">Les repères que Loomina a retenus. Une date fausse ? Corrigez-la au prochain appel.</p>
         {project.timeline.length ? (
           <ol className="relative mt-6 space-y-5 border-l-2 border-[var(--line)] pl-6">
             {project.timeline.map((t, i) => (
@@ -125,48 +125,45 @@ export default function LifeStory({
             ))}
           </ol>
         ) : (
-          <p className="t-small mt-6">Pas encore de dates : elles viendront au fil des appels.</p>
+          <p className="mt-3 text-[15px] text-[var(--ink-3)]">Les dates viendront au fil des appels.</p>
         )}
       </section>
 
-      <div className="flex flex-col gap-4">
-        <section className="card p-6 md:p-8" aria-labelledby="proches">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <h2 id="proches" className="t-heading min-w-0 flex-1 basis-0">
-              Les personnes de votre histoire
+      <div className="flex flex-col gap-4 lg:gap-5">
+        <section className="card p-6 md:p-7" aria-labelledby="proches">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 id="proches" className={`${head} min-w-0 flex-1 basis-0`}>
+              Les personnes
             </h2>
             <AddPerson onAdded={onPersonAdded} onUnauthorized={onUnauthorized} />
           </div>
           {project.family.length ? (
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4">
               {project.family.map((f) => (
-                <li key={f.name} className="flex items-center gap-3">
-                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[16px] font-extrabold text-[var(--amber-deep)]">
+                <li key={f.name} className="flex min-w-0 items-center gap-3">
+                  <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[15px] font-extrabold text-[var(--amber-deep)]">
                     {f.name.charAt(0).toUpperCase()}
                   </span>
                   <span className="min-w-0">
-                    <b className="block text-[16px] leading-tight">{f.name}</b>
-                    <span className="text-[14px] text-[var(--ink-3)]">
-                      {f.relation}
-                      {f.deceased ? " · disparu(e)" : ""}
-                    </span>
+                    <b className="block truncate text-[15.5px] leading-tight">{f.name}</b>
+                    <span className="mt-0.5 block truncate text-[13.5px] leading-tight text-[var(--ink-3)]">{f.relation.split(",")[0]}</span>
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="t-small mt-4">Elles apparaîtront quand vous les évoquerez. Vous pouvez aussi en ajouter une vous-même.</p>
+            <p className="mt-3 text-[15px] leading-snug text-[var(--ink-3)]">Elles apparaîtront au fil des appels.</p>
           )}
         </section>
 
         {project.themes.length > 0 && (
-          <section className="card p-6 md:p-8" aria-labelledby="themes-abordes">
-            <h2 id="themes-abordes" className="t-heading">
+          <section className="card p-6 md:p-7" aria-labelledby="themes-abordes">
+            <h2 id="themes-abordes" className={head}>
               Déjà racontés
             </h2>
             <ul className="mt-4 flex flex-wrap gap-2">
               {project.themes.map((t) => (
-                <li key={t} className="rounded-full bg-[var(--surface-2)] px-3 py-1.5 text-[14px] font-semibold">
+                <li key={t} className="rounded-full bg-[var(--surface-2)] px-3.5 py-1.5 text-[14px] font-semibold">
                   {t}
                 </li>
               ))}

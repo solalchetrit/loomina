@@ -1,0 +1,92 @@
+/* La scène de Mémo sur le site public. */
+
+.stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 340px;
+  padding: 1.25rem 1.25rem 4.25rem;
+  background: radial-gradient(120% 90% at 50% 100%, #e6ebf3 0%, #fff 70%);
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.halo {
+  position: absolute;
+  left: 50%;
+  bottom: 16%;
+  width: min(62%, 360px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(241, 168, 67, 0.22), rgba(241, 168, 67, 0));
+  pointer-events: none;
+}
+
+.memo {
+  position: relative;
+  display: block;
+  width: min(100%, 380px);
+}
+
+.caption {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  transform: translateX(-50%);
+  padding: 0.5rem 1.05rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(23, 29, 43, 0.08);
+  color: var(--ink-3);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.caption b {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  padding: 7px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--line);
+}
+
+.avatar img {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.avatarOn {
+  background: var(--amber-wash);
+  box-shadow: inset 0 0 0 2.5px var(--amber);
+}
+
+@media (max-width: 480px) {
+  .avatar {
+    width: 50px;
+    height: 50px;
+    padding: 6px;
+  }
+  .caption {
+    font-size: 14px;
+  }
+}

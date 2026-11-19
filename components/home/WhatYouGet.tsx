@@ -49,7 +49,7 @@ export default function WhatYouGet({
   features?: { icon: IconName; title: string; text: string }[];
 }) {
   return (
-    <Section id="le-livre" className="bg-white">
+    <Section id="le-livre">
       <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
         {photo === "collection" ? (
           <Photo

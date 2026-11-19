@@ -17,7 +17,7 @@ const FAQ_CATEGORIES = [
     questions: [
       {
         q: "Comment fonctionne Loomina ?",
-        a: `Vous appelez le ${SITE.phoneDisplay} quand vous voulez. Loomina mène l’entretien et écrit le récit de chaque appel, dans vos mots, puis en compose le livre. Vous relisez, vous corrigez, notre équipe relit tout, et le livre relié arrive chez vous.`,
+        a: `Vous appelez le ${SITE.phoneDisplay} quand vous voulez. Loomina mène l’entretien et écrit le récit de chaque appel, dans vos mots, puis en compose le livre. Vous relisez, vous corrigez, notre équipe relit tout, et le livre arrive chez vous.`,
       },
       {
         q: "Combien de temps dure le processus ?",
@@ -56,6 +56,10 @@ const FAQ_CATEGORIES = [
       {
         q: "Puis-je relire et modifier le texte ?",
         a: "Oui, c’est même la règle. Le récit de chaque appel apparaît dans votre espace auteur quelques minutes après. Vous corrigez un passage vous-même, ou vous dites à Loomina, au prochain appel, ce qu’il faut changer. Vous avez le dernier mot avant l’impression.",
+      },
+      {
+        q: "Qui est Mémo, le petit éléphant de l’espace auteur ?",
+        a: "Mémo est le petit éléphant de votre espace auteur. Il retient chaque souvenir que vous racontez, et il grandit quand votre livre avance : tout petit au début, il se lève, prend la plume, met ses lunettes, puis tient votre livre. Il n’y a ni points ni niveaux : Mémo montre où en est votre livre.",
       },
     ],
   },
@@ -147,7 +151,7 @@ export default function FAQPage() {
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-16">
-          <nav aria-label="Thèmes" className="lg:sticky lg:top-32 lg:self-start">
+          <nav aria-label="Thèmes" className="faq-nav lg:sticky lg:top-32 lg:self-start">
             <ul className="flex flex-wrap gap-2 lg:flex-col">
               {FAQ_CATEGORIES.map((c) => (
                 <li key={c.id}>

@@ -58,9 +58,9 @@ export default function Settings({
   };
 
   return (
-    <form onSubmit={save} className="grid gap-4 lg:grid-cols-2">
-      <section className="card p-6 md:p-8" aria-labelledby="reglages-livre">
-        <h2 id="reglages-livre" className="t-heading">
+    <form onSubmit={save} className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-2 lg:gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.15fr)]">
+      <section className="card p-6 md:p-7" aria-labelledby="reglages-livre">
+        <h2 id="reglages-livre" className="text-[19px] font-extrabold leading-tight tracking-[-0.02em]">
           Votre livre
         </h2>
         <div className="mt-5 space-y-5">
@@ -71,9 +71,8 @@ export default function Settings({
             value={form.title ?? ""}
             onChange={(e) => update({ title: e.target.value })}
             placeholder={firstName ? `L’histoire de ${firstName}` : "Mon histoire"}
-            hint="Il figurera sur la couverture. Vous pourrez le changer jusqu’à l’impression."
           />
-          <fieldset>
+          <fieldset className="min-w-0">
             <legend className="field-label">Ton de l’écriture</legend>
             <div className="grid gap-2 sm:grid-cols-2">
               {STYLES.map((s) => {
@@ -84,7 +83,7 @@ export default function Settings({
                     type="button"
                     aria-pressed={active}
                     onClick={() => update({ writingStyle: s })}
-                    className={`press rounded-[14px] px-4 py-3 text-left text-[15px] font-semibold ${
+                    className={`press rounded-[12px] px-3.5 py-2.5 text-left text-[15px] font-semibold ${
                       active ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
                     }`}
                   >
@@ -94,19 +93,19 @@ export default function Settings({
               })}
             </div>
             {form.writingStyle && !STYLES.includes(form.writingStyle) && (
-              <p className="t-small mt-2">Ton actuel, choisi par Loomina d’après vos appels : « {form.writingStyle} ».</p>
+              <p className="t-small mt-1.5">Ton actuel, choisi par Loomina d’après vos appels : « {form.writingStyle} ».</p>
             )}
           </fieldset>
         </div>
       </section>
 
-      <section className="card p-6 md:p-8" aria-labelledby="reglages-appel">
-        <h2 id="reglages-appel" className="t-heading">
+      <section className="card p-6 md:p-7" aria-labelledby="reglages-appel">
+        <h2 id="reglages-appel" className="text-[19px] font-extrabold leading-tight tracking-[-0.02em]">
           Vos appels avec Loomina
         </h2>
         <div className="mt-5 space-y-5">
-          <fieldset>
-            <legend className="field-label">Loomina s’adresse à vous en disant</legend>
+          <fieldset className="min-w-0">
+            <legend className="field-label">Loomina vous dit</legend>
             <div className="flex gap-2">
               {(["vous", "tu"] as const).map((p) => (
                 <button
@@ -114,7 +113,7 @@ export default function Settings({
                   type="button"
                   aria-pressed={form.politeness === p}
                   onClick={() => update({ politeness: p })}
-                  className={`press min-h-12 flex-1 rounded-full text-[16px] font-bold ${
+                  className={`press min-h-11 flex-1 rounded-full text-[15px] font-bold ${
                     form.politeness === p ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
                   }`}
                 >
@@ -142,7 +141,7 @@ export default function Settings({
                 }}
                 placeholder="Par exemple : la guerre"
               />
-              <Button onClick={addTopic} variant="secondary" disabled={!topic.trim()}>
+              <Button onClick={addTopic} variant="secondary" disabled={!topic.trim()} className="!min-h-[46px] !px-4 !text-[15px]">
                 Ajouter
               </Button>
             </div>
@@ -162,7 +161,6 @@ export default function Settings({
                 ))}
               </ul>
             )}
-            <p className="t-small mt-2">Loomina ne les abordera pas. Vous restez libre d’en parler vous-même.</p>
           </div>
           <Input
             label="Prononciation de votre prénom"
@@ -171,19 +169,19 @@ export default function Settings({
             value={form.firstNamePhonetic ?? ""}
             onChange={(e) => update({ firstNamePhonetic: e.target.value })}
             placeholder={firstName ?? "Votre prénom"}
-            hint="Si la voix l’écorche, écrivez-le comme il se prononce : par exemple « Létissia » pour Laetitia."
+            hint="Écrivez-le comme il se prononce."
           />
         </div>
       </section>
 
-      <section className="card p-6 md:p-8 lg:col-span-2" aria-labelledby="reglages-rendezvous">
-        <h2 id="reglages-rendezvous" className="t-heading">
+      <section className="card p-6 md:p-7 lg:col-span-2 xl:col-span-1" aria-labelledby="reglages-rendezvous">
+        <h2 id="reglages-rendezvous" className="text-[19px] font-extrabold leading-tight tracking-[-0.02em]">
           Rendez-vous et nouvelles
         </h2>
-        <div className="mt-5 grid gap-6 md:grid-cols-2">
-          <fieldset>
-            <legend className="field-label">Loomina vous appelle de lui-même</legend>
-            <div className="flex flex-wrap gap-2">
+        <div className="mt-5 grid gap-x-8 gap-y-5 md:grid-cols-2 xl:grid-cols-1">
+          <fieldset className="min-w-0">
+            <legend className="field-label">Loomina vous appelle le</legend>
+            <div className="flex gap-1.5">
               {DAYS.map((d, i) => {
                 const day = i + 1;
                 const on = form.callSchedule.days.includes(day);
@@ -197,7 +195,7 @@ export default function Settings({
                       const days = on ? form.callSchedule.days.filter((x) => x !== day) : [...form.callSchedule.days, day].sort();
                       update({ callSchedule: { ...form.callSchedule, days, active: days.length > 0 } });
                     }}
-                    className={`press min-h-12 min-w-14 rounded-full px-3 text-[15px] font-bold ${
+                    className={`press min-h-11 min-w-0 flex-1 rounded-full px-0 text-[13.5px] font-bold sm:text-[14px] ${
                       on ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
                     }`}
                   >
@@ -206,12 +204,13 @@ export default function Settings({
                 );
               })}
             </div>
-            <label htmlFor="heure-appel" className="field-label mt-4 block">
+            <div className="mt-3 flex items-center gap-3">
+            <label htmlFor="heure-appel" className="field-label !mb-0">
               À quelle heure
             </label>
             <select
               id="heure-appel"
-              className="field max-w-[12rem]"
+              className="field max-w-[8.5rem]"
               value={form.callSchedule.time}
               onChange={(e) => update({ callSchedule: { ...form.callSchedule, time: e.target.value } })}
             >
@@ -221,14 +220,11 @@ export default function Settings({
                 </option>
               ))}
             </select>
-            <p className="t-small mt-2">
-              {form.callSchedule.days.length
-                ? "Loomina appellera le numéro de votre commande à ces moments-là. Vous pouvez toujours appeler quand vous voulez."
-                : "Choisissez un ou plusieurs jours. Sans jour choisi, c’est vous qui appelez, quand vous voulez."}
-            </p>
+            </div>
+            {form.callSchedule.days.length === 0 && <p className="t-small mt-1.5">Sans jour choisi, c’est vous qui appelez, quand vous voulez.</p>}
           </fieldset>
-          <fieldset>
-            <legend className="field-label">Durée souhaitée d’un appel</legend>
+          <fieldset className="min-w-0">
+            <legend className="field-label">Durée d’un appel</legend>
             <div className="flex flex-wrap gap-2">
               {CALL_MINUTES_OPTIONS.map((m) => (
                 <button
@@ -236,7 +232,7 @@ export default function Settings({
                   type="button"
                   aria-pressed={form.callMinutes === m}
                   onClick={() => update({ callMinutes: m })}
-                  className={`press min-h-12 flex-1 rounded-full px-4 text-[16px] font-bold ${
+                  className={`press min-h-11 flex-1 rounded-full px-3 text-[15px] font-bold ${
                     form.callMinutes === m ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
                   }`}
                 >
@@ -244,12 +240,9 @@ export default function Settings({
                 </button>
               ))}
             </div>
-            <p className="t-small mt-2">
-              À peu près : Loomina ne propose pas d’arrêter avant, et une fois ce temps passé, elle laisse finir le souvenir en cours. Vous pouvez toujours arrêter quand vous voulez.
-            </p>
           </fieldset>
-          <fieldset>
-            <legend className="field-label">Prévenir quand le récit d’un appel est prêt</legend>
+          <fieldset className="min-w-0">
+            <legend className="field-label">Un SMS quand votre récit est prêt</legend>
             <div className="flex gap-2">
               {[true, false].map((v) => (
                 <button
@@ -257,18 +250,17 @@ export default function Settings({
                   type="button"
                   aria-pressed={form.smsChapter === v}
                   onClick={() => update({ smsChapter: v })}
-                  className={`press min-h-12 flex-1 rounded-full text-[16px] font-bold ${
+                  className={`press min-h-11 flex-1 rounded-full text-[15px] font-bold ${
                     form.smsChapter === v ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
                   }`}
                 >
-                  {v ? "Oui, par SMS" : "Non merci"}
+                  {v ? "Oui" : "Non merci"}
                 </button>
               ))}
             </div>
-            <p className="t-small mt-2">Un SMS arrive quelques minutes après l’appel, avec le lien vers le récit de l’appel.</p>
           </fieldset>
           {form.giverFirstName !== null && (
-            <fieldset>
+            <fieldset className="min-w-0">
               <legend className="field-label">Laisser {form.giverFirstName || "la personne qui vous a offert ce livre"} lire vos récits</legend>
               <div className="flex gap-2">
                 {[true, false].map((v) => (
@@ -277,7 +269,7 @@ export default function Settings({
                     type="button"
                     aria-pressed={form.shareWithGiver === v}
                     onClick={() => update({ shareWithGiver: v })}
-                    className={`press min-h-12 flex-1 rounded-full text-[16px] font-bold ${
+                    className={`press min-h-11 flex-1 rounded-full text-[15px] font-bold ${
                       form.shareWithGiver === v ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
                     }`}
                   >
@@ -285,16 +277,14 @@ export default function Settings({
                   </button>
                 ))}
               </div>
-              <p className="t-small mt-2">
-                {form.giverFirstName || "Cette personne"} suit l’avancement de votre livre et voit le titre de vos récits. Le texte, c’est vous qui décidez, et vous pouvez changer d’avis à tout moment.
-              </p>
+              <p className="t-small mt-1.5">Sans votre accord, {form.giverFirstName || "cette personne"} ne voit que les titres.</p>
             </fieldset>
           )}
         </div>
       </section>
 
-      <div className="flex flex-wrap items-center gap-4 lg:col-span-2">
-        <Button type="submit" size="lg" loading={status === "saving"}>
+      <div className="flex flex-wrap items-center gap-4 lg:col-span-2 xl:col-span-3">
+        <Button type="submit" loading={status === "saving"} className="max-sm:w-full">
           Enregistrer
         </Button>
         <p role="status" className="text-[15px] font-semibold">
