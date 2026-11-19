@@ -87,13 +87,9 @@ export default function Home() {
             laissée parler. Son livre est aujourd’hui dans notre salon, et c’est pour que d’autres familles aient le leur que Loomina
             existe. »
           </blockquote>
-          <figcaption className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-[16px]">
-            <span>
-              <b>Solal Chetrit</b>, fondateur
-            </span>
-            <Link href="/about" className="link">
-              Notre histoire
-            </Link>
+          {/* Le lien « Notre histoire » (/about) est retiré à la demande de Solal (19/11/2026) : la page n'est pas prête. */}
+          <figcaption className="mt-8 text-[16px]">
+            <b>Solal Chetrit</b>, fondateur
           </figcaption>
           </div>
         </figure>

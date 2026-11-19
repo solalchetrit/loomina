@@ -8,7 +8,7 @@ const PAGES: [path: string, priority: number, changeFrequency: Frequency][] = [
   ["", 1, "monthly"],
   ["/offre", 0.9, "monthly"],
   ["/experience", 0.8, "monthly"],
-  ["/about", 0.6, "yearly"],
+  // « Notre histoire » (/about) n'est pas prête (Solal, 19/11/2026) : hors du plan du site tant qu'elle ne l'est pas.
   ["/faq", 0.6, "yearly"],
   ["/contact", 0.5, "yearly"],
   ["/legal", 0.3, "yearly"],
