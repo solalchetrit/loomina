@@ -34,6 +34,8 @@ const nextConfig: NextConfig = {
       { source: "/mission", destination: "/about", permanent: true },
       { source: "/offres", destination: "/offre", permanent: true },
       { source: "/accompagnement", destination: "/experience", permanent: true },
+      // L'adresse affichée sur les captures de l'accueil (« loomina.eu/espace-auteur »).
+      { source: "/espace-auteur", destination: "/dashboard", permanent: false },
     ];
   },
 };

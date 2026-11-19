@@ -95,7 +95,7 @@ export default function AboutPage() {
               <a href="mailto:contact@loomina.eu" className="link">
                 contact@loomina.eu
               </a>
-              . Le {SITE.phoneDisplay}, lui, est le numéro de Loomina : c’est elle qui décroche, à toute heure, pour un essai de trois
+              . Le {SITE.phoneDisplay}, lui, est le numéro de Loomina : c’est elle qui décroche, à toute heure, pour un essai de cinq
               minutes ou pour vos entretiens.
             </p>
           </div>

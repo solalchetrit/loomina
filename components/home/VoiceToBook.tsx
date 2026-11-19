@@ -5,7 +5,7 @@ import Image from "next/image";
 import { blurOf } from "@/lib/photo-blur";
 import s from "./VoiceToBook.module.css";
 
-/** Ce que Jeanne dit au téléphone. Exemple écrit pour illustrer la méthode, le même que plus bas sur la page. */
+/** Ce que Jeanne dit au téléphone. Exemple écrit pour illustrer la méthode : la même Jeanne que dans les autres exemples du site. */
 const SPOKEN = "« Oh, le tilleul. Un grand tilleul, énorme… Ma grand-mère faisait sécher les fleurs dessous, sur des draps. »";
 
 /** La page que Loomina en tire, dans la mise en page du livre imprimé. */

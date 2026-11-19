@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Ce que nous faisons de vos données" updated="18 novembre 2026">
+    <LegalPage title="Ce que nous faisons de vos données" updated="19 novembre 2026">
       <h2>1. Ce que nous collectons</h2>
       <ul>
         <li>
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
           Le récit et la transcription sont effacés au bout de 30 jours.
         </li>
         <li>
-          <strong>Pour le livre :</strong> les chapitres écrits, vos corrections, et les photographies que vous nous envoyez.
+          <strong>Pour le livre :</strong> les récits et les chapitres écrits, vos corrections, et les photographies que vous nous envoyez.
         </li>
         <li>
           <strong>Sur le site :</strong> des mesures d’audience anonymisées (Google Analytics), et les messages que vous nous
@@ -53,14 +53,18 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong>Twilio</strong> (téléphonie) : acheminement des appels, enregistrement audio des entretiens et envoi des SMS.
+          Pendant l’appel, Twilio fait transcrire votre voix par <strong>Deepgram</strong> et prononcer les réponses de
+          Loomina par <strong>ElevenLabs</strong>.
         </li>
         <li>
-          <strong>OpenAI</strong> (intelligence artificielle) : transcription de la voix, conduite de l’entretien et écriture
-          du premier jet des chapitres. Les échanges transitent par ses serveurs le temps du traitement, dans le cadre de ses
+          <strong>OpenAI</strong> (intelligence artificielle) : conduite de l’entretien et écriture des récits et des
+          chapitres. Les échanges transitent par ses serveurs le temps du traitement, dans le cadre de ses
           conditions d’utilisation pour les entreprises, qui excluent l’entraînement de ses modèles sur vos données.
         </li>
         <li>
-          <strong>Stripe</strong> (paiement) et <strong>Vercel</strong> (hébergement du site).
+          <strong>Stripe</strong> (paiement, et <strong>Klarna</strong> si vous choisissez de payer en plusieurs fois),{" "}
+          <strong>Vercel</strong> (hébergement du site) et <strong>Render</strong> (hébergement du serveur qui tient les
+          appels, à Francfort).
         </li>
       </ul>
 

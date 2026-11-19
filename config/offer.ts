@@ -16,7 +16,8 @@ export const OFFER = {
   demoMinutes: 5,
   /** Thèmes proposés au fil des appels, de l'enfance à aujourd'hui. */
   chapters: 14,
-  format: "15 × 23 cm, couverture rigide",
+  /** Le format du PDF d'impression (lib/loomina/book-pdf.ts) : A5. */
+  format: "14,8 × 21 cm, couverture rigide",
   digital: "PDF et EPUB",
   delivery: "France métropolitaine, livraison incluse",
   /** Garantie : remboursement intégral si demandé sous 7 jours après le premier appel. */

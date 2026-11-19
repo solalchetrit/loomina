@@ -13,15 +13,15 @@ import PrintedPage from "@/components/ui/PrintedPage";
 import s from "./VoiceToPage.module.css";
 
 const SPOKEN = [
-  { who: "Loomina", text: "Vous m’avez dit que vous étiez partie de la ferme à dix-huit ans. Comment s’est passé le départ ?" },
+  { who: "Loomina", text: "Vous m’avez dit que vous étiez partie pour Paris en 1967. Comment s’est passé le départ ?" },
   {
     who: "Jeanne",
-    text: "Par le car de six heures. Mon père a porté ma valise jusqu’à la route, il a rien dit, hein. Il m’a juste mis un mouchoir dans la main, avec trois billets dedans. Le mouchoir, je l’ai toujours. Les billets, non !",
+    text: "Par le train de six heures. Mon père a porté ma valise jusqu’au quai, il a rien dit, hein. Au moment de monter, il m’a juste mis un mouchoir dans la main, noué, avec trois billets dedans. Le mouchoir, je l’ai toujours, dans mon tiroir. Les billets, non !",
   },
-  { who: "Loomina", text: "Et en arrivant à Lyon, où avez-vous logé ?" },
+  { who: "Loomina", text: "Et en arrivant à Paris, où avez-vous logé ?" },
   {
     who: "Jeanne",
-    text: "Une chambre sous les toits, rue de la Charité. Toute petite, on touchait les deux murs. Mais c’était la mienne.",
+    text: "Une chambre de bonne, sous les toits. Toute petite : en tendant les bras, on touchait les deux murs. Mais c’était la mienne.",
   },
 ];
 
@@ -30,15 +30,15 @@ const WRITTEN: { kind: "p" | "h"; text: string }[][] = [
   [
     {
       kind: "p",
-      text: "Je suis partie de la ferme à dix-huit ans, par le car de six heures. Mon père a porté ma valise jusqu’à la route sans dire un mot. Au moment de monter, il m’a glissé dans la main un mouchoir noué, avec trois billets dedans.",
+      text: "Je suis partie pour Paris en 1967, par le train de six heures. Mon père a porté ma valise jusqu’au quai sans dire un mot. Au moment de monter, il m’a glissé dans la main un mouchoir noué, avec trois billets dedans.",
     },
-    { kind: "p", text: "Les billets n’ont pas duré longtemps. Le mouchoir, lui, est toujours dans mon tiroir." },
+    { kind: "p", text: "Les billets, je ne les ai plus. Le mouchoir, lui, est toujours dans mon tiroir." },
   ],
   [
-    { kind: "h", text: "Rue de la Charité" },
+    { kind: "h", text: "Sous les toits" },
     {
       kind: "p",
-      text: "À Lyon, j’ai trouvé une chambre sous les toits, rue de la Charité. Elle était si petite qu’en tendant les bras, je touchais les deux murs. Mais c’était la mienne.",
+      text: "À Paris, j’ai trouvé une chambre de bonne, sous les toits. Elle était si petite qu’en tendant les bras, je touchais les deux murs. Mais c’était la mienne.",
     },
   ],
 ];
@@ -160,7 +160,7 @@ export default function VoiceToPage() {
 
         <figure>
           <figcaption className="sr-only">Dans le livre</figcaption>
-          <PrintedPage chapter="Chapitre 4" title="Le car de six heures" page="58">
+          <PrintedPage chapter="Chapitre 5" title="Le train de six heures" page="58">
             {WRITTEN.map((blocks, b) => {
               let word = 0;
               const state = still || BLOCKS[shown] > b ? (still ? s.still : s.writing) : "";
