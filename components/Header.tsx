@@ -39,7 +39,7 @@ export default function Header() {
             <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
               {/* L'étoile tourne quand on passe sur le logo. Rien ne bouge à l'arrivée (Solal, 18/11/2026 : ça ressemblait à un bug). */}
               <LogoMotion name="survol" mode="hover" vb={TIGHT_WORDMARK} align="left" className="h-full w-full">
-                <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
+                <Image src="/header-logo-bleu.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
               </LogoMotion>
             </span>
           </Link>
