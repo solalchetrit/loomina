@@ -8,7 +8,7 @@
   overflow: hidden;
   container-type: size;
   background: #cdb19e; /* le fond du studio des photos */
-  box-shadow: 0 40px 80px -40px rgba(20, 29, 51, 0.34);
+  box-shadow: 0 40px 80px -40px rgba(20, 24, 34, 0.34);
 }
 
 /* L'appel : un voile sombre posé sur les photos du livre */
