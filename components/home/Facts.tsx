@@ -10,10 +10,10 @@ const FACTS: { value: string; label: string }[] = [
 
 export default function Facts() {
   return (
-    <section className="w-full px-5 sm:px-6" aria-label="Loomina en quatre chiffres">
+    <section className="mx-auto w-full max-w-[1240px] px-5 sm:px-6" aria-label="Loomina en quatre chiffres">
       <ul
         data-reveal
-        className="card mx-auto grid max-w-[1240px] grid-cols-2 px-4 py-10 sm:px-8 lg:grid-cols-4 lg:py-14"
+        className="card grid grid-cols-2 px-4 py-10 sm:px-8 lg:grid-cols-4 lg:py-14"
       >
         {FACTS.map((f, i) => (
           <li

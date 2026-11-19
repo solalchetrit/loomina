@@ -16,8 +16,8 @@ export default function Closing({
   secondary?: { href: string; label: string } | null;
 }) {
   return (
-    <section className="section-b w-full px-5 sm:px-6">
-      <div className="mx-auto flex max-w-[1240px] flex-col gap-10 rounded-[var(--radius-card)] bg-[var(--ink)] px-7 py-12 text-white sm:px-12 md:py-14 lg:flex-row lg:items-center lg:justify-between">
+    <section className="section-b mx-auto w-full max-w-[1240px] px-5 sm:px-6">
+      <div className="flex flex-col gap-10 rounded-[var(--radius-card)] bg-[var(--ink)] px-7 py-12 text-white sm:px-12 md:py-14 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-xl">
           <h2 className="t-banner text-white">{title}</h2>
           <p className="mt-4 text-[17px] leading-relaxed text-[#cfcfc8]">{text}</p>
