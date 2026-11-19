@@ -147,7 +147,7 @@ export default function FAQPage() {
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[240px_1fr] lg:gap-16">
-          <nav aria-label="Thèmes" className="lg:sticky lg:top-32 lg:self-start">
+          <nav aria-label="Thèmes" className="faq-nav lg:sticky lg:top-32 lg:self-start">
             <ul className="flex flex-wrap gap-2 lg:flex-col">
               {FAQ_CATEGORIES.map((c) => (
                 <li key={c.id}>

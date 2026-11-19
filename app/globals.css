@@ -753,3 +753,9 @@ textarea.field {
     }
   }
 }
+
+/* Questions : sur ordinateur, les thèmes à gauche s'alignent sur la première question, pas sur le titre « Le service »
+   (hauteur d'un .t-title + l'écart mt-6 de l'accordéon). Solal, 19/11/2026. */
+@media (min-width: 1024px) {
+  .faq-nav { margin-top: calc(clamp(1.9rem, 3.4vw, 2.75rem) * 1.08 + 1.5rem); }
+}
