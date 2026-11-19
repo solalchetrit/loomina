@@ -46,8 +46,7 @@ export default function Home() {
         <Hero />
       </div>
 
-      {/* lg:pt-12 : à l'arrivée par la flèche, le fond bleuté remplit l'écran et le titre se dégage du menu. */}
-      <div className="lg:pt-12">
+      <div>
         <HowItWorks />
       </div>
 

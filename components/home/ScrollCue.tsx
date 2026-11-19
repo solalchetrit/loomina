@@ -22,9 +22,7 @@ export default function ScrollCue({ target, label, style }: { target: string; la
         // sa marge (pas de la position du titre, faussée par son animation d'apparition qui le décale).
         const sectionTop = section.getBoundingClientRect().top + window.scrollY;
         const padding = parseFloat(getComputedStyle(section).paddingTop) || 0;
-        // Jamais au-dessus du début du fond de la section : pas de liseré du haut de page en haut de l'écran.
-        const bgTop = (section.parentElement?.getBoundingClientRect().top ?? 0) + window.scrollY;
-        const top = Math.max(0, bgTop, sectionTop + padding - menuBottom - 40);
+        const top = Math.max(0, sectionTop + padding - menuBottom - 40);
         const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         window.scrollTo({ top, behavior: calm ? "auto" : "smooth" });
       }}
