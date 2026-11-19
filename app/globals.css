@@ -795,3 +795,12 @@ img[src*="photos/photos-de-famille"] {
     transform: translateY(-1px);
   }
 }
+
+/* ================================================================
+   ESPACE AUTEUR
+   Une fois connecté, l'auteur a son propre menu (Solal, 19/11/2026) :
+   le menu, le pied de page et le bouton mobile du site s'effacent.
+   components/author/AuthorSpace.tsx pose data-space="auteur" sur <html>.
+   ================================================================ */
+.site-chrome { display: contents; }
+html[data-space="auteur"] .site-chrome { display: none; }

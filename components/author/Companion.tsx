@@ -133,12 +133,13 @@ export default function Companion({ project, demo = false }: { project: ProjectO
   const pages = Math.max(project.chapters ? 1 : 0, Math.round(project.words / WORDS_PER_PAGE));
 
   return (
-    <section className="card overflow-hidden" aria-labelledby="memo">
-      <div className="grid md:grid-cols-[minmax(0,380px)_1fr]">
+    <section className="card" aria-labelledby="memo">
+      {/* Compact (Solal, 19/11/2026) : Mémo à gauche, sa phrase à droite, le chemin dessous. */}
+      <div className={s.layout}>
         <button ref={scene} type="button" className={s.scene} onClick={onTap} onPointerMove={onMove} onPointerLeave={onLeave} aria-label="Jouer avec Mémo">
           <span className={s.halo} aria-hidden="true" />
           <span ref={lean} className={s.lean}>
-            <Memo age={age} clip={busy ? clip : home} size={340} onEnd={() => setClip(home)} />
+            <Memo age={age} clip={busy ? clip : home} size={200} onEnd={() => setClip(home)} />
           </span>
           {hearts.map((h) => (
             <span key={h.id} className={s.heart} style={{ left: `${h.x}%` }} onAnimationEnd={() => setHearts((all) => all.filter((x) => x.id !== h.id))} aria-hidden="true">
@@ -152,58 +153,58 @@ export default function Companion({ project, demo = false }: { project: ProjectO
           )}
         </button>
 
-        <div className="flex flex-col justify-center p-6 md:p-9 lg:p-11">
-          <p className="text-[15px] font-bold text-[var(--amber-deep)]">Mémo grandit avec votre livre</p>
-          <h2 id="memo" className="mt-2 text-[clamp(1.5rem,2.6vw,2.05rem)] font-extrabold leading-[1.15] tracking-[-0.03em]" aria-live="polite">
+        <div className={s.words}>
+          <p className="text-[13px] font-bold text-[var(--amber-deep)] md:text-[14px]">Mémo grandit avec votre livre</p>
+          <h2 id="memo" className="mt-1 text-[clamp(1.1rem,2vw,1.55rem)] font-extrabold leading-[1.18] tracking-[-0.025em]" aria-live="polite">
             {headline}
           </h2>
-          {shown && (news || state.note) && <p className="mt-2 text-[16px] font-semibold text-[var(--amber-deep)]">{news || state.note}</p>}
-
-          <ol className={s.path} aria-label="Les âges de Mémo">
-            <span className={s.rail} aria-hidden="true">
-              <span className={s.railFill} style={{ width: `${fill}%` }} />
+          <p className="mt-1.5 text-[14px] text-[var(--ink-3)] md:text-[15px]">
+            {shown && (news || state.note) ? <span className="block font-semibold text-[var(--amber-deep)]">{news || state.note}</span> : null}
+            <span className="block whitespace-nowrap">
+              <b className="font-extrabold text-[var(--ink)] tabular-nums">≈ {pages}</b> {pages > 1 ? "pages" : "page"}
+              <span className="mx-1.5" aria-hidden="true">
+                ·
+              </span>
+              <b className="font-extrabold text-[var(--ink)] tabular-nums">{project.chapters}</b> {project.chapters > 1 ? "appels" : "appel"}
             </span>
-            {MEMO_AGES.map((x) => {
-              const reached = x.age <= age;
-              const inner = (
-                <>
-                  <span className={`${s.dot} ${x.age === age ? s.current : reached ? s.reached : ""}`}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- petit dessin détouré, déjà à sa taille */}
-                    <img src={memoSrc(x.age)} alt="" className={`${s.mini} ${reached ? "" : s.later}`} />
-                  </span>
-                  <span className={`mt-2 block text-[13px] font-bold leading-tight ${x.age === age ? "text-[var(--ink)]" : "text-[var(--ink-3)]"}`}>{x.name}</span>
-                </>
-              );
-              return (
-                <li key={x.age} className={s.step} aria-current={x.age === age ? "step" : undefined}>
-                  {demo ? (
-                    <button
-                      type="button"
-                      className="press flex flex-col items-center"
-                      onClick={() => {
-                        setPreview(x.age === state.age ? null : x.age);
-                        setClip("pop");
-                      }}
-                    >
-                      {inner}
-                    </button>
-                  ) : (
-                    <span className="flex flex-col items-center">{inner}</span>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-
-          <p className="mt-6 text-[15px] text-[var(--ink-3)]">
-            <b className="font-extrabold text-[var(--ink)] tabular-nums">≈ {pages}</b> {pages > 1 ? "pages écrites" : "page écrite"}
-            <span className="mx-2.5" aria-hidden="true">
-              ·
-            </span>
-            <b className="font-extrabold text-[var(--ink)] tabular-nums">{project.chapters}</b> {project.chapters > 1 ? "appels racontés" : "appel raconté"}
-            <span className="mt-1 block">Touchez Mémo, caressez-le : il adore jouer.{demo ? " Démonstration : touchez un âge pour le voir." : ""}</span>
           </p>
         </div>
+
+        <ol className={s.path} aria-label="Les âges de Mémo">
+          <span className={s.rail} aria-hidden="true">
+            <span className={s.railFill} style={{ width: `${fill}%` }} />
+          </span>
+          {MEMO_AGES.map((x) => {
+            const reached = x.age <= age;
+            const inner = (
+              <>
+                <span className={`${s.dot} ${x.age === age ? s.current : reached ? s.reached : ""}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- petit dessin détouré, déjà à sa taille */}
+                  <img src={memoSrc(x.age)} alt="" className={`${s.mini} ${reached ? "" : s.later}`} />
+                </span>
+                <span className={`mt-1.5 block text-[12px] font-bold leading-tight ${x.age === age ? "text-[var(--ink)]" : "text-[var(--ink-3)]"}`}>{x.name}</span>
+              </>
+            );
+            return (
+              <li key={x.age} className={s.step} aria-current={x.age === age ? "step" : undefined}>
+                {demo ? (
+                  <button
+                    type="button"
+                    className="press flex flex-col items-center"
+                    onClick={() => {
+                      setPreview(x.age === state.age ? null : x.age);
+                      setClip("pop");
+                    }}
+                  >
+                    {inner}
+                  </button>
+                ) : (
+                  <span className="flex flex-col items-center">{inner}</span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </section>
   );

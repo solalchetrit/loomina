@@ -100,9 +100,9 @@ export default function RootLayout({
       >
         <ScrollTop />
         <Reveal />
-        <HideOnAdmin checkout><Header /></HideOnAdmin>
+        <HideOnAdmin checkout><div className="site-chrome"><Header /></div></HideOnAdmin>
         <main>{children}</main>
-        <HideOnAdmin checkout><Footer /><MobileCta /></HideOnAdmin>
+        <HideOnAdmin checkout><div className="site-chrome"><Footer /><MobileCta /></div></HideOnAdmin>
         <HideOnAdmin><Analytics /></HideOnAdmin>
         <script
           type="application/ld+json"

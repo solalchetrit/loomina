@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import LiveBook from "@/components/LiveBook";
-import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { SITE } from "@/config/site";
 import Progress from "./Progress";
@@ -97,56 +97,85 @@ export default function AuthorSpace({
     load();
   }, [load]);
 
+  // Tant que l'espace auteur est ouvert, le menu et le pied de page du site s'effacent (voir globals.css).
+  useEffect(() => {
+    document.documentElement.dataset.space = "auteur";
+    return () => {
+      delete document.documentElement.dataset.space;
+    };
+  }, []);
+
   const project = data?.project ?? null;
   const title = data?.prefs.title || (data?.firstName ? `L’histoire de ${data.firstName}` : "Votre livre");
   const lastCall = project?.calls[0];
 
   return (
-    <div className="page-top section-b w-full">
-      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
-        <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-[16px] font-semibold text-[var(--ink-3)]">{title}</p>
-            <h1 className="t-display mt-2">{data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour"}</h1>
-          </div>
-          {/* Sur téléphone, « Se déconnecter » vit en bas des Réglages : le haut de l'écran reste au livre. */}
-          <div className="hidden md:block">
-            <Button onClick={onLogout} variant="secondary">
-              Se déconnecter
-            </Button>
-          </div>
-        </header>
+    <div className="section-b w-full pt-[5.75rem] md:pt-[7.25rem]">
+      {/* Le menu de l'espace auteur : la même barre flottante que le site, avec ses rubriques.
+          Le logo ramène au site grand public (Solal, 19/11/2026). */}
+      <header className="fixed inset-x-0 top-0 z-[1000] px-3 pt-3 sm:px-4 sm:pt-4">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-3 rounded-[22px] border border-white/70 bg-white/80 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-xl backdrop-saturate-150 md:h-[68px] md:pl-6">
+          <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="Loomina, retour au site">
+            <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
+              <Image src="/header-logo-bleu.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
+            </span>
+            <span className="hidden rounded-full bg-[var(--amber-soft)] px-2.5 py-1 text-[12px] font-extrabold uppercase tracking-[0.06em] text-[var(--amber-deep)] sm:max-md:inline xl:inline">
+              Espace auteur
+            </span>
+          </Link>
 
-        {data?.demo && (
-          <p className="mt-6 rounded-[14px] bg-[var(--amber-soft)] px-4 py-3 text-[15px] font-semibold text-[var(--amber-deep)]">
-            Démonstration : livre d’exemple de Jeanne, rien n’est lu ni écrit en base.
-          </p>
-        )}
+          <nav aria-label="Rubriques de l’espace auteur" className="hidden md:block">
+            <ul className="flex items-center gap-0.5">
+              {TABS.map((t) => {
+                const active = tab === t.id;
+                return (
+                  <li key={t.id}>
+                    <button
+                      type="button"
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => setTab(t.id as Tab)}
+                      className={`press inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-[14px] px-3 text-[15px] font-bold transition-colors duration-150 lg:px-3.5 ${
+                        active ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:bg-[var(--canvas)] hover:text-[var(--ink)]"
+                      }`}
+                    >
+                      <Icon name={t.icon} size={18} className={active ? "text-[var(--amber)]" : ""} />
+                      {t.label}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          <button
+            type="button"
+            onClick={onLogout}
+            aria-label="Se déconnecter"
+            className="press inline-flex h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-[14px] px-3 text-[15px] font-bold text-[var(--ink)] hover:bg-[var(--canvas)]"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="M16 17l5-5-5-5" />
+              <path d="M21 12H9" />
+            </svg>
+            <span className="hidden lg:inline">Se déconnecter</span>
+          </button>
+        </div>
+      </header>
+
+      <div className="mx-auto w-full max-w-[1240px] px-5 sm:px-6">
+        <header>
+          <p className="text-[15px] font-semibold text-[var(--ink-3)]">{title}</p>
+          <h1 className="mt-1 text-[clamp(1.9rem,3.6vw,2.6rem)] font-extrabold leading-[1.08] tracking-[-0.035em]">
+            {data?.firstName ? `Bonjour ${data.firstName}` : "Bonjour"}
+          </h1>
+        </header>
 
         {data?.welcome && tab === "apercu" && (
           <Welcome ask={data.welcome} prefs={data.prefs} onDone={load} onUnauthorized={onUnauthorized} />
         )}
 
-        <nav aria-label="Rubriques de l’espace auteur" className="mt-8 hidden md:block">
-          <ul className="flex w-max gap-1 rounded-full bg-white p-1.5 shadow-[inset_0_0_0_1px_var(--line)]">
-            {TABS.map((t) => (
-              <li key={t.id}>
-                <button
-                  type="button"
-                  aria-current={tab === t.id ? "page" : undefined}
-                  onClick={() => setTab(t.id as Tab)}
-                  className={`press min-h-11 whitespace-nowrap rounded-full px-5 text-[15px] font-bold ${
-                    tab === t.id ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="mt-6 max-md:mt-8">
+        <div className="mt-6">
           {failed && (
             <p role="alert" className="rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
               Nous n’arrivons pas à charger votre espace pour le moment.{" "}
@@ -223,13 +252,6 @@ export default function AuthorSpace({
               onSaved={(prefs) => setData((d) => (d ? { ...d, prefs } : d))}
               onUnauthorized={onUnauthorized}
             />
-          )}
-          {tab === "reglages" && (
-            <div className="mt-8 border-t border-[var(--line-soft)] pt-6 md:hidden">
-              <Button onClick={onLogout} variant="secondary" className="w-full">
-                Se déconnecter
-              </Button>
-            </div>
           )}
         </div>
       </div>
