@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     try {
         if (DEMO_DATA) {
             const { edition } = demoEdition();
-            const pdf = await buildReadingPdf({ title: 'Les saisons de Jeanne', author: 'Jeanne', chapters: edition.chapters });
-            return send(pdf.bytes, pdfFileName('Les saisons de Jeanne'));
+            const pdf = await buildReadingPdf({ title: edition.pieces.title, author: 'Jeanne', chapters: edition.chapters, pieces: edition.pieces });
+            return send(pdf.bytes, pdfFileName(edition.pieces.title));
         }
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;
