@@ -14,7 +14,7 @@ export const PHOTO_BLUR: Record<string, string> = {
   "grand-pere-petite-fille": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAADwAQCdASoLABAAA4BaJaQAD5Ppx1n0mIAA/jGTqkzNgj9v/JSnmLqjQQT/c13H3gXma9oBC/qiwikBexuczP9M9EA3SjVk7S7qjptFwpnmcX8bSnA5okISq+UR+gAA",
   "homme-au-telephone": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAADwAQCdASoOABAAA4BaJaQAAutQccNkHAAA/LF3BxR4axEZbNrBl1tlpqBRahg/dTrUHDPEERHUmT/npeqAW0cU04q1O7k7RS7GQV5mkU7MK8VeLUvKmRAAAAA=",
   "livre-a-plat-lunettes": "data:image/webp;base64,UklGRkYAAABXRUJQVlA4IDoAAADwAQCdASoQAAsAA4BaJQBOgBulD5N5TQAA/uc6Ffdr5Na/zfz3ST9P72XMmH987WPjCaSdDZQJ5oAA",
-  "livre-arrive-chez-vous": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAACwAgCdASoNABAAA4BaJbACdGaA2wDGACY5ksxqu9AA/PaaySqDGxwLPPYhqmy2434899QXshwhJdyTC7WkOufGSMXZSmdq82bTuR19sSwxJm947MJisp0stOHSV6n2joX0xwdlirHAfTsrrOLCAAAA",
+  "livre-arrive-chez-vous": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAADQAQCdASoQAAkAA4BaJbACdADcG5qJmAD8q4OZ8l63gz+hNs4gWTsXMhaJMLleL4XLqLIo9+x/u2NrLAPrMqUafP5uLo3SLb7s4iadG/fRz2OkE9xzB0AAAAA=",
   "livre-bleu-dans-les-mains": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAAAQAgCdASoNABAAA4BaJagCdAEKln5kHPAAAPlzr76qGg/HnIm4/ydriyObGkqbKcXoMTtMNhb5Izqmt7Be60Pot1WXSDPCVr5Exlt0mkW8n3yV2X8RYpoScjCabmX8gAA=",
   "livre-bordeaux-debout": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADwAQCdASoNABAAA4BaJZgCdAEUiQkVUUAA4n5jW9kIJpcdubKIp90ssJLPXTWDWO1Dcrq7Cs/DAGR34VvS5+NYOYHwi8N8KaBDkHqAAAA=",
   "livre-debout": "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAADwAQCdASoNABAAA4BaJQBOgCHglWzuiAAA/q73TpiIgS6ADMXze6X973LRSKKbnYkAAA==",
