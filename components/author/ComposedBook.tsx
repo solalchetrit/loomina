@@ -253,7 +253,7 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
             )}
             <More label="Comment ce livre est composé ?">
               Loomina relit tout ce que vous avez raconté, range vos souvenirs dans l’ordre de votre vie et ne garde qu’une fois ce qui a été dit plusieurs fois. Rien n’est ajouté. Le
-              livre se met à jour tout seul après chaque appel. Pour corriger un passage, corrigez-le dans « Appel par appel » : le reste ne change pas.
+              livre se met à jour tout seul après chaque appel. Pour corriger un passage, ouvrez l’appel concerné dans « Mes appels » : le reste ne change pas.
             </More>
             {edition && <Toc label="Sommaire" parts={toc} />}
           </div>

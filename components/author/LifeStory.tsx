@@ -109,17 +109,18 @@ export default function LifeStory({
 
   const head = "text-[19px] font-extrabold leading-tight tracking-[-0.02em]";
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr] lg:items-start lg:gap-5">
+    <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-start lg:gap-5">
       <section className="card p-6 md:p-7" aria-labelledby="frise">
         <h2 id="frise" className={head}>
-          Votre frise
+          Votre frise de vie
         </h2>
         {project.timeline.length ? (
-          <ol className="mt-5 gap-x-10 sm:columns-2">
+          <ol className="relative mt-6 space-y-5 border-l-2 border-[var(--line)] pl-6">
             {project.timeline.map((t, i) => (
-              <li key={i} className="mb-4 grid break-inside-avoid grid-cols-[3.25rem_minmax(0,1fr)] items-baseline gap-x-2 last:mb-0">
-                <b className="text-[15px] font-extrabold tabular-nums text-[var(--amber-ink)]">{t.year ?? "?"}</b>
-                <span className="text-[16px] leading-snug">{t.event}</span>
+              <li key={i} className="relative">
+                <span aria-hidden="true" className="absolute -left-[31px] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-[var(--amber)]" />
+                <b className="block text-[15px] font-extrabold text-[var(--amber-ink)]">{t.year ?? "Date à préciser"}</b>
+                <span className="text-[17px] leading-snug">{t.event}</span>
               </li>
             ))}
           </ol>

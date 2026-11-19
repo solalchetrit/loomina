@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import LiveBook from "@/components/LiveBook";
+import ComposedBook from "./ComposedBook";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { SITE } from "@/config/site";
 import Progress from "./Progress";
@@ -230,7 +230,7 @@ export default function AuthorSpace({
           )}
 
           {data && tab === "livre" && (
-            <LiveBook onUnauthorized={onUnauthorized} aside={<Photos onUnauthorized={onUnauthorized} />} />
+            <ComposedBook onUnauthorized={onUnauthorized} aside={<Photos onUnauthorized={onUnauthorized} />} />
           )}
 
           {data && tab === "vie" &&
@@ -241,7 +241,7 @@ export default function AuthorSpace({
                 onUnauthorized={onUnauthorized}
               />
             ) : null)}
-          {data && tab === "appels" && (project ? <Calls project={project} /> : null)}
+          {data && tab === "appels" && (project ? <Calls project={project} onUnauthorized={onUnauthorized} /> : null)}
           {data && tab === "reglages" && (
             <Settings
               prefs={data.prefs}

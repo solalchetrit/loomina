@@ -86,35 +86,6 @@ export function More({ label, children }: { label: string; children: ReactNode }
   );
 }
 
-/** Les deux façons de lire : petit sélecteur à deux positions. */
-export function Segmented<T extends string>({
-  value,
-  options,
-  onChange,
-  label,
-}: {
-  value: T;
-  options: { id: T; label: string }[];
-  onChange: (id: T) => void;
-  label: string;
-}) {
-  return (
-    <div className="flex gap-1 rounded-full bg-[var(--surface-2)] p-1" role="group" aria-label={label}>
-      {options.map((o) => (
-        <button
-          key={o.id}
-          type="button"
-          aria-pressed={value === o.id}
-          onClick={() => onChange(o.id)}
-          className={`press min-h-10 flex-1 rounded-full px-3 text-[14px] font-bold leading-tight ${value === o.id ? "bg-[var(--ink)] text-white shadow-sm" : "text-[var(--ink-2)]"}`}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 /** Une page du livre : même carte pour un récit d'appel et pour un chapitre. */
 export const PAGE = "card scroll-mt-28 px-6 py-9 sm:px-12 sm:py-12";
 export const PAGE_TITLE = "mt-1 text-center font-serif text-[clamp(1.4rem,2.2vw,1.75rem)] font-normal italic leading-tight tracking-normal text-[var(--ink)]";
