@@ -16,14 +16,13 @@ export default function ScrollCue({ target, label, style }: { target: string; la
         const section = document.getElementById(target);
         if (!section) return;
         e.preventDefault();
-        const title = section.querySelector("h2") ?? section;
         const bar = document.querySelector("header")?.firstElementChild;
         const menuBottom = bar ? bar.getBoundingClientRect().bottom : 84;
-        // Arrivée : le haut de la section (son fond) pile en haut de l'écran, le titre dégagé sous le menu.
-        // Si la marge de la section ne suffit pas à dégager le titre, on descend juste ce qu'il faut.
+        // Arrivée : le titre de la section à 40 px sous le menu flottant. On part du haut de la section et de
+        // sa marge (pas de la position du titre, faussée par son animation d'apparition qui le décale).
         const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-        const titleTop = title.getBoundingClientRect().top + window.scrollY;
-        const top = Math.max(sectionTop, titleTop - menuBottom - 32);
+        const padding = parseFloat(getComputedStyle(section).paddingTop) || 0;
+        const top = Math.max(0, sectionTop + padding - menuBottom - 40);
         const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         window.scrollTo({ top, behavior: calm ? "auto" : "smooth" });
       }}
