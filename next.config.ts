@@ -26,7 +26,12 @@ const nextConfig: NextConfig = {
     "/api/admin/clients/*/livre-pdf": ["./lib/fonts/**/*", "./public/header-logo-trimmed.png", "./public/logo-loomina-blanc.png"],
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      // Vercel reprend l'en-tête du fichier d'origine pour les photos optimisées : sans cette ligne,
+      // max-age=0 et le navigateur redemande chaque photo à chaque visite.
+      { source: "/photos/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=2678400, stale-while-revalidate=86400" }] },
+    ];
   },
   // Anciennes adresses de la première version du site.
   async redirects() {
