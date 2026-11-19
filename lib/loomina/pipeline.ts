@@ -33,7 +33,7 @@ import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
 import type { TokenUsage } from './usage';
-import { notifyFamily, alertTeam } from './notify';
+import { notifyFamily, alertTeam, notifyAuthorBookComplete } from './notify';
 import { autoCompose } from './book-edition';
 
 /**
@@ -533,10 +533,12 @@ async function persistDirectorResult(params: {
     // (Un essai repris peut renvoyer ce message : rare, et sans gravité.)
     if (projectCompleted && project.status !== 'completed') {
         const name = profile.first_name ?? 'Un auteur';
+        // L'auteur d'abord : ce que Loomina vient de lui dire au téléphone, par écrit.
+        await notifyAuthorBookComplete(profile);
         await notifyFamily({ projectMetadata: project.project_metadata, narratorFirstName: profile.first_name, kind: 'book_complete' });
         await alertTeam({
             subject: `Livre terminé : ${name}`,
-            text: `${name} a dit que son livre est complet. Il attend maintenant votre relecture.`,
+            text: `${name} a dit que son livre est complet. Il attend maintenant votre relecture. Loomina lui a annoncé sa première version complète d'ici une semaine, par e-mail et dans son espace : à lui envoyer avant cette date.`,
             sms: `${name} a terminé son livre. Il attend la relecture.`,
         });
     }
