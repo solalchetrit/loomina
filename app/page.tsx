@@ -45,7 +45,8 @@ export default function Home() {
       <Hero />
 
       {/* Les fonds changent d'une section à l'autre (Solal, 19/11/2026) : blanc, brume bleutée, lin, toujours très clairs. */}
-      <div className="bg-white">
+      {/* lg:pt-10 : à l'arrivée par la flèche du haut de page, le fond blanc remplit tout l'écran. */}
+      <div className="bg-white lg:pt-10">
         <HowItWorks />
       </div>
 
