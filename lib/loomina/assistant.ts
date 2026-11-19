@@ -15,7 +15,7 @@ import type { Phase } from './phases';
 import { PHASE_KEYS, toPhase, isFinalPhase } from './phases';
 import { voicePromptTemplate, phaseObjective } from './voice-prompt';
 import { promptText } from './prompt-store';
-import { readPhaseState, spokenPhase, readTopics, openTopics, pendingAxes, PHASE_AXES } from './phase-plan';
+import { readPhaseState, spokenPhase, readTopics, openTopics, untouchedAxes, shallowAxes, readTold, readDeepen, openDeepen, sceneCounts, PHASE_AXES } from './phase-plan';
 import { OFFER } from '../../config/offer';
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
@@ -202,15 +202,62 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
         );
     }
 
+    const phaseNow = toPhase(project.phase);
+    const told = readTold(meta);
+    const state = readPhaseState(meta, phaseNow);
+
+    // Scènes fortes racontées trop vite : le Directeur les a notées après
+    // les appels précédents. Un biographe y revient (19/11/2026).
+    const deepen = first || check ? [] : openDeepen(readDeepen(meta));
+    if (deepen.length) {
+        parts.push(
+            [
+                '# SCÈNES FORTES À APPROFONDIR',
+                ...deepen.slice(-5).map((d) => `- ${d.label}`),
+                `${name} a raconté ces moments, mais trop vite pour qu'un lecteur les voie. Au cours de cet appel, reviens sur UNE ou DEUX d'entre elles, quand une histoire vient de se terminer : rappelle la scène avec ses mots (« ${tu ? 'Tu m\'as' : 'Vous m\'avez'} raconté… »), puis demande UNE chose précise qui manque. Si ${name} n'a rien à ajouter, n'insiste pas et n'y reviens plus.`,
+            ].join('\n')
+        );
+    }
+
+    // Sujets entamés mais pas encore assez racontés : une seule scène ne
+    // fait pas un chapitre. On y revient par un autre angle.
+    const shallow = first || check ? [] : shallowAxes(state, told);
+    if (shallow.length && phaseNow !== 1) {
+        parts.push(
+            [
+                '# SUJETS ENTAMÉS, À ENRICHIR',
+                ...shallow.map((a) => `- ${a.label}`),
+                `${name} en a déjà parlé, mais une seule scène ne suffit pas pour un chapitre. Reviens-y dans cet appel par un AUTRE angle que ce qui est déjà raconté (une autre personne, un autre moment, une journée ordinaire, une première fois, une dernière fois), en partant d'un fait de la MÉMOIRE ou de la liste CE QUI EST DÉJÀ RACONTÉ. Ne fais jamais reraconter une scène déjà dite. Si ${name} n'a vraiment plus rien à en dire, laisse et passe à autre chose.`,
+            ].join('\n')
+        );
+    }
+
     // Sujets du socle commun dont on ne sait encore rien : on demande d'abord
     // s'ils concernent la personne. C'est elle qui choisit d'en parler ou non.
-    const pending = first || check ? [] : pendingAxes(readPhaseState(meta, toPhase(project.phase)));
-    if (pending.length && toPhase(project.phase) !== 1) {
+    const pending = first || check ? [] : untouchedAxes(state, told);
+    if (pending.length && phaseNow !== 1) {
         parts.push(
             [
                 '# CE DONT ON NE SAIT ENCORE RIEN',
                 ...pending.map((a) => `- ${a.label}`),
                 `${name} n'en a pas encore parlé, et rien ne dit que ces sujets le ou la concernent. Au cours de cet appel, quand une histoire vient de se terminer, ouvre UN de ces sujets par une question douce qui ne suppose rien, et laisse ${name} choisir d'en parler ou non. Si ${name} dit que ça ne le ou la concerne pas, ou préfère ne pas en parler : « D'accord. » et passe à autre chose. Un seul de ces sujets par appel.`,
+            ].join('\n')
+        );
+    }
+
+    // Ce qui est déjà dans le livre : la voix ne relit pas les récits (trop
+    // long pour un appel en direct), mais elle en a la liste, scène par scène.
+    if (!first && told.length) {
+        const keys = new Set(PHASE_AXES[phaseNow].map((a) => a.key));
+        // D'abord la période en cours, puis les plus récentes ; 60 lignes au plus.
+        const mine = told.filter((t) => t.axis && keys.has(t.axis));
+        const rest = told.filter((t) => !(t.axis && keys.has(t.axis)));
+        const shown = [...mine.slice(-40), ...rest.slice(-(60 - Math.min(40, mine.length)))];
+        parts.push(
+            [
+                `# CE QUI EST DÉJÀ RACONTÉ (${told.length} scènes à ce jour, ${Object.keys(sceneCounts(told)).length} sujets touchés)`,
+                ...shown.map((t) => `- ${t.what}`),
+                `Ces scènes sont dans le livre. Ne les fais pas reraconter. Sers-t'en pour rebondir (« ${tu ? 'Tu m\'avais' : 'Vous m\'aviez'} parlé de… »), pour relier deux moments, et pour demander ce qui s'est passé avant, après, ou à côté.`,
             ].join('\n')
         );
     }

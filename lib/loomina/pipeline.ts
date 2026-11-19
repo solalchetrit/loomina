@@ -23,7 +23,7 @@
 import { db, findActiveProject, getRecentChapters, getNextChapterNumber, getChapterOutline } from './db';
 import type { Profile, Project } from './db';
 import { toPhase } from './phases';
-import { readPhaseState, readTopics } from './phase-plan';
+import { readPhaseState, readTopics, readTold, readDeepen, readWishes } from './phase-plan';
 import type { PhaseState, Topic } from './phase-plan';
 import type { Phase } from './phases';
 import { normalizeContext, contextFromLegacy, isEmptyContext, remainingSuggestions } from './context';
@@ -121,6 +121,8 @@ interface AnalysisLog {
     chapter_phase?: number;
     phase_state?: PhaseState;
     book_topics?: Topic[];
+    /** Scènes racontées, scènes à approfondir, souhaits pour le livre (voir phase-plan.ts). */
+    book_extra?: Record<string, unknown>;
     next_topic_id?: number | null;
     project_update?: Record<string, unknown> & { context?: unknown };
     family_members?: DirectorResult['family_members'];
@@ -245,7 +247,8 @@ export async function processEndOfCall(params: {
                     log.suggestions_shown ?? [],
                     log.covered_suggestions ?? [],
                     log.phase_state,
-                    log.book_topics
+                    log.book_topics,
+                    log.book_extra
                 )
             );
         }
@@ -276,6 +279,9 @@ export async function processEndOfCall(params: {
         const director = await runDirector({
             phaseState: readPhaseState(project.project_metadata, phase),
             topics: readTopics(project.project_metadata),
+            told: readTold(project.project_metadata),
+            deepen: readDeepen(project.project_metadata),
+            wishes: readWishes(project.project_metadata),
             transcript: data.transcript,
             context: currentContext,
             phase,
@@ -488,6 +494,7 @@ async function persistDirectorResult(params: {
                 phase_answer: director.phase_answer,
                 phase_state: director.phase_state,
                 book_topics: director.book_topics,
+                book_extra: bookExtra(director),
                 next_topic_id: director.next_topic_id,
                 project_update: projectUpdate,
                 family_members: director.family_members,
@@ -510,7 +517,8 @@ async function persistDirectorResult(params: {
             director.context.suggested_topics ?? [],
             director.covered_suggestions,
             director.phase_state,
-            director.book_topics
+            director.book_topics,
+            bookExtra(director)
         )
     );
 
@@ -534,6 +542,11 @@ async function persistDirectorResult(params: {
     }
 }
 
+/** Ce que le Directeur tient à jour pour le livre, en plus des sujets : gardé dans `project_metadata`. */
+function bookExtra(director: DirectorResult): Record<string, unknown> {
+    return { book_told: director.book_told, book_deepen: director.book_deepen, book_wishes: director.book_wishes };
+}
+
 /**
  * Les sujets suggérés et les corrections de l'auteur sont relus en base juste avant l'écriture : l'auteur
  * a pu en ajouter un pendant l'appel ou pendant l'analyse. On retire ceux
@@ -545,7 +558,8 @@ async function withLatestSuggestions(
     shown: string[],
     covered: number[],
     phaseState?: PhaseState,
-    topics?: Topic[]
+    topics?: Topic[],
+    extra?: Record<string, unknown>
 ): Promise<Record<string, unknown>> {
     const { data, error } = await db().from('projects').select('context, project_metadata').eq('id', projectId).single();
     if (error) throw new Error(`Lecture projects impossible : ${error.message}`);
@@ -556,7 +570,7 @@ async function withLatestSuggestions(
         ...update,
         // Les réglages de l'espace auteur (rendez-vous, SMS…) sont relus et
         // gardés ; seul l'état de la phase est remplacé.
-        ...(phaseState ? { project_metadata: { ...((data?.project_metadata ?? {}) as Record<string, unknown>), phase_state: phaseState, ...(topics ? { book_topics: topics } : {}) } } : {}),
+        ...(phaseState ? { project_metadata: { ...((data?.project_metadata ?? {}) as Record<string, unknown>), phase_state: phaseState, ...(topics ? { book_topics: topics } : {}), ...(extra ?? {}) } } : {}),
         context: {
             ...context,
             suggested_topics: remainingSuggestions(shown, covered, latest),

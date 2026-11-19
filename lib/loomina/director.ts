@@ -24,8 +24,8 @@ import type { TokenUsage } from './usage';
 import OpenAI from 'openai';
 import type { Phase } from './phases';
 import { PHASE_GOALS, PHASE_LABELS, isFinalPhase, toPhase } from './phases';
-import { PHASE_AXES, AXIS_RULE, stepPhase, mergeTopics } from './phase-plan';
-import type { PhaseState, PhaseAnswer, Topic } from './phase-plan';
+import { PHASE_AXES, AXIS_RULE, stepPhase, mergeTopics, mergeTold, mergeDeepen, mergeWishes, axesCoveredByScenes, countsScenes, axisDepth, sceneCounts } from './phase-plan';
+import type { PhaseState, PhaseAnswer, Topic, ToldScene, DeepenItem, BookWishes } from './phase-plan';
 import type { LoominaContext } from './context';
 import { normalizeContext, renderContext } from './context';
 
@@ -107,6 +107,12 @@ export interface DirectorResult {
     phase_state: PhaseState;
     /** Sujets propres à la personne, à enregistrer dans `project_metadata.book_topics`. */
     book_topics: Topic[];
+    /** Scènes racontées à ce jour (`project_metadata.book_told`). */
+    book_told: ToldScene[];
+    /** Scènes fortes à approfondir (`project_metadata.book_deepen`). */
+    book_deepen: DeepenItem[];
+    /** Souhaits pour le livre lui-même : titre, dédicace, remerciements, fin (`project_metadata.book_wishes`). */
+    book_wishes: BookWishes;
     /** La personne a confirmé que le livre est complet. */
     project_completed: boolean;
     /** Période de vie à laquelle appartient ce que le narrateur a raconté : le chapitre y est rangé. */
@@ -183,7 +189,8 @@ Si le contexte contient une section « Corrections de l'auteur », elles l'empor
 Tu reçois le contexte accumulé et le nouveau transcript.
 Tu renvoies le contexte **complet, fusionné et mis à jour** — pas un ajout.
 Cela veut dire : fusionner les doublons, préciser ce qui était vague, retirer une question qui a trouvé sa réponse.
-Reste sous 1 500 tokens. Si tu dois couper, garde ce qui sert à écrire le livre.
+Reste sous 2 500 tokens. Si tu dois couper, garde ce qui sert à mener les prochains entretiens : les personnes (avec un trait qui les rend reconnaissables), les lieux, les dates, les récits annoncés.
+Dans \`family[].note\`, garde pour chaque proche ce qui permet de le faire revivre au prochain appel : son métier, un trait, une expression qu'il répétait, telle que le narrateur l'a dite.
 Un récit que le narrateur a annoncé sans le raconter (« je vous en reparlerai », un deuil ou une épreuve seulement nommés) reste dans \`open_questions\` tant qu'il n'a pas été raconté ou refusé : c'est souvent une page importante du livre.
 \`open_questions\` : huit au plus, seulement ce qui compte pour le livre (identité, dates des grandes étapes, proches principaux, un récit resté inachevé). Pas le nom de famille d'un personnage secondaire, pas le nom officiel d'un lieu.
 
@@ -191,7 +198,7 @@ Un récit que le narrateur a annoncé sans le raconter (« je vous en reparlerai
 La phase ${phase} avance selon l'information reçue, pas selon le nombre d'appels. Voici ses sujets, avec leur clé :
 ${PHASE_AXES[phase].map((a) => `- ${a.key} : ${a.label}`).join('\n')}
 ${AXIS_RULE[phase]}
-Renvoie dans \`covered_axes\` les clés de TOUS les sujets couverts à ce jour, en tenant compte de la mémoire et de cet appel. Les sujets déjà cochés (donnés plus bas) le restent. Sois juste : un sujet coché trop tôt donne un livre creux, un sujet jamais coché empêche le livre d'avancer.
+${countsScenes(phase) ? "Laisse `covered_axes` vide : dans cette phase, c'est le compte des scènes qui décide." : "Renvoie dans `covered_axes` les clés de TOUS les sujets couverts à ce jour, en tenant compte de la mémoire et de cet appel. Les sujets déjà cochés (donnés plus bas) le restent. Sois juste : un sujet coché trop tôt donne un livre creux, un sujet jamais coché empêche le livre d'avancer."}
 
 Toutes les vies ne se ressemblent pas : certaines personnes n'ont jamais travaillé, jamais vécu en couple, pas eu d'enfants, pas connu leurs parents. Si le narrateur a dit qu'un sujet ne le concerne pas, ou qu'il ne souhaite pas en parler, mets sa clé dans \`axes_not_applicable\` : seulement s'il l'a dit, jamais par supposition. Un sujet vécu sous une autre forme (une compagne sans mariage, le foyer plutôt qu'un emploi) n'est pas sans objet : il est couvert dès qu'il est raconté. N'écris jamais \`next_question\` en supposant un mari, une épouse, des enfants ou un métier que le narrateur n'a pas mentionnés.
 
@@ -201,6 +208,30 @@ La liste ci-dessus est la même pour tout le monde ; chaque vie a aussi ses suje
 - \`done\` : les numéros des sujets de la liste que le narrateur a racontés dans cet appel avec au moins une scène concrète, quelle que soit leur phase.
 - \`skip\` : les numéros des sujets dont il a dit ne pas vouloir parler.
 Reste sobre : cinq à dix sujets propres par phase suffisent. Pas de sujet général (« son enfance »), pas de doublon d'un sujet de la liste commune, rien que le narrateur n'ait dit.
+
+# LES SCÈNES RACONTÉES DANS CET APPEL (\`scenes\`)
+C'est la matière du livre, et c'est elle qui fait avancer le projet. Relève chaque SCÈNE CONCRÈTE que le narrateur a racontée dans cet appel et qui n'est pas déjà dans la liste « Scènes déjà racontées » donnée plus bas.
+- Une scène, c'est un moment ou un tableau précis : un lieu, des gens, ce qui s'est passé ou ce qu'on se disait (« le matin où son père est parti en tournée sous la neige »), ou un portrait précis (« sa mère derrière le comptoir, ferme avec les clients pénibles »). Un fait nu (« j'ai été institutrice ») ou une généralité (« on était heureux ») n'est PAS une scène.
+- \`what\` : une phrase précise, avec les noms et les lieux dits par le narrateur. Rien qu'il n'ait dit.
+- \`axis\` : la clé du sujet auquel la scène appartient, parmi celles-ci (toutes périodes confondues), ou null si elle n'entre dans aucun :
+${([2, 3, 4] as Phase[]).flatMap((p) => PHASE_AXES[p]).map((a) => `  - ${a.key} : ${a.label}`).join('\n')}
+- Une scène déjà racontée et simplement redite ne se recompte pas. Une scène déjà racontée à laquelle le narrateur ajoute des détails nouveaux ne se recompte pas non plus (elle sort de « Scènes à approfondir », voir plus bas).
+- Sois juste : n'en invente pas pour faire avancer le livre, n'en oublie pas.
+\`axes_exhausted\` : les clés des sujets de la phase en cours sur lesquels le narrateur n'a visiblement plus rien à donner. Seulement si l'assistant a relancé dessus et que le narrateur a répondu par des phrases très courtes, « je ne sais plus », « c'est tout », ou a dit qu'il n'avait rien à ajouter. Jamais par supposition : un sujet que l'assistant n'a pas vraiment creusé n'est pas épuisé.
+
+# SCÈNES FORTES À APPROFONDIR (\`deepen\`)
+Un biographe revient sur les scènes fortes racontées trop vite. Relis les scènes de cet appel : si l'une d'elles compte visiblement pour le narrateur (une rencontre, un départ, un deuil qu'il a raconté de lui-même, une fierté, un tournant) mais qu'il y manque ce qui la ferait vivre dans un livre, ajoute-la dans \`add\`, en une phrase qui dit la scène ET ce qui manque : « La rencontre avec Pierre à Lavastrie : on ne sait pas à quoi il ressemblait ni ce qu'ils se sont dit. »
+Ce qui peut manquer : le visage ou l'allure d'une personne, les mots échangés, ce qu'on voyait, entendait ou sentait, comment la journée s'est déroulée, ce qui s'est passé juste après.
+- Trois au plus par appel, seulement les scènes qui le méritent. Jamais un sujet de la liste « Sujets à laisser de côté », jamais un deuil ou une épreuve que le narrateur a seulement effleurés.
+- \`done\` : les numéros des scènes de la liste « Scènes à approfondir » sur lesquelles le narrateur a donné des détails nouveaux dans cet appel, ou a dit n'avoir rien à ajouter.
+
+# CE QUE LE NARRATEUR VEUT POUR SON LIVRE (\`book_wishes\`)
+Si, dans cet appel, le narrateur a dit quelque chose sur le livre lui-même, note-le avec SES mots, sans rien arranger :
+- \`title\` : le titre qu'il aimerait.
+- \`dedication\` : à qui il dédie le livre, et ses mots s'il en a eu (« à mes petits-enfants, pour qu'ils sachent d'où ils viennent »).
+- \`thanks\` : les personnes qu'il veut remercier, et pourquoi s'il l'a dit.
+- \`ending\` : comment il aimerait que le livre se termine.
+Laisse null ce qu'il n'a pas exprimé dans cet appel. Ne déduis rien : un proche aimé n'est pas une dédicace.
 
 # LE POINT SUR LA PHASE (\`phase_answer\`)
 Quand tous les sujets sont couverts, l'assistant demande au narrateur, au début de l'appel, s'il veut ajouter quelque chose ou passer à la suite (pour la phase 4 : si le livre est complet). On te dit plus bas si cette question devait être posée dans cet appel.
@@ -240,7 +271,7 @@ Phase 2 (les racines) : tant que le sujet \`heritage\` (le bagage familial) n'es
 UNE seule question, un seul point d'interrogation : jamais une liste de renseignements (« votre nom complet, votre date et votre lieu de naissance ? »), jamais deux questions reliées par « et ». S'il manque un fait d'identité ou une date, ne le demande pas ici : note-le dans \`open_questions\`, l'assistant le glissera au bon moment.
 
 Ne bâtis JAMAIS \`next_question\` sur un sujet de la liste « Sujets à laisser de côté », même si le narrateur l'a évoqué dans cet appel.
-Si un récit est resté inachevé à la fin de l'appel, reprends-le : c'est presque toujours la meilleure question. Sinon, et si un sujet suggéré depuis le site attend, tu peux ouvrir sur lui.
+Si un récit est resté inachevé à la fin de l'appel, reprends-le : c'est presque toujours la meilleure question. Sinon, repars d'une scène forte à approfondir (celles que tu viens de noter ou celles de la liste), en demandant UNE chose précise qui lui manque (« Vous m'avez raconté le soir où Pierre a frappé à votre porte. À quoi ressemblait-il, ce soir-là ? »). Sinon, et si un sujet suggéré depuis le site attend, tu peux ouvrir sur lui.
 
 # SUJETS SUGGÉRÉS DEPUIS LE SITE (\`covered_suggestions\`)
 L'auteur ou ses proches ont pu proposer des sujets sur l'espace auteur ; ils te sont donnés numérotés. Ne les recopie PAS dans le contexte : le code les gère.
@@ -260,6 +291,10 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
   },
   "covered_axes": [],
   "axes_not_applicable": [],
+  "scenes": [ { "axis": "clé du sujet, ou null", "what": "la scène en une phrase précise" } ],
+  "axes_exhausted": [],
+  "deepen": { "add": [ "la scène et ce qui lui manque, en une phrase" ], "done": [] },
+  "book_wishes": { "title": null, "dedication": null, "thanks": null, "ending": null },
   "topics": { "add": [ { "phase": 3, "label": "" } ], "done": [], "skip": [] },
   "phase_answer": "none",
   "chapter_phase": ${phase},
@@ -299,12 +334,21 @@ interface DirectorInput {
     phaseState?: PhaseState;
     /** Sujets propres à la personne, toutes phases (`project_metadata.book_topics`). */
     topics?: Topic[];
+    /** Scènes déjà racontées (`project_metadata.book_told`). */
+    told?: ToldScene[];
+    /** Scènes fortes à approfondir (`project_metadata.book_deepen`). */
+    deepen?: DeepenItem[];
+    /** Souhaits déjà exprimés pour le livre (`project_metadata.book_wishes`). */
+    wishes?: BookWishes;
     /** Banc d'essai : forcer un modèle. */
     model?: string;
 }
 
-function userPrompt(params: Omit<DirectorInput, 'phase'>): string {
+function userPrompt(params: DirectorInput): string {
     const suggestions = params.context.suggested_topics ?? [];
+    const told = params.told ?? [];
+    const counts = sceneCounts(told);
+    const open = (params.deepen ?? []).filter((d) => d.status === 'open');
     return `# CONTEXTE ACCUMULÉ
 ${renderContext(params.context)}
 
@@ -329,6 +373,18 @@ ${
         ? params.topics.map((t) => `${t.id}. [phase ${t.phase}] ${t.label} — ${t.status === 'open' ? 'à raconter' : t.status === 'done' ? 'raconté' : 'ne souhaite pas en parler'}`).join('\n')
         : 'Aucun pour l\'instant'
 }
+
+# SCÈNES DÉJÀ RACONTÉES (ne les recompte pas dans \`scenes\`)
+${told.length ? told.map((t) => `- ${t.axis ? `[${t.axis}] ` : ''}${t.what}`).join('\n') : 'Aucune pour l\'instant'}
+${
+    countsScenes(params.phase)
+        ? `Scènes comptées par sujet de la phase en cours : ${PHASE_AXES[params.phase].map((a) => `${a.key} ${counts[a.key] ?? 0}/${axisDepth(a.key)}`).join(', ')}`
+        : ''
+}
+
+# SCÈNES À APPROFONDIR, EN ATTENTE
+${open.length ? open.map((d) => `${d.id}. ${d.label}`).join('\n') : 'Aucune'}
+
 Question « on ajoute quelque chose ou on passe à la suite ? » à poser dans cet appel : ${params.phaseState?.check === 'to_ask' ? 'OUI' : 'non'}
 
 # TRANSCRIPT DE L'APPEL
@@ -361,7 +417,16 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
         before.check === 'to_ask' && (parsed.phase_answer === 'advance' || parsed.phase_answer === 'stay') ? parsed.phase_answer : 'none';
     // Le passage de phase est décidé par le CODE (phase-plan.ts), à partir
     // des sujets couverts et de la réponse de la personne.
-    const step = stepPhase(before, { covered: parsed.covered_axes, skipped: parsed.axes_not_applicable }, answer, topics);
+    const told = mergeTold(params.told ?? [], parsed.scenes);
+    // Phases 2 et 3 : un sujet est couvert quand assez de scènes ont été
+    // racontées dessus, ou quand la personne l'a épuisé. Si le modèle n'a
+    // pas renvoyé de scènes (prompt réécrit dans l'admin, modèle de repli
+    // distrait), on retombe sur son jugement pour ne pas bloquer le livre.
+    const byScenes = countsScenes(phase) && Array.isArray(parsed.scenes);
+    const covered = byScenes ? axesCoveredByScenes(phase, told, parsed.axes_exhausted) : parsed.covered_axes;
+    const step = stepPhase(before, { covered, skipped: parsed.axes_not_applicable }, answer, topics, told);
+    const deepen = mergeDeepen(params.deepen ?? [], parsed.deepen);
+    const wishes = mergeWishes(params.wishes ?? {}, parsed.book_wishes);
 
     const suggestions = params.context.suggested_topics ?? [];
     // Les suggestions ne passent jamais par la plume du modèle : on garde
@@ -381,6 +446,9 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
         phase_answer: answer,
         phase_state: step.state,
         book_topics: topics,
+        book_told: told,
+        book_deepen: deepen,
+        book_wishes: wishes,
         project_completed: step.completed,
         chapter_phase: toPhase(parsed.chapter_phase, phase),
         sentiment_score: clamp(Number(parsed.sentiment_score) || 0, -1, 1),

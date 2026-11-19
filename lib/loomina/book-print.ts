@@ -44,8 +44,18 @@ async function loadPhotos(entries: PhotoEntry[]): Promise<PrintPhoto[]> {
     return out;
 }
 
-export function bookTitle(project: Pick<Project, 'title'> | null, firstName: string): string {
-    return project?.title?.trim() || `Biographie de ${firstName}`;
+/** Les titres posés d'office à la commande : ils cèdent la place au titre trouvé dans le livre. */
+const DEFAULT_TITLE = /^(biographie de\b|mon livre de vie$)/i;
+
+/**
+ * Le titre du livre : celui du projet s'il a été choisi, sinon celui des
+ * pièces du livre (demandé par la personne, ou tiré du manuscrit), sinon
+ * « Biographie de… ».
+ */
+export function bookTitle(project: Pick<Project, 'title'> | null, firstName: string, pieceTitle?: string | null): string {
+    const own = project?.title?.trim();
+    if (own && !DEFAULT_TITLE.test(own)) return own;
+    return pieceTitle?.trim() || own || `Biographie de ${firstName}`;
 }
 
 /** Le livre prêt à mettre en page, ou null s'il n'y a pas encore d'édition prête. */
@@ -60,15 +70,17 @@ export async function loadPrintBook(projectId: string, opts: { photos?: boolean 
     const meta = (p.project_metadata ?? {}) as Record<string, unknown>;
     const entries = Array.isArray(meta.photos) ? (meta.photos as PhotoEntry[]) : [];
     const photos = opts.photos === false ? [] : await loadPhotos(entries);
+    const pieces = ready.extras?.pieces ?? null;
     return {
         edition: ready,
         book: {
-            title: bookTitle(p, firstName),
+            title: bookTitle(p, firstName, pieces?.title),
             author: firstName,
             chapters: ready.chapters.map((c) => ({ title: c.title, content: c.content })),
             photos,
             year: new Date(ready.updated_at).getFullYear(),
             cloth: 'lin',
+            pieces,
         },
     };
 }
