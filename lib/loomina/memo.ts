@@ -13,12 +13,12 @@ import type { Weave } from './weave';
 export type MemoAge = 1 | 2 | 3 | 4 | 5;
 
 /** Les cinq âges de Mémo : un par étape du livre, le dernier quand le récit est complet. */
-export const MEMO_AGES: { age: MemoAge; name: string; stage: string; text: string; then: string }[] = [
-    { age: 1, name: 'Tout petit', stage: 'Faire connaissance', text: 'Mémo est tout petit. Vous lui dites d’où vous venez.', then: 'se lève' },
-    { age: 2, name: 'Premiers pas', stage: 'Les racines', text: 'Il se lève : vos parents, votre enfance, l’école.', then: 'prend la plume' },
-    { age: 3, name: 'La plume', stage: 'La vie adulte', text: 'Il prend la plume : votre métier, vos amours, vos enfants.', then: 'met ses lunettes' },
-    { age: 4, name: 'Les lunettes', stage: 'Ce que vous transmettez', text: 'Il met ses lunettes et relit : vos valeurs, vos messages.', then: 'reçoit votre livre' },
-    { age: 5, name: 'Le livre', stage: 'Votre livre', text: 'Votre récit est complet. Mémo vous tend votre livre.', then: '' },
+export const MEMO_AGES: { age: MemoAge; name: string; stage: string; text: string; then: string; event: string; meaning: string }[] = [
+    { age: 1, name: 'Tout petit', stage: 'Faire connaissance', text: 'Mémo est tout petit. Vous lui dites d’où vous venez.', then: 'se lève', event: 'Voici Mémo', meaning: 'Un éléphant n’oublie rien. Mémo retient chaque souvenir que vous racontez, et chaque souvenir le fait grandir, jusqu’à votre livre.' },
+    { age: 2, name: 'Premiers pas', stage: 'Les racines', text: 'Il se lève : vos parents, votre enfance, l’école.', then: 'prend la plume', event: 'Mémo fait ses premiers pas', meaning: 'Vous avez fait connaissance. Il vous suit maintenant vers vos racines : vos parents, la maison d’enfance, l’école.' },
+    { age: 3, name: 'La plume', stage: 'La vie adulte', text: 'Il prend la plume : votre métier, vos amours, vos enfants.', then: 'met ses lunettes', event: 'Mémo prend la plume', meaning: 'Vos racines sont racontées. Il écrit à présent votre vie adulte : votre métier, vos amours, vos enfants.' },
+    { age: 4, name: 'Les lunettes', stage: 'Ce que vous transmettez', text: 'Il met ses lunettes et relit : vos valeurs, vos messages.', then: 'reçoit votre livre', event: 'Mémo met ses lunettes', meaning: 'Votre vie est racontée. Il relit tout avec vous : ce que vous avez appris, ce que vous voulez transmettre.' },
+    { age: 5, name: 'Le livre', stage: 'Votre livre', text: 'Votre récit est complet. Mémo vous tend votre livre.', then: '', event: 'Mémo vous tend votre livre', meaning: 'Votre récit est complet. Tout ce que vous lui avez confié tient maintenant dans un livre.' },
 ];
 
 /** Au-delà de ce délai sans appel, Mémo dit simplement qu'il attend la suite. */
@@ -53,6 +53,8 @@ export function memoState(input: {
     /** Les appels, le plus récent en premier ou non : seule la date compte. */
     calls: { date: string }[];
     scheduleText?: string | null;
+    /** Le titre du dernier récit, pour que Mémo dise ce qu'il vient de retenir. */
+    lastTitle?: string | null;
     now?: Date;
 }): MemoState {
     const now = (input.now ?? new Date()).getTime();
@@ -79,7 +81,7 @@ export function memoState(input: {
     const headline = `Encore ${left} souvenir${left > 1 ? 's' : ''} et Mémo ${MEMO_AGES[age - 1].then}.`;
     const since = now - last;
     if (since < MEMO_FRESH_HOURS * 3600 * 1000) {
-        return { ...base, mood: 'fresh', headline, note: 'Mémo a retenu votre dernier récit.' };
+        return { ...base, mood: 'fresh', headline, note: input.lastTitle ? `Mémo vient de retenir « ${input.lastTitle} ».` : 'Mémo a retenu votre dernier récit.' };
     }
     if (since > MEMO_WAITING_DAYS * DAY) {
         return {
