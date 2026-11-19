@@ -98,6 +98,10 @@ export function liveChecks(call: CallResult, attendu: Expectation, tutoiement: '
         const said = attendu.loominaDit.filter((w) => all.some((t) => has(t, w)));
         checks.push({ ok: said.length > 0, gravite: 'important', domaine: 'direct', label: `Loomina amène le sujet attendu (mots attendus : ${attendu.loominaDit.join(', ')} ; entendus : ${said.join(', ') || 'aucun'})` });
     }
+    for (const group of attendu.loominaReprend ?? []) {
+        const said = group.filter((w) => all.some((t) => has(t, w)));
+        checks.push({ ok: said.length > 0, gravite: 'important', domaine: 'direct', label: `Loomina revient sur ce qui a été cité (${group.join(' / ')}) : ${said.length ? `oui (${said.join(', ')})` : 'jamais repris'}` });
+    }
     for (const w of attendu.loominaSans ?? []) {
         const offender = all.find((t) => has(t, w));
         checks.push({ ok: !offender, gravite: 'important', domaine: 'direct', label: `Loomina ne dit jamais « ${w} »${offender ? ` — elle a dit : « ${offender.slice(0, 120)} »` : ''}` });

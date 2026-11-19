@@ -51,6 +51,12 @@ export interface Expectation {
     loominaDit?: string[];
     /** Le narrateur est-il resté dans le rôle : mots que Loomina ne doit pas écrire. */
     loominaSans?: string[];
+    /** Chaque groupe : Loomina doit dire au moins un de ces mots (un lieu ou une personne cités à reprendre). */
+    loominaReprend?: string[][];
+    /** Démonstration : mots attendus dans le récit envoyé par SMS. */
+    recitContient?: string[];
+    /** Démonstration : mots absents du récit (lieux mal transcrits, phrases sur l'appel). */
+    recitSans?: string[];
 }
 
 export interface Scenario {
@@ -70,6 +76,8 @@ export interface Scenario {
     /** Après l'appel : doublon du rapport, rejeu, Écrivain en échec puis repris. */
     rejeux?: boolean;
     inconnu?: boolean;
+    /** Appelant inconnu sur un portable : la démo annonce le récit par SMS, et le banc fait écrire puis juger ce récit. */
+    mobile?: boolean;
 }
 
 const VOUS_BAVARD = 'Tu vouvoies. Tu aimes raconter : 3 à 6 phrases par réponse, avec des détails concrets.';
@@ -540,6 +548,107 @@ export const SCENARIOS: Scenario[] = [
             chapitreSans: ['mon mari', 'mon époux'],
             memoireContient: ['Françoise'],
         },
+    },
+    // ---------------------------------------------------------------
+    // Démonstrations sur portable (20/11/2026, demande de Solal après la
+    // démo de Joana du 19/11) : en temps réel, récit écrit puis jugé.
+    // ---------------------------------------------------------------
+    {
+        id: '30-demo-joana',
+        titre: 'Démo : Joana, enfance entre Londres et Paris',
+        question: 'Rejoué d\'après la vraie démo du 19/11 : Loomina reprend-elle chaque lieu cité, laisse-t-elle finir l\'histoire du vélo, et le récit corrige-t-il les lieux mal transcrits ?',
+        inconnu: true,
+        mobile: true,
+        persona: {
+            prenom: 'Joana',
+            fiche: 'Joana, une cinquantaine d\'années. Née à Londres, arrivée à Paris vers 4 ou 5 ans. A vécu à Courbevoie (tu le dis « Cour de voix », comme l\'entendrait une transcription automatique), puis dans une maison avec jardin à Chatou dans le 78 (tu dis « Chatoux »), puis Asnières, « Levaloir » (Levallois) et Boulogne. Ses frères vivaient à Londres avec son père ; elle vivait à Chatou avec sa mère et son beau-père Jean-Marc. Souvenirs : les visites de ses frères, les intervilles dans le jardin, les Noëls dans la maison de Chatou, Jean-Marc qui construit un circuit de voitures électriques qui prend tout le grand salon pour Pascal, son petit frère. Et le vol du vélo de Pascal : à 8 ou 9 ans, elle le prend pour aller à la piscine avec ses copines, l\'attache avec du bolduc faute de cadenas, il est volé ; elle rentre à pied en pleurant, terrifiée à l\'idée que Pascal la frappe ; une femme dans la rue la raccompagne et arrive furieuse à la maison, prête à engueuler Pascal.',
+            maniere: 'Tu vouvoies. Tu parles comme à l\'oral, avec des hésitations (« euh », « si mes souvenirs sont bons », mots répétés). Réponses de 1 à 3 phrases, sauf pour l\'histoire du vélo.',
+            consignes: 'Quand on te demande un détail sensoriel ou ce que tu ressens, réponds « non, rien de particulier, c\'était juste joyeux ». Vers ta septième réponse, lance l\'histoire du vélo en plusieurs morceaux, puis raconte la fin d\'une traite, longuement (6 à 8 phrases), même si Loomina parle de finir.',
+        },
+        behaviour: { vitesse: 1, maxRepliques: 18 },
+        attendu: {
+            fin: ['loomina'],
+            loominaDit: ['SMS'],
+            loominaSans: ['relié'],
+            loominaReprend: [['Asnières', 'Levallois', 'Boulogne', 'Courbevoie', 'Londres']],
+            recitContient: ['bolduc', 'Chatou', 'Jean-Marc'],
+            recitSans: ['Cour de voix', 'Chatoux', 'Levaloir', 'Loumina', 'SMS'],
+        },
+    },
+    {
+        id: '31-demo-laconique',
+        titre: 'Démo : un homme qui répond en trois mots',
+        question: 'Face à des réponses très courtes, Loomina trouve-t-elle des questions concrètes qui font venir un vrai souvenir, sans remplir le silence à sa place ?',
+        inconnu: true,
+        mobile: true,
+        persona: {
+            prenom: 'Bernard',
+            fiche: 'Bernard, 74 ans, ancien boulanger à Vierzon. Enfance à la ferme de ses grands-parents à Mehun-sur-Yèvre : le pétrin du grand-père, le four à bois, les levées à trois heures du matin dès 12 ans, sa sœur Mireille. Souvenir fort s\'il est bien questionné : la nuit où le four a pris feu et où il a sauvé les fournées avec son grand-père.',
+            maniere: 'Tu vouvoies. Tu réponds en 2 à 6 mots (« À la ferme. », « Oui, mon grand-père. »). Tu ne développes que si la question est très concrète (un objet, un geste, une nuit précise), et alors en 2 phrases au plus.',
+            consignes: 'Si on te demande ce que tu ressentais, réponds « Je sais pas. ». Si on te demande de raconter une nuit au fournil, raconte enfin le feu du four, en 3 phrases.',
+        },
+        behaviour: { vitesse: 1, maxRepliques: 18 },
+        attendu: { fin: ['loomina'], loominaDit: ['SMS'], loominaSans: ['relié'], recitContient: ['four'], recitSans: ['Loumina', 'SMS'] },
+    },
+    {
+        id: '32-demo-fleuve',
+        titre: 'Démo : une conteuse qui ne s\'arrête plus à quatre minutes',
+        question: 'Quand l\'histoire la plus forte arrive juste avant la fin, Loomina la laisse-t-elle finir, puis clôt-elle court, sans couper ni raccrocher brutalement ?',
+        inconnu: true,
+        mobile: true,
+        persona: {
+            prenom: 'Yvette',
+            fiche: 'Yvette, 81 ans, née à Sète. Son père Antoine, pêcheur, sa mère Rose qui vendait le poisson au marché. Les joutes nautiques de la Saint-Louis sur le canal Royal, le pavois, la musique. La tielle de sa grand-mère Nina. L\'histoire la plus forte : à dix ans, le jour où la barque de son père n\'est pas rentrée par gros temps, toute la nuit sur le quai avec sa mère, et l\'aube où la barque est apparue au bout du môle.',
+            maniere: 'Tu vouvoies. Tu aimes raconter : 3 à 5 phrases par réponse, avec des détails concrets.',
+            consignes: 'Ne raconte la nuit de la barque qu\'à partir de ta sixième réponse, puis raconte-la longuement, en deux grandes répliques de 6 à 8 phrases, même si Loomina annonce la fin. Termine par « voilà, c\'est ça qui me revient ».',
+        },
+        behaviour: { vitesse: 1, maxRepliques: 16 },
+        attendu: { fin: ['loomina'], loominaDit: ['SMS'], loominaSans: ['relié'], recitContient: ['barque', 'môle'], recitSans: ['Loumina', 'SMS'] },
+    },
+    {
+        id: '33-demo-mefiant',
+        titre: 'Démo : il veut savoir qui parle et combien ça coûte',
+        question: 'Loomina répond-elle franchement (voix artificielle, prix, données) puis ramène-t-elle à un souvenir assez vite pour qu\'il y ait un récit ?',
+        inconnu: true,
+        mobile: true,
+        persona: {
+            prenom: 'Thierry',
+            fiche: 'Thierry, 61 ans, cherche un cadeau pour son père et teste lui-même. Son souvenir s\'il s\'y met : les étés chez son oncle Robert à Arcachon, la pinasse, la cabane tchanquée, la dune du Pilat dévalée en courant avec son cousin Didier.',
+            maniere: 'Tu vouvoies. Méfiant au début, direct. 1 à 2 phrases par réponse, plus long une fois lancé.',
+            consignes: 'Première réponse : donne ton prénom puis demande « Vous êtes un robot ? ». Deuxième : « Et ça coûte combien votre truc ? ». Troisième : « Et ce que je raconte, ça part où ? ». Ensuite tu joues le jeu et racontes Arcachon.',
+        },
+        behaviour: { vitesse: 1, maxRepliques: 16 },
+        attendu: { fin: ['loomina'], loominaDit: ['449'], loominaSans: ['relié', 'GPT', 'OpenAI'], recitContient: ['Arcachon'], recitSans: ['robot', '449', 'Loumina'] },
+    },
+    {
+        id: '34-demo-deuil',
+        titre: 'Démo : le souvenir mène à un frère disparu',
+        question: 'Quand l\'émotion arrive, Loomina reste-t-elle douce et sobre, sans creuser la douleur, et le récit reste-t-il pudique ?',
+        inconnu: true,
+        mobile: true,
+        persona: {
+            prenom: 'Martine',
+            fiche: 'Martine, 69 ans, enfance à Roubaix, rue de Lannoy. Son grand frère Didier, mort à 19 ans dans un accident de mobylette en 1972. Souvenirs heureux : Didier qui l\'emmenait au parc Barbieux sur le porte-bagages, les frites du dimanche chez la grand-mère Germaine, le carillon de l\'église Saint-Martin.',
+            maniere: 'Tu vouvoies. Chaleureuse, 2 à 4 phrases par réponse.',
+            consignes: 'Vers ta quatrième réponse, dis que Didier est mort jeune et que ta voix se serre ; tu ne veux pas raconter l\'accident. Tu acceptes volontiers de parler des bons moments avec lui.',
+        },
+        behaviour: { vitesse: 1, maxRepliques: 16 },
+        attendu: { fin: ['loomina'], loominaDit: ['SMS'], loominaSans: ['relié'], motsSensibles: ['accident'], recitContient: ['Didier', 'Barbieux'], recitSans: ['accident', 'Loumina'] },
+    },
+    {
+        id: '35-demo-pas-enfance',
+        titre: 'Démo : elle préfère raconter sa rencontre amoureuse',
+        question: 'Si la personne refuse l\'enfance et choisit un autre moment de vie, Loomina suit-elle sans insister ?',
+        inconnu: true,
+        mobile: true,
+        persona: {
+            prenom: 'Nadia',
+            fiche: 'Nadia, 66 ans, née à Oran, arrivée à Marseille à 6 ans. Elle ne veut pas parler de son enfance. Elle veut raconter sa rencontre avec Paul en 1979, au bal du 14 juillet sur le Vieux-Port : la robe jaune cousue par sa tante Fatiha, Paul qui lui marche sur le pied, le premier rendez-vous au glacier de la Canebière.',
+            maniere: 'Tu vouvoies. Vive, souriante, 2 à 4 phrases par réponse.',
+            consignes: 'Quand Loomina propose l\'enfance, réponds : « Ah non, l\'enfance, pas trop. Je préférerais vous raconter comment j\'ai rencontré mon mari. » Ne reviens jamais sur l\'enfance.',
+        },
+        behaviour: { vitesse: 1, maxRepliques: 16 },
+        attendu: { fin: ['loomina'], loominaDit: ['SMS'], loominaSans: ['relié'], loominaReprend: [['Paul', 'bal', 'Vieux-Port']], recitContient: ['Paul', 'robe jaune'], recitSans: ['Loumina', 'SMS'] },
     },
 ];
 

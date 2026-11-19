@@ -18,6 +18,31 @@ import { recordEvent, processEvent } from '../../../lib/loomina/events';
 import { extractCallData } from '../../../lib/loomina/pipeline';
 import type { PipelineOutcome, VapiMessage } from '../../../lib/loomina/pipeline';
 import { checkSharedSecret } from '../../../lib/loomina/secret';
+import { writeDemoStory } from '../../../lib/loomina/demo-story';
+
+export type DemoStoryResult = Awaited<ReturnType<typeof writeDemoStory>> & { transcript: string; error?: string };
+
+/** Récits de démonstration écrits par le vrai Écrivain, par identifiant d'appel (jamais en base, jamais de SMS). */
+const demoDone = new Map<string, DemoStoryResult>();
+const demoWaiters = new Map<string, Array<(d: DemoStoryResult) => void>>();
+
+function settleDemo(callId: string, d: DemoStoryResult) {
+    demoDone.set(callId, d);
+    for (const w of demoWaiters.get(callId) ?? []) w(d);
+    demoWaiters.delete(callId);
+}
+
+/** Attend le récit d'une démonstration (portable seulement : sans portable, rien n'arrive). */
+export function waitDemoStory(callId: string, timeoutMs = 180_000): Promise<DemoStoryResult | null> {
+    const known = demoDone.get(callId);
+    if (known) return Promise.resolve(known);
+    return new Promise((resolve) => {
+        const timer = setTimeout(() => resolve(null), timeoutMs);
+        const list = demoWaiters.get(callId) ?? [];
+        list.push((d) => { clearTimeout(timer); resolve(d); });
+        demoWaiters.set(callId, list);
+    });
+}
 
 export interface Processed {
     eventId: string;
@@ -73,7 +98,15 @@ async function handleWebhook(req: http.IncomingMessage, res: http.ServerResponse
 
     const data = extractCallData(message);
     const metadata = message.call?.metadata ?? message.metadata ?? {};
-    if (metadata.demo === true) return json(200, { received: true, demo: true, stored: false }, data.vapiCallId);
+    if (metadata.demo === true) {
+        // Le site écrit le récit puis l'envoie par SMS. Ici : le même Écrivain, sans base ni SMS.
+        json(200, { received: true, demo: true, stored: false }, data.vapiCallId);
+        const id = data.vapiCallId ?? 'demo';
+        writeDemoStory(data.transcript)
+            .then((r) => settleDemo(id, { ...r, transcript: data.transcript }))
+            .catch((err) => settleDemo(id, { title: '', content: '', firstName: null, smsRefused: false, unusable: true, usage: undefined, transcript: data.transcript, error: err instanceof Error ? err.message : String(err) }));
+        return;
+    }
 
     const { id: eventId, alreadySeen } = await recordEvent({
         eventType: 'end-of-call-report',

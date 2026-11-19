@@ -80,7 +80,7 @@ Réponds en JSON : {"ecoute":0,"relances":0,"naturel":0,"respect":0,"problemes":
 Tutoiement/vouvoiement attendu : ${params.tutoiement}
 Sujets sensibles à ne pas aborder : ${params.sensibles || 'aucun'}
 Sujets suggérés depuis l'espace auteur, à aborder : ${params.suggestions.length ? params.suggestions.join(' | ') : 'aucun'}
-Premier appel : ${params.premierAppel ? 'oui (Loomina ne sait rien encore)' : 'non'}${params.demo ? "\nCet appel est une DÉMONSTRATION de trois minutes pour un appelant inconnu : quatre questions sur un seul souvenir, puis Loomina explique le service et renvoie vers le site. C'est son rôle ici, pas une sortie de rôle." : ''}
+Premier appel : ${params.premierAppel ? 'oui (Loomina ne sait rien encore)' : 'non'}${params.demo ? "\nCet appel est une DÉMONSTRATION d'environ cinq minutes pour un appelant inconnu : Loomina se présente, demande le prénom, recueille un moment de vie (l'enfance par défaut) en revenant sur chaque lieu ou personne cité, annonce avant la fin que le récit part par SMS, puis fait une clôture courte et renvoie vers le site. Elle peut répondre au prix (449 euros) si on le lui demande. C'est son rôle ici, pas une sortie de rôle. Compte comme problème : une question qui n'exploite pas ce qui vient d'être dit, une relance émotionnelle creuse (« qu'est-ce que vous ressentez ? ») quand un fait concret attendait, un lieu ou une personne cité et jamais repris, une phrase coupée ou une personne coupée en plein récit, une fin abrupte." : ''}
 
 # MÉMOIRE DONT LOOMINA DISPOSAIT AVANT L'APPEL
 ${params.memory}
@@ -247,5 +247,54 @@ Rends en JSON :
         trous: list(out.trous),
         points_forts: list(out.points_forts),
         verdict: String(out.verdict ?? ''),
+    };
+}
+
+export interface DemoStoryVerdict {
+    inventions: string[];
+    erreurs: string[];
+    omissions: string[];
+    meta: string[];
+    lieux: string[];
+    fidelite: number;
+    style: number;
+    envie: number;
+    commentaire: string;
+}
+
+/** Le récit de la démonstration : fidèle, bien écrit, et donne-t-il envie d'écrire le livre ? */
+export async function judgeDemoStory(params: { transcript: string; title: string; story: string }): Promise<DemoStoryVerdict> {
+    const out = await judge(
+        `Tu vérifies le récit écrit après une DÉMONSTRATION téléphonique de cinq minutes : c'est le premier texte que la personne reçoit de Loomina, il doit lui donner envie d'écrire tout son livre. SEULES les lignes « User: » du transcript sont des faits ; les lignes « AI: » sont des questions, jamais une source. La transcription automatique déforme parfois les noms de lieux (« Cour de voix » pour Courbevoie, « Levaloir » pour Levallois) : les écrire correctement est attendu, ce n'est pas une invention.
+
+Rends en JSON :
+- "inventions" : chaque détail factuel du récit absent des lignes « User: » (cite le passage). Les reformulations fidèles ne comptent pas.
+- "erreurs" : chaque fait déformé (nom, lien, lieu, ordre).
+- "omissions" : les moments marquants racontés et absents du récit (au plus 3).
+- "meta" : chaque phrase qui parle de l'appel lui-même, de Loomina, du SMS, ou qui recopie une hésitation sans intérêt pour un lecteur (« je n'ai pas de détail particulier », « si mes souvenirs sont bons » répété), au lieu de raconter.
+- "lieux" : chaque nom de lieu laissé avec une orthographe fautive ou phonétique (« Chatoux », « Cour de voix »).
+- "fidelite" : de 1 à 10.
+- "style" : de 1 à 10 (10 = vivant, sobre, on entend la personne ; 5 = correct mais plat).
+- "envie" : de 1 à 10, à quel point ce texte donne envie à la personne et à sa famille d'avoir le livre entier.
+- "commentaire" : deux phrases pour Solal, le fondateur.
+
+{"inventions":[],"erreurs":[],"omissions":[],"meta":[],"lieux":[],"fidelite":0,"style":0,"envie":0,"commentaire":""}`,
+        `# TRANSCRIPT DE LA DÉMONSTRATION
+${params.transcript}
+
+# RÉCIT À VÉRIFIER — « ${params.title} »
+${params.story}`,
+        FINE_JUDGE_MODEL
+    );
+    return {
+        inventions: list(out.inventions),
+        erreurs: list(out.erreurs),
+        omissions: list(out.omissions),
+        meta: list(out.meta),
+        lieux: list(out.lieux),
+        fidelite: num(out.fidelite),
+        style: num(out.style),
+        envie: num(out.envie),
+        commentaire: String(out.commentaire ?? ''),
     };
 }

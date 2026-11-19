@@ -19,16 +19,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { SITE_URL, SPEED, DEDICATED_KEY, usage } from './lib/env';
 import OpenAI from 'openai';
-import { startStack, stopStack, waitProcessed } from './lib/pile';
+import { startStack, stopStack, waitProcessed, waitDemoStory } from './lib/pile';
 import type { Processed } from './lib/pile';
-import { createAccount, snapshot, cleanup, unknownPhone } from './lib/profils';
+import { createAccount, snapshot, cleanup, unknownPhone, unknownMobile } from './lib/profils';
 import type { TestAccount, Snapshot } from './lib/profils';
 import { simulateCall, renderTurns } from './lib/appel';
 import type { CallResult } from './lib/appel';
 import { liveChecks, dbChecks, judgedReplies } from './lib/controles';
 import type { Check, LiveStats } from './lib/controles';
-import { judgeLive, judgeChapter, judgeMemory, judgeBook, JUDGE_MODEL } from './lib/juges';
-import type { LiveVerdict, ChapterVerdict, MemoryVerdict, BookVerdict } from './lib/juges';
+import { judgeLive, judgeChapter, judgeMemory, judgeBook, judgeDemoStory, JUDGE_MODEL } from './lib/juges';
+import type { LiveVerdict, ChapterVerdict, MemoryVerdict, BookVerdict, DemoStoryVerdict } from './lib/juges';
 import { NARRATOR_MODEL } from './lib/narrateur';
 import { SCENARIOS, LIVRE } from './scenarios';
 import type { Scenario } from './scenarios';
@@ -48,6 +48,8 @@ interface CallRecord {
     live: LiveVerdict | null;
     chapter: ChapterVerdict | null;
     memory: MemoryVerdict | null;
+    /** Démonstration sur portable : le récit envoyé par SMS et son verdict. */
+    demoStory?: { title: string; content: string; verdict: DemoStoryVerdict | null } | null;
     checks: Check[];
 }
 
@@ -152,7 +154,7 @@ async function runScenario(sc: Scenario): Promise<ScenarioResult> {
     fs.mkdirSync(dir, { recursive: true });
     try {
         const account = sc.inconnu || !sc.seed ? null : await createAccount(sc.seed, runId);
-        const phone = account?.phone ?? unknownPhone();
+        const phone = account?.phone ?? (sc.mobile ? unknownMobile() : unknownPhone());
         const total = sc.appels ?? 1;
         const told: string[] = [];
 
@@ -193,6 +195,27 @@ async function runScenario(sc: Scenario): Promise<ScenarioResult> {
                 const { data: stored } = await db().from('call_events').select('id').eq('vapi_call_id', call.callSid);
                 record.checks.push({ ok: call.turns.length > 2, gravite: 'bloquant', domaine: 'direct', label: 'l\'appelant inconnu a bien une démonstration' });
                 record.checks.push({ ok: (stored ?? []).length === 0, gravite: 'bloquant', domaine: 'base', label: 'démonstration : rien n\'est écrit en base' });
+                if (sc.mobile) {
+                    const story = await waitDemoStory(call.callSid);
+                    record.checks.push({ ok: Boolean(story && !story.error), gravite: 'bloquant', domaine: 'chapitre', label: `démonstration sur portable : le récit est écrit${story?.error ? ` — erreur : ${story.error}` : story ? '' : ' — aucun rapport reçu du serveur vocal'}` });
+                    if (story && !story.error) {
+                        record.checks.push({ ok: !story.unusable, gravite: 'bloquant', domaine: 'chapitre', label: `le récit de démonstration est exploitable (« ${story.title} », ${story.content.split(/\s+/).length} mots)` });
+                        const has = (w: string) => story.content.toLowerCase().includes(w.toLowerCase());
+                        for (const w of sc.attendu.recitContient ?? []) record.checks.push({ ok: has(w), gravite: 'important', domaine: 'chapitre', label: `le récit contient « ${w} »` });
+                        for (const w of sc.attendu.recitSans ?? []) record.checks.push({ ok: !has(w), gravite: 'important', domaine: 'chapitre', label: `le récit ne contient pas « ${w} »` });
+                        record.checks.push({ ok: !/reli[ée]/i.test(story.content + story.title), gravite: 'bloquant', domaine: 'chapitre', label: 'le récit ne dit jamais « relié »' });
+                        const verdict = await judgeDemoStory({ transcript: story.transcript, title: story.title, story: story.content }).catch(() => null);
+                        record.demoStory = { title: story.title, content: story.content, verdict };
+                        fs.writeFileSync(path.join(dir, 'recit-demo.md'), `# ${story.title}\n\n${story.content}`);
+                        if (verdict) {
+                            record.checks.push({ ok: verdict.inventions.length === 0, gravite: verdict.inventions.length > 2 ? 'bloquant' : 'important', domaine: 'chapitre', label: `détails inventés dans le récit de démo : ${verdict.inventions.length}${verdict.inventions.length ? ` (${verdict.inventions.slice(0, 2).join(' ; ')})` : ''}` });
+                            record.checks.push({ ok: verdict.erreurs.length === 0, gravite: 'important', domaine: 'chapitre', label: `faits déformés dans le récit de démo : ${verdict.erreurs.length}` });
+                            record.checks.push({ ok: verdict.meta.length === 0, gravite: 'important', domaine: 'chapitre', label: `phrases sur l'appel ou hésitations recopiées dans le récit : ${verdict.meta.length}${verdict.meta.length ? ` (${verdict.meta.slice(0, 2).join(' ; ')})` : ''}` });
+                            record.checks.push({ ok: verdict.lieux.length === 0, gravite: 'important', domaine: 'chapitre', label: `lieux mal orthographiés dans le récit : ${verdict.lieux.length}${verdict.lieux.length ? ` (${verdict.lieux.join(', ')})` : ''}` });
+                            record.checks.push({ ok: verdict.style >= 7 && verdict.envie >= 7, gravite: 'important', domaine: 'chapitre', label: `récit de démo : style ${verdict.style}/10, envie d'avoir le livre ${verdict.envie}/10, fidélité ${verdict.fidelite}/10` });
+                        }
+                    }
+                }
                 record.live = await livePromise;
                 record.checks.push(...judgeChecks(record.live, null, null));
                 continue;
@@ -297,7 +320,7 @@ function report(results: ScenarioResult[]): string {
 
     L.push(`# Batterie de tests Loomina — ${stamp.slice(0, 10)} ${stamp.slice(11).replace('-', ':')}`, '');
     L.push(`**${checks.length - ko.length} contrôles réussis sur ${checks.length}.** En échec : ${ko.filter((c) => c.gravite === 'bloquant').length} bloquant(s) 🟥, ${ko.filter((c) => c.gravite === 'important').length} important(s) 🟧, ${ko.filter((c) => c.gravite === 'mineur').length} mineur(s) 🟨.`, '');
-    L.push(`${results.length} scénarios, ${results.reduce((a, r) => a + r.calls.length, 0)} appels simulés. Voix ${process.env.VOICE_MODEL ?? 'gpt-4.1'}, Directeur ${DIRECTOR_MODEL}, Écrivain ${WRITER_MODEL}, narrateur joué par ${NARRATOR_MODEL}, juge ${JUDGE_MODEL}. Parole simulée accélérée ${SPEED} fois : les durées d'appel ne sont pas réalistes, les temps de réponse du cerveau le sont.`, '');
+    L.push(`${results.length} scénarios, ${results.reduce((a, r) => a + r.calls.length, 0)} appels simulés. Voix ${process.env.VOICE_MODEL ?? 'gpt-4.1'}, Directeur ${DIRECTOR_MODEL}, Écrivain ${WRITER_MODEL}, narrateur joué par ${NARRATOR_MODEL}, juge ${JUDGE_MODEL}. Parole simulée accélérée ${SPEED} fois (en temps réel pour les démonstrations, dont la fin dépend de l'horloge) : les durées des autres appels ne sont pas réalistes, les temps de réponse du cerveau le sont.`, '');
 
     L.push('## En chiffres', '');
     if (lat.length) L.push(`- **Temps de réponse du cerveau** (du dernier mot du narrateur au premier mot de Loomina, sans la voix ni la transcription) : médiane ${lat[Math.floor(lat.length / 2)]} ms, 95 % sous ${lat[Math.floor(lat.length * 0.95)]} ms, pire ${lat[lat.length - 1]} ms, sur ${lat.length} répliques.`);
@@ -342,6 +365,15 @@ function report(results: ScenarioResult[]): string {
                 L.push(`**Le juge sur le chapitre :** ${c.chapter.commentaire}`);
                 for (const [label, items] of [['Inventé', c.chapter.inventions], ['Déformé', c.chapter.erreurs], ['Oublié', c.chapter.omissions], ['Redit', c.chapter.repetitions]] as const) for (const i of items) L.push(`- ${label} : ${i}`);
                 L.push('');
+            }
+            if (c.demoStory) {
+                L.push(`**Le récit envoyé par SMS — « ${c.demoStory.title} » :**`, '', ...c.demoStory.content.split('\n').map((l) => `> ${l}`), '');
+                if (c.demoStory.verdict) {
+                    const v = c.demoStory.verdict;
+                    L.push(`**Le juge sur le récit :** ${v.commentaire}`);
+                    for (const [label, items] of [['Inventé', v.inventions], ['Déformé', v.erreurs], ['Oublié', v.omissions], ['Hors récit', v.meta], ['Lieu mal écrit', v.lieux]] as const) for (const i of items) L.push(`- ${label} : ${i}`);
+                    L.push('');
+                }
             }
             if (c.memory && (c.memory.erreurs.length || c.memory.oublis.length)) {
                 L.push('**Le juge sur la mémoire :**');

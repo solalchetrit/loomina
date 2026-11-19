@@ -45,6 +45,11 @@ function fakePhone(): string {
     return `+3319900${String(crypto.randomInt(0, 10000)).padStart(4, '0')}`;
 }
 
+/** Un portable fictif (plage ARCEP 06 39 98 xx xx, réservée aux œuvres de fiction) : la démo y annonce le récit par SMS. */
+export function unknownMobile(): string {
+    return `+3363998${String(crypto.randomInt(0, 10000)).padStart(4, '0')}`;
+}
+
 /** Un numéro qui n'appartient à aucun profil (appelant inconnu). */
 export function unknownPhone(): string {
     return `+3326191${String(crypto.randomInt(0, 10000)).padStart(4, '0')}`;
