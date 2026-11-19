@@ -109,30 +109,40 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
 
   const [open, setOpen] = useState(false);
 
+  // Dans la carte du livre : les photos en petite rangée, puis une tuile « + » pour en ajouter.
   return (
-    <section className="card p-5" aria-labelledby="photos-titre">
-      <div className="flex items-center justify-between gap-3">
-        <h2 id="photos-titre" className="text-[16px] font-extrabold tracking-[-0.01em]">
-          Vos photos{photos.length > 0 ? ` · ${photos.length}` : ""}
-        </h2>
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={() => setOpen((o) => !o)}
-          className="press inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-3.5 text-[14px] font-bold text-[var(--ink-2)] hover:bg-[var(--line)] hover:text-[var(--ink)]"
-        >
-          {open ? (
-            "Fermer"
-          ) : (
-            <>
-              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Ajouter
-            </>
-          )}
-        </button>
-      </div>
+    <section aria-labelledby="photos-titre">
+      <h3 id="photos-titre" className="text-[13px] font-bold text-[var(--ink-3)]">
+        {photos.length > 0 ? `Vos photos · ${photos.length}` : "Vos photos"}
+      </h3>
+      <ul className="mt-2 flex flex-wrap items-center gap-2">
+        {photos.slice(0, 9).map((p) => (
+          <li key={p.id}>
+            {p.url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- lien signé temporaire, hors optimisation Next
+              <img src={p.url} alt={p.caption ?? "Photo envoyée"} title={p.caption ?? p.question} className="h-12 w-12 rounded-[12px] object-cover" />
+            ) : (
+              <div className="h-12 w-12 rounded-[12px] bg-[var(--surface-2)]" title={p.caption ?? p.question} />
+            )}
+          </li>
+        ))}
+        <li className={photos.length ? "" : "w-full"}>
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-label={open ? "Fermer" : "Ajouter une photo"}
+            onClick={() => setOpen((o) => !o)}
+            className={`press flex h-12 items-center justify-center gap-2 rounded-[12px] border border-dashed border-[var(--rule-strong)] text-[15px] font-bold text-[var(--ink-2)] hover:border-[var(--ink-3)] hover:bg-[var(--canvas)] hover:text-[var(--ink)] ${
+              photos.length ? "w-12" : "w-full"
+            }`}
+          >
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className={`transition-transform ${open ? "rotate-45" : ""}`}>
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            {!photos.length && (open ? "Fermer" : "Ajouter une photo")}
+          </button>
+        </li>
+      </ul>
 
       {open && (
       <form onSubmit={send} className="mt-3 space-y-2.5">
@@ -185,23 +195,6 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
           {status === "error" && <span className="text-[var(--danger)]">{error}</span>}
         </p>
       </form>
-      )}
-
-      {photos.length > 0 && (
-        <ul className="mt-4 grid grid-cols-4 gap-2.5 sm:grid-cols-6 lg:grid-cols-3">
-          {photos.map((p) => (
-            <li key={p.id} className="min-w-0">
-              {p.url ? (
-                // eslint-disable-next-line @next/next/no-img-element -- lien signé temporaire, hors optimisation Next
-                <img src={p.url} alt={p.caption ?? "Photo envoyée"} className="aspect-square w-full rounded-[10px] object-cover" />
-              ) : (
-                <div className="aspect-square w-full rounded-[10px] bg-[var(--surface-2)]" />
-              )}
-              <p className="mt-1 line-clamp-1 text-[12.5px] leading-tight text-[var(--ink-3)]">{p.caption ?? p.question}</p>
-              
-            </li>
-          ))}
-        </ul>
       )}
     </section>
   );

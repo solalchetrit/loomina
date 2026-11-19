@@ -31,26 +31,26 @@ type Tab = "apercu" | "livre" | "vie" | "appels" | "reglages";
 /** Le prochain appel : le numéro, et le sujet que Loomina a prévu d'aborder. */
 function NextCall({ topic, schedule }: { topic: string | null; schedule?: string | null }) {
   return (
-    <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white" aria-labelledby="prochain-appel">
-      <h2 id="prochain-appel" className="text-[15px] font-bold tracking-normal text-[var(--amber)]">
+    <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white md:p-7" aria-labelledby="prochain-appel">
+      <h2 id="prochain-appel" className="text-[17px] font-bold tracking-normal text-[var(--amber)]">
         Votre prochain appel
       </h2>
       {topic ? (
         <>
-          <p className="mt-2 text-[14px] text-[#cfcfc8]">Loomina a prévu de commencer par :</p>
-          <p className="mt-1.5 font-serif text-[clamp(1.15rem,1.6vw,1.3rem)] leading-snug text-white">« {topic} »</p>
+          <p className="mt-3 text-[16px] text-[#cfcfc8]">Loomina a prévu de commencer par :</p>
+          <p className="mt-2 font-serif text-[clamp(1.4rem,2.1vw,1.75rem)] leading-[1.3] text-white">« {topic} »</p>
         </>
       ) : (
-        <p className="mt-2 text-[clamp(1.15rem,1.7vw,1.35rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
+        <p className="mt-3 text-[clamp(1.4rem,2.1vw,1.7rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
       )}
       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
         <a
           href={`tel:${SITE.phone}`}
-          className="press inline-flex min-h-12 shrink-0 items-center rounded-full bg-[var(--amber)] px-6 text-[19px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
+          className="press inline-flex min-h-12 shrink-0 items-center rounded-full bg-[var(--amber)] px-6 text-[21px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
         >
           {SITE.phoneDisplay}
         </a>
-        <p className="min-w-[12rem] flex-1 text-[14px] leading-snug text-[#cfcfc8]">
+        <p className="min-w-[12rem] flex-1 text-[15px] leading-snug text-[#cfcfc8]">
           {schedule ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.` : "Depuis le numéro de votre commande, quand vous voulez."}
         </p>
       </div>

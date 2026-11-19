@@ -60,9 +60,12 @@ export default function Calls({ project, onUnauthorized }: { project: ProjectOve
 
   return (
     <section className="card px-3 py-3 md:px-4" aria-label="Vos appels">
-      <p className="px-3 pb-2 pt-2 text-[14px] text-[var(--ink-3)]">
-        {project.calls.length} appel{project.calls.length > 1 ? "s" : ""} · {total} min · touchez un appel pour lire son récit
-      </p>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-3 pb-3 pt-2">
+        <p className="text-[16px] font-semibold text-[var(--ink)]">Chaque appel devient un récit. Ouvrez-en un pour le lire ou le corriger.</p>
+        <p className="text-[14px] text-[var(--ink-3)]">
+          {project.calls.length} appel{project.calls.length > 1 ? "s" : ""} · {total} min
+        </p>
+      </div>
       <ol>
         {project.calls.map((c) => {
           const on = open === c.date;
@@ -73,11 +76,12 @@ export default function Calls({ project, onUnauthorized }: { project: ProjectOve
                 type="button"
                 aria-expanded={on}
                 onClick={() => setOpen(on ? null : c.date)}
-                className="press grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 rounded-[14px] px-3 py-3.5 text-left hover:bg-[var(--canvas)] sm:grid-cols-[9.5rem_minmax(0,1fr)_auto_auto]"
+                className="press grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 rounded-[14px] px-3 py-3.5 text-left hover:bg-[var(--canvas)] sm:grid-cols-[9.5rem_minmax(0,1fr)_auto_auto_auto]"
               >
                 <span className="col-span-2 text-[13.5px] text-[var(--ink-3)] sm:col-span-1 sm:text-[15px]">{formatDate(c.date)}</span>
                 <b className="text-[16px] leading-snug text-[var(--ink)]">{c.title ?? "Appel enregistré"}</b>
-                <span className="text-[14px] tabular-nums text-[var(--ink-3)] max-sm:hidden">{c.minutes ? `${c.minutes} min` : ""}</span>
+                <span className="w-14 text-right text-[14px] tabular-nums text-[var(--ink-3)] max-sm:hidden">{c.minutes ? `${c.minutes} min` : ""}</span>
+                <span className="text-[14px] font-semibold text-[var(--ink-3)] max-sm:hidden">{on ? "Fermer" : story ? "Lire le récit" : "Voir"}</span>
                 <svg
                   aria-hidden="true"
                   width="16"

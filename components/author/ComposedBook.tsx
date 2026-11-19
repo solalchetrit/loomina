@@ -210,6 +210,8 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
               <h2 className="text-[19px] font-extrabold leading-tight tracking-[-0.02em]">Votre livre</h2>
             )}
 
+            {aside && <div className="mt-5">{aside}</div>}
+
             {running ? (
               <p className="mt-4 flex items-center gap-3 text-[14px] font-semibold leading-snug text-[var(--ink-2)]" role="status">
                 {/* L'Étincelle écrit : l'attente devient un moment (le rond qui tourne reste si le kit ne charge pas). */}
@@ -234,6 +236,11 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
                 {!canCompose && <p className={small}>Votre livre sera composé à partir de deux appels racontés.</p>}
                 {edition && (
                   <Button onClick={download} loading={downloading} variant="secondary" className="!min-h-11 w-full !px-4 !text-[15px]">
+                    {!downloading && (
+                      <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
+                      </svg>
+                    )}
                     {downloading ? "Préparation du PDF…" : "Télécharger en PDF"}
                   </Button>
                 )}
@@ -257,7 +264,6 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
             </More>
             {edition && <Toc label="Sommaire" parts={toc} />}
           </div>
-          {aside}
         </>
       }
     >
