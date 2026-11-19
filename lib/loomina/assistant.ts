@@ -275,7 +275,7 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
                 `- Si le sujet touche un sujet sensible ci-dessus, ne l'aborde pas. Si ${name} préfère ne pas en parler, n'insiste pas et passe à autre chose.`,
                 first
                     ? "- Au premier appel, garde-le pour la seconde moitié : d'abord faire connaissance."
-                    : "- Ne laisse pas OÙ REPRENDRE empêcher ce sujet : s'il ne trouve pas sa place après la première histoire, amène-le ensuite.",
+                    : "- Ce sujet passe avant tout le reste. Dès que la première histoire de l'appel est racontée (deux ou trois relances au plus), amène-le, AVANT d'ouvrir un autre souvenir, une scène à approfondir ou un sujet des listes ci-dessus. Ne laisse ni OÙ REPRENDRE ni l'envie de creuser l'empêcher.",
             ].join('\n')
         );
     }
