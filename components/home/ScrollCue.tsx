@@ -30,7 +30,7 @@ export default function ScrollCue({ target, label, style }: { target: string; la
       }}
       aria-label={label}
       title={label}
-      className="rise mx-auto mt-6 hidden h-11 w-11 items-center justify-center rounded-full text-[var(--ink-3)] transition-colors duration-200 hover:text-[var(--ink)] lg:flex"
+      className="rise mx-auto mt-8 hidden h-11 w-11 items-center justify-center rounded-full text-[var(--ink-3)] transition-colors duration-200 hover:text-[var(--ink)] lg:flex"
       style={style}
     >
       {/* Une flèche seule, discrète : le texte « Comment ça marche » est retiré (Solal, 19/11/2026). */}

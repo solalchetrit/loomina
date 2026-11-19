@@ -15,9 +15,9 @@
 
 :root {
   /* Surfaces */
-  --canvas: #f6f7f9;         /* fond de page et panneaux dans les cartes : gris neutre, sans beige */
+  --canvas: #eef2f5;         /* fond de tout le site : bleuté naturel (Solal, 19/11/2026) ; aussi les panneaux dans les cartes */
   --surface: #ffffff;        /* cartes */
-  --mist: #edf0f5;           /* fond d'une section sur deux : brume bleutée, l'écho du bleu nuit */
+  --mist: var(--canvas);           /* fond d'une section sur deux : brume bleutée, l'écho du bleu nuit */
   --surface-2: #eff1f4;      /* puce d'icône, bande discrète */
   --line: #e4e7ec;           /* bord de carte */
   --line-soft: #edeff3;      /* séparateur dans une carte */
@@ -172,7 +172,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --gap: 5.5rem;
+    --gap: 4.5rem;  /* resserré (Solal, 19/11/2026 : « un grand espace pour rien ») */
     --page-top: 8.5rem;
     --head-gap: 2.75rem;
   }

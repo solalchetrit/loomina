@@ -8,7 +8,6 @@ import Compare from "@/components/home/Compare";
 import HowItWorks from "@/components/HowItWorks";
 import AuthorShowcase from "@/components/AuthorShowcase";
 import VoiceToPage from "@/components/VoiceToPage";
-import OfferCard from "@/components/OfferCard";
 import Closing from "@/components/Closing";
 import Accordion from "@/components/ui/Accordion";
 import { Section, SectionHead } from "@/components/ui/Section";
@@ -42,26 +41,22 @@ const QUESTIONS = [
 export default function Home() {
   return (
     <>
-      {/*
-        Fonds de section (Solal, 19/11/2026) : une section blanche, une section bleutée (--mist),
-        en alternance stricte du haut jusqu'en bas. Pas d'autre couleur de fond.
-      */}
-      <div className="bg-white">
+      {/* Fond (Solal, 19/11/2026) : le même bleuté naturel partout (--canvas), seul le pied de page reste bleu nuit. */}
+      <div>
         <Hero />
       </div>
 
-      {/* lg:pt-10 : à l'arrivée par la flèche du haut de page, le fond bleuté remplit tout l'écran. */}
-      <div className="bg-[var(--mist)] lg:pt-10">
+      {/* lg:pt-12 : à l'arrivée par la flèche, le fond bleuté remplit l'écran et le titre se dégage du menu. */}
+      <div className="lg:pt-12">
         <HowItWorks />
       </div>
 
-      {/* Le bandeau de chiffres se pose à cheval entre la section bleutée et la section blanche. */}
-      <div className="bg-[linear-gradient(to_bottom,var(--mist)_50%,#fff_50%)]">
+            <div>
         <Facts />
       </div>
 
       {/* Une respiration : ce que le livre fait vivre en famille (placée sous les trois étapes, Solal 19/11/2026). */}
-      <div className="bg-white">
+      <div>
         <div className="section-y mx-auto w-full max-w-[1240px] px-5 sm:px-6" data-reveal>
           <Photo
             name="famille-album"
@@ -73,33 +68,26 @@ export default function Home() {
         </div>
       </div>
 
-      <AuthorShowcase className="bg-[var(--mist)]" />
-      <div className="bg-white">
+      <AuthorShowcase />
+      <div>
         <Audiences />
       </div>
-      <div className="bg-[var(--mist)]">
+      <div>
         <VoiceToPage />
       </div>
-      <div className="bg-white">
+      <div>
         <ThemePicker />
       </div>
-      <div className="bg-[var(--mist)]">
+      <div>
         <WhatYouGet />
       </div>
 
-      <Section id="offre" className="bg-white">
-        <SectionHead title="Un prix, tout compris" text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Rien à payer en plus." />
-        <div className="head-gap">
-          <OfferCard />
-        </div>
-      </Section>
-
-      <div className="bg-[var(--mist)]">
+      <div>
         <Compare />
       </div>
 
       {/* Le mot du fondateur, à la place d'avis clients que nous n'avons pas encore. */}
-      <Section className="bg-white">
+      <Section>
         <figure className="card mx-auto grid max-w-5xl items-center gap-8 p-5 md:grid-cols-[1fr_1.5fr] md:gap-12 md:p-6">
           <Photo
             name="album-photo"
@@ -121,8 +109,7 @@ export default function Home() {
         </figure>
       </Section>
 
-      {/* Les questions et l’appel final partagent le même fond bleuté. */}
-      <div className="bg-[var(--mist)]">
+            <div>
       <Section id="questions">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
           <div>
