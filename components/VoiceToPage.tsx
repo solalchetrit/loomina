@@ -98,7 +98,7 @@ export default function VoiceToPage() {
   const speaking = !still && beat > 0 && beat < END;
 
   return (
-    <Section id="exemple" className="bg-white">
+    <Section id="exemple">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <SectionHead
           title="De l’appel à la page du livre"

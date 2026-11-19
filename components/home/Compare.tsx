@@ -51,7 +51,7 @@ function Value({ cell, strong = false }: { cell: Cell; strong?: boolean }) {
 
 export default function Compare() {
   return (
-    <Section id="comparer" className="bg-white">
+    <Section id="comparer">
       <SectionHead
         title="Écrire seul, un biographe, ou Loomina ?"
         text="Trois façons d’obtenir le livre d’une vie. Ligne par ligne, voici ce qui change pour vous."

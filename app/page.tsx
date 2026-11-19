@@ -42,49 +42,64 @@ const QUESTIONS = [
 export default function Home() {
   return (
     <>
-      <Hero />
+      {/*
+        Fonds de section (Solal, 19/11/2026) : une section blanche, une section bleutée (--mist),
+        en alternance stricte du haut jusqu'en bas. Pas d'autre couleur de fond.
+      */}
+      <div className="bg-white">
+        <Hero />
+      </div>
 
-      {/* Les fonds changent d'une section à l'autre (Solal, 19/11/2026) : blanc, brume bleutée, lin, toujours très clairs. */}
-      {/* lg:pt-10 : à l'arrivée par la flèche du haut de page, le fond blanc remplit tout l'écran. */}
-      <div className="bg-white lg:pt-10">
+      {/* lg:pt-10 : à l'arrivée par la flèche du haut de page, le fond bleuté remplit tout l'écran. */}
+      <div className="bg-[var(--mist)] lg:pt-10">
         <HowItWorks />
       </div>
 
-      {/* Le bandeau de chiffres se pose à cheval entre le blanc et le fond de page. */}
-      <div className="bg-[linear-gradient(to_bottom,#fff_50%,var(--canvas)_50%)]">
+      {/* Le bandeau de chiffres se pose à cheval entre la section bleutée et la section blanche. */}
+      <div className="bg-[linear-gradient(to_bottom,var(--mist)_50%,#fff_50%)]">
         <Facts />
       </div>
 
       {/* Une respiration : ce que le livre fait vivre en famille (placée sous les trois étapes, Solal 19/11/2026). */}
-      <div className="section-y mx-auto w-full max-w-[1240px] px-5 sm:px-6" data-reveal>
-        <Photo
-          name="famille-album"
-          alt="Trois générations d’une même famille regardent ensemble un album de photos."
-          ratio="aspect-[3/2] sm:aspect-[3/1]"
-          focus="50% 22%"
-          sizes="(min-width: 1240px) 1200px, 100vw"
-        />
+      <div className="bg-white">
+        <div className="section-y mx-auto w-full max-w-[1240px] px-5 sm:px-6" data-reveal>
+          <Photo
+            name="famille-album"
+            alt="Trois générations d’une même famille regardent ensemble un album de photos."
+            ratio="aspect-[3/2] sm:aspect-[3/1]"
+            focus="50% 22%"
+            sizes="(min-width: 1240px) 1200px, 100vw"
+          />
+        </div>
       </div>
 
       <AuthorShowcase className="bg-[var(--mist)]" />
-      <Audiences />
-      <VoiceToPage />
-      <div className="bg-[var(--linen)]">
+      <div className="bg-white">
+        <Audiences />
+      </div>
+      <div className="bg-[var(--mist)]">
+        <VoiceToPage />
+      </div>
+      <div className="bg-white">
         <ThemePicker />
       </div>
-      <WhatYouGet />
+      <div className="bg-[var(--mist)]">
+        <WhatYouGet />
+      </div>
 
-      <Section id="offre" className="bg-[var(--mist)]">
+      <Section id="offre" className="bg-white">
         <SectionHead title="Un prix, tout compris" text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Rien à payer en plus." />
         <div className="head-gap">
           <OfferCard />
         </div>
       </Section>
 
-      <Compare />
+      <div className="bg-[var(--mist)]">
+        <Compare />
+      </div>
 
       {/* Le mot du fondateur, à la place d'avis clients que nous n'avons pas encore. */}
-      <Section className="bg-[var(--linen)]">
+      <Section className="bg-white">
         <figure className="card mx-auto grid max-w-5xl items-center gap-8 p-5 md:grid-cols-[1fr_1.5fr] md:gap-12 md:p-6">
           <Photo
             name="album-photo"
@@ -106,6 +121,8 @@ export default function Home() {
         </figure>
       </Section>
 
+      {/* Les questions et l’appel final partagent le même fond bleuté. */}
+      <div className="bg-[var(--mist)]">
       <Section id="questions">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
           <div>
@@ -139,6 +156,7 @@ export default function Home() {
       </Section>
 
       <Closing />
+      </div>
     </>
   );
 }

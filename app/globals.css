@@ -15,13 +15,12 @@
 
 :root {
   /* Surfaces */
-  --canvas: #f6f5f1;         /* fond de page */
+  --canvas: #f6f7f9;         /* fond de page et panneaux dans les cartes : gris neutre, sans beige */
   --surface: #ffffff;        /* cartes */
-  --mist: #eef0f3;           /* fond de section : brume bleutée, l'écho du bleu nuit */
-  --linen: #f4efe7;          /* fond de section : lin, l'écho de la toile du livre */
-  --surface-2: #f0f1f0;      /* puce d'icône, bande discrète */
-  --line: #e5e5e4;           /* bord de carte */
-  --line-soft: #eeeeed;      /* séparateur dans une carte */
+  --mist: #edf0f5;           /* fond d'une section sur deux : brume bleutée, l'écho du bleu nuit */
+  --surface-2: #eff1f4;      /* puce d'icône, bande discrète */
+  --line: #e4e7ec;           /* bord de carte */
+  --line-soft: #edeff3;      /* séparateur dans une carte */
 
   /* Encre */
   --ink: #171d2b;            /* bleu nuit : titres, boutons, panneaux sombres */
@@ -60,7 +59,7 @@
   --gold-ink: var(--amber-ink);
   --gold-light: var(--amber);
   --rule: var(--line);
-  --rule-strong: #d0d1d2;
+  --rule-strong: #cfd3da;
 
   /* Courbes */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -678,29 +677,27 @@ textarea.field {
 
 /* ================================================================
    FONDS DE SECTION ET MOUVEMENTS LÉGERS (Solal, 19/11/2026)
-   Les sections alternent blanc, brume bleutée et lin. Sur la brume
-   et le lin, une lueur très douce dérive lentement. Les photos se
+   Une section sur deux est bleutée (brume), les autres blanches. Sur
+   la brume, une lueur très douce dérive lentement. Les photos se
    posent en entrant à l'écran, le bandeau bleu nuit reçoit un reflet
    qui passe une seule fois, et les cartes se soulèvent d'un cheveu
    au survol. Tout s'arrête si l'appareil demande moins de mouvement.
    ================================================================ */
-.bg-\[var\(--mist\)\],
-.bg-\[var\(--linen\)\] {
+.bg-\[var\(--mist\)\] {
   position: relative;
   isolation: isolate;
   overflow: clip; /* pas hidden : l'aperçu collant de l'espace auteur doit rester collant */
 }
 
-.bg-\[var\(--mist\)\]::before,
-.bg-\[var\(--linen\)\]::before {
+.bg-\[var\(--mist\)\]::before {
   content: "";
   position: absolute;
   inset: -20% -10%;
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(40% 50% at 20% 20%, rgba(255, 255, 255, 0.7), transparent 70%),
-    radial-gradient(35% 45% at 85% 75%, rgba(255, 255, 255, 0.45), transparent 70%);
+    radial-gradient(40% 50% at 20% 20%, rgba(255, 255, 255, 0.5), transparent 70%),
+    radial-gradient(35% 45% at 85% 75%, rgba(255, 255, 255, 0.3), transparent 70%);
 }
 
 @keyframes loomina-drift {
@@ -719,8 +716,7 @@ textarea.field {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .bg-\[var\(--mist\)\]::before,
-  .bg-\[var\(--linen\)\]::before {
+  .bg-\[var\(--mist\)\]::before {
     animation: loomina-drift 28s ease-in-out infinite;
   }
 
