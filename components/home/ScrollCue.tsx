@@ -19,15 +19,21 @@ export default function ScrollCue({ target, label, style }: { target: string; la
         const title = section.querySelector("h2") ?? section;
         const bar = document.querySelector("header")?.firstElementChild;
         const menuBottom = bar ? bar.getBoundingClientRect().bottom : 84;
-        const top = title.getBoundingClientRect().top + window.scrollY - menuBottom - 28;
+        // Arrivée : le haut de la section (son fond) pile en haut de l'écran, le titre dégagé sous le menu.
+        // Si la marge de la section ne suffit pas à dégager le titre, on descend juste ce qu'il faut.
+        const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+        const titleTop = title.getBoundingClientRect().top + window.scrollY;
+        const top = Math.max(sectionTop, titleTop - menuBottom - 32);
         const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         window.scrollTo({ top, behavior: calm ? "auto" : "smooth" });
       }}
-      className="rise mx-auto mt-6 hidden items-center gap-2.5 rounded-full px-4 py-2 text-[15px] font-bold text-[var(--ink)] lg:flex"
+      aria-label={label}
+      title={label}
+      className="rise mx-auto mt-6 hidden h-11 w-11 items-center justify-center rounded-full text-[var(--ink-3)] transition-colors duration-200 hover:text-[var(--ink)] lg:flex"
       style={style}
     >
-      {label}
-      <span className="scroll-cue flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] bg-white">
+      {/* Une flèche seule, discrète : le texte « Comment ça marche » est retiré (Solal, 19/11/2026). */}
+      <span className="scroll-cue flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-white/70">
         <Icon name="arrow" size={16} className="rotate-90" />
       </span>
     </a>

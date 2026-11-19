@@ -77,7 +77,7 @@ export default function Hero() {
         </div>
       </div>
       {/* Le haut de page occupe tout l'écran : cette invitation, en bas au milieu, donne la suite. */}
-      <ScrollCue target="parcours" label="Comment ça marche" style={{ "--i": 5 } as CSSProperties} />
+      <ScrollCue target="parcours" label="Voir les trois étapes" style={{ "--i": 5 } as CSSProperties} />
     </section>
   );
 }
