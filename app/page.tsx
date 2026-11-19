@@ -44,8 +44,18 @@ export default function Home() {
     <>
       <Hero />
 
-      {/* Une respiration sous le haut de page : ce que le livre fait vivre en famille. */}
-      <div className="section-b mx-auto w-full max-w-[1240px] px-5 sm:px-6" data-reveal>
+      {/* Les fonds changent d'une section à l'autre (Solal, 19/11/2026) : blanc, brume bleutée, lin, toujours très clairs. */}
+      <div className="bg-white">
+        <HowItWorks />
+      </div>
+
+      {/* Le bandeau de chiffres se pose à cheval entre le blanc et le fond de page. */}
+      <div className="bg-[linear-gradient(to_bottom,#fff_50%,var(--canvas)_50%)]">
+        <Facts />
+      </div>
+
+      {/* Une respiration : ce que le livre fait vivre en famille (placée sous les trois étapes, Solal 19/11/2026). */}
+      <div className="section-y mx-auto w-full max-w-[1240px] px-5 sm:px-6" data-reveal>
         <Photo
           name="famille-album"
           alt="Trois générations d’une même famille regardent ensemble un album de photos."
@@ -55,15 +65,15 @@ export default function Home() {
         />
       </div>
 
-      <Facts />
-      <HowItWorks />
-      <AuthorShowcase className="bg-white" />
+      <AuthorShowcase className="bg-[var(--mist)]" />
       <Audiences />
       <VoiceToPage />
-      <ThemePicker />
+      <div className="bg-[var(--linen)]">
+        <ThemePicker />
+      </div>
       <WhatYouGet />
 
-      <Section id="offre">
+      <Section id="offre" className="bg-[var(--mist)]">
         <SectionHead title="Un prix, tout compris" text="Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Rien à payer en plus." />
         <div className="head-gap">
           <OfferCard />
@@ -73,7 +83,7 @@ export default function Home() {
       <Compare />
 
       {/* Le mot du fondateur, à la place d'avis clients que nous n'avons pas encore. */}
-      <Section>
+      <Section className="bg-[var(--linen)]">
         <figure className="card mx-auto grid max-w-5xl items-center gap-8 p-5 md:grid-cols-[1fr_1.5fr] md:gap-12 md:p-6">
           <Photo
             name="album-photo"
