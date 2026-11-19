@@ -45,7 +45,9 @@ for p in PAGES:
     s = read(f"{SRC}/{p}.html").replace("/_next/", "./n/")
     for a in ("href", "src"):
         s = s.replace(a + '="/', a + '="./').replace('\\"' + a + '\\":\\"/', '\\"' + a + '\\":\\"./')
-    head = HEAD + (SNAPSHOT if p == "dashboard" else "")
+    # L'hébergeur enveloppe la page d'accueil dans un squelette qui impose body{background:#fff} hors calque :
+    # il passerait devant les utilitaires Tailwind (rangés en calque). On remet le fond du site, hors calque aussi.
+    head = HEAD + "<style>body{background:var(--canvas)}</style>" + (SNAPSHOT if p == "dashboard" else "")
     write(os.path.join(OUT, "index.html" if p == "index" else p), s.replace("<head>", "<head>" + head, 1))
 
 for d, _, fs in os.walk(OUT + "/n"):

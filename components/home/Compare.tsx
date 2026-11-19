@@ -79,7 +79,7 @@ export default function Compare() {
           </li>
         ))}
       </ul>
-      <div className="head-gap hidden overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] md:block">
+      <div className="head-gap hidden overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-white md:block">
         <table className="w-full border-collapse text-left text-[16px]">
           <caption className="sr-only">Écrire seul, un biographe ou Loomina</caption>
           <thead>

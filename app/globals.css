@@ -15,7 +15,7 @@
 
 :root {
   /* Surfaces */
-  --canvas: #eef2f5;         /* fond de tout le site : bleuté naturel (Solal, 19/11/2026) ; aussi les panneaux dans les cartes */
+  --canvas: #f2f5f8;         /* fond de tout le site : bleuté naturel (Solal, 19/11/2026) ; aussi les panneaux dans les cartes */
   --surface: #ffffff;        /* cartes */
   --mist: var(--canvas);           /* fond d'une section sur deux : brume bleutée, l'écho du bleu nuit */
   --surface-2: #eff1f4;      /* puce d'icône, bande discrète */
