@@ -58,7 +58,7 @@ export default function Plans() {
         {PLANS.map((p, i) => (
           <li
             key={p.name}
-            className={`rounded-[var(--radius-card)] p-6 ${p.draft ? "border border-dashed border-[var(--line)]" : "border border-[var(--ink)] bg-[#fdf3e4]"}`}
+            className={`rounded-[var(--radius-card)] p-6 ${p.draft ? "border border-dashed border-[var(--line)]" : "border border-[var(--ink)] bg-[var(--amber-wash)]"}`}
           >
             <p className="text-[18px] font-extrabold">{p.name}</p>
             <p className={`mt-1 font-extrabold tracking-[-0.03em] ${p.draft ? "text-[20px] text-[var(--ink-3)]" : "text-[40px] leading-none"}`}>{p.price}</p>
@@ -116,7 +116,7 @@ export default function Plans() {
                   {r.label}
                 </th>
                 {PLANS.map((p, i) => (
-                  <td key={p.name} className={`px-6 py-4 ${p.featured ? "bg-[#fdf3e4]" : ""}`}>
+                  <td key={p.name} className={`px-6 py-4 ${p.featured ? "bg-[var(--amber-wash)]" : ""}`}>
                     <Value cell={r.values[i]} muted={p.draft} />
                   </td>
                 ))}
@@ -125,7 +125,7 @@ export default function Plans() {
             <tr className="border-t border-[var(--line-soft)]">
               <td className="px-6 py-5" />
               {PLANS.map((p) => (
-                <td key={p.name} className={`px-6 py-5 ${p.featured ? "bg-[#fdf3e4]" : ""}`}>
+                <td key={p.name} className={`px-6 py-5 ${p.featured ? "bg-[var(--amber-wash)]" : ""}`}>
                   {!p.draft && (
                     <Button href="/order" size="lg">
                       Commander

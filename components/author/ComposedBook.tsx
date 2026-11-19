@@ -1,5 +1,7 @@
 "use client";
 
+import LogoMotion from "@/components/brand/LogoMotion";
+
 import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 
@@ -149,7 +151,12 @@ export default function ComposedBook({ onUnauthorized }: { onUnauthorized: () =>
 
         {running ? (
           <p className="t-body mt-5 flex items-center gap-3 font-semibold" role="status">
-            <span className="spinner" aria-hidden="true" />
+            {/* L'Étincelle écrit : l'attente devient un moment (le rond qui tourne reste si le kit ne charge pas). */}
+            <LogoMotion name="persoEcrit" mode="loop" className="h-16 w-16 shrink-0">
+              <span className="flex h-full w-full items-center justify-center">
+                <span className="spinner" />
+              </span>
+            </LogoMotion>
             {running.total
               ? `Loomina écrit votre livre : chapitre ${Math.min(running.done + 1, running.total)} sur ${running.total}. Vous pouvez fermer cette page, il continuera.`
               : "Loomina relit tous vos appels et prépare le plan du livre. Comptez quelques minutes."}

@@ -50,7 +50,7 @@ export default function Progress({ project }: { project: ProjectOverview }) {
             <li
               key={s.phase}
               aria-current={current ? "step" : undefined}
-              className={`rounded-[18px] p-4 ${current ? "bg-[#fdf3e4] ring-1 ring-[var(--amber-line)]" : "bg-[var(--canvas)]"}`}
+              className={`rounded-[18px] p-4 ${current ? "bg-[var(--amber-wash)] ring-1 ring-[var(--amber-line)]" : "bg-[var(--canvas)]"}`}
             >
               <div className="flex items-center justify-between text-[13px] font-bold">
                 <span className={done ? "text-[var(--success)]" : current ? "text-[var(--amber-deep)]" : "text-[var(--ink-3)]"}>
