@@ -114,6 +114,19 @@ export default function DashboardPage() {
       const data = await res.json().catch(() => ({}));
       if (res.status === 404) throw new Error("Ce numéro ne correspond à aucune commande. Indiquez le numéro donné à la commande : celui de la personne qui raconte, ou le vôtre si vous avez offert le livre.");
       if (!res.ok) throw new Error(data.message || "Le code n’a pas pu être envoyé. Réessayez dans un instant.");
+      // Numéro de l'espace de test : la session est déjà ouverte, pas de code à attendre.
+      if (data.open === true) {
+        setIsLoggedIn(true);
+        setSessionExpired(false);
+        if (rememberMe) {
+          try {
+            localStorage.setItem(STORAGE_KEY, phone);
+          } catch {
+            /* ignore */
+          }
+        }
+        return;
+      }
       setLoginStep("otp");
     } catch (err) {
       setError(

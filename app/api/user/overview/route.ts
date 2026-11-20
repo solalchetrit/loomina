@@ -3,7 +3,8 @@ import { db } from '@/lib/loomina/db';
 import { currentAuthor, splitTopics } from '@/lib/loomina/author';
 import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
 import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
-import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
+import { demoOverview } from '@/lib/loomina/demo';
+import { isDemoRequest } from '@/lib/loomina/test-author';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
 import { readGiver, sharesWithGiver } from '@/lib/loomina/giver';
@@ -16,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 /** Tout ce que l'espace auteur affiche, hors texte des chapitres (voir /api/user/stories). */
 export async function GET(request: NextRequest) {
-    if (DEMO_DATA) return NextResponse.json(demoOverview());
+    if (await isDemoRequest(request)) return NextResponse.json(demoOverview());
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;

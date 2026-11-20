@@ -3,7 +3,7 @@ import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
 import { applyCorrection } from '@/lib/loomina/writer';
-import { DEMO_DATA } from '@/lib/loomina/demo';
+import { isDemoRequest } from '@/lib/loomina/test-author';
 import { queueCorrection } from '@/lib/loomina/corrections';
 
 export const runtime = 'nodejs';
@@ -28,9 +28,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (correction.length < 4) return NextResponse.json({ error: 'Décrivez la correction en quelques mots.' }, { status: 400 });
 
     if (!Number.isInteger(number) || number < 1) return NextResponse.json({ error: 'Chapitre inconnu' }, { status: 400 });
-    if (DEMO_DATA && body.later === true) return NextResponse.json({ queued: true, demo: true });
+    const demo = await isDemoRequest(request);
+    if (demo && body.later === true) return NextResponse.json({ queued: true, demo: true });
 
-    if (DEMO_DATA) {
+    if (demo) {
         const content = typeof body.content === 'string' ? body.content : '';
         return NextResponse.json({ content, demo: true });
     }

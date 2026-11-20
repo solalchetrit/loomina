@@ -4,7 +4,7 @@ import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
 import { buildBookPlan, sanitizePlan } from '@/lib/loomina/book-plan';
 import type { BookPlan } from '@/lib/loomina/book-plan';
-import { DEMO_DATA } from '@/lib/loomina/demo';
+import { isDemoRequest } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,7 +12,7 @@ export const maxDuration = 120;
 
 /** Le plan par périodes enregistré, s'il existe. */
 export async function GET(request: NextRequest) {
-    if (DEMO_DATA) return NextResponse.json({ plan: null });
+    if (await isDemoRequest(request)) return NextResponse.json({ plan: null });
     const author = await currentAuthor(request);
     if (author instanceof NextResponse) return author;
     const plan = ((author.project?.project_metadata ?? {}) as { book_plan?: BookPlan }).book_plan ?? null;
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
 /** Range (ou range à nouveau) les chapitres par périodes de vie. */
 export async function POST(request: NextRequest) {
-    if (DEMO_DATA) {
+    if (await isDemoRequest(request)) {
         // Démo : un plan simple, sans appel au modèle.
         return NextResponse.json({ plan: { parts: sanitizePlan([{ title: 'L’enfance', chapters: [1, 2, 3] }], [1, 2, 3]), chapter_count: 3, at: new Date().toISOString() } });
     }

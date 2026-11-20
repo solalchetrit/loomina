@@ -3,7 +3,7 @@ import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
 import { countWords } from '@/lib/loomina/writer';
-import { DEMO_DATA } from '@/lib/loomina/demo';
+import { isDemoRequest } from '@/lib/loomina/test-author';
 import { carryIntoBook } from '@/lib/loomina/book-edition';
 
 export const runtime = 'nodejs';
@@ -30,7 +30,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!content) return NextResponse.json({ error: 'Le récit ne peut pas être vide.' }, { status: 400 });
     if (content.length > MAX_CHARS) return NextResponse.json({ error: 'Le récit est trop long.' }, { status: 400 });
 
-    if (DEMO_DATA) return NextResponse.json({ saved: true, demo: true });
+    if (await isDemoRequest(request)) return NextResponse.json({ saved: true, demo: true });
 
     try {
         const author = await currentAuthor(request);

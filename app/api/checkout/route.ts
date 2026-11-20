@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { OFFER } from "@/config/offer";
 import { stripe } from "@/lib/stripe";
 import { normalizeCallMinutes } from "@/lib/loomina/call-length";
+import { isTestAuthorPhone } from "@/lib/loomina/test-author";
 
 export async function POST(request: NextRequest) {
     try {
@@ -16,6 +17,10 @@ export async function POST(request: NextRequest) {
         // Validation simple
         if (!email || !firstName || !lastName) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        }
+        // 01 12 34 56 78 est le numéro de l'espace de test : il ne peut pas porter une vraie commande.
+        if (isTestAuthorPhone(phone) || isTestAuthorPhone(giverPhone)) {
+            return NextResponse.json({ error: "Ce numéro sert à l’espace de test. Indiquez un vrai numéro de téléphone." }, { status: 400 });
         }
 
         // Base URL for success/cancel redirects

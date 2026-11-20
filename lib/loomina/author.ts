@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { findProfileByPhone, findActiveProject } from './db';
 import type { Profile, Project } from './db';
 import { readSession } from './session';
+import { isTestAuthorPhone } from './test-author';
 
 export type Author = { profile: Profile; project: Project | null };
 
@@ -16,6 +17,9 @@ export type Author = { profile: Profile; project: Project | null };
 export async function currentAuthor(request: NextRequest): Promise<Author | NextResponse> {
     const session = await readSession(request);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Garde-fou : la session de test (01 12 34 56 78) ne lit ni n'écrit jamais un vrai livre,
+    // même si un profil portait un jour ce numéro.
+    if (isTestAuthorPhone(session.phone)) return NextResponse.json({ error: 'Espace de test : rien n’est enregistré.' }, { status: 403 });
 
     const profile = await findProfileByPhone(session.phone);
     if (!profile) return NextResponse.json({ error: 'Not found' }, { status: 404 });

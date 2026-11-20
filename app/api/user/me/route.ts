@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { findProfileByPhone } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
+import { isTestAuthorPhone, TEST_AUTHOR_PHONE } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,6 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
     const session = await readSession(request);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (isTestAuthorPhone(session.phone)) return NextResponse.json({ first_name: 'Jeanne', full_name: 'Jeanne (exemple)', phone_number: TEST_AUTHOR_PHONE });
 
     try {
         const profile = await findProfileByPhone(session.phone);

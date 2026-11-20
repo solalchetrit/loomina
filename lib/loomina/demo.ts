@@ -5,6 +5,10 @@
  * avec le livre d'exemple ci-dessous au lieu de lire Supabase : on voit chaque
  * module rempli sans clé ni vrai client. Jamais actif en production.
  * Les réglages et les sujets suggérés sont gardés en mémoire jusqu'au redémarrage.
+ *
+ * En ligne, le même livre d'exemple sert l'espace auteur de test (numéro
+ * 01 12 34 56 78, voir test-author.ts). Là, rien n'est gardé : la réponse
+ * montre l'essai, mais le visiteur suivant retrouve l'exemple intact.
  */
 
 import { buildWeave } from './weave';
@@ -198,18 +202,23 @@ export function demoStories() {
 }
 
 export function demoSavePrefs(patch: Partial<typeof state.prefs>) {
-    state.prefs = { ...state.prefs, ...patch };
+    if (DEMO_DATA) state.prefs = { ...state.prefs, ...patch };
 }
 
 export function demoAddQuestion(question: string) {
-    state.openQuestions = [question, ...state.openQuestions.filter((q) => q !== question)].slice(0, 15);
-    return state.openQuestions;
+    const openQuestions = [question, ...state.openQuestions.filter((q) => q !== question)].slice(0, 15);
+    if (DEMO_DATA) state.openQuestions = openQuestions;
+    return openQuestions;
 }
 
 export function demoAddPerson(name: string, relation: string) {
-    state.family = [...state.family, { name, relation }];
-    state.openQuestions = [personTopic(name, relation), ...state.openQuestions].slice(0, 15);
-    return { family: state.family, openQuestions: state.openQuestions };
+    const family = [...state.family, { name, relation }];
+    const openQuestions = [personTopic(name, relation), ...state.openQuestions].slice(0, 15);
+    if (DEMO_DATA) {
+        state.family = family;
+        state.openQuestions = openQuestions;
+    }
+    return { family, openQuestions };
 }
 
 /** Le sujet que Loomina garde en tête pour une personne ajoutée depuis l'espace auteur. */
