@@ -24,6 +24,14 @@ const COLUMNS = [
     ],
   },
   {
+    title: "Guides",
+    links: [
+      { href: "/ecrire-ses-memoires", label: "Écrire ses mémoires" },
+      { href: "/cadeau-grands-parents", label: "Offrir à ses grands-parents" },
+      { href: "/biographe-familial", label: "Biographe familial" },
+    ],
+  },
+  {
     title: "Légal",
     links: [
       { href: "/cgv", label: "Conditions de vente" },
@@ -74,7 +82,7 @@ export default function Footer() {
             </dl>
           </div>
 
-          <div className="grid gap-10 sm:grid-cols-3">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {COLUMNS.map((col) => (
               <div key={col.title}>
                 <h2 className="text-[15px] font-bold tracking-normal text-[var(--ink)]">{col.title}</h2>
