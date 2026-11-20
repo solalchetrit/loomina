@@ -20,6 +20,13 @@ import { demoTimeNote } from '../../lib/loomina/assistant';
 
 const END_MARKER = '##END_CALL##';
 
+/** Une réplique qui se termine par un au revoir. */
+const GOODBYE = /(à (très )?bientôt|au revoir|bonne (fin de )?(journée|soirée)|prends soin de toi|prenez soin de vous)[^?]{0,40}$/i;
+
+function words(text: string): number {
+    return text.split(/\s+/).filter(Boolean).length;
+}
+
 /**
  * Temps d'attente après la fin d'une phrase du narrateur avant que Loomina
  * réponde. La transcription déclare une phrase finie dès une petite pause :
@@ -93,6 +100,10 @@ export class CallSession {
     private silenceNudged = false;
     private finished = false;
     private endRequested = false;
+    /** Loomina a dit au revoir sans marqueur de fin : on attend un dernier mot. */
+    private closingSaid = false;
+    /** La toute petite phrase d'au revoir a été dite (une seule fois). */
+    private farewellSaid = false;
     /** Texte déjà envoyé à la voix pour la réponse en cours. */
     private spokenSoFar = '';
 
@@ -172,6 +183,15 @@ export class CallSession {
         }
         const clean = text.trim();
         if (!clean) return;
+
+        // Après l'au revoir de Loomina, la personne dit « merci, au revoir » :
+        // démo d'Ethan (20/11/2026), Loomina lui a refait toute la clôture.
+        // Une toute petite phrase, puis on raccroche, sans repasser par le modèle.
+        // Si la personne se remet à raconter (longue phrase), on reprend normalement.
+        if (this.endRequested || this.closingSaid) {
+            if (this.endRequested || words(clean) <= 12) return this.farewell(clean);
+            this.closingSaid = false;
+        }
 
         this.armSilenceTimer();
         // D'abord clore la réponse en cours (gardée telle que dite), puis
@@ -446,6 +466,10 @@ export class CallSession {
             if (!this.endRequested) this.armSilenceTimer(speechMs(spoken));
         }
 
+        // Au revoir dit, mais le modèle a oublié ##END_CALL## : le prochain
+        // « merci » de la personne ne doit pas relancer une réponse.
+        if (!this.endRequested && GOODBYE.test(spoken)) this.closingSaid = true;
+
         if (this.endRequested) {
             // Laisser la voix finir la phrase d'au revoir avant de couper.
             const ms = Math.min(90_000, speechMs(spoken));
@@ -514,6 +538,21 @@ export class CallSession {
         this.sendText(text, true);
         this.turns.push({ role: 'bot', message: text, time: Date.now() });
         setTimeout(() => void this.end(reason), speechMs(text));
+    }
+
+    /** Dernier mot de la personne après l'au revoir : une phrase courte, puis on raccroche. */
+    private farewell(heard: string): void {
+        this.turns.push({ role: 'user', message: heard, time: Date.now() });
+        if (this.farewellSaid) return;
+        this.farewellSaid = true;
+        this.endRequested = true;
+        this.cancelPendingReply();
+        if (this.silenceTimer) clearTimeout(this.silenceTimer);
+        const name = typeof this.plan.metadata.first_name_spoken === 'string' ? this.plan.metadata.first_name_spoken.trim() : '';
+        const text = name ? `À bientôt, ${name}. C'était un plaisir.` : "À bientôt. C'était un plaisir.";
+        this.sendText(text, true);
+        this.turns.push({ role: 'bot', message: text, time: Date.now() });
+        setTimeout(() => void this.end('assistant-ended-call'), speechMs(text));
     }
 
     private async end(reason: string): Promise<void> {
