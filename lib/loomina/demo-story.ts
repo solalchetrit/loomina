@@ -103,6 +103,7 @@ function openai(): OpenAI {
 
 const DEMO_NOTE = `# CET APPEL EST UNE DÉMONSTRATION
 Le narrateur découvre Loumina et a fait un essai de cinq minutes. Écris le récit de ce qu'il a raconté, comme un chapitre de son livre. Toutes tes règles s'appliquent, en premier lieu : zéro invention. Ce qui parle de la démonstration, du SMS, du prix ou de Loumina n'entre jamais dans le récit.
+Ne résume pas (demande de Solal, 20/11/2026 : le récit d'Ethan tenait en cinq phrases sèches). Reprends TOUT ce qu'il a confié, chaque détail, chaque parole rapportée, chaque sensation, chaque précision ou correction qu'il a apportée, dans l'ordre de la scène et avec ses mots. Raconte la scène comme une scène (le décor, qui était là, ce qui s'est passé, ce qu'il a ressenti), en reliant les éléments avec fluidité, sans rien ajouter qu'il n'ait dit. Un mot manifestement mal transcrit et jamais confirmé est laissé de côté.
 
 Ajoute deux champs à l'objet JSON :
 - "first_name" : le prénom que le narrateur a donné, avec son orthographe la plus probable, ou null ;
