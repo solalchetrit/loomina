@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
 import { OFFER } from "@/config/offer";
 import { SELLER } from "@/config/legal";
 
 export const metadata: Metadata = {
-  title: "Conditions générales de vente",
-  description: "Les conditions de vente du service Loomina : prix, paiement, délais, garantie, rétractation, données.",
-  alternates: { canonical: "/cgv" },
+  ...pageMeta({
+    title: "Conditions générales de vente",
+    description: "Les conditions de vente du service Loomina : prix, paiement, délais, garantie, rétractation, données.",
+    path: "/cgv",
+  }),
 };
 
 export default function CGVPage() {

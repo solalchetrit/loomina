@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import LegalPage from "@/components/LegalPage";
 import { SELLER } from "@/config/legal";
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialité",
-  description: "Quelles données Loomina collecte, pourquoi, où elles sont stockées, et vos droits.",
-  alternates: { canonical: "/privacy" },
+  ...pageMeta({
+    title: "Politique de confidentialité",
+    description: "Quelles données Loomina collecte, pourquoi, où elles sont stockées, et vos droits.",
+    path: "/privacy",
+  }),
 };
 
 export default function PrivacyPage() {

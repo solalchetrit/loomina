@@ -82,6 +82,11 @@ export default function GuidePage({
                 </li>
               ))}
               <li>
+                <Link href="/blog" className="link">
+                  Le blog
+                </Link>
+              </li>
+              <li>
                 <Link href="/faq" className="link">
                   Toutes les questions
                 </Link>

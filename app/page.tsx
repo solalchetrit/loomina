@@ -14,6 +14,7 @@ import Accordion from "@/components/ui/Accordion";
 import { Section, SectionHead } from "@/components/ui/Section";
 import { GUARANTEE, OFFER } from "@/config/offer";
 import Photo from "@/components/ui/Photo";
+import ProductJsonLd from "@/components/seo/ProductJsonLd";
 
 const QUESTIONS = [
   {
@@ -147,6 +148,7 @@ export default function Home() {
 
       <Closing />
       </div>
+      <ProductJsonLd />
     </>
   );
 }

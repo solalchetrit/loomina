@@ -1,6 +1,6 @@
 ---
 title: Récit de vie, autobiographie, mémoires, biographie : quelles différences ?
-description: Quatre mots pour quatre livres différents. Les définitions simples, un tableau pour s’y retrouver, et comment choisir la forme qui convient à votre histoire.
+description: Quatre mots pour quatre livres différents. Les définitions simples, un résumé en quatre lignes, et comment choisir la forme qui convient à votre histoire.
 date: 2026-11-20
 photo: album-photo
 photoAlt: Un album de photos de famille ouvert sur une table.

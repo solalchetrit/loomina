@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import GuidePage from "@/components/guide/GuidePage";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
 export const metadata: Metadata = {
-  title: "Écrire ses mémoires sans écrire : racontez, on rédige",
-  description: `Écrire ses mémoires sans tenir la plume : vous racontez votre vie au téléphone, Loomina en écrit le récit et en fait un livre imprimé. Démo gratuite au ${SITE.phoneDisplay}.`,
-  alternates: { canonical: "/ecrire-ses-memoires" },
+  ...pageMeta({
+    title: "Écrire ses mémoires sans écrire",
+    description: `Écrire ses mémoires sans tenir la plume : vous racontez votre vie au téléphone, Loomina en écrit le récit et en fait un livre imprimé. Démo gratuite au ${SITE.phoneDisplay}.`,
+    path: "/ecrire-ses-memoires",
+  }),
 };
 
 export default function Page() {

@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
 import { SELLER } from "@/config/legal";
 
 export const metadata: Metadata = {
-  title: "Mentions légales",
-  description: "Éditeur, hébergement, propriété intellectuelle et cookies du site loomina.eu.",
-  alternates: { canonical: "/legal" },
+  ...pageMeta({
+    title: "Mentions légales",
+    description: "Éditeur, hébergement, propriété intellectuelle et cookies du site loomina.eu.",
+    path: "/legal",
+  }),
 };
 
 export default function LegalMentionsPage() {

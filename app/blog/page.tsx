@@ -5,11 +5,17 @@ import Photo from "@/components/ui/Photo";
 import Closing from "@/components/Closing";
 import { allPosts, frenchDate, type Post } from "@/lib/blog";
 import { SITE } from "@/config/site";
+import { pageMeta } from "@/lib/seo";
+
+const META = pageMeta({
+  title: "Le blog : raconter et transmettre son histoire",
+  description: "Conseils pour raconter sa vie, questions à poser à ses parents et grands-parents, idées pour garder les souvenirs de famille dans un livre.",
+  path: "/blog",
+});
 
 export const metadata: Metadata = {
-  title: "Le blog : raconter, écrire et transmettre son histoire",
-  description: "Conseils pour raconter sa vie, questions à poser à ses parents et grands-parents, idées pour garder les souvenirs de famille dans un livre.",
-  alternates: { canonical: "/blog", types: { "application/rss+xml": "/blog/rss.xml" } },
+  ...META,
+  alternates: { ...META.alternates, types: { "application/rss+xml": "/blog/rss.xml" } },
 };
 
 function Meta({ post }: { post: Post }) {

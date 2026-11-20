@@ -9,7 +9,6 @@ import Footer from "@/components/Footer";
 import MobileCta from "@/components/MobileCta";
 import HideOnAdmin from "@/components/HideOnAdmin";
 import { SITE } from "@/config/site";
-import { OFFER } from "@/config/offer";
 
 // Serif des extraits de livre uniquement : c'est la page que le client recevra.
 const newsreader = Newsreader({
@@ -136,30 +135,6 @@ export default function RootLayout({
                   "url": SITE.url,
                   "inLanguage": "fr-FR",
                   "publisher": { "@id": `${SITE.url}/#organisation` }
-                },
-                {
-                  "@type": "Product",
-                  "name": OFFER.name,
-                  "image": `${SITE.url}/og-image.jpg`,
-                  "description": "Service de création de livre autobiographique par entretiens téléphoniques avec IA.",
-                  "brand": {
-                    "@type": "Brand",
-                    "name": SITE.name
-                  },
-                  "offers": {
-                    "@type": "Offer",
-                    "url": `${SITE.url}/offre`,
-                    "priceCurrency": "EUR",
-                    "price": OFFER.price.toFixed(2),
-                    "availability": "https://schema.org/InStock",
-                    "seller": { "@id": `${SITE.url}/#organisation` },
-                    // Livraison incluse en France métropolitaine (config/offer.ts).
-                    "shippingDetails": {
-                      "@type": "OfferShippingDetails",
-                      "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "EUR" },
-                      "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "FR" }
-                    }
-                  }
                 }
               ]
             })

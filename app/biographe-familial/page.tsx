@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import GuidePage from "@/components/guide/GuidePage";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 
 export const metadata: Metadata = {
-  title: "Biographe familial : prix, déroulement, et une alternative par téléphone",
-  description: `Faire écrire la biographie d’un parent : ce que fait un biographe familial, ce que cela coûte, et comment Loomina propose un livre imprimé pour ${OFFER.price} €, par téléphone.`,
-  alternates: { canonical: "/biographe-familial" },
+  ...pageMeta({
+    title: "Biographe familial : prix et alternative",
+    description: `Faire écrire la biographie d’un parent : ce que fait un biographe familial, ce que cela coûte, et comment Loomina propose un livre imprimé pour ${OFFER.price} €, par téléphone.`,
+    path: "/biographe-familial",
+  }),
 };
 
 export default function Page() {

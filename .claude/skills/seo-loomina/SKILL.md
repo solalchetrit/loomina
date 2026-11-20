@@ -12,7 +12,8 @@ Les faits sur l'offre viennent de `config/offer.ts` et `config/site.ts`. Ne jama
 ## Ce qui existe déjà
 
 - Métadonnées par page (titre, description, adresse canonique), Open Graph, `app/sitemap.ts`, `app/robots.ts`.
-- Données structurées : Organisation, Site, Produit dans `app/layout.tsx` ; questions sur `/faq` et les guides ; article et fil d'Ariane sur le blog.
+- Toute page publique déclare ses métadonnées avec `pageMeta()` (`lib/seo.ts`) : titre de 50 caractères au plus, description, adresse canonique et aperçu de partage propres à la page.
+- Données structurées : Organisation et Site dans `app/layout.tsx`, Produit seulement sur l'accueil et `/offre` (`components/seo/ProductJsonLd.tsx`) ; questions sur `/faq` et les guides ; article et fil d'Ariane sur le blog.
 - Pages guides (`components/guide/GuidePage.tsx`) : `/ecrire-ses-memoires`, `/cadeau-grands-parents`, `/biographe-familial`.
 - Blog : un fichier Markdown par article dans `content/blog/` (mode d'emploi : `content/blog/LISEZ-MOI.md`), moteur dans `lib/blog.ts`.
 - Mesure : Google Analytics et Search Console, onglet « Audience » de l'admin.
@@ -58,6 +59,17 @@ Les faits sur l'offre viennent de `config/offer.ts` et `config/site.ts`. Ne jama
 - Relire l'article une fois comme un lecteur de 70 ans, une fois comme un moteur : la réponse est-elle dans le premier paragraphe ?
 - Mettre à jour le nœud `d-blog` de `lib/admin/map.ts` seulement si le fonctionnement du blog change (pas à chaque article).
 - Mise en ligne : jamais sans que Solal écrive « déploie ».
+
+## Auditer le site
+
+À refaire après tout ajout de page, et une fois par mois.
+
+1. `npx next build` puis `npx next start`, et lire chaque page publique SANS JavaScript (c'est ce que voient les robots des assistants).
+2. Pour chaque page, relever : titre (60 caractères au plus avec « | Loomina », unique), description (120 à 160 caractères, unique), adresse canonique égale à l'adresse de la page, un seul `h1`, aperçu de partage (`og:title`, `og:url`) propre à la page, données structurées valides, images de contenu avec un texte alternatif (les images décoratives gardent `alt=""`).
+3. Vérifier que `/sitemap.xml` liste toutes les pages publiques et aucune page privée, et que `/robots.txt` écarte `/dashboard`, `/order`, `/bienvenue`, `/admin`.
+4. Vérifier les liens internes : chaque page publique reçoit au moins un lien depuis une autre page que le pied de page.
+5. Ne pas toucher au haut de l'accueil (titre, module de droite) sans demande de Solal.
+6. Rendre à Solal une liste courte : ce qui est corrigé, ce qui reste, ce qui dépend de lui.
 
 ## Ce qu'on ne fait pas
 
