@@ -543,6 +543,29 @@ test('clients de test : drapeau test ou banc', async () => {
     assert.equal(isTestMeta(null), false);
 });
 
+test('démo : une réponse coupée sans rien d’entendu disparaît, un bout entendu est marqué coupé', async () => {
+    // Le serveur vocal lit sa configuration au chargement : valeurs factices.
+    for (const k of ['PUBLIC_URL', 'NEXT_BASE_URL', 'VAPI_WEBHOOK_SECRET', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER', 'OPENAI_API_KEY']) process.env[k] ||= 'test';
+    // Chemin en variable : le serveur vocal a son propre tsconfig, hors du site.
+    const sessionModule = '../../voice/src/session.ts';
+    const { CallSession } = (await import(sessionModule)) as { CallSession: new (init: unknown) => { onInterrupt(heard: string): void } };
+    const s = new CallSession({ callSid: 'CAtest', from: '+33600000000', to: '+33159169357', direction: 'inbound', plan: { demo: true, metadata: {}, systemPrompt: 'x' } });
+    const turns = (s as unknown as { turns: { role: string; message: string; cut?: boolean }[] }).turns;
+    turns.push({ role: 'user', message: 'Le jour du foot avec mon cousin.' }, { role: 'bot', message: 'Racontez-moi ce jour-là. Où étiez-vous ?' });
+    s.onInterrupt('');
+    assert.equal(turns.length, 1);
+    turns.push({ role: 'bot', message: 'Racontez-moi ce jour-là. Où étiez-vous ?' });
+    s.onInterrupt('Racontez-moi ce jour-là.');
+    assert.deepEqual(turns[1], { role: 'bot', message: 'Racontez-moi ce jour-là.', cut: true });
+});
+
+test('démo : voix un peu moins stable, le reste identique', async () => {
+    const twimlModule = '../../voice/src/twiml.ts';
+    const { demoVoice } = (await import(twimlModule)) as { demoVoice: (v: string) => string };
+    assert.equal(demoVoice('c365oriviHmAhyLhpuN6-turbo_v2_5-0.92_0.5_0.6'), 'c365oriviHmAhyLhpuN6-turbo_v2_5-0.92_0.4_0.6');
+    assert.equal(demoVoice('UgBBYS2sOqTuMpoF3BR0'), 'UgBBYS2sOqTuMpoF3BR0');
+});
+
 test('famille : préparer le premier appel seulement avant tout appel et sans réglage du narrateur', async () => {
     const { familySetupOpen } = await import('../../lib/loomina/family-setup');
     assert.equal(familySetupOpen({ meta: {}, status: 'active', calls: 0 }), true);

@@ -23,6 +23,8 @@ export interface TurnRecord {
     role: 'bot' | 'user';
     message: string;
     time: number;
+    /** Réplique de Loomina coupée par la personne : seul `message` a été entendu. */
+    cut?: boolean;
 }
 
 export interface CallReportInput {

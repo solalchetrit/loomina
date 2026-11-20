@@ -19,6 +19,8 @@ function escapeXml(value: string): string {
 export function conversationRelayTwiml(params: {
     welcomeGreeting: string;
     callSid: string;
+    /** Voix propre à cet appel (la démo), sinon celle de la configuration. */
+    voice?: string;
 }): string {
     const attrs: Record<string, string> = {
         url: wsUrl(),
@@ -28,7 +30,7 @@ export function conversationRelayTwiml(params: {
         welcomeGreetingInterruptible: 'none',
         language: config.voice.language,
         ttsProvider: 'ElevenLabs',
-        voice: config.voice.ttsVoice,
+        voice: params.voice ?? config.voice.ttsVoice,
         transcriptionProvider: 'Deepgram',
         speechModel: config.voice.sttModel,
         deepgramSmartFormat: 'true',
@@ -66,6 +68,18 @@ export function conversationRelayTwiml(params: {
         `</Connect>` +
         `</Response>`
     );
+}
+
+/**
+ * La voix de la démo : la même que les appels (variable VOICE_TTS_VOICE),
+ * un peu moins « stable » pour une intonation moins monotone (Solal,
+ * 20/11/2026 : « pas naturelle, pas du tout humaine »). Format ElevenLabs
+ * de ConversationRelay : id-modèle-vitesse_stabilité_similarité.
+ */
+export const DEMO_STABILITY = '0.4';
+export function demoVoice(voice: string): string {
+    const m = /^(.*-)([\d.]+)_([\d.]+)_([\d.]+)$/.exec(voice);
+    return m ? `${m[1]}${m[2]}_${DEMO_STABILITY}_${m[4]}` : voice;
 }
 
 /** Réponse de secours : une phrase, puis on raccroche. */

@@ -141,7 +141,7 @@ Ce récit est souvent le premier texte que la personne lit d'elle : il doit donn
 - Un détail isolé qui casse la scène (un plat cité en une phrase) va à la fin, en une phrase, ou n'entre pas.
 
 Ajoute deux champs à l'objet JSON :
-- "first_name" : le prénom que le narrateur a donné, avec son orthographe la plus probable, ou null ;
+- "first_name" : le prénom que le narrateur a donné, avec son orthographe la plus probable, ou null. S'il en a donné plusieurs ou a plaisanté, prends celui qu'il a confirmé à Loomina ; si aucun n'a été confirmé, null ;
 - "sms_refused" : true si le narrateur a dit qu'il ne voulait pas recevoir de SMS ou de récit, sinon false.`;
 
 /** Écrit le récit d'une démo. */

@@ -18,7 +18,7 @@ import type { WebSocket } from 'ws';
 import twilio from 'twilio';
 import { config, wsUrl } from './config.ts';
 import { flushSpool } from './report.ts';
-import { conversationRelayTwiml, sayAndHangupTwiml } from './twiml.ts';
+import { conversationRelayTwiml, demoVoice, sayAndHangupTwiml } from './twiml.ts';
 import { planForCaller } from './plan.ts';
 import { forVoice } from './speech.ts';
 import { CallSession } from './session.ts';
@@ -97,7 +97,7 @@ async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse):
                 console.info(`[voice] ${callSid} jamais connecté, session retirée`);
             }
         }, 60_000);
-        reply(res, 200, conversationRelayTwiml({ welcomeGreeting: forVoice(plan.firstMessage), callSid }), 'text/xml');
+        reply(res, 200, conversationRelayTwiml({ welcomeGreeting: forVoice(plan.firstMessage), callSid, voice: plan.demo ? demoVoice(config.voice.ttsVoice) : undefined }), 'text/xml');
     } catch (err) {
         console.error('[voice] préparation impossible :', err instanceof Error ? err.message : err);
         reply(
