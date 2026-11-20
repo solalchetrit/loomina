@@ -13,7 +13,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { SITE } from '../../config/site';
 
 /** Durée de validité d'un lien envoyé par SMS. */
-export const LINK_DAYS = 14;
+export const LINK_DAYS = 30;
 
 /**
  * Le secret qui signe et vérifie les liens : celui des sessions du site.
