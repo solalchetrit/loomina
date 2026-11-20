@@ -7,7 +7,7 @@ import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
 import { testAuthorReply } from '@/lib/loomina/test-author';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
-import { readGiver, sharesWithGiver } from '@/lib/loomina/giver';
+import { familyAudience, readGiver, sharesWithGiver } from '@/lib/loomina/giver';
 import { readFulfillment } from '@/lib/loomina/fulfillment';
 import { readShipping } from '@/lib/loomina/shipping';
 import { readPhaseState } from '@/lib/loomina/phase-plan';
@@ -38,6 +38,8 @@ export async function GET(request: NextRequest) {
             // Livre offert : qui l'a offert, et si l'auteur lui laisse lire ses récits.
             giverFirstName: readGiver(project?.project_metadata)?.firstName ?? (readGiver(project?.project_metadata) ? '' : null),
             shareWithGiver: sharesWithGiver(project?.project_metadata),
+            // Qui ouvre l'espace famille : celui qui a offert le livre, puis les proches ajoutés.
+            family: familyAudience(project?.project_metadata).map((p) => ({ firstName: p.firstName, phone: p.phone, giver: p.giver })),
         };
 
         if (!project) {
@@ -60,10 +62,11 @@ export async function GET(request: NextRequest) {
         // L'accueil du premier passage : seulement tant qu'aucun appel n'a eu
         // lieu (au premier appel, Loomina demande elle-même tu/vous et les
         // sujets à éviter) et que l'auteur n'a ni réglé ni remis à plus tard.
+        // Si la famille a préparé l'appel, l'accueil reste montré, avec ses choix déjà remplis.
         const pmeta = (project.project_metadata ?? {}) as Record<string, unknown>;
         const { count: anyCall } = await db().from('interviews').select('id', { count: 'exact', head: true }).eq('project_id', project.id);
         const welcome =
-            !pmeta.welcome_done_at && !pmeta.prefs_set_at && !anyCall && project.status !== 'completed'
+            !pmeta.welcome_done_at && (!pmeta.prefs_set_at || pmeta.prefs_set_by === 'giver') && !anyCall && project.status !== 'completed'
                 ? { politeness: true, topics: !profile.sensitive_topics?.trim() }
                 : null;
 

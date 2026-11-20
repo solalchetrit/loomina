@@ -4,7 +4,8 @@ import { formatToE164 } from '@/lib/phone';
 import { db, findProfileByPhone } from '@/lib/loomina/db';
 import { stripe } from '@/lib/stripe';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
-import { notifyNewOrder, notifyAbandonedCart } from '@/lib/loomina/notify';
+import { notifyNewOrder, notifyAbandonedCart, notifyFamilyInvite } from '@/lib/loomina/notify';
+import { decodeFamilyFromStripe, storeFamilyMembers } from '@/lib/loomina/giver';
 
 /**
  * Provisionnement d'un client après paiement.
@@ -84,6 +85,8 @@ export async function POST(request: NextRequest) {
         giverPhone && /^\+\d{8,15}$/.test(giverPhone) && giverPhone !== phone
             ? { first_name: meta.giverFirstName?.trim() || null, phone: giverPhone }
             : null;
+    // Les autres proches ajoutés à la commande (lib/loomina/giver.ts).
+    const family = giver ? decodeFamilyFromStripe(meta.family, [phone, giver.phone], new Date().toISOString()) : [];
 
     try {
         const supabase = db();
@@ -168,6 +171,7 @@ export async function POST(request: NextRequest) {
                 buyer_email: email,
                 call_minutes: normalizeCallMinutes(meta.callMinutes),
                 ...(giver ? { giver } : {}),
+                ...(family.length ? { family_members: storeFamilyMembers(family) } : {}),
                 ...(queuedBehind ? { queued_behind: queuedBehind } : {}),
                 // Payée 0 € (code promo à 100 %) : une commande d'essai, sortie des chiffres de l'admin.
                 ...(session.amount_total === 0 ? { test: true } : {}),
@@ -189,6 +193,8 @@ export async function POST(request: NextRequest) {
         // Bienvenue au client (e-mail et SMS) et alerte à l'équipe. Une seule
         // fois : un rejeu de Stripe est arrêté plus haut. Ne lève jamais.
         await notifyNewOrder({ buyerEmail: email, narratorFirstName: firstName, narratorPhone: phone, isGift, giver });
+        // Chaque proche ajouté reçoit son accès à l'espace famille.
+        await Promise.allSettled(family.map((m) => notifyFamilyInvite({ phone: m.phone, firstName: m.firstName, narratorFirstName: firstName, invitedBy: giver?.first_name ?? null })));
         return NextResponse.json({ received: true, provisioned: true });
 
     } catch (err) {

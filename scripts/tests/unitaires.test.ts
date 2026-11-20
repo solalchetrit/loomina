@@ -565,3 +565,35 @@ test('démo : voix un peu moins stable, le reste identique', async () => {
     assert.equal(demoVoice('c365oriviHmAhyLhpuN6-turbo_v2_5-0.92_0.5_0.6'), 'c365oriviHmAhyLhpuN6-turbo_v2_5-0.92_0.4_0.6');
     assert.equal(demoVoice('UgBBYS2sOqTuMpoF3BR0'), 'UgBBYS2sOqTuMpoF3BR0');
 });
+
+test('famille : préparer le premier appel seulement avant tout appel et sans réglage du narrateur', async () => {
+    const { familySetupOpen } = await import('../../lib/loomina/family-setup');
+    assert.equal(familySetupOpen({ meta: {}, status: 'active', calls: 0 }), true);
+    assert.equal(familySetupOpen({ meta: {}, status: 'active', calls: 1 }), false);
+    assert.equal(familySetupOpen({ meta: {}, status: 'completed', calls: 0 }), false);
+    assert.equal(familySetupOpen({ meta: { prefs_set_at: 'x', prefs_set_by: 'author' }, status: 'active', calls: 0 }), false);
+    assert.equal(familySetupOpen({ meta: { prefs_set_at: 'x' }, status: 'active', calls: 0 }), false);
+    assert.equal(familySetupOpen({ meta: { prefs_set_at: 'x', prefs_set_by: 'giver' }, status: 'active', calls: 0 }), true);
+});
+
+test('famille : plusieurs proches, de la commande au webhook', async () => {
+    const g = await import('../../lib/loomina/giver');
+    const raw = g.encodeFamilyForStripe([
+        { firstName: 'Léa', phone: '+33611111111' },
+        { firstName: 'Léa bis', phone: '+33611111111' },
+        { firstName: 'Tom', phone: 'pas un numéro' },
+        { firstName: 'Narrateur', phone: '+33622222222' },
+    ]);
+    assert.ok(raw.length <= 500);
+    const back = g.decodeFamilyFromStripe(raw, ['+33622222222', '+33633333333'], '2026-11-20T00:00:00Z');
+    assert.deepEqual(back.map((m) => [m.firstName, m.phone, m.addedBy]), [['Léa', '+33611111111', 'order']]);
+    const meta = { giver: { first_name: 'Solal', phone: '+33633333333' }, family_members: g.storeFamilyMembers(back) };
+    assert.deepEqual(g.familyAudience(meta).map((p) => [p.phone, p.giver]), [['+33633333333', true], ['+33611111111', false]]);
+    assert.equal(g.familyMemberOf(meta, '+33611111111')?.firstName, 'Léa');
+    assert.equal(g.familyMemberOf(meta, '+33699999999'), null);
+    assert.equal(g.familyWelcomeDone({ family_welcome_done: g.markFamilyWelcome({}, '+33611111111') }, '+33611111111'), true);
+    assert.equal(g.familyWelcomeDone({ family_welcome_done: g.markFamilyWelcome({}, '+33611111111') }, '+33633333333'), false);
+    // Dix numéros au plus, et toujours sous la limite de Stripe.
+    const many = Array.from({ length: 15 }, (_, i) => ({ firstName: 'Prénom assez long ' + i, phone: `+336000000${String(i).padStart(2, '0')}` }));
+    assert.ok(g.encodeFamilyForStripe(many).length <= 500);
+});

@@ -259,9 +259,13 @@ export default function Settings({
               ))}
             </div>
           </fieldset>
-          {form.giverFirstName !== null && (
+          {(form.giverFirstName !== null || (prefs.family?.length ?? 0) > 0) && (
             <fieldset className="min-w-0">
-              <legend className="field-label">Laisser {form.giverFirstName || "la personne qui vous a offert ce livre"} lire vos récits</legend>
+              <legend className="field-label">
+                {(prefs.family?.length ?? 0) > 1 || form.giverFirstName === null
+                  ? "Laisser votre famille lire vos récits"
+                  : `Laisser ${form.giverFirstName || "la personne qui vous a offert ce livre"} lire vos récits`}
+              </legend>
               <div className="flex gap-2">
                 {[true, false].map((v) => (
                   <button
@@ -277,7 +281,7 @@ export default function Settings({
                   </button>
                 ))}
               </div>
-              <p className="t-small mt-1.5">Sans votre accord, {form.giverFirstName || "cette personne"} ne voit que les titres.</p>
+              <p className="t-small mt-1.5">Sans votre accord, votre famille voit seulement que le livre avance.</p>
             </fieldset>
           )}
         </div>

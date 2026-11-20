@@ -828,4 +828,5 @@ img[src*="photos/photos-de-famille"] {
    components/author/AuthorSpace.tsx pose data-space="auteur" sur <html>.
    ================================================================ */
 .site-chrome { display: contents; }
-html[data-space="auteur"] .site-chrome { display: none; }
+html[data-space="auteur"] .site-chrome,
+html[data-space="famille"] .site-chrome { display: none; }
