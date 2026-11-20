@@ -175,6 +175,19 @@ export default function FAQPage() {
       </Section>
 
       <Closing title="Le mieux, c’est encore d’essayer" />
+      {/* Questions et réponses lisibles par Google (réponses en texte seul). */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: FAQ_CATEGORIES.flatMap((c) => c.questions)
+              .filter((x): x is { q: string; a: string } => typeof x.a === "string")
+              .map(({ q, a }) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+          }),
+        }}
+      />
     </>
   );
 }

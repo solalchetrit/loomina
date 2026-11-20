@@ -112,15 +112,30 @@ export default function RootLayout({
               "@graph": [
                 {
                   "@type": "Organization",
+                  "@id": `${SITE.url}/#organisation`,
                   "name": SITE.name,
                   "url": SITE.url,
-                  "logo": `${SITE.url}/icon.png`
+                  "logo": `${SITE.url}/icon.png`,
+                  "description": "Loomina est un biographe par téléphone : vous racontez votre vie au téléphone, Loomina en fait un livre imprimé.",
+                  "email": "contact@loomina.eu",
+                  "telephone": SITE.phone,
+                  "founder": { "@type": "Person", "name": "Solal Chetrit" },
+                  "areaServed": "FR",
+                  "contactPoint": {
+                    "@type": "ContactPoint",
+                    "contactType": "customer service",
+                    "email": "contact@loomina.eu",
+                    "telephone": SITE.phone,
+                    "availableLanguage": "fr"
+                  }
                 },
                 {
                   "@type": "WebSite",
+                  "@id": `${SITE.url}/#site`,
                   "name": SITE.name,
                   "url": SITE.url,
-                  "inLanguage": "fr-FR"
+                  "inLanguage": "fr-FR",
+                  "publisher": { "@id": `${SITE.url}/#organisation` }
                 },
                 {
                   "@type": "Product",
@@ -133,10 +148,17 @@ export default function RootLayout({
                   },
                   "offers": {
                     "@type": "Offer",
-                    "url": SITE.url,
+                    "url": `${SITE.url}/offre`,
                     "priceCurrency": "EUR",
                     "price": OFFER.price.toFixed(2),
-                    "availability": "https://schema.org/InStock"
+                    "availability": "https://schema.org/InStock",
+                    "seller": { "@id": `${SITE.url}/#organisation` },
+                    // Livraison incluse en France métropolitaine (config/offer.ts).
+                    "shippingDetails": {
+                      "@type": "OfferShippingDetails",
+                      "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "EUR" },
+                      "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "FR" }
+                    }
                   }
                 }
               ]
