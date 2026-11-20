@@ -8,6 +8,9 @@
  * retrouver ! », « L'amour du PSG, ça marque ! ») malgré le prompt : on les
  * remplace donc ici, de façon sûre, par un point.
  *
+ * Points de suspension aussi remplacés par un point (20/11/2026, Solal) :
+ * la voix les étirait et sonnait mièvre.
+ *
  * Aussi retirés : les astérisques et dièses du gras ou des titres (lus ou
  * prononcés bizarrement), les émojis.
  */
@@ -15,8 +18,7 @@ export function forVoice(text: string): string {
     return text
         .replace(/!+(?=\s*\?)/g, '')
         .replace(/\s*!+/g, '.')
-        .replace(/\.{3,}/g, '…')
-        .replace(/\.{2}/g, '.')
+        .replace(/(?:\.{2,}|…)+/g, '.')
         .replace(/[*_#]+/g, '')
         .replace(/\p{Extended_Pictographic}️?/gu, '');
 }
