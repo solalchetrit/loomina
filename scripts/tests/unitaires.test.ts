@@ -558,3 +558,10 @@ test('démo : une réponse coupée sans rien d’entendu disparaît, un bout ent
     s.onInterrupt('Racontez-moi ce jour-là.');
     assert.deepEqual(turns[1], { role: 'bot', message: 'Racontez-moi ce jour-là.', cut: true });
 });
+
+test('démo : voix un peu moins stable, le reste identique', async () => {
+    const twimlModule = '../../voice/src/twiml.ts';
+    const { demoVoice } = (await import(twimlModule)) as { demoVoice: (v: string) => string };
+    assert.equal(demoVoice('c365oriviHmAhyLhpuN6-turbo_v2_5-0.92_0.5_0.6'), 'c365oriviHmAhyLhpuN6-turbo_v2_5-0.92_0.4_0.6');
+    assert.equal(demoVoice('UgBBYS2sOqTuMpoF3BR0'), 'UgBBYS2sOqTuMpoF3BR0');
+});

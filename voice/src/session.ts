@@ -343,10 +343,14 @@ export class CallSession {
                 voiceBuf = '';
                 return;
             }
+            // Démo (20/11/2026) : des phrases entières seulement. Coupée à
+            // chaque virgule, chaque morceau repartait avec une intonation
+            // neuve et la voix sonnait « robot ».
+            const demo = this.plan.demo;
             let cut = -1;
-            const re = /[.!?;:,…»)](?=\s)/g;
+            const re = demo ? /[.!?…](?=\s)/g : /[.!?;:,…»)](?=\s)/g;
             for (let m = re.exec(voiceBuf); m; m = re.exec(voiceBuf)) cut = m.index + 1;
-            if (cut < 0 && voiceBuf.length > 90) cut = voiceBuf.lastIndexOf(' ');
+            if (cut < 0 && voiceBuf.length > (demo ? 220 : 90)) cut = voiceBuf.lastIndexOf(' ');
             if (cut <= 0) return;
             say(voiceBuf.slice(0, cut));
             voiceBuf = voiceBuf.slice(cut);
