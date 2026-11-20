@@ -84,7 +84,7 @@ export default function WhatYouGet({
           </ul>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button href="/order" size="lg">
-              Commander · {OFFER.price} €
+              Commander
             </Button>
             {showDetailLink && (
               <Button href="/offre" variant="secondary" size="lg">
