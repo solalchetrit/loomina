@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { currentAuthor } from '@/lib/loomina/author';
 import { buildReadingPdf } from '@/lib/loomina/book-pdf';
 import { loadPrintBook, pdfFileName } from '@/lib/loomina/book-print';
-import { demoEdition } from '@/lib/loomina/demo';
-import { isDemoRequest } from '@/lib/loomina/test-author';
+import { DEMO_DATA, demoEdition } from '@/lib/loomina/demo';
+import { testAuthorReply } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,8 +14,10 @@ export const maxDuration = 120;
  * imprimé (A5, couverture en première page), avec les photos.
  */
 export async function GET(request: NextRequest) {
+    const essai = await testAuthorReply(request, 'book-pdf');
+    if (essai) return essai;
     try {
-        if (await isDemoRequest(request)) {
+        if (DEMO_DATA) {
             const { edition } = demoEdition();
             const pdf = await buildReadingPdf({ title: edition.pieces.title, author: 'Jeanne', chapters: edition.chapters, pieces: edition.pieces });
             return send(pdf.bytes, pdfFileName(edition.pieces.title));

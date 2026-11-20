@@ -6,9 +6,8 @@
  * module rempli sans clé ni vrai client. Jamais actif en production.
  * Les réglages et les sujets suggérés sont gardés en mémoire jusqu'au redémarrage.
  *
- * En ligne, le même livre d'exemple sert l'espace auteur de test (numéro
- * 01 12 34 56 78, voir test-author.ts). Là, rien n'est gardé : la réponse
- * montre l'essai, mais le visiteur suivant retrouve l'exemple intact.
+ * Rien n'est gardé hors du mode démo local, par prudence (l'espace de test en
+ * ligne, 06 12 34 56 78, ne passe pas par ici : voir test-author.ts).
  */
 
 import { buildWeave } from './weave';

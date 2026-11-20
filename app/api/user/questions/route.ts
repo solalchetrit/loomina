@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
-import { demoAddQuestion } from '@/lib/loomina/demo';
-import { isDemoRequest } from '@/lib/loomina/test-author';
+import { DEMO_DATA, demoAddQuestion } from '@/lib/loomina/demo';
+import { testAuthorReply } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,7 +15,9 @@ export const dynamic = 'force-dynamic';
  * quand il a été traité et le pipeline le retire.
  */
 export async function POST(request: NextRequest) {
-    if (await isDemoRequest(request)) {
+    const essai = await testAuthorReply(request, 'question');
+    if (essai) return essai;
+    if (DEMO_DATA) {
         const { question } = (await request.json().catch(() => ({}))) as { question?: string };
         if (!question?.trim()) return NextResponse.json({ error: 'Question trop courte' }, { status: 400 });
         return NextResponse.json({ openQuestions: demoAddQuestion(question.trim().slice(0, 280)) });

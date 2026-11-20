@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, findProfileByPhone, findActiveProject } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
-import { demoStories } from '@/lib/loomina/demo';
-import { isDemoRequest } from '@/lib/loomina/test-author';
+import { DEMO_DATA, demoStories } from '@/lib/loomina/demo';
+import { testAuthorReply } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,9 @@ export const dynamic = 'force-dynamic';
  * pas toucher au composant LiveBook.
  */
 export async function GET(request: NextRequest) {
-    if (await isDemoRequest(request)) return NextResponse.json(demoStories());
+    const essai = await testAuthorReply(request, 'stories');
+    if (essai) return essai;
+    if (DEMO_DATA) return NextResponse.json(demoStories());
     const session = await readSession(request);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

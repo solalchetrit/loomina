@@ -43,6 +43,8 @@ export interface Overview {
   firstName: string | null;
   /** Livre d'exemple du mode démo local (lib/loomina/demo.ts). */
   demo?: boolean;
+  /** Espace de test (06 12 34 56 78) : un nouvel auteur au premier jour, rien n'est enregistré. */
+  essai?: boolean;
   prefs: Prefs;
   project: ProjectOverview | null;
   /**
