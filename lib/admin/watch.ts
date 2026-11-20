@@ -89,7 +89,7 @@ export async function sweepRelanceAlerts(now = new Date()): Promise<number> {
         if (!fresh.length) return 0;
         await alertTeam({
             subject: fresh.length === 1 ? `Client à relancer : ${fresh[0].name}` : `${fresh.length} clients à relancer`,
-            text: `${fresh.map((f) => `- ${f.name} ${f.why}.`).join('\n')}\n\nLe bouton « Relancer » est dans Suivi client : ${SITE.url}/admin/suivi`,
+            text: `${fresh.map((f) => `- ${f.name} ${f.why}.`).join('\n')}\n\nLe bouton « Relancer » est dans Clients : ${SITE.url}/admin/clients`,
             sms: fresh.length === 1 ? `${fresh[0].name} ${fresh[0].why}. À relancer.` : `${fresh.length} clients à relancer : ${fresh.map((f) => f.name).join(', ')}.`,
         });
         return fresh.length;

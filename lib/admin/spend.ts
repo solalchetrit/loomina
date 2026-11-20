@@ -14,6 +14,7 @@
  * alors pourquoi, sans tomber.
  */
 
+import { isTestMeta } from '@/lib/loomina/test-flag';
 import { db } from '@/lib/loomina/db';
 import { COSTS } from '@/config/costs';
 import { stripe } from '@/lib/stripe';
@@ -191,6 +192,8 @@ export interface CallLine {
     profileId: string | null;
     seconds: number;
     cost: CallCost;
+    /** Client de test : l'appel a coûté, mais il ne compte pas dans le coût moyen d'un appel client. */
+    test: boolean;
 }
 
 export interface DemoLine {
@@ -213,6 +216,7 @@ export interface CompositionLine {
     profileId: string | null;
     count: number;
     total: number;
+    test: boolean;
 }
 
 /** Prix réel de la ligne pour un appel Twilio, en euros (null si inconnu). */
@@ -228,14 +232,15 @@ async function twilioCallPrice(callSid: string): Promise<number | null> {
     }
 }
 
-async function clientNames(projectIds: string[]): Promise<Map<string, { name: string; profileId: string | null }>> {
-    const out = new Map<string, { name: string; profileId: string | null }>();
+async function clientNames(projectIds: string[]): Promise<Map<string, { name: string; profileId: string | null; test: boolean }>> {
+    const out = new Map<string, { name: string; profileId: string | null; test: boolean }>();
     if (!projectIds.length) return out;
-    const { data: projects } = await db().from('projects').select('id, user_id').in('id', projectIds);
+    const { data: projects } = await db().from('projects').select('id, user_id, project_metadata').in('id', projectIds);
     const userIds = [...new Set((projects ?? []).map((p) => p.user_id as string).filter(Boolean))];
     const { data: profiles } = userIds.length ? await db().from('profiles').select('id, first_name, last_name').in('id', userIds) : { data: [] };
     const byId = new Map((profiles ?? []).map((p) => [p.id as string, `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim()]));
-    for (const p of projects ?? []) out.set(p.id as string, { name: byId.get(p.user_id as string) || 'Client sans nom', profileId: (p.user_id as string) ?? null });
+    for (const p of projects ?? [])
+        out.set(p.id as string, { name: byId.get(p.user_id as string) || 'Client sans nom', profileId: (p.user_id as string) ?? null, test: isTestMeta(p.project_metadata as Record<string, unknown> | null) });
     return out;
 }
 
@@ -259,6 +264,7 @@ export async function callLines(range: Range): Promise<CallLine[]> {
             profileId: who?.profileId ?? null,
             seconds: Number(r.duration_seconds) || 0,
             cost: costs.get(String(r.id)) ?? { line: 0, voice: 0, conversation: 0, writing: 0, total: 0, totalTtc: 0, estimated: true },
+            test: who?.test ?? false,
         };
     });
 }
@@ -325,6 +331,7 @@ export async function compositionLines(range: Range): Promise<CompositionLine[]>
             profileId: names.get(projectId)?.profileId ?? null,
             count,
             total: eur(count * COSTS.compositionFallbackPerEdition),
+            test: names.get(projectId)?.test ?? false,
         }))
         .sort((a, b) => b.count - a.count);
 }

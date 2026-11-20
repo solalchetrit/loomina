@@ -1,3 +1,4 @@
+import { readFulfillment } from '@/lib/loomina/fulfillment';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
@@ -53,6 +54,11 @@ export async function GET(request: NextRequest) {
                     phaseLabel: PHASE_LABELS[phase],
                     progress: Math.max(0, Math.min(100, project.phase_progress ?? 0)),
                     completed: project.status === 'completed',
+                    // Après « terminé » : relu, à l'impression, expédié, reçu.
+                    delivery: (() => {
+                        const f = readFulfillment(project.status, project.project_metadata);
+                        return { stage: f.stage, tracking: f.tracking };
+                    })(),
                     scheduleText: describeSchedule(schedule),
                     shared,
                     calls: (interviews.data ?? []).map((i) => ({

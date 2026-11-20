@@ -202,7 +202,7 @@ export default function AuthorSpace({
 
           {data && tab === "apercu" && (
             <div className="flex flex-col gap-3">
-              {project?.completed && <Shipping saved={data.shipping ?? null} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
+              {project?.completed && <Shipping saved={data.shipping ?? null} delivery={data.delivery} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
               {project && (project.weave ? <Companion project={project} demo={data.demo} skipIntro={Boolean(data.welcome)} /> : <Progress project={project} />)}
               <div className="grid gap-3 lg:grid-cols-[1fr_1.2fr]">
                 <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />

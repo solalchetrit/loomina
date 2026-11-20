@@ -178,7 +178,7 @@ export function Segmented({ options, value }: { options: Array<{ value: string; 
           role="tab"
           aria-selected={o.value === value}
           href={o.href}
-          className={`rounded-[10px] px-3.5 py-1.5 text-[14.5px] font-bold transition-colors ${o.value === value ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"}`}
+          className={`whitespace-nowrap rounded-[10px] px-3.5 py-1.5 text-[14.5px] font-bold transition-colors ${o.value === value ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"}`}
         >
           {o.label}
         </a>

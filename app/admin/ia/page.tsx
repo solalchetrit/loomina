@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin/auth";
+import TechTabs from "@/components/admin/TechTabs";
 import { aiCatalog, editablePrompts } from "@/lib/admin/prompts";
 import { refreshPrompts, promptText, editedKeys, templateVars } from "@/lib/loomina/prompt-store";
 import { Fold, PageHeader } from "@/components/admin/ui";
@@ -19,6 +20,7 @@ export default async function AdminAis({ searchParams }: { searchParams: Promise
 
   return (
     <div>
+      <TechTabs value="ia" />
       <PageHeader eyebrow="Les IA" title={`Les ${ais.length} IA de Loomina`}>
         Ce que fait chacune, quand elle agit, ce qu’elle lit et écrit, et ses prompts exacts. Vous pouvez réécrire un prompt sous « Modifier » : il est pris en compte dans la minute, et « Revenir au texte d’origine » annule tout.
       </PageHeader>

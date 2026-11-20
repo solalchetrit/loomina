@@ -169,6 +169,8 @@ export async function POST(request: NextRequest) {
                 call_minutes: normalizeCallMinutes(meta.callMinutes),
                 ...(giver ? { giver } : {}),
                 ...(queuedBehind ? { queued_behind: queuedBehind } : {}),
+                // Payée 0 € (code promo à 100 %) : une commande d'essai, sortie des chiffres de l'admin.
+                ...(session.amount_total === 0 ? { test: true } : {}),
             },
         });
 
