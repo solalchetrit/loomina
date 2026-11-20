@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
-import { demoSavePrefs } from '@/lib/loomina/demo';
-import { isDemoRequest } from '@/lib/loomina/test-author';
+import { DEMO_DATA, demoSavePrefs } from '@/lib/loomina/demo';
+import { testAuthorReply } from '@/lib/loomina/test-author';
 import { normalizeSchedule } from '@/lib/loomina/schedule';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 
@@ -21,7 +21,9 @@ const clean = (v: unknown, max: number): string | null | undefined => {
  * Lus par l'assistant vocal au prochain appel (lib/loomina/assistant.ts) et par l'Écrivain.
  */
 export async function PATCH(request: NextRequest) {
-    if (await isDemoRequest(request)) {
+    const essai = await testAuthorReply(request, 'preferences');
+    if (essai) return essai;
+    if (DEMO_DATA) {
         demoSavePrefs(await request.json().catch(() => ({})));
         return NextResponse.json({ saved: true });
     }

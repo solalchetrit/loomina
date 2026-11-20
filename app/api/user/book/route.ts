@@ -2,8 +2,8 @@ import { NextRequest, NextResponse, after } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { readEditions, startEdition, kickEdition, publicEdition, autoCompose } from '@/lib/loomina/book-edition';
-import { demoEdition } from '@/lib/loomina/demo';
-import { isDemoRequest } from '@/lib/loomina/test-author';
+import { DEMO_DATA, demoEdition } from '@/lib/loomina/demo';
+import { testAuthorReply } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,9 @@ const STALE_MS = 3 * 60 * 1000;
  * l'avancement de celle qui est en cours.
  */
 export async function GET(request: NextRequest) {
-    if (await isDemoRequest(request)) return NextResponse.json(demoEdition());
+    const essai = await testAuthorReply(request, 'book');
+    if (essai) return essai;
+    if (DEMO_DATA) return NextResponse.json(demoEdition());
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;
@@ -55,7 +57,9 @@ export async function GET(request: NextRequest) {
 
 /** Compose (ou recompose) le livre à partir de tous les appels. */
 export async function POST(request: NextRequest) {
-    if (await isDemoRequest(request)) return NextResponse.json({ error: 'La composition n’est pas disponible en démonstration.' }, { status: 409 });
+    const essai = await testAuthorReply(request, 'book-compose');
+    if (essai) return essai;
+    if (DEMO_DATA) return NextResponse.json({ error: 'La composition n’est pas disponible en démonstration.' }, { status: 409 });
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;

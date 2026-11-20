@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
     const session = await readSession(request);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    if (isTestAuthorPhone(session.phone)) return NextResponse.json({ first_name: 'Jeanne', full_name: 'Jeanne (exemple)', phone_number: TEST_AUTHOR_PHONE });
+    if (isTestAuthorPhone(session.phone)) return NextResponse.json({ first_name: null, full_name: null, phone_number: TEST_AUTHOR_PHONE });
 
     try {
         const profile = await findProfileByPhone(session.phone);

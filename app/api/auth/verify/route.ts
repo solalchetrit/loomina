@@ -3,7 +3,7 @@ import { formatToE164 } from "@/lib/phone";
 import { findProfileByPhone } from "@/lib/loomina/db";
 import { findGiftProjects } from "@/lib/loomina/giver";
 import { signSession, SESSION_COOKIE, SESSION_MAX_AGE_S } from "@/lib/loomina/session";
-import { isTestAuthorPhone, TEST_AUTHOR_PHONE } from "@/lib/loomina/test-author";
+import { isTestAuthorPhone, resetEssai, TEST_AUTHOR_PHONE } from "@/lib/loomina/test-author";
 
 // Twilio credentials from environment variables
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
@@ -37,8 +37,8 @@ export async function POST(request: NextRequest) {
 
         const formattedPhone = formatToE164(phone_number);
 
-        // Espace auteur de test (01 12 34 56 78) : ouvert sans code SMS, sur le livre
-        // d'exemple seulement (lib/loomina/test-author.ts). Aucun autre numéro n'est concerné.
+        // Espace auteur de test (06 12 34 56 78) : ouvert sans code SMS, comme un nouvel
+        // auteur au premier jour (lib/loomina/test-author.ts). Aucun autre numéro n'est concerné.
         if (isTestAuthorPhone(formattedPhone)) {
             const open = NextResponse.json({ status: "approved", valid: true, open: true });
             open.cookies.set(SESSION_COOKIE, await signSession(TEST_AUTHOR_PHONE), {
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
                 maxAge: SESSION_MAX_AGE_S,
                 path: "/",
             });
-            return open;
+            return resetEssai(open);
         }
         const authHeader = "Basic " + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString("base64");
 

@@ -3,7 +3,8 @@ import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
 import { countWords } from '@/lib/loomina/writer';
-import { isDemoRequest } from '@/lib/loomina/test-author';
+import { DEMO_DATA } from '@/lib/loomina/demo';
+import { testAuthorReply } from '@/lib/loomina/test-author';
 import { carryIntoBook } from '@/lib/loomina/book-edition';
 
 export const runtime = 'nodejs';
@@ -21,6 +22,8 @@ const MAX_CHARS = 30_000;
  * l'Écrivain la respecteront dans tous les chapitres suivants.
  */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ number: string }> }) {
+    const essai = await testAuthorReply(request, 'chapter');
+    if (essai) return essai;
     const number = Number((await params).number);
     if (!Number.isInteger(number) || number < 1) return NextResponse.json({ error: 'Chapitre inconnu' }, { status: 400 });
 
@@ -30,7 +33,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!content) return NextResponse.json({ error: 'Le récit ne peut pas être vide.' }, { status: 400 });
     if (content.length > MAX_CHARS) return NextResponse.json({ error: 'Le récit est trop long.' }, { status: 400 });
 
-    if (await isDemoRequest(request)) return NextResponse.json({ saved: true, demo: true });
+    if (DEMO_DATA) return NextResponse.json({ saved: true, demo: true });
 
     try {
         const author = await currentAuthor(request);

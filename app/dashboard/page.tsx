@@ -114,7 +114,7 @@ export default function DashboardPage() {
       const data = await res.json().catch(() => ({}));
       if (res.status === 404) throw new Error("Ce numéro ne correspond à aucune commande. Indiquez le numéro donné à la commande : celui de la personne qui raconte, ou le vôtre si vous avez offert le livre.");
       if (!res.ok) throw new Error(data.message || "Le code n’a pas pu être envoyé. Réessayez dans un instant.");
-      // Numéro de l'espace de test : la session est déjà ouverte, pas de code à attendre.
+      // Numéro de l'espace de test (06 12 34 56 78) : la session est déjà ouverte, pas de code à attendre.
       if (data.open === true) {
         setIsLoggedIn(true);
         setSessionExpired(false);

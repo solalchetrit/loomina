@@ -173,9 +173,9 @@ export default function AuthorSpace({
           </h1>
           {tab === "apercu" && <p className="text-[15px] font-semibold text-[var(--ink-3)]">{title}</p>}
         </header>
-        {data?.demo && (
-          // Espace de test (01 12 34 56 78) ou démo locale : le livre de Jeanne est un exemple.
-          <p className="mt-1 text-[14px] text-[var(--ink-3)]">Espace de test : vous visitez le livre d’exemple de Jeanne. Vos essais ne sont pas enregistrés.</p>
+        {data?.essai && (
+          // Espace de test (06 12 34 56 78) : un nouvel auteur au premier jour.
+          <p className="mt-1 text-[14px] text-[var(--ink-3)]">Espace de test : vous découvrez l’espace auteur comme au premier jour. Rien n’est enregistré chez Loomina.</p>
         )}
 
         {data?.welcome && <Onboarding ask={data.welcome} prefs={data.prefs} firstName={data.firstName} onDone={load} onUnauthorized={onUnauthorized} />}

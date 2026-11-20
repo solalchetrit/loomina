@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         if (!email || !firstName || !lastName) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
-        // 01 12 34 56 78 est le numéro de l'espace de test : il ne peut pas porter une vraie commande.
+        // 06 12 34 56 78 est le numéro de l'espace de test : il ne peut pas porter une vraie commande.
         if (isTestAuthorPhone(phone) || isTestAuthorPhone(giverPhone)) {
             return NextResponse.json({ error: "Ce numéro sert à l’espace de test. Indiquez un vrai numéro de téléphone." }, { status: 400 });
         }

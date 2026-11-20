@@ -5,7 +5,8 @@ import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
 import { describePhoto, photoTopic, signedUrls, MAX_PHOTOS, MAX_PHOTO_BYTES, PHOTO_BUCKET } from '@/lib/loomina/photos';
 import type { PhotoEntry } from '@/lib/loomina/photos';
-import { isDemoRequest } from '@/lib/loomina/test-author';
+import { DEMO_DATA } from '@/lib/loomina/demo';
+import { testAuthorReply } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,9 @@ async function withUrls(photos: PhotoEntry[]) {
 
 /** Les photos du livre, avec des liens d'affichage temporaires. */
 export async function GET(request: NextRequest) {
-    if (await isDemoRequest(request)) return NextResponse.json({ photos: [] });
+    const essai = await testAuthorReply(request, 'photos');
+    if (essai) return essai;
+    if (DEMO_DATA) return NextResponse.json({ photos: [] });
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;
@@ -40,7 +43,9 @@ export async function GET(request: NextRequest) {
  * appel. Le navigateur la réduit avant l'envoi (1 600 px, JPEG).
  */
 export async function POST(request: NextRequest) {
-    if (await isDemoRequest(request)) return NextResponse.json({ error: 'Indisponible en mode démo.' }, { status: 501 });
+    const essai = await testAuthorReply(request, 'photo-upload');
+    if (essai) return essai;
+    if (DEMO_DATA) return NextResponse.json({ error: 'Indisponible en mode démo.' }, { status: 501 });
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;

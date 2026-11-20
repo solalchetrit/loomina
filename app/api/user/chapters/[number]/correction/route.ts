@@ -3,7 +3,8 @@ import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext } from '@/lib/loomina/context';
 import { applyCorrection } from '@/lib/loomina/writer';
-import { isDemoRequest } from '@/lib/loomina/test-author';
+import { DEMO_DATA } from '@/lib/loomina/demo';
+import { testAuthorReply } from '@/lib/loomina/test-author';
 import { queueCorrection } from '@/lib/loomina/corrections';
 
 export const runtime = 'nodejs';
@@ -22,13 +23,15 @@ export const maxDuration = 120;
  * proposition de texte sans rien enregistrer.
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ number: string }> }) {
+    const essai = await testAuthorReply(request, 'chapter');
+    if (essai) return essai;
     const number = Number((await params).number);
     const body = (await request.json().catch(() => ({}))) as { correction?: unknown; content?: unknown; later?: unknown };
     const correction = typeof body.correction === 'string' ? body.correction.trim().slice(0, 300) : '';
     if (correction.length < 4) return NextResponse.json({ error: 'Décrivez la correction en quelques mots.' }, { status: 400 });
 
     if (!Number.isInteger(number) || number < 1) return NextResponse.json({ error: 'Chapitre inconnu' }, { status: 400 });
-    const demo = await isDemoRequest(request);
+    const demo = DEMO_DATA;
     if (demo && body.later === true) return NextResponse.json({ queued: true, demo: true });
 
     if (demo) {
