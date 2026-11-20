@@ -46,10 +46,10 @@ export const config = {
         /** Format Twilio/ElevenLabs : voiceId[-modèle][-vitesse_stabilité_similarité] */
         // Stabilité 0,6 au lieu de 0,5 (19/11/2026) : une voix plus régulière,
         // moins de petits accrocs entendus à la démo.
-        // « Hugo - Deep French Storyteller » (6DEjyaHWnTHsvXM5Byys), choisie par
-        // Solal le 20/11/2026 : grave, calme, chaude. Avant : « Guillaume -
+        // « Adrien Clairon - Podcast Narrator » (c365oriviHmAhyLhpuN6), choisie
+        // par Solal le 20/11/2026 (Hugo, 6DEjyaHWnTHsvXM5Byys, trop grave). Avant : « Guillaume -
         // Narrator » (Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.6_0.75).
-        ttsVoice: optional('VOICE_TTS_VOICE', '6DEjyaHWnTHsvXM5Byys-flash_v2_5-1.0_0.5_0.75'),
+        ttsVoice: optional('VOICE_TTS_VOICE', 'c365oriviHmAhyLhpuN6-flash_v2_5-1.0_0.5_0.75'),
         language: optional('VOICE_LANGUAGE', 'fr-FR'),
         sttModel: optional('VOICE_STT_MODEL', 'nova-3-general'),
     },
