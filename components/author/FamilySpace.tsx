@@ -3,6 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 
+/** Le livre après « terminé », vu par la famille. */
+const DELIVERY_LABEL: Record<string, string> = {
+  completed: "Le récit est terminé, le livre est en relecture",
+  reviewed: "Le livre est relu",
+  printing: "Le livre est à l’impression",
+  shipped: "Le livre est en route",
+  delivered: "Le livre est arrivé",
+};
+
 interface FamilyBook {
   id: string;
   narratorFirstName: string | null;
@@ -10,6 +19,7 @@ interface FamilyBook {
   phaseLabel: string;
   progress: number;
   completed: boolean;
+  delivery?: { stage: "writing" | "completed" | "reviewed" | "printing" | "shipped" | "delivered"; tracking: { number: string; url: string } | null };
   scheduleText: string | null;
   /** Le narrateur a choisi de laisser lire ses récits. */
   shared: boolean;
@@ -121,7 +131,13 @@ function Book({ book, onChange, onUnauthorized }: { book: FamilyBook; onChange: 
     <div className="flex flex-col gap-4">
       <section className="rounded-[var(--radius-card)] bg-[var(--ink)] p-7 text-white md:p-9" aria-label={`Le livre de ${name}`}>
         <p className="text-[15px] font-bold text-[var(--amber)]">Le livre de {name}</p>
-        <p className="t-banner mt-2 text-white">{book.completed ? "Le récit est terminé" : book.phaseLabel}</p>
+        <p className="t-banner mt-2 text-white">{book.completed ? (DELIVERY_LABEL[book.delivery?.stage ?? "completed"] ?? "Le récit est terminé") : book.phaseLabel}</p>
+        {book.delivery?.tracking && (book.delivery.stage === "shipped" || book.delivery.stage === "delivered") && (
+          <p className="mt-2 text-[16px] text-[#e7e5de]">
+            Numéro de suivi {book.delivery.tracking.number} ·{" "}
+            <a href={book.delivery.tracking.url} target="_blank" rel="noreferrer" className="font-semibold text-white underline underline-offset-4">Suivre le colis</a>
+          </p>
+        )}
         <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-white/15" role="progressbar" aria-valuenow={book.progress} aria-valuemin={0} aria-valuemax={100} aria-label="Avancement de l’étape en cours">
           <div className="h-full rounded-full bg-[var(--amber)]" style={{ width: `${Math.max(4, book.progress)}%` }} />
         </div>

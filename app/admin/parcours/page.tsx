@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin/auth";
+import TechTabs from "@/components/admin/TechTabs";
 import { MAP_GROUPS, MAP_ROOTS, MAP_LINKS } from "@/lib/admin/map";
 import MapTree from "@/components/admin/MapTree";
 
@@ -8,6 +9,7 @@ export default async function AdminMap() {
   await requireAdmin();
   return (
     <div>
+      <TechTabs value="carte" />
 <header className="mb-6">
         <p className="t-eyebrow">La carte</p>
         <h1 className="t-title mt-2">Tout Loomina sur un seul arbre</h1>

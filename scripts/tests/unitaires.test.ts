@@ -508,3 +508,37 @@ test('livre terminé : la voix annonce la fin, et l\'auteur reçoit SMS et e-mai
         assert.doesNotMatch(t.sms + t.email, /reli[ée]/);
     }
 });
+
+// ── Le livre après « terminé » (20/11/2026) ─────────────────────────────
+test('étapes du livre : lecture, étape suivante, suivi La Poste par défaut', async () => {
+    const { readFulfillment, nextTeamStep, parseTracking } = await import('../../lib/loomina/fulfillment');
+    assert.equal(readFulfillment('active', { reviewed_at: '2026-11-20' }).stage, 'writing');
+    assert.equal(readFulfillment('completed', {}).stage, 'completed');
+    assert.equal(readFulfillment('completed', { reviewed_at: 'x', printed_at: 'y' }).stage, 'printing');
+    assert.equal(nextTeamStep('completed'), 'reviewed');
+    assert.equal(nextTeamStep('delivered'), null);
+    const t = parseTracking(' 6A 1234 ', '');
+    assert.equal(t?.number, '6A 1234');
+    assert.match(t!.url, /laposte\.fr.*6A1234/);
+    assert.equal(parseTracking('', 'https://x'), null);
+});
+
+test('étapes du livre : messages à l’auteur (tu/vous) et à la famille', async () => {
+    const { bookStageTexts } = await import('../../lib/loomina/notify');
+    const vous = bookStageTexts('reviewed', { first_name: 'Jeanne' }, null);
+    assert.match(vous.sms, /votre livre est relu/);
+    assert.doesNotMatch(vous.email, /relié/);
+    const tu = bookStageTexts('printing', { first_name: 'Marc', politeness_preference: 'tu' }, null);
+    assert.match(tu.sms, /ton livre est à l'impression/);
+    const fam = bookStageTexts('shipped', { first_name: 'Claire', family: true, narratorFirstName: 'Jeanne' }, { number: 'AB1', url: 'https://suivi' });
+    assert.match(fam.sms, /le livre de Jeanne est en route/);
+    assert.match(fam.email, /AB1/);
+});
+
+test('clients de test : drapeau test ou banc', async () => {
+    const { isTestMeta } = await import('../../lib/loomina/test-flag');
+    assert.equal(isTestMeta({ test: true }), true);
+    assert.equal(isTestMeta({ banc: true }), true);
+    assert.equal(isTestMeta({ is_gift: true }), false);
+    assert.equal(isTestMeta(null), false);
+});

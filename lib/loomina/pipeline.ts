@@ -533,6 +533,14 @@ async function persistDirectorResult(params: {
     // (Un essai repris peut renvoyer ce message : rare, et sans gravité.)
     if (projectCompleted && project.status !== 'completed') {
         const name = profile.first_name ?? 'Un auteur';
+        // La date de fin : l'admin compte les jours de la semaine promise pour la première version.
+        try {
+            const { data: fresh } = await db().from('projects').select('project_metadata').eq('id', project.id).single();
+            const meta = (fresh?.project_metadata ?? {}) as Record<string, unknown>;
+            if (!meta.completed_at) await db().from('projects').update({ project_metadata: { ...meta, completed_at: new Date().toISOString() } }).eq('id', project.id);
+        } catch (err) {
+            console.warn('[pipeline] date de fin non notée :', err instanceof Error ? err.message : String(err));
+        }
         // L'auteur d'abord : ce que Loomina vient de lui dire au téléphone, par écrit.
         await notifyAuthorBookComplete(profile);
         await notifyFamily({ projectMetadata: project.project_metadata, narratorFirstName: profile.first_name, kind: 'book_complete' });
