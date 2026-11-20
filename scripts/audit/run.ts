@@ -81,7 +81,7 @@ run('PDF du livre', tsx, ['--tsconfig', 'tsconfig.json', 'scripts/tests/livre-pd
 if (!QUICK) run('Build du site', bin('next'), ['build']);
 
 // 4. Règles de texte (ce que voit un client : site, voix, e-mails, PDF)
-const TEXT_DIRS = ['app', 'components', 'config', 'lib', join('voice', 'src')].map((d) => join(ROOT, d));
+const TEXT_DIRS = ['app', 'components', 'config', 'content', 'lib', join('voice', 'src')].map((d) => join(ROOT, d));
 const textFiles = TEXT_DIRS.flatMap((d) => walk(d, ['.ts', '.tsx', '.md']))
     .filter((f) => !f.includes(join('lib', 'admin')) && !f.includes(join('components', 'admin')));
 

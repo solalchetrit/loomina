@@ -26,6 +26,8 @@ photoAlt: Ce que montre la photo, en une phrase.
 
 ## Les règles de la maison
 
+La méthode complète est dans `.claude/skills/seo-loomina/SKILL.md`. En bref :
+
 - Une recherche Google précise par article. Ne pas refaire le sujet d'un guide ou d'un article existant.
 - La réponse dès le premier paragraphe, en phrases courtes. Chaque section doit se comprendre seule.
 - Rien d'inventé : pas de faux témoignage, pas de chiffre sans source.

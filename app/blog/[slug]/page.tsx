@@ -63,7 +63,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         inLanguage: "fr-FR",
         mainEntityOfPage: url,
         author: { "@type": "Person", name: AUTHOR.name, jobTitle: "Fondateur de Loomina", url: SITE.url },
-        publisher: { "@type": "Organization", name: SITE.name, url: SITE.url, logo: { "@type": "ImageObject", url: `${SITE.url}/icon.png` } },
+        publisher: { "@id": `${SITE.url}/#organisation` },
       },
       {
         "@type": "BreadcrumbList",
