@@ -14,14 +14,15 @@ export const SELLER = {
   registry: "immatriculé au Registre national des entreprises (RNE) le 18 mars 2024",
   address: "10 rue Talma, 75016 Paris, France",
   email: "contact@loomina.eu",
-  /** À fournir par Solal : obligatoire pour la vente à distance. null = non affiché. */
-  phone: null as string | null,
+  /** Solal, 20/11/2026 : son portable pour l’instant. null = non affiché. */
+  phone: "07 81 31 12 98" as string | null,
   /** Pas de numéro de TVA : franchise en base. */
   vat: "TVA non applicable, article 293 B du Code général des impôts",
   director: "Solal Chetrit",
   /**
    * Médiateur de la consommation : obligatoire (art. L612-1 du Code de la
-   * consommation). À remplir dès que Solal a adhéré à un médiateur.
+   * consommation). Solal, 20/11/2026 : pas encore de médiateur, rien n’est affiché
+   * tant que c’est null. À remplir dès qu’il a adhéré.
    */
   mediator: null as { name: string; address: string; website: string } | null,
 };

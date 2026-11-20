@@ -112,17 +112,15 @@ export default function CGVPage() {
 
       <h2>12. Litiges</h2>
       <p>
-        En cas de difficulté, le Client écrit d’abord à {SELLER.email} pour trouver une solution amiable. Conformément à
-        l’article L612-1 du Code de la consommation, il peut ensuite recourir gratuitement au médiateur de la consommation
-        {SELLER.mediator ? (
+        En cas de difficulté, le Client écrit d’abord à {SELLER.email} pour trouver une solution amiable.
+        {SELLER.mediator && (
           <>
             {" "}
-            : <strong>{SELLER.mediator.name}</strong>, {SELLER.mediator.address} ({SELLER.mediator.website})
+            Conformément à l’article L612-1 du Code de la consommation, il peut ensuite recourir gratuitement au médiateur de la
+            consommation : <strong>{SELLER.mediator.name}</strong>, {SELLER.mediator.address} ({SELLER.mediator.website}).
           </>
-        ) : (
-          " dont Loomina relève ; ses coordonnées sont communiquées sur demande"
-        )}
-        . À défaut d’accord, les tribunaux français sont compétents.
+        )}{" "}
+        À défaut d’accord, les tribunaux français sont compétents.
       </p>
 
       <h2>13. Modification des CGV</h2>
