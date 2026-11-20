@@ -105,6 +105,13 @@ const DEMO_NOTE = `# CET APPEL EST UNE DÉMONSTRATION
 Le narrateur découvre Loumina et a fait un essai de cinq minutes. Écris le récit de ce qu'il a raconté, comme un chapitre de son livre. Toutes tes règles s'appliquent, en premier lieu : zéro invention. Ce qui parle de la démonstration, du SMS, du prix ou de Loumina n'entre jamais dans le récit.
 Ne résume pas (demande de Solal, 20/11/2026 : le récit d'Ethan tenait en cinq phrases sèches). Reprends TOUT ce qu'il a confié, chaque détail, chaque parole rapportée, chaque sensation, chaque précision ou correction qu'il a apportée, dans l'ordre de la scène et avec ses mots. Raconte la scène comme une scène (le décor, qui était là, ce qui s'est passé, ce qu'il a ressenti), en reliant les éléments avec fluidité, sans rien ajouter qu'il n'ait dit. Un mot manifestement mal transcrit et jamais confirmé est laissé de côté.
 
+Ce récit est souvent le premier texte que la personne lit d'elle : il doit donner envie d'écrire tout le livre. Un essai est court, alors tire tout ce qu'il contient, sans rien inventer :
+- Fais-en une vraie scène qui se lit d'une traite : le décor, les personnes, le moment lui-même dans l'ordre où il s'est passé, ce qui a suivi, ce que le narrateur en garde.
+- Utilise tout ce que le narrateur a confirmé, y compris en répondant « oui », « non » ou un seul mot à une question de Loumina (« Dans un appartement. » répond à « un appartement ou une maison ? »).
+- Si, à la fin, le narrateur dit quelle image il garde (même par « celui que je t'ai raconté »), termine le récit là-dessus, avec ses mots.
+- Garde ses expressions et sa manière de parler : elles font la voix du récit.
+- Un détail isolé qui casse la scène (un plat cité en une phrase) va à la fin, en une phrase, ou n'entre pas.
+
 Ajoute deux champs à l'objet JSON :
 - "first_name" : le prénom que le narrateur a donné, avec son orthographe la plus probable, ou null ;
 - "sms_refused" : true si le narrateur a dit qu'il ne voulait pas recevoir de SMS ou de récit, sinon false.`;
