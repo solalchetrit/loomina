@@ -14,6 +14,7 @@ const STATUS: Record<string, { label: string; tone: Tone }> = {
   unusable: { label: "Pas assez de matière", tone: "muted" },
   refused: { label: "SMS refusé", tone: "muted" },
   failed: { label: "Échec d’écriture", tone: "bad" },
+  no_sms: { label: "Fixe ou masqué : son seul", tone: "muted" },
 };
 
 function words(text: unknown): number {
@@ -35,7 +36,7 @@ export default async function AdminDemos() {
   return (
     <div>
       <PageHeader eyebrow="Démos" title={`${demos.length} démonstration${demos.length > 1 ? "s" : ""}`}>
-        Les appels d’essai de cinq minutes, du plus récent au plus ancien : le transcript, le récit envoyé, le SMS et l’e-mail. Tout est effacé au bout de {DEMO_STORY_DAYS} jours.
+        Les appels d’essai de cinq minutes, du plus récent au plus ancien : l’enregistrement audio, le transcript, le récit envoyé, le SMS et l’e-mail. Tout est effacé au bout de {DEMO_STORY_DAYS} jours.
       </PageHeader>
       <Panel>
         {demos.length === 0 ? (
@@ -62,6 +63,7 @@ export default async function AdminDemos() {
                     {d.status === "written" && d.token ? <> · <Link href={`/recit/${String(d.token)}`} className="font-semibold underline" target="_blank">Voir la page du récit</Link></> : null}
                   </p>
                   {d.error ? <p className="mt-2 text-[14px] text-[var(--danger)]">Erreur : {String(d.error)}</p> : null}
+                  {d.recording_sid ? <audio controls preload="none" src={`/api/admin/recordings/${String(d.id)}?demo=1`} className="mt-3 w-full" /> : null}
                   <div className="mt-3 grid gap-2">
                     {d.content ? <Fold summary="Récit envoyé">{String(d.content)}</Fold> : null}
                     {d.transcript ? <Fold summary="Transcript de l’appel" mono>{String(d.transcript)}</Fold> : null}

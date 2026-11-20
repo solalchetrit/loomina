@@ -196,10 +196,11 @@ wss.on('connection', (ws: WebSocket) => {
                     return;
                 }
                 session.attach(ws);
-                // Enregistrement audio de l'entretien (demande de Solal, 17/11/2026).
-                // Jamais pour une démonstration : on y promet que rien n'est gardé.
+                // Enregistrement audio de l'entretien (demande de Solal, 17/11/2026),
+                // et de la démonstration depuis le 20/11/2026 (pour corriger la voix ;
+                // la première phrase le dit, le son est effacé au bout de 30 jours).
                 // Lancé ici, une fois l'appel établi ; un échec ne gêne pas l'appel.
-                if (config.recordingEnabled && !session.plan.demo) {
+                if (config.recordingEnabled) {
                     const current = session;
                     twilio(config.twilio.accountSid, config.twilio.authToken)
                         .calls(callSid)

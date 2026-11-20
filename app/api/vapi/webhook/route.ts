@@ -213,7 +213,8 @@ async function handleEndOfCall(
     // ni dans un livre : la personne n'est pas cliente.
     const metadata = message.call?.metadata ?? message.metadata ?? {};
     if (metadata.demo === true) {
-        return handleDemoEnd(data);
+        const rec = (metadata as { recordingSid?: unknown }).recordingSid;
+        return handleDemoEnd(data, typeof rec === 'string' ? rec : null);
     }
 
     const { id: eventId, alreadySeen } = await recordEvent({
@@ -251,12 +252,19 @@ async function handleEndOfCall(
     return NextResponse.json({ received: true, eventId });
 }
 
-async function handleDemoEnd(data: ReturnType<typeof extractCallData>) {
+async function handleDemoEnd(data: ReturnType<typeof extractCallData>, recordingSid: string | null) {
+    // Pas de SMS possible, mais un enregistrement : la démo est gardée pour
+    // l'écoute dans l'admin, sans récit (demande de Solal, 20/11/2026).
+    if (data.vapiCallId && recordingSid && (!data.phone || !data.transcript || !canReceiveSms(data.phone))) {
+        await recordDemoCall({ callId: data.vapiCallId, phone: data.phone ?? 'numéro masqué', transcript: data.transcript ?? '', durationSeconds: data.durationSeconds, recordingSid, status: 'no_sms' });
+        after(purgeOldDemoStories);
+        return NextResponse.json({ received: true, demo: true, stored: 'recording' });
+    }
     if (!data.vapiCallId || !data.phone || !data.transcript || !canReceiveSms(data.phone)) {
         console.info('[vapi] démo sans récit possible (pas de portable ou pas de transcript)');
         return NextResponse.json({ received: true, demo: true, stored: false });
     }
-    const id = await recordDemoCall({ callId: data.vapiCallId, phone: data.phone, transcript: data.transcript, durationSeconds: data.durationSeconds });
+    const id = await recordDemoCall({ callId: data.vapiCallId, phone: data.phone, transcript: data.transcript, durationSeconds: data.durationSeconds, recordingSid });
     if (!id) return NextResponse.json({ received: true, demo: true, duplicate: true });
     after(async () => {
         const outcome = await processDemoStory(id);

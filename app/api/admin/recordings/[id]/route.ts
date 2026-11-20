@@ -10,11 +10,13 @@ export const dynamic = 'force-dynamic';
  * `id` est l'identifiant du rapport d'appel (call_events) : le fichier est
  * chez Twilio, on le relaie ici sans jamais exposer les identifiants Twilio.
  */
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     if (!(await isAdmin())) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
     const { id } = await params;
-    const { data } = await db().from('call_events').select('rec:payload->message->call->metadata->>recordingSid').eq('id', id).maybeSingle();
-    const recordingSid = (data as { rec?: string | null } | null)?.rec;
+    // ?demo=1 : `id` est une démonstration (demo_stories), enregistrée depuis le 20/11/2026.
+    const recordingSid = request.nextUrl.searchParams.get('demo') === '1'
+        ? ((await db().from('demo_stories').select('recording_sid').eq('id', id).maybeSingle()).data as { recording_sid?: string | null } | null)?.recording_sid
+        : ((await db().from('call_events').select('rec:payload->message->call->metadata->>recordingSid').eq('id', id).maybeSingle()).data as { rec?: string | null } | null)?.rec;
     const sid = process.env.TWILIO_ACCOUNT_SID;
     const token = process.env.TWILIO_AUTH_TOKEN;
     if (!recordingSid || !/^RE[0-9a-f]{32}$/i.test(recordingSid) || !sid || !token) return NextResponse.json({ error: 'pas d’enregistrement' }, { status: 404 });

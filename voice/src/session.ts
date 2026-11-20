@@ -254,8 +254,9 @@ export class CallSession {
         );
 
         // Démonstration : le transcript part au site, qui écrit le récit et
-        // l'envoie par SMS. Sans portable, ou sans échange, rien n'est envoyé.
-        if (this.plan.demo && (this.plan.metadata.can_text !== true || !this.turns.some((t) => t.role === 'user'))) {
+        // l'envoie par SMS. Sans portable, ou sans échange, rien n'est envoyé,
+        // sauf s'il y a un enregistrement : le site le garde pour l'admin.
+        if (this.plan.demo && !this.recordingSid && (this.plan.metadata.can_text !== true || !this.turns.some((t) => t.role === 'user'))) {
             console.info(`[${this.callSid}] démo sans envoi possible : rien n'est conservé`);
             return;
         }

@@ -65,6 +65,9 @@ export function isExpired(createdAt: string): boolean {
 /** Efface les récits de plus de 30 jours. Ne lève jamais. */
 export async function purgeOldDemoStories(): Promise<void> {
     const limit = new Date(Date.now() - DEMO_STORY_DAYS * 86_400_000).toISOString();
+    // D'abord le son chez Twilio : la ligne effacée, on ne saurait plus le retrouver.
+    const { data: old } = await db().from('demo_stories').select('recording_sid').lt('created_at', limit).not('recording_sid', 'is', null);
+    for (const row of old ?? []) await deleteTwilioRecording(row.recording_sid as string);
     const { error } = await db().from('demo_stories').delete().lt('created_at', limit);
     if (error) console.warn('[demo] purge des anciens récits :', error.message);
 }
@@ -73,7 +76,15 @@ export async function purgeOldDemoStories(): Promise<void> {
  * Archive le transcript d'une démo. Renvoie null si l'appel est déjà connu
  * (rapport renvoyé deux fois par le serveur vocal).
  */
-export async function recordDemoCall(params: { callId: string; phone: string; transcript: string; durationSeconds: number | null }): Promise<string | null> {
+export async function recordDemoCall(params: {
+    callId: string;
+    phone: string;
+    transcript: string;
+    durationSeconds: number | null;
+    recordingSid?: string | null;
+    /** 'no_sms' : démo gardée seulement pour son enregistrement (fixe, numéro masqué). */
+    status?: 'pending' | 'no_sms';
+}): Promise<string | null> {
     const { data, error } = await db()
         .from('demo_stories')
         .insert({
@@ -82,6 +93,8 @@ export async function recordDemoCall(params: { callId: string; phone: string; tr
             phone: params.phone,
             transcript: params.transcript,
             duration_seconds: params.durationSeconds,
+            recording_sid: params.recordingSid ?? null,
+            status: params.status ?? 'pending',
         })
         .select('id')
         .single();
@@ -361,4 +374,20 @@ export async function sweepDemoStories(limit = 5): Promise<{ retried: number; sm
         console.error('[demo] rattrapage :', err instanceof Error ? err.message : String(err));
     }
     return out;
+}
+
+/** Efface un enregistrement chez Twilio. Ne lève jamais. */
+export async function deleteTwilioRecording(recordingSid: string): Promise<void> {
+    const sid = process.env.TWILIO_ACCOUNT_SID;
+    const token = process.env.TWILIO_AUTH_TOKEN;
+    if (!sid || !token || !/^RE[0-9a-f]{32}$/i.test(recordingSid)) return;
+    try {
+        const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Recordings/${recordingSid}.json`, {
+            method: 'DELETE',
+            headers: { Authorization: 'Basic ' + Buffer.from(`${sid}:${token}`).toString('base64') },
+        });
+        if (!res.ok && res.status !== 404) console.warn(`[demo] effacement de l’enregistrement ${recordingSid} : HTTP ${res.status}`);
+    } catch (err) {
+        console.warn(`[demo] effacement de l’enregistrement ${recordingSid} :`, err instanceof Error ? err.message : String(err));
+    }
 }

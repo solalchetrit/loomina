@@ -19,12 +19,13 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong>Pendant les appels :</strong> la transcription de ce que vous dites et de ce que Loomina répond, l’enregistrement
-          audio de vos entretiens (jamais celui de la démonstration), ainsi que le numéro appelant, la date et la durée de l’appel.
+          audio de vos entretiens et de la démonstration, ainsi que le numéro appelant, la date et la durée de l’appel.
         </li>
         <li>
           <strong>Pendant la démonstration gratuite :</strong> la transcription de l’appel et le numéro appelant, pour écrire votre
-          récit et vous l’envoyer par SMS, puis l’e-mail que vous nous donnez pour le recevoir en PDF. Pas d’enregistrement audio.
-          Le récit et la transcription sont effacés au bout de 30 jours.
+          récit et vous l’envoyer par SMS, puis l’e-mail que vous nous donnez pour le recevoir en PDF. L’appel est aussi enregistré
+          (vous en êtes prévenu dès le début), pour améliorer la qualité de la voix. Le récit, la transcription et l’enregistrement
+          sont effacés au bout de 30 jours.
         </li>
         <li>
           <strong>Pour le livre :</strong> les récits et les chapitres écrits, vos corrections, et les photographies que vous nous envoyez.
@@ -52,7 +53,7 @@ export default function PrivacyPage() {
           et des chapitres.
         </li>
         <li>
-          <strong>Twilio</strong> (téléphonie) : acheminement des appels, enregistrement audio des entretiens et envoi des SMS.
+          <strong>Twilio</strong> (téléphonie) : acheminement des appels, enregistrement audio des entretiens et des démonstrations, et envoi des SMS.
           Pendant l’appel, Twilio fait transcrire votre voix par <strong>Deepgram</strong> et prononcer les réponses de
           Loomina par <strong>ElevenLabs</strong>.
         </li>

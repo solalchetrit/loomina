@@ -435,7 +435,7 @@ export async function listDemos(): Promise<Row[]> {
     return must(
         await db()
             .from('demo_stories')
-            .select('id, created_at, first_name, phone, duration_seconds, status, title, content, transcript, error, sms_sent_at, email, email_count, promo_code, token')
+            .select('id, created_at, first_name, phone, duration_seconds, status, title, content, transcript, error, sms_sent_at, email, email_count, promo_code, token, recording_sid')
             .order('created_at', { ascending: false })
             .limit(200),
         'demo_stories'
