@@ -278,10 +278,11 @@ export const MAP_GROUPS: MapGroup[] = [
         nodes: [
             { id: 'm-mdp', label: 'Mot de passe', d: 'Un seul mot de passe (ADMIN_PASSWORD, sur Vercel). Aucun lien depuis le site, pages non indexées.', code: 'lib/admin/auth.ts' },
             { id: 'm-session', label: 'Session de 30 jours', kind: 'end', d: 'Changer le mot de passe déconnecte tout le monde.' },
-            { id: 'm-vue', label: 'Vue d’ensemble', d: 'La page d’accueil de l’admin.', code: 'app/admin/page.tsx' },
+            { id: 'm-vue', label: 'Vue d’ensemble', d: 'La page d’accueil de l’admin. Depuis le 20/11/2026, le logo Loomina en haut à gauche de l’admin ramène à l’accueil du site (loomina.eu), plus à cette page.', code: 'app/admin/page.tsx' },
             { id: 'm-suivi', label: 'Suivi client', gap: 2, d: 'Où en sont les clients, d’un coup d’œil.', code: 'app/admin/suivi' },
             { id: 'm-clients', label: 'Clients', gap: 2, d: 'La liste de tous les narrateurs, du plus récent au plus ancien.', code: 'app/admin/clients' },
             { id: 'm-fiche', label: 'Fiche d’un client', d: 'Tout ce que Loomina sait d’un client, sur une page.', code: 'app/admin/clients/[id]' },
+            { id: 'm-demos', label: 'Démos', d: 'Depuis le 20/11/2026 (demande de Solal) : toutes les démonstrations de cinq minutes, de la plus récente à la plus ancienne. Pour chacune : date, prénom, durée, numéro, statut du récit, SMS envoyé, e-mail laissé, code promo, nombre de mots dits par la personne et du récit, le récit envoyé, le transcript, et le lien vers la page du récit. Effacées au bout de 30 jours, comme la table demo_stories.', code: 'app/admin/demos/page.tsx' },
             { id: 'm-mails', label: 'Mails', gap: 1, d: 'La boîte contact@loomina.eu dans l’admin, au format webmail comme sur L’Étincelle : la liste à gauche, le message à droite, dossiers Reçus, Envoyés, Indésirables, Corbeille, recherche, raccourcis clavier. Lue en direct chez l’hébergeur.', code: 'app/admin/mails' },
             { id: 'm-carte', label: 'La carte', gap: 3, d: 'Cette page : tout le projet sur un seul arbre, avec ce qui manque.', code: 'lib/admin/map.ts' },
             { id: 'm-structure', label: 'Structure', d: 'Le schéma « qui parle à qui », le contenu de la base, ce qui tourne tout seul.', code: 'app/admin/structure' },

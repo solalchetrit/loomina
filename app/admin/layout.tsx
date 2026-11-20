@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 function Logo() {
   return (
-    <Link href="/admin" className="flex shrink-0 items-center gap-2.5" aria-label="Admin Loomina, accueil">
+    <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Loomina, page d’accueil du site">
       <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
         <Image src="/header-logo-trimmed.png" alt="" fill className="object-contain object-left" priority sizes="128px" />
       </span>
