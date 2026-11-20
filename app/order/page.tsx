@@ -31,6 +31,9 @@ export default function OrderPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", giverFirstName: "", giverPhone: "" });
+  // Les autres proches qui suivront le livre dans l'espace famille (livre offert).
+  const [relatives, setRelatives] = useState<{ firstName: string; phone: string }[]>([]);
+  const [relativeErrors, setRelativeErrors] = useState<Record<number, { firstName?: string; phone?: string }>>({});
   const [callMinutes, setCallMinutes] = useState<number>(DEFAULT_CALL_MINUTES);
   // Paiement intégré : le formulaire Stripe s'affiche ici, à l'étape 3.
   const [checkout, setCheckout] = useState<{ clientSecret: string; publishableKey: string; installments: boolean; method: PayMethod } | null>(null);
@@ -78,8 +81,23 @@ export default function OrderPage() {
       else if (validPhone(form.phone) && formatToE164(form.giverPhone) === formatToE164(form.phone))
         next.giverPhone = "C’est le même numéro que celui de la personne qui raconte. Indiquez le vôtre.";
     }
+    // Les proches ajoutés : une ligne vide est ignorée, une ligne commencée doit être complète.
+    const rel: Record<number, { firstName?: string; phone?: string }> = {};
+    if (isGift) {
+      const taken = new Set([formatToE164(form.phone), formatToE164(form.giverPhone)]);
+      relatives.forEach((r, i) => {
+        if (!r.firstName.trim() && !r.phone.trim()) return;
+        const e: { firstName?: string; phone?: string } = {};
+        if (!r.firstName.trim()) e.firstName = "Son prénom, pour l’accueillir.";
+        if (!validPhone(r.phone)) e.phone = "Vérifiez le numéro : dix chiffres.";
+        else if (taken.has(formatToE164(r.phone))) e.phone = "Ce numéro est déjà dans la commande.";
+        else taken.add(formatToE164(r.phone));
+        if (e.firstName || e.phone) rel[i] = e;
+      });
+    }
+    setRelativeErrors(rel);
     setErrors(next);
-    return Object.keys(next).length === 0;
+    return Object.keys(next).length === 0 && Object.keys(rel).length === 0;
   };
 
   const startCheckout = async (method: PayMethod, replaces: string | null, phone = formatToE164(form.phone)) => {
@@ -93,6 +111,9 @@ export default function OrderPage() {
         callMinutes,
         giverFirstName: isGift ? form.giverFirstName.trim() : "",
         giverPhone: isGift ? formatToE164(form.giverPhone) : "",
+        familyMembers: isGift
+          ? relatives.filter((r) => r.firstName.trim() && validPhone(r.phone)).map((r) => ({ firstName: r.firstName.trim(), phone: formatToE164(r.phone) }))
+          : [],
         method,
         replaces,
       }),
@@ -314,6 +335,69 @@ export default function OrderPage() {
                           required
                         />
                       </div>
+
+                      {/* D'autres proches peuvent suivre le livre, chacun avec son numéro (Solal, 20/11/2026). */}
+                      {relatives.map((r, i) => (
+                        <div key={i} className="mt-5 border-t border-[var(--line-soft)] pt-5">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-[15px] font-bold">Un autre proche</p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setRelatives((all) => all.filter((_, j) => j !== i));
+                                setRelativeErrors({});
+                              }}
+                              className="link text-[14px]"
+                            >
+                              Retirer
+                            </button>
+                          </div>
+                          <div className="mt-3 grid gap-x-4 gap-y-5 sm:grid-cols-2">
+                            <Input
+                              className={field}
+                              label="Son prénom"
+                              name={`proche-prenom-${i}`}
+                              autoComplete="off"
+                              value={r.firstName}
+                              onChange={(e) => {
+                                const v = e.target.value.slice(0, 30);
+                                setRelatives((all) => all.map((x, j) => (j === i ? { ...x, firstName: v } : x)));
+                                setRelativeErrors((er) => ({ ...er, [i]: { ...er[i], firstName: undefined } }));
+                              }}
+                              error={relativeErrors[i]?.firstName}
+                            />
+                            <Input
+                              className={field}
+                              label="Son portable"
+                              name={`proche-tel-${i}`}
+                              type="tel"
+                              inputMode="tel"
+                              placeholder="06 12 34 56 78"
+                              autoComplete="off"
+                              value={r.phone}
+                              onChange={(e) => {
+                                const v = formatPhoneNumberForDisplay(e.target.value).slice(0, 20);
+                                setRelatives((all) => all.map((x, j) => (j === i ? { ...x, phone: v } : x)));
+                                setRelativeErrors((er) => ({ ...er, [i]: { ...er[i], phone: undefined } }));
+                              }}
+                              error={relativeErrors[i]?.phone}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      {relatives.length < 9 && (
+                        <button
+                          type="button"
+                          onClick={() => setRelatives((all) => [...all, { firstName: "", phone: "" }])}
+                          className="press mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--rule-strong)] bg-white px-4 text-[15px] font-semibold hover:border-[var(--ink)]"
+                        >
+                          <span aria-hidden="true" className="text-[18px] leading-none">+</span>
+                          {relatives.length ? "Ajouter un autre proche" : "Ajouter un proche"}
+                        </button>
+                      )}
+                      <p className="mt-2 text-[13.5px] leading-relaxed text-[var(--ink-3)]">
+                        Un frère, une cousine, un petit-enfant : chacun suit le livre avec son propre numéro. Il reçoit un SMS pour ouvrir son espace.
+                      </p>
                     </div>
                   )}
                   <fieldset className="sm:col-span-2">

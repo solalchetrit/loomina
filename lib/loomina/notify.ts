@@ -18,6 +18,7 @@
 
 import { sendSms } from './sms';
 import { SITE } from '../../config/site';
+import { familyAudience } from './giver';
 
 const HOST = SITE.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
 
@@ -303,20 +304,39 @@ export async function notifyFamily(params: {
 }): Promise<void> {
     try {
         const meta = params.projectMetadata ?? {};
-        if (meta.is_gift !== true || meta.family_news === false) return;
-        const giver = meta.giver as { phone?: unknown } | undefined;
-        const phone = typeof giver?.phone === 'string' ? giver.phone : null;
-        const email = typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
+        if (meta.family_news === false) return;
+        // Celui qui a offert le livre, et les autres proches ajoutés (lib/loomina/giver.ts).
+        const phones = familyAudience(meta).map((p) => p.phone);
+        const email = meta.is_gift === true && typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
+        if (!phones.length && !email) return;
         const news = familyNewsText(params.kind, params.narratorFirstName ?? '', params.storyTitle);
         const follow = `Suivez l'avancement sur ${HOST}/dashboard`;
         await Promise.allSettled([
-            phone ? sendSms(phone, `Loomina : ${news.text} ${follow}`) : Promise.resolve(false),
+            ...phones.map((phone) => sendSms(phone, `Loomina : ${news.text} ${follow}`)),
             email
                 ? sendEmail({ to: email, subject: news.subject, text: `Bonjour,\n\n${news.text}\n\n${follow}, en vous connectant avec votre numéro de téléphone.\n\nL'équipe Loomina` })
                 : Promise.resolve(false),
         ]);
     } catch (err) {
         console.warn('[famille] nouvelles non envoyées :', err instanceof Error ? err.message : String(err));
+    }
+}
+
+/** Le SMS qui ouvre l'espace famille à un proche ajouté. */
+export function familyInviteSms(params: { firstName: string | null; narratorFirstName: string | null; invitedBy: string | null }): string {
+    const hello = params.firstName ? `Bonjour ${params.firstName}, ` : 'Bonjour, ';
+    const narrator = params.narratorFirstName?.trim() || 'votre proche';
+    const by = params.invitedBy?.trim() ? `${params.invitedBy.trim()} vous invite` : 'Loomina vous invite';
+    return `Loomina : ${hello}${by} à suivre le livre de ${narrator}, raconté au téléphone. Ouvrez votre espace famille sur ${HOST}/dashboard avec ce numéro.`;
+}
+
+/** Prévient un proche qu'il a accès à l'espace famille. Ne lève jamais. */
+export async function notifyFamilyInvite(params: { phone: string; firstName: string | null; narratorFirstName: string | null; invitedBy: string | null }): Promise<boolean> {
+    try {
+        return await sendSms(params.phone, familyInviteSms(params));
+    } catch (err) {
+        console.warn('[famille] invitation non envoyée :', err instanceof Error ? err.message : String(err));
+        return false;
     }
 }
 
@@ -439,17 +459,15 @@ export async function notifyBookStage(params: {
         if (params.author.email) jobs.push(sendEmail({ to: params.author.email, subject: t.subject, text: t.email, replyTo: team }));
 
         const meta = params.projectMetadata ?? {};
-        if (meta.is_gift === true && meta.family_news !== false) {
-            const giver = meta.giver as { phone?: unknown; first_name?: unknown } | undefined;
-            const phone = typeof giver?.phone === 'string' ? giver.phone : null;
-            const email = typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
-            const f = bookStageTexts(
-                params.step,
-                { first_name: typeof giver?.first_name === 'string' ? giver.first_name : null, family: true, narratorFirstName: params.author.first_name },
-                params.tracking
-            );
-            if (phone && phone !== params.author.phone_number) jobs.push(sendSms(phone, f.sms));
-            if (email && email !== params.author.email) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, replyTo: team }));
+        if (meta.family_news !== false) {
+            // Celui qui a offert le livre, et les autres proches ajoutés (lib/loomina/giver.ts).
+            for (const person of familyAudience(meta)) {
+                if (person.phone === params.author.phone_number) continue;
+                const f = bookStageTexts(params.step, { first_name: person.firstName, family: true, narratorFirstName: params.author.first_name }, params.tracking);
+                jobs.push(sendSms(person.phone, f.sms));
+                const email = person.giver && meta.is_gift === true && typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
+                if (email && email !== params.author.email) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, replyTo: team }));
+            }
         }
         await Promise.allSettled(jobs);
     } catch (err) {

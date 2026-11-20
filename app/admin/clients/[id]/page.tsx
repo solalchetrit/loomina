@@ -101,6 +101,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
             <Field label="Pour">{order.isGift ? "un proche (cadeau)" : "soi-même"}</Field>
             <Field label="E-mail acheteur">{order.buyerEmail}</Field>
             {order.giver && <Field label="Offert par">{`${order.giver.firstName ?? "?"} · ${order.giver.phone}`}</Field>}
+            {order.family.length > 0 && <Field label="Espace famille">{order.family.map((m) => `${m.firstName ?? "?"} · ${m.phone}`).join(", ")}</Field>}
             <Field label="Durée d’appel voulue">{`${order.callMinutes} min`}</Field>
             <Field label="Adresse de livraison">{order.shipping ? order.shipping.join(", ") : "pas encore demandée (elle l’est quand le livre est terminé)"}</Field>
             <Field label="Paiement Stripe">
@@ -117,7 +118,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
           <dl>
             <Field label="Rendez-vous">{describeSchedule(settings.schedule) ?? "aucun : il appelle quand il veut"}</Field>
             <Field label="SMS « récit prêt »">{settings.smsChapter ? "oui" : "coupé"}</Field>
-            <Field label="Partage avec l’offreur">{order.giver ? (settings.shareWithGiver ? "récits visibles" : "avancement seulement") : "sans objet"}</Field>
+            <Field label="Partage avec la famille">{order.giver || order.family.length ? (settings.shareWithGiver ? "récits visibles" : "avancement seulement") : "sans objet"}</Field>
             <Field label="Préférences réglées">{settings.prefsSetAt ? fmtDate(settings.prefsSetAt) : "pas encore"}</Field>
             <Field label="Photos envoyées">{String(settings.photos)}</Field>
             <Field label="Proches connus">{String(c.family.length)}</Field>

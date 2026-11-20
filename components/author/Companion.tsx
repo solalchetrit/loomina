@@ -25,7 +25,12 @@ interface Heart {
  * l'avancée réelle du livre (lib/loomina/memo.ts). On peut jouer avec lui :
  * le toucher (il saute, s'occupe, rit), le caresser (des cœurs s'envolent).
  */
-export default function Companion({ project, demo = false, skipIntro = false }: { project: ProjectOverview; demo?: boolean; skipIntro?: boolean }) {
+export default function Companion({ project, demo = false, skipIntro = false, narrator }: { project: ProjectOverview; demo?: boolean; skipIntro?: boolean; narrator?: string | null }) {
+  // Espace famille : Mémo parle de la personne qui raconte, à celle qui a offert le livre.
+  const family = narrator !== undefined;
+  const who = narrator?.trim() || "votre proche";
+  const seenKey = family ? `${SEEN_KEY}:famille` : SEEN_KEY;
+  const words = family ? ["Je n’oublie rien.", `Un souvenir à souffler pour ${who} ?`, "Je garde tout pour le livre."] : WORDS;
   const state = useMemo(
     () =>
       memoState({
@@ -35,8 +40,9 @@ export default function Companion({ project, demo = false, skipIntro = false }: 
         calls: project.calls,
         scheduleText: project.scheduleText,
         lastTitle: project.calls[0]?.title,
+        ...(family ? { narrator } : {}),
       }),
-    [project],
+    [project, family, narrator],
   );
   // Livre d'exemple : on peut toucher un âge pour le voir.
   const [preview, setPreview] = useState<MemoAge | null>(null);
@@ -79,8 +85,8 @@ export default function Companion({ project, demo = false, skipIntro = false }: 
     started.current = true;
     let seen: { age: number; told: number } | null = null;
     try {
-      seen = JSON.parse(window.localStorage.getItem(SEEN_KEY) ?? "null");
-      window.localStorage.setItem(SEEN_KEY, JSON.stringify({ age: state.age, told: state.told }));
+      seen = JSON.parse(window.localStorage.getItem(seenKey) ?? "null");
+      window.localStorage.setItem(seenKey, JSON.stringify({ age: state.age, told: state.told }));
     } catch {
       // Stockage indisponible : Mémo reste simplement là.
     }
@@ -103,7 +109,7 @@ export default function Companion({ project, demo = false, skipIntro = false }: 
       }
     }, 700);
     return () => window.clearTimeout(id);
-  }, [skipIntro, state]);
+  }, [skipIntro, state, seenKey]);
 
   // Tout seul, de temps en temps, il s'occupe.
   useEffect(() => {
@@ -153,7 +159,7 @@ export default function Companion({ project, demo = false, skipIntro = false }: 
     setClip(TAPS[n % TAPS.length]);
     // Deux fois sur trois, il reparle d'un vrai souvenir ; sinon, un mot à lui.
     if (memories.length && n % 3 !== 2) say(memories[(n * 5) % memories.length]);
-    else say(WORDS[n % WORDS.length]);
+    else say(words[n % words.length]);
   };
 
   const meta = MEMO_AGES[age - 1];
@@ -289,7 +295,7 @@ export default function Companion({ project, demo = false, skipIntro = false }: 
         </div>
       )}
 
-      {growth && <Growth age={growth.age} intro={growth.intro} onClose={() => setGrowth(null)} />}
+      {growth && <Growth age={growth.age} intro={growth.intro} narrator={family ? who : null} onClose={() => setGrowth(null)} />}
     </section>
   );
 }
@@ -299,7 +305,7 @@ export default function Companion({ project, demo = false, skipIntro = false }: 
  * ce que ce nouvel âge veut dire pour le livre. À la toute première visite, la même
  * scène sert à le présenter (« Voici Mémo »).
  */
-function Growth({ age, intro, onClose }: { age: MemoAge; intro: boolean; onClose: () => void }) {
+function Growth({ age, intro, narrator = null, onClose }: { age: MemoAge; intro: boolean; narrator?: string | null; onClose: () => void }) {
   const meta = MEMO_AGES[age - 1];
   const [clip, setClip] = useState<MemoClip>("pop");
   useEffect(() => {
@@ -316,11 +322,21 @@ function Growth({ age, intro, onClose }: { age: MemoAge; intro: boolean; onClose
           <span className={s.growthHalo} aria-hidden="true" />
           <Memo age={age} clip={clip} size={240} onEnd={() => setClip("idle")} />
         </div>
-        <p className="text-[14px] font-bold text-[var(--amber-ink)]">{intro ? "Il grandit avec votre livre" : "Mémo a grandi"}</p>
+        <p className="text-[14px] font-bold text-[var(--amber-ink)]">{intro ? (narrator ? `Il grandit avec le livre de ${narrator}` : "Il grandit avec votre livre") : "Mémo a grandi"}</p>
         <h2 id="memo-grandit" className="mt-1 text-[clamp(1.5rem,4vw,1.9rem)] font-extrabold leading-tight tracking-[-0.03em]">
           {intro ? first.event : meta.event}
         </h2>
-        <p className="mx-auto mt-3 max-w-[26rem] text-[16px] leading-relaxed text-[var(--ink-2)]">{intro ? first.meaning : meta.meaning}</p>
+        <p className="mx-auto mt-3 max-w-[26rem] text-[16px] leading-relaxed text-[var(--ink-2)]">
+          {narrator
+            ? intro
+              ? `Mémo n’oublie rien. Il retient chaque souvenir que ${narrator} raconte. À chaque souvenir, il grandit, et le livre avance.`
+              : age === 5
+                ? `Le récit de ${narrator} est complet. Le livre va être relu, puis imprimé.`
+                : `Le livre de ${narrator} passe à l’étape « ${meta.stage} ».`
+            : intro
+              ? first.meaning
+              : meta.meaning}
+        </p>
         <button
           type="button"
           autoFocus

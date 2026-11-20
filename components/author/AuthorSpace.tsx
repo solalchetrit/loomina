@@ -12,6 +12,7 @@ import SuggestTopic from "./SuggestTopic";
 import LifeStory from "./LifeStory";
 import Calls from "./Calls";
 import Settings from "./Settings";
+import FamilyAccess from "./FamilyAccess";
 import Photos from "./Photos";
 import Onboarding from "./Onboarding";
 import Shipping from "./Shipping";
@@ -255,12 +256,22 @@ export default function AuthorSpace({
             ) : null)}
           {data && tab === "appels" && (project ? <Calls project={project} onUnauthorized={onUnauthorized} /> : null)}
           {data && tab === "reglages" && (
-            <Settings
-              prefs={data.prefs}
-              firstName={data.firstName}
-              onSaved={(prefs) => setData((d) => (d ? { ...d, prefs } : d))}
-              onUnauthorized={onUnauthorized}
-            />
+            <div className="flex flex-col gap-4 lg:gap-5">
+              <Settings
+                prefs={data.prefs}
+                firstName={data.firstName}
+                onSaved={(prefs) => setData((d) => (d ? { ...d, prefs: { ...prefs, family: d.prefs.family } } : d))}
+                onUnauthorized={onUnauthorized}
+              />
+              {project && (
+                <FamilyAccess
+                  family={data.prefs.family ?? []}
+                  shared={data.prefs.shareWithGiver}
+                  onChange={(family) => setData((d) => (d ? { ...d, prefs: { ...d.prefs, family, giverFirstName: d.prefs.giverFirstName ?? (family.length ? "" : null) } } : d))}
+                  onUnauthorized={onUnauthorized}
+                />
+              )}
+            </div>
           )}
         </div>
       </div>
