@@ -46,6 +46,8 @@ interface FamilyBook {
 
 interface FamilyOverview {
   giverFirstName: string | null;
+  /** Espace famille de test (07 12 34 56 78) : rien n'est enregistré. */
+  essai?: boolean;
   books: FamilyBook[];
 }
 
@@ -417,6 +419,10 @@ export default function FamilySpace({ onLogout, onUnauthorized, onNotFound }: { 
           <h1 className="text-[clamp(1.6rem,2.6vw,2rem)] font-extrabold leading-[1.1] tracking-[-0.03em]">{data?.giverFirstName ? `Bonjour ${data.giverFirstName}` : "Bonjour"}</h1>
           {single && <p className="text-[15px] font-semibold text-[var(--ink-3)]">{single.title || `Le livre de ${single.narratorFirstName ?? "votre proche"}`}</p>}
         </header>
+        {data?.essai && (
+          // Espace famille de test (07 12 34 56 78) : quelqu'un qui vient d'offrir un livre.
+          <p className="mt-1 text-[14px] text-[var(--ink-3)]">Espace de test : vous découvrez l’espace famille, juste après avoir offert un livre. Rien n’est enregistré chez Loomina.</p>
+        )}
 
         <div className="mt-4 flex flex-col gap-10">
           {failed && (

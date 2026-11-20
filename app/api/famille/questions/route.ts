@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
+import { testFamilyReply } from '@/lib/loomina/test-family';
 import { findGiftProjects, giverPendingTopics } from '@/lib/loomina/giver';
 import { normalizeContext } from '@/lib/loomina/context';
 
@@ -13,6 +14,8 @@ export const dynamic = 'force-dynamic';
  * Loomina l'aborde à un prochain appel. Voir app/api/user/questions.
  */
 export async function POST(request: NextRequest) {
+    const essai = await testFamilyReply(request, 'questions');
+    if (essai) return essai;
     const session = await readSession(request);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 

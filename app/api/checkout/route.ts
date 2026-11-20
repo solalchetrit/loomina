@@ -3,6 +3,7 @@ import { OFFER } from "@/config/offer";
 import { stripe } from "@/lib/stripe";
 import { normalizeCallMinutes } from "@/lib/loomina/call-length";
 import { isTestAuthorPhone } from "@/lib/loomina/test-author";
+import { isTestFamilyPhone } from "@/lib/loomina/test-family";
 import { encodeFamilyForStripe } from "@/lib/loomina/giver";
 
 export async function POST(request: NextRequest) {
@@ -19,8 +20,8 @@ export async function POST(request: NextRequest) {
         if (!email || !firstName || !lastName) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
-        // 06 12 34 56 78 est le numéro de l'espace de test : il ne peut pas porter une vraie commande.
-        if (isTestAuthorPhone(phone) || isTestAuthorPhone(giverPhone)) {
+        // 06 12 34 56 78 et 07 12 34 56 78 sont les numéros des espaces de test : ils ne peuvent pas porter une vraie commande.
+        if (isTestAuthorPhone(phone) || isTestAuthorPhone(giverPhone) || isTestFamilyPhone(phone) || isTestFamilyPhone(giverPhone)) {
             return NextResponse.json({ error: "Ce numéro sert à l’espace de test. Indiquez un vrai numéro de téléphone." }, { status: 400 });
         }
 

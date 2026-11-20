@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
+import { testFamilyReply } from '@/lib/loomina/test-family';
 import { findGiftProjects, markFamilyWelcome } from '@/lib/loomina/giver';
 import { familySetupOpen } from '@/lib/loomina/family-setup';
 
@@ -22,6 +23,8 @@ const clean = (v: unknown, max: number): string | null => {
  * Loomina ne redemande pas ce que la famille a déjà dit.
  */
 export async function PATCH(request: NextRequest) {
+    const essai = await testFamilyReply(request, 'preferences');
+    if (essai) return essai;
     const session = await readSession(request);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
