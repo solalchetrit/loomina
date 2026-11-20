@@ -92,6 +92,10 @@ export class CallSession {
     private silenceNudged = false;
     private finished = false;
     private endRequested = false;
+    /** Minuteur qui raccroche après la phrase d'au revoir. */
+    private endTimer: NodeJS.Timeout | null = null;
+    /** La toute petite phrase d'au revoir a déjà été dite. */
+    private farewellSaid = false;
     /** Texte déjà envoyé à la voix pour la réponse en cours. */
     private spokenSoFar = '';
 
@@ -171,6 +175,19 @@ export class CallSession {
         }
         const clean = text.trim();
         if (!clean) return;
+
+        // La fin est déjà annoncée et le narrateur répond (« merci », « au
+        // revoir ») : plus de nouvelle réplique du modèle, qui reprenait tout
+        // le discours de fin (démo d'Ethan, 20/11/2026). Une toute petite
+        // phrase, puis on raccroche.
+        if (this.endRequested) {
+            this.turns.push({ role: 'user', message: clean, time: Date.now() });
+            if (this.farewellSaid) return;
+            this.farewellSaid = true;
+            if (this.endTimer) clearTimeout(this.endTimer);
+            await this.sayAndEnd(this.farewell(), 'assistant-ended-call');
+            return;
+        }
 
         this.armSilenceTimer();
         // D'abord clore la réponse en cours (gardée telle que dite), puis
@@ -448,7 +465,7 @@ export class CallSession {
         if (this.endRequested) {
             // Laisser la voix finir la phrase d'au revoir avant de couper.
             const ms = Math.min(90_000, speechMs(spoken));
-            setTimeout(() => void this.end('assistant-ended-call'), ms);
+            this.endTimer = setTimeout(() => void this.end('assistant-ended-call'), ms);
         }
     }
 
@@ -505,6 +522,15 @@ export class CallSession {
             return;
         }
         await this.sayAndEnd('Je vous laisse. Rappelez-moi quand vous voulez, je serai là. À bientôt !', 'silence-timeout');
+    }
+
+    /** « À bientôt, Ethan, c'était un plaisir. » Prénom du profil, ou celui dit dans la clôture. */
+    private farewell(): string {
+        const known = typeof this.plan.metadata.first_name === 'string' ? this.plan.metadata.first_name.trim() : '';
+        const lastBot = [...this.turns].reverse().find((t) => t.role === 'bot')?.message ?? '';
+        const heard = /Merci,?\s+([A-ZÀ-Ý][\p{L}'-]+),?\s+à bientôt/u.exec(lastBot)?.[1] ?? '';
+        const name = known || heard;
+        return name ? `À bientôt, ${name}, c'était un plaisir.` : "À bientôt, c'était un plaisir.";
     }
 
     private async sayAndEnd(text: string, reason: string): Promise<void> {
