@@ -44,6 +44,9 @@ const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 1200);
  * narrateur reprend entre-temps, la réponse préparée est jetée.
  * Une question (« Ça va, et toi ? ») attend une réponse : pas d'attente.
  */
+/** Note ajoutée quand la dernière réplique de Loomina a été coupée (voir onInterrupt). */
+export const CUT_NOTE = "Ta dernière réplique a été coupée : la personne a continué à parler et n'en a entendu que le début. Ne la répète pas. Reprends TOUT ce qu'elle a raconté depuis ta dernière question entendue, et rebondis sur ce qui a le plus de matière (une scène, une action, des gens), pas seulement sur sa dernière phrase.";
+
 function holdFor(text: string): number {
     return /\?\s*$/.test(text) ? 0 : REPLY_DELAY_MS;
 }
@@ -220,15 +223,24 @@ export class CallSession {
     onInterrupt(utteranceUntilInterrupt: string): void {
         this.interruptions += 1;
         const heard = utteranceUntilInterrupt.trim();
+        // Démo de Fabrice (20/11/2026) : la personne a continué à raconter,
+        // la réponse de Loomina n'a jamais été dite, mais elle restait en
+        // entier dans l'historique. Le modèle croyait avoir posé ses
+        // questions et ne revenait pas sur ce qui avait été raconté entre-temps.
+        // Maintenant : rien d'entendu = la réponse disparaît (les phrases
+        // de la personne se recollent) ; un bout entendu = on garde ce bout,
+        // marqué comme coupé.
         if (this.generation) {
-            // Réponse encore en cours : elle n'est pas dans l'historique.
-            // On l'y ajoute, réduite à ce qui a été entendu.
-            this.abortGeneration(heard);
+            this.abortGeneration(heard, true);
             return;
         }
-        // Réponse déjà complète mais en train d'être lue : on la tronque.
-        const lastBot = [...this.turns].reverse().find((t) => t.role === 'bot');
-        if (lastBot && heard) lastBot.message = heard;
+        const last = this.turns[this.turns.length - 1];
+        if (last?.role !== 'bot') return;
+        if (!heard) this.turns.pop();
+        else {
+            last.message = heard;
+            last.cut = true;
+        }
     }
 
 
@@ -487,6 +499,12 @@ export class CallSession {
             content: t.message,
         }));
         const messages: ChatMessage[] = [{ role: 'system', content: this.plan.systemPrompt }, ...history];
+        // Après une réponse coupée, le modèle doit revenir sur tout ce que la
+        // personne a raconté depuis, pas seulement sur sa dernière phrase.
+        const lastBot = [...this.turns].reverse().find((t) => t.role === 'bot');
+        if (lastBot?.cut) {
+            messages.push({ role: 'system', content: CUT_NOTE });
+        }
         // Le modèle ne voit pas l'heure. La note va en dernier : le début de
         // la conversation reste identique d'une réplique à l'autre (cache).
         if (this.plan.demo) {
@@ -504,13 +522,14 @@ export class CallSession {
      * réponse coupée disparaissait et l'interruption écrasait la réponse
      * précédente.
      */
-    private abortGeneration(heard?: string): void {
+    private abortGeneration(heard?: string, interrupted = false): void {
         if (!this.generation) return;
         this.generation.abort();
         this.generation = null;
-        const said = (heard || this.spokenSoFar).trim();
+        // Coupée par la personne : seul ce qu'elle a entendu compte.
+        const said = (interrupted ? heard ?? '' : heard || this.spokenSoFar).trim();
         this.spokenSoFar = '';
-        if (said) this.turns.push({ role: 'bot', message: said, time: Date.now() });
+        if (said) this.turns.push({ role: 'bot', message: said, time: Date.now(), ...(interrupted ? { cut: true } : {}) });
     }
 
     // ------------------------------------------------------------
