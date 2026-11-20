@@ -5,12 +5,13 @@ import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import type { Prefs } from "./types";
 import { CALL_MINUTES_OPTIONS } from "@/lib/loomina/call-length";
+import { WRITING_STYLES, normalizeStyle } from "@/lib/loomina/styles";
 
 const DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 const DAY_LABELS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
 const HOURS = Array.from({ length: 12 }, (_, i) => `${String(9 + i).padStart(2, "0")}:00`).flatMap((h) => [h, h.replace(":00", ":30")]).filter((h) => h <= "20:30");
 
-const STYLES = ["Naturel et sobre", "Chaleureux et vivant", "Littéraire et soigné", "Simple, comme je parle"];
+const STYLES: readonly string[] = WRITING_STYLES;
 
 /** Réglages de l'entretien et du livre. Lus par Loomina dès l'appel suivant. */
 export default function Settings({
@@ -76,7 +77,7 @@ export default function Settings({
             <legend className="field-label">Ton de l’écriture</legend>
             <div className="grid gap-2 sm:grid-cols-2">
               {STYLES.map((s) => {
-                const active = form.writingStyle === s;
+                const active = normalizeStyle(form.writingStyle) === s;
                 return (
                   <button
                     key={s}
@@ -92,7 +93,7 @@ export default function Settings({
                 );
               })}
             </div>
-            {form.writingStyle && !STYLES.includes(form.writingStyle) && (
+            {form.writingStyle && !STYLES.includes(normalizeStyle(form.writingStyle)) && (
               <p className="t-small mt-1.5">Ton actuel, choisi par Loomina d’après vos appels : « {form.writingStyle} ».</p>
             )}
           </fieldset>

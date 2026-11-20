@@ -6,6 +6,7 @@ import { stripe } from '@/lib/stripe';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { notifyNewOrder, notifyAbandonedCart, notifyFamilyInvite } from '@/lib/loomina/notify';
 import { decodeFamilyFromStripe, storeFamilyMembers } from '@/lib/loomina/giver';
+import { DEFAULT_WRITING_STYLE } from '@/lib/loomina/styles';
 
 /**
  * Provisionnement d'un client après paiement.
@@ -136,7 +137,7 @@ export async function POST(request: NextRequest) {
         if (prefErr) throw new Error(`défaut politeness : ${prefErr.message}`);
         const { error: styleErr } = await supabase
             .from('profiles')
-            .update({ writing_style: 'Naturel' })
+            .update({ writing_style: DEFAULT_WRITING_STYLE })
             .eq('id', userId)
             .is('writing_style', null);
         if (styleErr) throw new Error(`défaut writing_style : ${styleErr.message}`);
