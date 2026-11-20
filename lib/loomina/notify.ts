@@ -362,3 +362,97 @@ export async function notifyAbandonedCart(cart: AbandonedCart): Promise<void> {
         cart.phone ? sendSms(cart.phone, t.sms) : Promise.resolve(false),
     ]);
 }
+
+// ------------------------------------------------------------
+// Les étapes du livre après « terminé » (demande de Solal, 20/11/2026)
+// ------------------------------------------------------------
+
+export type AnnouncedStep = 'reviewed' | 'printing' | 'shipped';
+
+/** Les messages de chaque étape, à l'auteur (tu ou vous) ou à la personne qui a offert le livre. */
+export function bookStageTexts(
+    step: AnnouncedStep,
+    who: { first_name: string | null; politeness_preference?: string | null; family?: boolean; narratorFirstName?: string | null },
+    tracking: { number: string; url: string } | null
+): { subject: string; email: string; sms: string } {
+    const tu = !who.family && who.politeness_preference === 'tu';
+    const name = who.first_name?.trim();
+    const hello = name ? `Bonjour ${name}` : 'Bonjour';
+    const where = `${HOST}/dashboard`;
+    const narrator = who.narratorFirstName?.trim() || 'votre proche';
+    // « votre livre » / « ton livre » / « le livre de Jeanne »
+    const book = who.family ? `le livre de ${narrator}` : tu ? 'ton livre' : 'votre livre';
+    const Book = book.charAt(0).toUpperCase() + book.slice(1);
+    const you = tu ? 'tu' : 'vous';
+    const sign = `L'équipe Loomina`;
+
+    if (step === 'reviewed') {
+        if (who.family) {
+            return {
+                subject: `${Book} est relu`,
+                sms: `Loomina : ${book} est relu. Sa version complète est à lire sur ${where}, avant son départ à l'impression.`,
+                email: `${hello},\n\nNous avons relu ${book} en entier. Sa version complète est à lire sur ${where}, en vous connectant avec votre numéro de téléphone.\n\nIl part ensuite à l'impression : nous vous préviendrons à chaque étape, jusqu'à l'envoi.\n\n${sign}`,
+            };
+        }
+        return {
+            subject: `${Book} est relu : ${tu ? 'découvre-le' : 'découvrez-le'}`,
+            sms: tu
+                ? `${hello}, ton livre est relu. Sa version complète t'attend sur ${where}. Un détail à changer ? Appelle le ${SITE.phoneDisplay} ou réponds à notre e-mail. Ensuite, il part à l'impression. Loomina`
+                : `${hello}, votre livre est relu. Sa version complète vous attend sur ${where}. Un détail à changer ? Appelez le ${SITE.phoneDisplay} ou répondez à notre e-mail. Ensuite, il part à l'impression. Loomina`,
+            email: tu
+                ? `${hello},\n\nNous avons relu ton livre en entier. Sa version complète t'attend sur ${where} : connecte-toi avec ton numéro de téléphone, puis ouvre « Mon livre ». Tu peux aussi l'y télécharger.\n\nPrends le temps de le lire. Un nom mal écrit, un souvenir à ajouter ? Appelle le ${SITE.phoneDisplay} ou réponds simplement à ce message.\n\nEnsuite, ton livre part à l'impression. Nous te préviendrons à chaque étape, jusqu'à son arrivée chez toi.\n\n${sign}`
+                : `${hello},\n\nNous avons relu votre livre en entier. Sa version complète vous attend sur ${where} : connectez-vous avec votre numéro de téléphone, puis ouvrez « Mon livre ». Vous pouvez aussi l'y télécharger.\n\nPrenez le temps de le lire. Un nom mal écrit, un souvenir à ajouter ? Appelez le ${SITE.phoneDisplay} ou répondez simplement à ce message.\n\nEnsuite, votre livre part à l'impression. Nous vous préviendrons à chaque étape, jusqu'à son arrivée chez vous.\n\n${sign}`,
+        };
+    }
+
+    if (step === 'printing') {
+        return {
+            subject: `${Book} est à l'impression`,
+            sms: `${who.family ? 'Loomina : ' : `${hello}, `}${book} est à l'impression. ${tu ? 'Nous te prévenons' : 'Nous vous prévenons'} dès qu'il part, avec son numéro de suivi.${who.family ? '' : ' Loomina'}`,
+            email: `${hello},\n\n${Book} est parti chez l'imprimeur. ${tu ? 'Nous te préviendrons' : 'Nous vous préviendrons'} dès qu'il sera expédié, avec le numéro qui permet de suivre le colis.\n\n${tu ? 'Tu peux' : 'Vous pouvez'} suivre chaque étape sur ${where}.\n\n${sign}`,
+        };
+    }
+
+    const follow = tracking ? ` Suivi du colis : ${tracking.url}` : '';
+    return {
+        subject: `${Book} est en route`,
+        sms: `${who.family ? 'Loomina : ' : `${hello}, `}${book} est en route.${tracking ? ` Numéro de suivi : ${tracking.number}.` : ''}${follow}${who.family ? '' : ' Loomina'}`,
+        email: `${hello},\n\n${Book} vient de partir.${tracking ? `\n\nNuméro de suivi : ${tracking.number}\nSuivre le colis : ${tracking.url}` : ''}\n\n${who.family ? 'Il arrive à l’adresse indiquée par ' + narrator + '.' : `Il arrive à l'adresse que ${you} ${tu ? 'nous as donnée' : 'nous avez donnée'}.`} Une question ? Répondez simplement à ce message.\n\n${sign}`,
+    };
+}
+
+/**
+ * Annonce une étape du livre à l'auteur, et à la personne qui l'a offert
+ * (si c'est un cadeau et qu'elle n'a pas coupé les nouvelles). Ne lève jamais.
+ */
+export async function notifyBookStage(params: {
+    step: AnnouncedStep;
+    author: { first_name: string | null; politeness_preference?: string | null; phone_number?: string | null; email?: string | null };
+    projectMetadata: Record<string, unknown> | null;
+    tracking: { number: string; url: string } | null;
+}): Promise<void> {
+    try {
+        const jobs: Promise<unknown>[] = [];
+        const t = bookStageTexts(params.step, params.author, params.tracking);
+        const team = teamContacts().email;
+        if (params.author.phone_number) jobs.push(sendSms(params.author.phone_number, t.sms));
+        if (params.author.email) jobs.push(sendEmail({ to: params.author.email, subject: t.subject, text: t.email, replyTo: team }));
+
+        const meta = params.projectMetadata ?? {};
+        if (meta.is_gift === true && meta.family_news !== false) {
+            const giver = meta.giver as { phone?: unknown; first_name?: unknown } | undefined;
+            const phone = typeof giver?.phone === 'string' ? giver.phone : null;
+            const email = typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
+            const f = bookStageTexts(
+                params.step,
+                { first_name: typeof giver?.first_name === 'string' ? giver.first_name : null, family: true, narratorFirstName: params.author.first_name },
+                params.tracking
+            );
+            if (phone && phone !== params.author.phone_number) jobs.push(sendSms(phone, f.sms));
+            if (email && email !== params.author.email) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, replyTo: team }));
+        }
+        await Promise.allSettled(jobs);
+    } catch (err) {
+        console.error('[notify] étape du livre non annoncée :', err instanceof Error ? err.message : String(err));
+    }
+}

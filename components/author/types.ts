@@ -54,6 +54,8 @@ export interface Overview {
   welcome?: { politeness: boolean; topics: boolean } | null;
   /** L'adresse d'envoi du livre, demandée une fois le livre terminé (null : pas encore donnée). */
   shipping?: { name: string; line1: string; line2: string | null; postalCode: string; city: string } | null;
+  /** Le livre après « terminé » : relu, à l'impression, expédié, reçu (lib/loomina/fulfillment.ts). */
+  delivery?: { stage: "writing" | "completed" | "reviewed" | "printing" | "shipped" | "delivered"; tracking: { number: string; url: string } | null; shippedAt: string | null } | null;
 }
 
 export const formatDate = (iso: string, withYear = true) =>

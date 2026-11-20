@@ -6,6 +6,7 @@ import { fmtDate, fmtNumber, PROJECT_STATUS } from "@/lib/admin/format";
 import { readReview } from "@/lib/loomina/book-review";
 import { Badge, Panel, Empty } from "@/components/admin/ui";
 import AIcon from "@/components/admin/icons";
+import BookSteps from "@/components/admin/BookSteps";
 
 export const metadata = { title: "Relire le livre" };
 
@@ -75,14 +76,14 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
               {review?.status === "done" ? "Redemander un avis" : "Demander l’avis de l’IA"}
             </button>
           </form>
-          <form action={`/api/admin/clients/${id}/relu`} method="post">
-            {reviewedAt && <input type="hidden" name="annuler" value="1" />}
-            <button disabled={!book} className="press inline-flex h-11 items-center rounded-[14px] bg-white px-4 text-[15px] font-bold text-[var(--ink)] shadow-[0_0_0_1px_var(--line)] disabled:opacity-40">
-              {reviewedAt ? "Remettre à relire" : "J’ai relu ce livre"}
-            </button>
-          </form>
         </div>
       </Panel>
+
+      {c.order.fulfillment.completed && !c.order.refundedAt && (
+        <Panel icon="route" title="De la relecture à l’envoi">
+          <BookSteps profileId={id} f={c.order.fulfillment} hasAddress={!!c.order.shipping} retour="livre" completedAt={typeof meta.completed_at === "string" ? meta.completed_at : null} />
+        </Panel>
+      )}
 
       <Panel icon="book" title="Le livre à imprimer">
         <p className="text-[15px] text-[var(--ink-2)]">

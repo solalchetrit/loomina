@@ -12,6 +12,7 @@ import { getSystemPrompt } from "@/lib/loomina/db";
 import { Badge, Panel, Field, Fold, Empty, Avatar, Progress, Stat } from "@/components/admin/ui";
 import AIcon from "@/components/admin/icons";
 import { callCosts, sumCosts, fmtEur } from "@/lib/admin/costs";
+import BookSteps from "@/components/admin/BookSteps";
 
 export const metadata = { title: "Fiche client" };
 
@@ -59,6 +60,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
               {st && <Badge tone={st.tone}>{st.label}</Badge>}
               {order.isGift && <Badge tone="wait">Livre offert</Badge>}
               {order.refundedAt && <Badge tone="bad">Remboursé</Badge>}
+              {order.test && <Badge>Client de test</Badge>}
             </div>
             <p className="mt-1 text-[15px] tabular-nums text-[var(--ink-3)]">{profile.phone_number ?? "pas de numéro"} · client depuis le {fmtDate(profile.created_at, false)}</p>
           </div>
@@ -123,9 +125,15 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
         </Panel>
       </div>
 
+      {project && order.fulfillment.completed && !order.refundedAt && (
+        <Panel icon="book" title="Le livre, de la relecture à l’envoi" action={<Link href={`/admin/clients/${id}/livre`} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Relire et fichiers d’impression <AIcon name="arrow" size={14} /></Link>}>
+          <BookSteps profileId={id} f={order.fulfillment} hasAddress={!!order.shipping} retour="fiche" completedAt={typeof project.project_metadata?.completed_at === "string" ? (project.project_metadata.completed_at as string) : null} />
+        </Panel>
+      )}
+
       {project && (
         <Panel icon="pen" title="Agir">
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-3">
             <div className="rounded-[18px] bg-[var(--canvas)] p-4">
               <p className="text-[16px] font-bold">Relancer ce client</p>
               <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">
@@ -151,6 +159,20 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
                   </form>
                 </>
               )}
+            </div>
+            <div className="rounded-[18px] bg-[var(--canvas)] p-4">
+              <p className="text-[16px] font-bold">{order.test ? "Client de test" : "Classer en test"}</p>
+              <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">
+                {order.test
+                  ? "Ce client ne compte dans aucun chiffre de l’admin (clients, commandes, argent, parcours). Il reste visible, rangé avec les tests."
+                  : "Pour vos essais et ceux de vos proches : le client reste visible, mais sort de tous les chiffres. Une commande payée 0 € est classée en test toute seule."}
+              </p>
+              <form action={`/api/admin/clients/${id}/test`} method="post" className="mt-3">
+                {order.test && <input type="hidden" name="annuler" value="1" />}
+                <button className="press inline-flex h-11 items-center rounded-[14px] bg-white px-4 text-[15px] font-bold text-[var(--ink)] shadow-[0_0_0_1px_var(--line)]">
+                  {order.test ? "C’est un vrai client" : "C’est un client de test"}
+                </button>
+              </form>
             </div>
           </div>
         </Panel>

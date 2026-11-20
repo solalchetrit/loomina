@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin/auth";
+import TechTabs from "@/components/admin/TechTabs";
 import { Panel, PageHeader } from "@/components/admin/ui";
 
 export const metadata = { title: "Structure" };
@@ -92,6 +93,7 @@ export default async function AdminStructure() {
 
   return (
     <div className="grid grid-cols-1 gap-5">
+      <TechTabs value="structure" />
       <PageHeader eyebrow="Structure" title="Comment Loomina fonctionne">
         Les services qui font tourner Loomina, ce qui passe de l’un à l’autre, ce que contient la base et ce qui tourne tout seul.
       </PageHeader>

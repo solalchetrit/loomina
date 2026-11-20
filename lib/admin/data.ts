@@ -13,6 +13,8 @@ import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
 import { readGiver } from '@/lib/loomina/giver';
 import type { Giver } from '@/lib/loomina/giver';
+import { isTestMeta } from '@/lib/loomina/test-flag';
+import { readFulfillment, type Fulfillment } from '@/lib/loomina/fulfillment';
 
 export type Row = Record<string, unknown>;
 
@@ -32,6 +34,8 @@ export interface ClientSummary {
     failedEvents: number;
     isGift: boolean;
     giverName: string | null;
+    /** Client de test : rangé à part, hors de tous les chiffres. */
+    test: boolean;
 }
 
 /** Tous les clients, du plus récent au plus ancien, avec leurs chiffres. */
@@ -68,6 +72,7 @@ export async function listClients(): Promise<ClientSummary[]> {
             failedEvents: project ? E.filter((e) => e.project_id === project.id).length : 0,
             isGift: meta.is_gift === true,
             giverName: giver?.firstName ?? null,
+            test: isTestMeta(meta),
         };
     });
 }
@@ -93,6 +98,8 @@ export interface ClientDetail {
         refundedAt: string | null;
         refundAmount: number | null;
         relances: Array<{ at: string; to?: string }>;
+        test: boolean;
+        fulfillment: Fulfillment;
     };
     settings: {
         schedule: ReturnType<typeof normalizeSchedule>;
@@ -162,6 +169,8 @@ export async function getClient(profileId: string): Promise<ClientDetail | null>
             refundedAt: typeof meta.refunded_at === 'string' ? meta.refunded_at : null,
             refundAmount: typeof meta.refund_amount === 'number' ? meta.refund_amount : null,
             relances: Array.isArray(meta.relances) ? (meta.relances as Array<{ at: string; to?: string }>).filter((r) => typeof r?.at === 'string') : [],
+            test: isTestMeta(meta),
+            fulfillment: readFulfillment(project?.status, meta),
         },
         settings: {
             schedule: normalizeSchedule(meta.call_schedule),
@@ -173,21 +182,37 @@ export async function getClient(profileId: string): Promise<ClientDetail | null>
     };
 }
 
+export interface BookLine {
+    profileId: string;
+    projectId: string;
+    client: string;
+    phone: string | null;
+    isGift: boolean;
+    completedAt: string | null;
+    fulfillment: Fulfillment;
+    hasAddress: boolean;
+    refunded: boolean;
+}
+
 export interface Overview {
     clients: number;
     activeBooks: number;
     completedBooks: number;
     callsWeek: number;
     minutesWeek: number;
+    ordersWeek: number;
     chapters: number;
     words: number;
-    recentCalls: Array<Row & { client: string | null; profileId: string | null }>;
+    recentCalls: Array<Row & { client: string | null; profileId: string | null; test: boolean }>;
     problems: Array<Row & { client: string | null; profileId: string | null }>;
+    /** Messages du formulaire de contact pas encore traités, le plus récent d'abord. */
     contacts: Row[];
+    /** Combien ont déjà été traités (rangés dans un repli). */
+    contactsHandled: Row[];
     stuckEditions: Row[];
-    /** Livres déclarés complets par leur auteur et pas encore relus par l'équipe. */
-    toReview: Array<{ client: string | null; profileId: string | null }>;
-    /** Commandes des sept derniers jours, la plus récente d'abord. */
+    /** Les livres terminés qui attendent un geste de l'équipe (relire, imprimer, expédier). */
+    booksToAct: BookLine[];
+    /** Commandes des sept derniers jours, la plus récente d'abord (hors tests). */
     newOrders: Array<{ client: string | null; profileId: string | null; at: string; isGift: boolean }>;
 }
 
@@ -195,30 +220,34 @@ export async function getOverview(): Promise<Overview> {
     const supabase = db();
     const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
     const [profiles, projects, interviews, chapters, problems, contacts, editions] = await Promise.all([
-        supabase.from('profiles').select('id, first_name, last_name').limit(1000),
-        supabase.from('projects').select('id, user_id, status, project_metadata, created_at').limit(1000),
+        supabase.from('profiles').select('id, first_name, last_name, phone_number').limit(1000),
+        supabase.from('projects').select('id, user_id, status, project_metadata, created_at, updated_at').order('created_at', { ascending: false }).limit(1000),
         supabase
             .from('interviews')
             .select('id, project_id, created_at, duration_seconds, processing_status, topics_summary, phase')
             .order('created_at', { ascending: false })
             .limit(500),
-        supabase.from('chapters').select('word_count, status').limit(10000),
+        supabase.from('chapters').select('project_id, word_count, status').limit(10000),
         supabase
             .from('call_events')
             .select('id, project_id, created_at, status, attempts, error, event_type')
             .in('status', ['failed', 'pending', 'processing'])
             .order('created_at', { ascending: false })
             .limit(50),
-        supabase.from('contact_messages').select('*').order('created_at', { ascending: false }).limit(10),
+        supabase.from('contact_messages').select('*').order('created_at', { ascending: false }).limit(60),
         supabase.from('book_editions').select('id, project_id, status, error, updated_at').eq('status', 'failed').order('updated_at', { ascending: false }).limit(5),
     ]);
     const P = must(profiles, 'profils') as Row[];
-    const J = must(projects, 'projets') as Row[];
+    const allProjects = must(projects, 'projets') as Row[];
+    const testIds = new Set(allProjects.filter((j) => isTestMeta(j.project_metadata as Row | null)).map((j) => j.id));
+    // Les chiffres ne comptent que les vrais clients.
+    const J = allProjects.filter((j) => !testIds.has(j.id));
     const I = must(interviews, 'entretiens') as Row[];
-    const C = (must(chapters, 'chapitres') as Row[]).filter((c) => c.status !== 'archived');
+    const realI = I.filter((i) => !testIds.has(i.project_id));
+    const C = (must(chapters, 'chapitres') as Row[]).filter((c) => c.status !== 'archived' && !testIds.has(c.project_id));
 
     const whose = (projectId: unknown) => {
-        const project = J.find((j) => j.id === projectId);
+        const project = allProjects.find((j) => j.id === projectId);
         const profile = project ? P.find((p) => p.id === project.user_id) : undefined;
         return {
             client: profile ? `${profile.first_name ?? ''} ${profile.last_name ?? ''}`.trim() || null : null,
@@ -226,45 +255,90 @@ export async function getOverview(): Promise<Overview> {
         };
     };
 
-    const week = I.filter((i) => String(i.created_at) >= weekAgo);
+    const week = realI.filter((i) => String(i.created_at) >= weekAgo);
+    const allContacts = contacts.error ? [] : ((contacts.data ?? []) as Row[]);
+    const books = booksFrom(J, P);
     return {
-        clients: P.length,
+        clients: new Set(J.map((j) => j.user_id)).size,
         activeBooks: J.filter((j) => j.status === 'active').length,
         completedBooks: J.filter((j) => j.status === 'completed').length,
         callsWeek: week.length,
         minutesWeek: Math.round(week.reduce((s, i) => s + (Number(i.duration_seconds) || 0), 0) / 60),
+        ordersWeek: J.filter((j) => String(j.created_at) >= weekAgo).length,
         chapters: C.length,
         words: C.reduce((s, c) => s + (Number(c.word_count) || 0), 0),
-        recentCalls: I.slice(0, 12).map((i) => ({ ...i, ...whose(i.project_id) })),
+        recentCalls: I.slice(0, 12).map((i) => ({ ...i, ...whose(i.project_id), test: testIds.has(i.project_id) })),
         problems: (must(problems, 'événements') as Row[]).map((e) => ({ ...e, ...whose(e.project_id) })),
         // La table peut ne pas exister sur une base de test : on ne bloque pas la page.
-        contacts: contacts.error ? [] : ((contacts.data ?? []) as Row[]),
+        contacts: allContacts.filter((m) => !m.handled_at),
+        contactsHandled: allContacts.filter((m) => !!m.handled_at).slice(0, 20),
         stuckEditions: editions.error ? [] : ((editions.data ?? []) as Row[]),
-        newOrders: J.filter((j) => String(j.created_at) >= weekAgo && (j.project_metadata as Row | null)?.banc !== true)
-            .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+        newOrders: J.filter((j) => String(j.created_at) >= weekAgo)
             .map((j) => ({ ...whose(j.id), at: String(j.created_at), isGift: (j.project_metadata as Row | null)?.is_gift === true })),
-        toReview: J.filter((j) => j.status === 'completed' && typeof (j.project_metadata as Row | null)?.reviewed_at !== 'string' && typeof (j.project_metadata as Row | null)?.refunded_at !== 'string').map((j) => whose(j.id)),
+        booksToAct: books.filter((b) => !b.refunded && ['completed', 'reviewed', 'printing'].includes(b.fulfillment.stage)),
     };
 }
 
-/** Réglages de production qui méritent une alerte sur la page d'accueil de l'admin. */
-export function configWarnings(): string[] {
-    const w: string[] = [];
-    const need: Array<[string, string]> = [
-        ['SUPABASE_SERVICE_ROLE_KEY', 'base de données'],
-        ['OPENAI_API_KEY', 'Directeur, Écrivain et livre'],
-        ['VAPI_WEBHOOK_SECRET', 'réception des rapports d’appel'],
-        ['STRIPE_SECRET_KEY', 'paiement'],
-        ['STRIPE_WEBHOOK_SECRET', 'création des comptes après paiement'],
-        ['TWILIO_ACCOUNT_SID', 'SMS'],
-        ['TWILIO_VERIFY_SERVICE_SID', 'code de connexion par SMS'],
-        ['JWT_SECRET', 'sessions de l’espace auteur'],
-        ['SMTP_PASS', 'envoi des e-mails (bienvenue, alertes, nouvelles à la famille) depuis contact@loomina.eu'],
-        ['LOOMINA_ALERT_PHONE', 'SMS d’alerte à l’équipe'],
+/** Les livres terminés (hors tests), du plus récent au plus ancien. */
+function booksFrom(projects: Row[], profiles: Row[]): BookLine[] {
+    return projects
+        .filter((j) => j.status === 'completed')
+        .map((j) => {
+            const meta = (j.project_metadata ?? {}) as Row;
+            const profile = profiles.find((p) => p.id === j.user_id);
+            return {
+                profileId: String(j.user_id),
+                projectId: String(j.id),
+                client: profile ? `${profile.first_name ?? ''} ${profile.last_name ?? ''}`.trim() || 'Sans nom' : 'Client inconnu',
+                phone: (profile?.phone_number as string | null) ?? null,
+                isGift: meta.is_gift === true,
+                completedAt: typeof meta.completed_at === 'string' ? meta.completed_at : ((j.updated_at as string | null) ?? null),
+                fulfillment: readFulfillment(String(j.status), meta),
+                hasAddress: readShipping(meta) !== null,
+                refunded: typeof meta.refunded_at === 'string',
+            };
+        });
+}
+
+/** La page « Livres » : chaque livre terminé et son étape, de la relecture à l'arrivée. */
+export async function listBooks(): Promise<BookLine[]> {
+    const supabase = db();
+    const [profiles, projects] = await Promise.all([
+        supabase.from('profiles').select('id, first_name, last_name, phone_number').limit(1000),
+        supabase.from('projects').select('id, user_id, status, project_metadata, created_at, updated_at').eq('status', 'completed').order('updated_at', { ascending: false }).limit(1000),
+    ]);
+    const J = (must(projects, 'projets') as Row[]).filter((j) => !isTestMeta(j.project_metadata as Row | null));
+    return booksFrom(J, must(profiles, 'profils') as Row[]);
+}
+
+export interface ConfigWarning {
+    /** Ce qui ne marche pas, en clair. */
+    problem: string;
+    /** Ce qu'il faut faire. */
+    fix: string;
+    /** Le nom technique, en petit, pour Vercel. */
+    variable: string;
+}
+
+/** Réglages de production qui manquent, dits en clair (audit du 20/11/2026). */
+export function configWarnings(): ConfigWarning[] {
+    const vercel = 'Dans Vercel (projet loomina, Settings, Environment Variables), ajouter la variable';
+    const need: Array<[string, string, string]> = [
+        ['SUPABASE_SERVICE_ROLE_KEY', 'Le site ne peut plus lire la base de données : espaces auteur et admin vides.', 'la clé « service_role » de Supabase'],
+        ['OPENAI_API_KEY', 'Les appels ne sont plus transformés en récits, et le livre ne se compose plus.', 'la clé OpenAI'],
+        ['VAPI_WEBHOOK_SECRET', 'Le site refuse les comptes rendus d’appel envoyés par le serveur vocal.', 'le secret partagé avec le serveur vocal'],
+        ['STRIPE_SECRET_KEY', 'Plus personne ne peut commander : le paiement ne s’ouvre pas.', 'la clé secrète Stripe'],
+        ['STRIPE_WEBHOOK_SECRET', 'Un client qui paie ne reçoit ni compte ni livre.', 'le secret du webhook Stripe'],
+        ['TWILIO_ACCOUNT_SID', 'Aucun SMS ne part (codes, récits prêts, alertes).', 'l’identifiant du compte Twilio'],
+        ['TWILIO_VERIFY_SERVICE_SID', 'Les clients ne reçoivent plus de code pour ouvrir leur espace.', 'le service Verify de Twilio'],
+        ['JWT_SECRET', 'Personne ne peut rester connecté à son espace auteur.', 'une longue phrase secrète'],
+        ['SMTP_PASS', 'Aucun e-mail ne part de contact@loomina.eu (bienvenue, étapes du livre, alertes).', 'le mot de passe de la boîte contact@loomina.eu'],
+        ['LOOMINA_ALERT_PHONE', 'Vous ne recevez plus les alertes par SMS (seulement par e-mail).', 'votre numéro de portable'],
+        ['CRON_SECRET', 'Le rattrapage de nuit ne passe pas (celui du serveur vocal, toutes les 5 minutes, continue).', 'une phrase secrète pour la tâche de nuit'],
     ];
-    for (const [name, role] of need) if (!process.env[name]?.trim()) w.push(`${name} absente (${role}).`);
-    if (!process.env.CRON_SECRET?.trim()) w.push('CRON_SECRET absente : le rattrapage de 3 h par le site ne passe pas (celui du serveur vocal, toutes les 5 minutes, continue).');
-    return w;
+    return need
+        .filter(([name]) => !process.env[name]?.trim())
+        .map(([variable, problem, what]) => ({ problem, fix: `${vercel} ${variable} avec ${what}, puis redéployer.`, variable }));
 }
 
 /** État du serveur vocal (Render). Ne lève jamais. */
@@ -312,6 +386,9 @@ export interface CrmClient {
     stage: CrmStage;
     health: CrmHealth;
     failedEvents: number;
+    test: boolean;
+    /** Livre terminé : son étape, de la relecture à l'arrivée. */
+    fulfillment: Fulfillment;
 }
 
 export interface Crm {
@@ -391,8 +468,15 @@ export async function getCrm(now = Date.now()): Promise<Crm> {
             stage,
             health,
             failedEvents: project ? E.filter((e) => e.project_id === project.id).length : 0,
+            test: isTestMeta(meta),
+            fulfillment: readFulfillment(project?.status, meta),
         };
     });
+
+    // Les graphiques ne comptent que les vrais clients.
+    const testProjects = new Set(J.filter((j) => isTestMeta(j.project_metadata as Row | null)).map((j) => j.id));
+    const realOrders = J.filter((j) => !testProjects.has(j.id));
+    const realInterviews = I.filter((i) => !testProjects.has(i.project_id as string));
 
     // Huit dernières semaines d'appels (lundi → dimanche, heure de Paris approchée par UTC).
     const weeks: Crm['weeks'] = [];
@@ -401,7 +485,7 @@ export async function getCrm(now = Date.now()): Promise<Crm> {
     monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
     for (let w = 7; w >= 0; w--) {
         const start = monday.getTime() - w * 7 * DAY;
-        const inWeek = I.filter((i) => {
+        const inWeek = realInterviews.filter((i) => {
             const t = new Date(String(i.created_at)).getTime();
             return t >= start && t < start + 7 * DAY && i.processing_status !== 'too_short';
         });
@@ -420,7 +504,7 @@ export async function getCrm(now = Date.now()): Promise<Crm> {
         const end = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - m + 1, 1));
         months.push({
             label: new Intl.DateTimeFormat('fr-FR', { month: 'short', timeZone: 'UTC' }).format(start),
-            orders: J.filter((j) => {
+            orders: realOrders.filter((j) => {
                 const t = new Date(j.created_at).getTime();
                 return t >= start.getTime() && t < end.getTime();
             }).length,
@@ -440,4 +524,26 @@ export async function listDemos(): Promise<Row[]> {
             .limit(200),
         'demo_stories'
     );
+}
+
+/** Les commandes payées par Stripe (un livre = une commande), pour la page Argent. */
+export async function listOrders(): Promise<Array<{ sessionId: string; client: string; profileId: string; isGift: boolean; at: string; test: boolean }>> {
+    const supabase = db();
+    const [profiles, projects] = await Promise.all([
+        supabase.from('profiles').select('id, first_name, last_name').limit(1000),
+        supabase.from('projects').select('user_id, stripe_session_id, project_metadata, created_at').not('stripe_session_id', 'is', null).order('created_at', { ascending: false }).limit(1000),
+    ]);
+    const P = must(profiles, 'profils') as Row[];
+    return (must(projects, 'projets') as Row[]).map((j) => {
+        const p = P.find((x) => x.id === j.user_id);
+        const meta = (j.project_metadata ?? {}) as Row;
+        return {
+            sessionId: String(j.stripe_session_id),
+            client: p ? `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim() || 'Sans nom' : 'Client inconnu',
+            profileId: String(j.user_id),
+            isGift: meta.is_gift === true,
+            at: String(j.created_at),
+            test: isTestMeta(meta),
+        };
+    });
 }
