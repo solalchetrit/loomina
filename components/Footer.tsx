@@ -29,6 +29,7 @@ const COLUMNS = [
       { href: "/ecrire-ses-memoires", label: "Écrire ses mémoires" },
       { href: "/cadeau-grands-parents", label: "Offrir à ses grands-parents" },
       { href: "/biographe-familial", label: "Biographe familial" },
+      { href: "/blog", label: "Le blog" },
     ],
   },
   {
