@@ -187,6 +187,8 @@ export const MAP_GROUPS: MapGroup[] = [
         nodes: [
             { id: 'f-num', label: 'Tape son propre numéro', d: 'Le portable donné à la commande, dans « Et vous ? ».' },
             { id: 'f-code', label: 'Code reçu par SMS' },
+            { id: 'f-accueil', label: 'Accueil de l’espace famille', d: 'Depuis le 20/11/2026, au premier passage : ce que permet l’espace, Mémo, puis « Préparez le premier appel » (prénom et prononciation du narrateur, tu ou vous, sujets à éviter). Ce dernier écran n’existe que tant qu’aucun appel n’a eu lieu et que le narrateur n’a rien réglé lui-même ; il reste modifiable depuis l’espace jusqu’au premier appel. Loomina ne redemande pas ce que la famille a dit (prefs_set_by = giver). Le narrateur garde la main : son propre accueil s’affiche quand même, avec ces choix déjà remplis.', code: 'components/author/FamilyOnboarding.tsx' },
+            { id: 'f-memo', label: 'Suit Mémo', d: 'Depuis le 20/11/2026, Mémo grandit dans l’espace famille comme dans l’espace auteur, et parle du narrateur à la troisième personne. Il ne cite les titres des récits que si le narrateur les partage.', code: 'components/author/Companion.tsx' },
             { id: 'f-avance', label: 'Voit l’avancement', d: 'Depuis le 20/11/2026, une fois le livre terminé : son étape (en relecture, relu, à l’impression, en route avec le numéro de suivi, arrivé), et un SMS et un e-mail à chaque étape. Avant : la phase et les titres des récits.', code: 'app/api/famille/overview' },
             { id: 'f-texte', label: 'Le narrateur partage ?', kind: 'q', d: 'Réglage du narrateur dans son espace : c’est sa vie, c’est lui qui choisit.' },
             { id: 'f-lit', label: 'Oui : lit les récits' },

@@ -64,6 +64,8 @@ export async function PATCH(request: NextRequest) {
         let metaChanged = false;
         if (profileUpdates.politeness_preference || 'sensitive_topics' in profileUpdates) {
             meta.prefs_set_at = new Date().toISOString();
+            // Désormais réglé par l'auteur : la famille ne peut plus y toucher (lib/loomina/family-setup.ts).
+            meta.prefs_set_by = 'author';
             metaChanged = true;
         }
         // L'accueil du premier passage est fait (enregistré ou remis à plus tard).

@@ -95,11 +95,19 @@ export function memoState(input: {
     scheduleText?: string | null;
     /** Le titre du dernier récit, pour que Mémo dise ce qu'il vient de retenir. */
     lastTitle?: string | null;
+    /**
+     * Espace famille (20/11/2026) : le prénom de la personne qui raconte. Mémo
+     * parle alors d'elle à la troisième personne, à celle qui a offert le livre.
+     */
+    narrator?: string | null;
     now?: Date;
 }): MemoState {
     const now = (input.now ?? new Date()).getTime();
+    const family = input.narrator !== undefined;
+    const who = input.narrator?.trim() || 'votre proche';
     if (input.completed) {
-        return { age: 5, mood: 'done', headline: 'Votre récit est complet. Mémo tient votre livre.', note: null, told: 0, total: 0, path: 1 };
+        const headline = family ? `Le récit de ${who} est complet. Mémo tient son livre.` : 'Votre récit est complet. Mémo tient votre livre.';
+        return { age: 5, mood: 'done', headline, note: null, told: 0, total: 0, path: 1 };
     }
     const age = input.phase as MemoAge;
     const stage = input.weave.rows.filter((r) => r.phase === input.phase);
@@ -114,21 +122,25 @@ export function memoState(input: {
         return {
             ...base,
             mood: 'asleep',
-            headline: 'Mémo dort. Il se réveillera à votre premier appel.',
-            note: input.scheduleText ? `Premier appel ${input.scheduleText}.` : 'Appelez quand vous voulez.',
+            headline: family ? `Mémo dort. Il se réveillera au premier appel de ${who}.` : 'Mémo dort. Il se réveillera à votre premier appel.',
+            note: input.scheduleText ? `Premier appel ${input.scheduleText}.` : family ? `${who} peut appeler quand bon lui semble.` : 'Appelez quand vous voulez.',
         };
     }
     const headline = `Encore ${left} souvenir${left > 1 ? 's' : ''} et Mémo ${MEMO_AGES[age - 1].then}.`;
     const since = now - last;
     if (since < MEMO_FRESH_HOURS * 3600 * 1000) {
-        return { ...base, mood: 'fresh', headline, note: input.lastTitle ? `Mémo vient de retenir « ${input.lastTitle} ».` : 'Mémo a retenu votre dernier récit.' };
+        return { ...base, mood: 'fresh', headline, note: input.lastTitle ? `Mémo vient de retenir « ${input.lastTitle} ».` : family ? `Mémo a retenu le dernier récit de ${who}.` : 'Mémo a retenu votre dernier récit.' };
     }
     if (since > MEMO_WAITING_DAYS * DAY) {
         return {
             ...base,
             mood: 'waiting',
             headline,
-            note: input.scheduleText ? `Mémo attend la suite. Prochain appel ${input.scheduleText}.` : 'Mémo attend la suite. Appelez quand vous voulez.',
+            note: input.scheduleText
+                ? `Mémo attend la suite. Prochain appel ${input.scheduleText}.`
+                : family
+                  ? `Mémo attend la suite. Un souvenir à souffler pourrait donner envie à ${who} de rappeler.`
+                  : 'Mémo attend la suite. Appelez quand vous voulez.',
         };
     }
     return { ...base, mood: 'steady', headline, note: input.scheduleText ? `Prochain appel ${input.scheduleText}.` : null };

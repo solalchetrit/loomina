@@ -60,10 +60,11 @@ export async function GET(request: NextRequest) {
         // L'accueil du premier passage : seulement tant qu'aucun appel n'a eu
         // lieu (au premier appel, Loomina demande elle-même tu/vous et les
         // sujets à éviter) et que l'auteur n'a ni réglé ni remis à plus tard.
+        // Si la famille a préparé l'appel, l'accueil reste montré, avec ses choix déjà remplis.
         const pmeta = (project.project_metadata ?? {}) as Record<string, unknown>;
         const { count: anyCall } = await db().from('interviews').select('id', { count: 'exact', head: true }).eq('project_id', project.id);
         const welcome =
-            !pmeta.welcome_done_at && !pmeta.prefs_set_at && !anyCall && project.status !== 'completed'
+            !pmeta.welcome_done_at && (!pmeta.prefs_set_at || pmeta.prefs_set_by === 'giver') && !anyCall && project.status !== 'completed'
                 ? { politeness: true, topics: !profile.sensitive_topics?.trim() }
                 : null;
 

@@ -542,3 +542,13 @@ test('clients de test : drapeau test ou banc', async () => {
     assert.equal(isTestMeta({ is_gift: true }), false);
     assert.equal(isTestMeta(null), false);
 });
+
+test('famille : préparer le premier appel seulement avant tout appel et sans réglage du narrateur', async () => {
+    const { familySetupOpen } = await import('../../lib/loomina/family-setup');
+    assert.equal(familySetupOpen({ meta: {}, status: 'active', calls: 0 }), true);
+    assert.equal(familySetupOpen({ meta: {}, status: 'active', calls: 1 }), false);
+    assert.equal(familySetupOpen({ meta: {}, status: 'completed', calls: 0 }), false);
+    assert.equal(familySetupOpen({ meta: { prefs_set_at: 'x', prefs_set_by: 'author' }, status: 'active', calls: 0 }), false);
+    assert.equal(familySetupOpen({ meta: { prefs_set_at: 'x' }, status: 'active', calls: 0 }), false);
+    assert.equal(familySetupOpen({ meta: { prefs_set_at: 'x', prefs_set_by: 'giver' }, status: 'active', calls: 0 }), true);
+});
