@@ -81,7 +81,7 @@ export const MAP_GROUPS: MapGroup[] = [
         about: 'Ce que Loomina respecte à chaque réplique, à tous les appels.',
         flat: true,
         nodes: [
-            { id: 'g-finir', label: 'Laisser finir la personne', d: 'Loomina attend 1,2 s après la fin d’une phrase (rien après une question) ; 0,8 s avant le 19/11/2026, allongé pour laisser réfléchir (demande de Solal). Si la personne reprend, la réponse préparée est jetée.', code: 'voice/src/session.ts' },
+            { id: 'g-finir', label: 'Laisser finir la personne', d: 'Loomina attend 1,2 s après la fin d’une phrase (rien après une question) ; 0,8 s avant le 19/11/2026, allongé pour laisser réfléchir (demande de Solal). Si la personne reprend, la réponse préparée est jetée. Depuis le 20/11/2026 (appel test de Solal, 24 coupures en 17 min) : 2,6 s quand la phrase n’est pas finie (pas de point final, ou elle s’arrête sur « et », « parce que », « en fait »…), 1,9 s pour une phrase très courte (8 mots au plus). Et Loomina ne résume plus ce qui vient d’être raconté, ne reprend jamais deux fois le même détail, pose ses questions directement (plus de « tu te souviens », « tu te rappelles », « qu’est-ce qui te revient »), et ne redit que sa question quand on lui demande de répéter.', code: 'voice/src/session.ts' },
             { id: 'g-une', label: 'Une seule question à la fois', d: 'Demandé dans le prompt, et garanti par le code : une deuxième question est coupée avant d’être dite.' },
             { id: 'g-court', label: 'Deux phrases, 30 mots au plus', d: 'Jamais de liste, jamais de monologue.' },
             { id: 'g-detail', label: 'Relancer sur un détail concret', d: 'Avec les mots de la personne : un lieu, quelqu’un, ce qui a été dit.' },

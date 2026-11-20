@@ -45,10 +45,37 @@ const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 1200);
  * Une question (« Ça va, et toi ? ») attend une réponse : pas d'attente.
  */
 /** Note ajoutée quand la dernière réplique de Loomina a été coupée (voir onInterrupt). */
-export const CUT_NOTE = "Ta dernière réplique a été coupée : la personne a continué à parler et n'en a entendu que le début. Ne la répète pas. Reprends TOUT ce qu'elle a raconté depuis ta dernière question entendue, et rebondis sur ce qui a le plus de matière (une scène, une action, des gens), pas seulement sur sa dernière phrase.";
+// Reformulée le 20/11/2026 (appel test de Solal) : « reprends TOUT » donnait
+// de longs résumés (« Tu racontais ce loup-garou géant, avec les deux
+// canapés noirs, et… »). On veut tenir compte de tout, sans le redire.
+export const CUT_NOTE = "Ta dernière réplique a été coupée : la personne a continué à parler et n'en a entendu que le début. Ne la répète pas et ne résume rien. Tiens compte de tout ce qu'elle vient de raconter, pas seulement de sa dernière phrase : un écho très court sur UN détail nouveau, puis ta question.";
 
-function holdFor(text: string): number {
-    return /\?\s*$/.test(text) ? 0 : REPLY_DELAY_MS;
+/**
+ * Phrase sans doute pas finie : la transcription n'a pas mis de point final
+ * (« Donc, j'étais plutôt dans ma », « Qui est »), ou elle s'arrête sur un
+ * mot qui annonce une suite (« et », « parce que », « en fait »).
+ */
+const UNFINISHED_END = /(?:^|[\s,])(?:et|mais|donc|alors|parce|que|qui|où|de|du|des|le|la|les|un|une|en|à|au|aux|avec|pour|sur|dans|si|comme|euh|enfin|bon|bah|ben|genre|fait|vois|veux|dire)\s*[,.]?\s*$/i;
+export function looksUnfinished(text: string): boolean {
+    const t = text.trim();
+    if (!t) return false;
+    if (!/[.!?…»")]$/.test(t)) return true;
+    return UNFINISHED_END.test(t);
+}
+
+/** Attente plus longue quand la phrase n'est pas finie ou très courte. */
+const UNFINISHED_DELAY_MS = Number(process.env.VOICE_UNFINISHED_DELAY_MS ?? 2600);
+const SHORT_DELAY_MS = Number(process.env.VOICE_SHORT_DELAY_MS ?? 1900);
+
+// Appel test de Solal (20/11/2026, 24 coupures en 17 min) : Loomina
+// reprenait la parole dès une petite pause au milieu d'une idée (« En fait,
+// si tu veux, c'était à ce moment-là. » puis la suite). Une phrase pas
+// finie attend 2,6 s, une phrase très courte (8 mots au plus) 1,9 s.
+export function holdFor(text: string): number {
+    if (/\?\s*$/.test(text)) return 0;
+    if (looksUnfinished(text)) return UNFINISHED_DELAY_MS;
+    if (words(text) <= 8) return SHORT_DELAY_MS;
+    return REPLY_DELAY_MS;
 }
 
 /**
