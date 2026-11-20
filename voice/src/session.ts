@@ -49,7 +49,7 @@ function holdFor(text: string): number {
 }
 
 /**
- * Durée estimée de la voix pour un texte. La voix (ElevenLabs, vitesse 0,9)
+ * Durée estimée de la voix pour un texte. La voix (ElevenLabs, vitesse 0,92)
  * lit environ 12 caractères par seconde en français. Avant (19/11/2026) on
  * comptait 60 ms par caractère avec un plafond de 12 s : la clôture de la
  * démo (environ 560 caractères, 40 s de voix) était coupée net au bout de

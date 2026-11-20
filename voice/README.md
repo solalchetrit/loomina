@@ -57,7 +57,7 @@ Appels sortants : seuls les rendez-vous d'appel en lancent (voir `src/scheduler.
 | Variable | Rôle | Défaut |
 |---|---|---|
 | `VOICE_MODEL` | cerveau vocal OpenAI | `gpt-4.1` |
-| `VOICE_TTS_VOICE` | voix ElevenLabs `voiceId[-modèle][-vitesse_stabilité_similarité]` | `Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.5_0.75` |
+| `VOICE_TTS_VOICE` | voix ElevenLabs `voiceId[-modèle][-vitesse_stabilité_similarité]` | `c365oriviHmAhyLhpuN6-turbo_v2_5-0.92_0.5_0.6` |
 | `VOICE_LANGUAGE` | langue STT/TTS | `fr-FR` |
 | `VOICE_STT_MODEL` | modèle Deepgram | `nova-3-general` |
 | `VOICE_MAX_CALL_SECONDS` | durée max d'un entretien | `2700` |

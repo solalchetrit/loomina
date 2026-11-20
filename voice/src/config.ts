@@ -47,9 +47,12 @@ export const config = {
         // Stabilité 0,6 au lieu de 0,5 (19/11/2026) : une voix plus régulière,
         // moins de petits accrocs entendus à la démo.
         // « Adrien Clairon - Podcast Narrator » (c365oriviHmAhyLhpuN6), choisie
-        // par Solal le 20/11/2026 (Hugo, 6DEjyaHWnTHsvXM5Byys, trop grave). Avant : « Guillaume -
+        // par Solal le 20/11/2026 (Hugo, 6DEjyaHWnTHsvXM5Byys, trop grave). Moteur
+        // turbo (intonation plus naturelle que flash), vitesse 0,92, stabilité
+        // 0,5, fidélité 0,6 (moins de basses : la ligne téléphonique coupe les
+        // aigus et rend toute voix plus grave que son extrait). Avant : « Guillaume -
         // Narrator » (Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.6_0.75).
-        ttsVoice: optional('VOICE_TTS_VOICE', 'c365oriviHmAhyLhpuN6-flash_v2_5-1.0_0.5_0.75'),
+        ttsVoice: optional('VOICE_TTS_VOICE', 'c365oriviHmAhyLhpuN6-turbo_v2_5-0.92_0.5_0.6'),
         language: optional('VOICE_LANGUAGE', 'fr-FR'),
         sttModel: optional('VOICE_STT_MODEL', 'nova-3-general'),
     },
