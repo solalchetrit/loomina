@@ -31,4 +31,27 @@ export const COSTS = {
      * coût moyen de l'analyse et de l'écriture d'un récit.
      */
     writingFallbackPerCall: 0.25,
+    /**
+     * Repli pour l'IA de la conversation d'une démo d'avant le suivi des
+     * jetons (20/11/2026), par minute d'appel.
+     */
+    conversationFallbackPerMinute: 0.02,
+    /**
+     * Repli pour une composition automatique du livre (plan, chapitres, passe
+     * finale), tant que la clé d'administration OpenAI n'est pas posée.
+     */
+    compositionFallbackPerEdition: 0.6,
+    /**
+     * Les abonnements fixes de Loomina, par mois, dans leur devise. `null` :
+     * montant à renseigner. Relevés le 20/11/2026 : Supabase est sur l'offre
+     * gratuite, Render sur Starter. Le numéro Twilio est déjà dans la facture
+     * Twilio lue en direct.
+     */
+    subscriptions: [
+        { name: 'Render, serveur vocal (Starter)', amount: 7, currency: 'USD' },
+        { name: 'Vercel, le site', amount: 0, currency: 'USD', note: 'offre Hobby à confirmer' },
+        { name: 'Supabase, la base', amount: 0, currency: 'USD', note: 'offre gratuite' },
+        { name: 'o2switch, les e-mails', amount: null, currency: 'EUR' },
+        { name: 'Nom de domaine loomina.eu', amount: null, currency: 'EUR' },
+    ] as Array<{ name: string; amount: number | null; currency: 'USD' | 'EUR'; note?: string }>,
 };

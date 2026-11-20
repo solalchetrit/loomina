@@ -91,7 +91,7 @@ export default async function AdminStructure() {
   await requireAdmin();
 
   return (
-    <div className="grid grid-cols-1 gap-8">
+    <div className="grid grid-cols-1 gap-5">
       <PageHeader eyebrow="Structure" title="Comment Loomina fonctionne">
         Les services qui font tourner Loomina, ce qui passe de l’un à l’autre, ce que contient la base et ce qui tourne tout seul.
       </PageHeader>

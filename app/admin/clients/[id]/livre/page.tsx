@@ -29,7 +29,7 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
   const stale = review && book && review.edition_id !== book.id;
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:gap-8">
+    <div className="grid grid-cols-1 gap-5">
       <div>
         <Link href={`/admin/clients/${id}`} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-3)] hover:text-[var(--ink)]">
           <AIcon name="chevron" size={14} className="rotate-180" /> {name}

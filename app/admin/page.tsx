@@ -2,10 +2,13 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getOverview, configWarnings, voiceHealth } from "@/lib/admin/data";
 import { fmtDate, fmtDuration, fmtNumber, INTERVIEW_STATUS, EVENT_STATUS } from "@/lib/admin/format";
-import { Badge, Panel, Stat, Empty, PageHeader, Avatar } from "@/components/admin/ui";
+import { Badge, Panel, Stat, Empty, PageHeader, Avatar, NightPanel, NightFigure, Delta } from "@/components/admin/ui";
+import { getAudience, audienceConfigured, type Audience } from "@/lib/admin/audience";
+import { getSpend } from "@/lib/admin/spend";
+import { fmtEur } from "@/lib/admin/costs";
 import AIcon from "@/components/admin/icons";
 
-export const metadata = { title: "Vue d’ensemble" };
+export const metadata = { title: "Aujourd’hui" };
 
 function today(): string {
   return new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", weekday: "long", day: "numeric", month: "long" }).format(new Date());
@@ -13,20 +16,33 @@ function today(): string {
 
 export default async function AdminHome() {
   await requireAdmin();
-  const [o, voice] = await Promise.all([getOverview(), voiceHealth()]);
+  const [o, voice, audience, spend] = await Promise.all([
+    getOverview(),
+    voiceHealth(),
+    audienceConfigured() ? getAudience(7).catch((): Audience | null => null) : Promise.resolve(null),
+    getSpend("mois").catch(() => null),
+  ]);
   const warnings = configWarnings();
   const alerts = warnings.length + (voice.ok ? 0 : 1) + o.problems.length + o.stuckEditions.length;
 
   return (
-    <div className="grid grid-cols-1 gap-8">
-      <PageHeader eyebrow={today()} title="Vue d’ensemble">
+    <div className="grid grid-cols-1 gap-5">
+      <PageHeader eyebrow={today()} title="Aujourd’hui">
         {alerts === 0 ? "Tout tourne normalement." : `${alerts} point(s) à surveiller.`}
       </PageHeader>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <NightPanel title="Cette semaine">
+        <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <NightFigure href="/admin/audience?jours=7" label="Visiteurs du site, 7 jours" value={audience ? fmtNumber(audience.users) : "—"} hint={audience ? <span className="inline-flex items-center gap-2">{fmtNumber(audience.sessions)} visites <Delta now={audience.users} before={audience.previous.users} /></span> : "Google Analytics non branché"} />
+          <NightFigure href="/admin/audience?jours=7" label="Clics sur la démo" value={audience ? fmtNumber(audience.events.demo) : "—"} hint={audience ? `${fmtNumber(audience.events.purchase)} achat(s) sur le site` : undefined} />
+          <NightFigure href="/admin/clients" label="Appels clients" value={o.callsWeek} hint={`${o.minutesWeek} min au total`} />
+          <NightFigure href="/admin/couts" label="Dépensé ce mois-ci" value={spend ? fmtEur(spend.total) : "—"} hint={spend?.projected != null ? `vers ${fmtEur(spend.projected)} en fin de mois` : "coûts indisponibles"} />
+        </div>
+      </NightPanel>
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         <Stat icon="users" label="Clients" value={o.clients} hint={`${o.activeBooks} en cours · ${o.completedBooks} terminé(s)`} />
-        <Stat icon="phone" tone="amber" label="Appels, 7 derniers jours" value={o.callsWeek} hint={`${o.minutesWeek} min au total`} />
-        <Stat icon="book" label="Récits écrits" value={o.chapters} hint={`${fmtNumber(o.words)} mots`} />
+        <Stat icon="book" tone="amber" label="Récits écrits" value={o.chapters} hint={`${fmtNumber(o.words)} mots`} />
         <Stat icon="server" tone={voice.ok ? "green" : "red"} label="Serveur vocal" value={voice.ok ? "En ligne" : "Coupé"} hint={voice.detail} />
       </div>
 
