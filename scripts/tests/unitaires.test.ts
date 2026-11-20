@@ -597,3 +597,25 @@ test('famille : plusieurs proches, de la commande au webhook', async () => {
     const many = Array.from({ length: 15 }, (_, i) => ({ firstName: 'Prénom assez long ' + i, phone: `+336000000${String(i).padStart(2, '0')}` }));
     assert.ok(g.encodeFamilyForStripe(many).length <= 500);
 });
+
+test('lien de connexion directe : court, lié au numéro, refusé s’il est modifié ou expiré', async () => {
+    process.env.JWT_SECRET = process.env.JWT_SECRET || 'secret-de-test';
+    process.env.LOOMINA_MAGIC_LINKS = 'true';
+    const { magicToken, readMagicToken, magicLink } = await import('../../lib/loomina/magic-link');
+    const { personalizeSms } = await import('../../lib/loomina/sms');
+    const now = Date.UTC(2026, 10, 20);
+    const t = magicToken('+33612345670', now)!;
+    assert.ok(t.length <= 50, t);
+    assert.deepEqual(readMagicToken(t, now), { phone: '+33612345670' });
+    // Autre numéro, signature touchée, ou après 30 jours : refusé.
+    const [n, e, sig] = t.split('.');
+    assert.equal(readMagicToken(`${(parseInt(n, 36) + 1).toString(36)}.${e}.${sig}`, now), null);
+    assert.equal(readMagicToken(`${n}.${e}.${sig.slice(0, -1)}${sig.endsWith('A') ? 'B' : 'A'}`, now), null);
+    assert.equal(readMagicToken(t, now + 31 * 86_400_000), null);
+    assert.match(magicLink('+33612345670'), /\/l\/[0-9a-z]+\.[0-9a-z]+\.[\w-]{22}$/);
+    // Dans un SMS, le lien de l'espace devient celui du destinataire.
+    const sms = personalizeSms('+33612345670', 'Votre espace : loomina.eu/dashboard');
+    assert.match(sms, /Votre espace : loomina\.eu\/l\/\S+$/);
+    assert.equal(readMagicToken(sms.split('/l/')[1])?.phone, '+33612345670');
+    assert.equal(personalizeSms('+33612345670', 'Rien à changer.'), 'Rien à changer.');
+});

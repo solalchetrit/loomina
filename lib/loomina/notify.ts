@@ -192,7 +192,8 @@ export function welcomeTexts(order: Order): { subject: string; email: string; sm
                 `Une question ? Répondez simplement à ce message.`,
                 `L'équipe Loomina`,
             ].join('\n\n'),
-            sms: `Loomina : merci pour votre commande. ${name} peut commencer son livre en appelant le ${SITE.phoneDisplay} depuis son téléphone. Suivez l'avancement sur ${HOST}/dashboard`,
+            // Le lien de l'espace devient un lien de connexion directe à l'envoi (lib/loomina/sms.ts).
+            sms: `Loomina : merci pour votre commande. Loomina est prêt pour vous : vous pouvez suivre l'histoire de ${name}. ${name} commence en appelant le ${SITE.phoneDisplay} depuis son téléphone. Votre espace famille : ${HOST}/dashboard`,
             smsTo: order.giver?.phone ?? null,
         };
     }
@@ -208,7 +209,7 @@ export function welcomeTexts(order: Order): { subject: string; email: string; sm
             `Une question ? Répondez simplement à ce message.`,
             `L'équipe Loomina`,
         ].join('\n\n'),
-        sms: `Bienvenue chez Loomina${order.narratorFirstName ? `, ${order.narratorFirstName}` : ''}. Pour commencer votre livre, appelez le ${SITE.phoneDisplay} depuis ce téléphone, quand vous voulez. Votre espace : ${HOST}/dashboard`,
+        sms: `Bienvenue chez Loomina${order.narratorFirstName ? `, ${order.narratorFirstName}` : ''}. Loomina est prêt pour vous : appelez le ${SITE.phoneDisplay} depuis ce téléphone, quand vous voulez, pour commencer votre livre. Votre espace : ${HOST}/dashboard`,
         smsTo: order.narratorPhone,
     };
 }
@@ -327,7 +328,8 @@ export function familyInviteSms(params: { firstName: string | null; narratorFirs
     const hello = params.firstName ? `Bonjour ${params.firstName}, ` : 'Bonjour, ';
     const narrator = params.narratorFirstName?.trim() || 'votre proche';
     const by = params.invitedBy?.trim() ? `${params.invitedBy.trim()} vous invite` : 'Loomina vous invite';
-    return `Loomina : ${hello}${by} à suivre le livre de ${narrator}, raconté au téléphone. Ouvrez votre espace famille sur ${HOST}/dashboard avec ce numéro.`;
+    // Le lien devient un lien de connexion directe pour ce numéro à l'envoi (lib/loomina/sms.ts).
+    return `Loomina : ${hello}Loomina est prêt pour vous. ${by} à suivre l'histoire de ${narrator}, racontée au téléphone. Votre espace famille : ${HOST}/dashboard`;
 }
 
 /** Prévient un proche qu'il a accès à l'espace famille. Ne lève jamais. */

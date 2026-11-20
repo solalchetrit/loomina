@@ -34,6 +34,8 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [justOrdered, setJustOrdered] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
+  // Arrivée par un lien reçu par SMS (app/l/[token]) : « ok », ou un lien expiré ou faux.
+  const [linkFailed, setLinkFailed] = useState(false);
 
   // localStorage n'existe que dans le navigateur : on le lit après le premier rendu.
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -57,6 +59,13 @@ export default function DashboardPage() {
         setIsLoggedIn(true);
       })
       .catch(() => {});
+    // Lien de connexion directe : la session est déjà posée par le serveur.
+    const lien = new URLSearchParams(window.location.search).get("lien");
+    if (lien) {
+      if (lien === "ok") setIsLoggedIn(true);
+      else setLinkFailed(true);
+      window.history.replaceState(null, "", "/dashboard");
+    }
     const sessionId = new URLSearchParams(window.location.search).get("session_id");
     if (sessionId) {
       setJustOrdered(true);
@@ -201,6 +210,12 @@ export default function DashboardPage() {
                   depuis le numéro indiqué à la commande, quand vous voulez. Le récit de chaque appel apparaîtra ici.
                 </p>
               </div>
+            )}
+
+            {linkFailed && !sessionExpired && (
+              <p role="status" className="t-body mt-8 max-w-md rounded-[14px] bg-[var(--surface-2)] px-4 py-3">
+                Ce lien n’est plus valable. Indiquez votre numéro : vous recevrez un code par SMS.
+              </p>
             )}
 
             {sessionExpired && (

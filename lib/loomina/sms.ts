@@ -8,6 +8,20 @@
 
 import type { Profile } from './db';
 import { SITE } from '../../config/site';
+import { magicLink } from './magic-link';
+
+const DASHBOARD = `${SITE.url.replace(/^https?:\/\//, '').replace(/^www\./, '')}/dashboard`;
+
+/**
+ * Chaque « loomina.eu/dashboard » d'un SMS devient un lien de connexion directe
+ * pour le numéro qui le reçoit (lib/loomina/magic-link.ts, demande de Solal du
+ * 20/11/2026) : un toucher ouvre son espace, sans code.
+ */
+export function personalizeSms(to: string, body: string): string {
+    if (!body.includes(DASHBOARD)) return body;
+    const link = magicLink(to);
+    return body.replace(new RegExp(`(?:https?://)?(?:www\\.)?${DASHBOARD.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w/])`, 'g'), link);
+}
 
 export async function sendSms(to: string, body: string): Promise<boolean> {
     const sid = process.env.TWILIO_ACCOUNT_SID;
@@ -23,7 +37,7 @@ export async function sendSms(to: string, body: string): Promise<boolean> {
             Authorization: 'Basic ' + Buffer.from(`${sid}:${token}`).toString('base64'),
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ To: to, From: from, Body: body.slice(0, 600) }),
+        body: new URLSearchParams({ To: to, From: from, Body: personalizeSms(to, body).slice(0, 600) }),
     });
     if (!res.ok) {
         console.warn(`[sms] refusé par Twilio (${res.status}) : ${(await res.text().catch(() => '')).slice(0, 200)}`);
