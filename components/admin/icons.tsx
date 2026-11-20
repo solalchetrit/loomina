@@ -25,6 +25,12 @@ const PATHS = {
   collapse: "M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7",
   check: "M20 6 9 17l-5-5",
   arrow: "M5 12h14M13 6l6 6-6 6",
+  chart: "M3 3v18h18M7 14l4-4 3 3 6-7",
+  euro: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15.5 8.5A4 4 0 0 0 9 12a4 4 0 0 0 6.5 3.5M7 10.5h6M7 13.5h6",
+  search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3",
+  up: "M7 17 17 7M8 7h9v9",
+  down: "M7 7l10 10M17 8v9H8",
+  external: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3",
 } as const;
 
 export type AdminIconName = keyof typeof PATHS;

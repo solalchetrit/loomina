@@ -303,7 +303,7 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
   const destinataire = (m: MailRow) => (folder === "sent" ? m.to[0] : m.from);
 
   return (
-    <div className="flex h-[calc(100dvh-12rem)] min-h-[480px] flex-col overflow-hidden rounded-[22px] border border-[var(--line)] bg-white shadow-[var(--shadow-bar)] xl:h-[calc(100dvh-10rem)]">
+    <div className="flex h-[calc(100dvh-11.5rem)] min-h-[480px] flex-col overflow-hidden rounded-[22px] border border-[var(--line)] bg-white shadow-[var(--shadow-bar)] lg:h-[calc(100dvh-8rem)]">
       {/* Barre : dossiers, recherche, actualiser, nouveau */}
       <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[var(--line)] px-3 py-2.5">
         <span className="hidden pl-1 pr-2 text-[15px] font-extrabold tracking-[-0.01em] sm:inline">{user}</span>

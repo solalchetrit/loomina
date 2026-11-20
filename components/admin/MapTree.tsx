@@ -498,7 +498,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
       {mode === "schema" ? (
         <div
           ref={frame}
-          className="relative left-1/2 mt-5 h-[78vh] min-h-[480px] w-[calc(100vw-24px)] max-w-[2200px] -translate-x-1/2 touch-none select-none overflow-hidden rounded-[24px] border border-[var(--line)] bg-white"
+          className="relative left-1/2 mt-5 h-[78vh] min-h-[480px] w-[calc(100vw-24px)] max-w-[2200px] -translate-x-1/2 lg:left-0 lg:w-full lg:translate-x-0 touch-none select-none overflow-hidden rounded-[24px] border border-[var(--line)] bg-white"
           style={{ backgroundImage: "radial-gradient(var(--rule-strong) 1px, transparent 1px)", backgroundSize: `${22 * view.z}px ${22 * view.z}px`, backgroundPosition: `${view.x}px ${view.y}px`, cursor: dragging ? "grabbing" : "grab" }}
           onPointerDown={(e) => {
             if ((e.target as HTMLElement).closest("[data-ui]")) return;

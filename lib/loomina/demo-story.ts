@@ -22,6 +22,18 @@ import { brandEmailHtml, sendEmail } from './notify';
 import { promptText, refreshPrompts } from './prompt-store';
 import { WRITER_SYSTEM, WRITER_MODEL, WRITER_REASONING_EFFORT, WRITER_MAX_TOKENS, countWords } from './writer';
 import { tokenUsage } from './usage';
+import type { TokenUsage } from './usage';
+
+/**
+ * `demo_stories.usage` : { voice, writer } depuis le 20/11/2026. Avant, la
+ * colonne ne portait que les jetons de l'Écrivain, à plat.
+ */
+export function demoUsage(raw: unknown): { voice?: TokenUsage; writer?: TokenUsage } {
+    if (!raw || typeof raw !== 'object') return {};
+    const u = raw as Record<string, unknown>;
+    if (typeof u.model === 'string') return { writer: u as unknown as TokenUsage };
+    return { voice: (u.voice as TokenUsage) ?? undefined, writer: (u.writer as TokenUsage) ?? undefined };
+}
 import { buildRecitPdf } from './recit-pdf';
 import { SITE } from '../../config/site';
 import { DEMO_PROMO } from '../../config/offer';
@@ -84,6 +96,8 @@ export async function recordDemoCall(params: {
     recordingSid?: string | null;
     /** 'no_sms' : démo gardée seulement pour son enregistrement (fixe, numéro masqué). */
     status?: 'pending' | 'no_sms';
+    /** Jetons de l'IA de la conversation, pour le coût de la démo (onglet Coûts de l'admin). */
+    voiceUsage?: TokenUsage | null;
 }): Promise<string | null> {
     const { data, error } = await db()
         .from('demo_stories')
@@ -95,6 +109,7 @@ export async function recordDemoCall(params: {
             duration_seconds: params.durationSeconds,
             recording_sid: params.recordingSid ?? null,
             status: params.status ?? 'pending',
+            usage: params.voiceUsage ? { voice: params.voiceUsage } : null,
         })
         .select('id')
         .single();
@@ -164,7 +179,7 @@ export async function writeDemoStory(transcript: string) {
 
 /** Écrit le récit d'une démo archivée, puis envoie le SMS. Ne lève jamais. */
 export async function processDemoStory(id: string): Promise<string> {
-    const { data: row, error } = await db().from('demo_stories').select('id, token, phone, transcript, status').eq('id', id).single();
+    const { data: row, error } = await db().from('demo_stories').select('id, token, phone, transcript, status, usage').eq('id', id).single();
     if (error || !row) return `introuvable (${error?.message ?? 'aucune ligne'})`;
     if (row.status !== 'pending') return `déjà traité (${row.status})`;
     try {
@@ -172,7 +187,7 @@ export async function processDemoStory(id: string): Promise<string> {
         const status = story.smsRefused ? 'refused' : story.unusable ? 'unusable' : 'written';
         await db()
             .from('demo_stories')
-            .update({ status, title: story.title, content: story.content, first_name: story.firstName, usage: story.usage ?? null })
+            .update({ status, title: story.title, content: story.content, first_name: story.firstName, usage: { ...demoUsage(row.usage), writer: story.usage ?? undefined } })
             .eq('id', id);
         if (status !== 'written') return status;
         const sent = await sendSms(row.phone as string, demoSmsText(row.token as string));

@@ -9,6 +9,7 @@ import { OFFER } from "@/config/offer";
 import { realRevenue } from "@/lib/admin/revenue";
 import { getAudience, audienceConfigured, type Audience } from "@/lib/admin/audience";
 import { fmtEur } from "@/lib/admin/costs";
+import AIcon from "@/components/admin/icons";
 import { Badge, Panel, Stat, Empty, PageHeader, Avatar, Progress } from "@/components/admin/ui";
 
 export const metadata = { title: "Suivi client" };
@@ -112,19 +113,19 @@ export default async function AdminCrm({ searchParams }: { searchParams: Promise
   const sorted = [...clients].sort((a, b) => b.orderedAt.localeCompare(a.orderedAt));
 
   return (
-    <div className="grid grid-cols-1 gap-8">
+    <div className="grid grid-cols-1 gap-5">
       <PageHeader eyebrow="Suivi client" title="Où en sont vos clients">
         Qui a commandé, qui a commencé, qui avance, et qui il faut relancer.
       </PageHeader>
 
-      <div className="-mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat icon="users" label="Clients" value={total} hint={`${gifts} livre(s) offert(s) · ${total - gifts} pour soi`} />
         <Stat icon="phone" tone="amber" label="Embarqués" value={onboarded.length} hint={`${pct(onboarded.length)} % ont fait un premier vrai appel`} />
         <Stat icon="clock" tone={waiting.length ? "red" : "neutral"} label="Attendent leur premier appel" value={waiting.length} hint={`dont ${clients.filter((c) => c.health === "relancer").length} depuis plus de ${RELANCE_AFTER_DAYS} jours`} />
         <Stat icon="book" tone="green" label="Livres terminés" value={done.length} hint={`${active.length} client(s) actif(s) sur ${INACTIVE_AFTER_DAYS} jours`} />
       </div>
 
-      <Panel icon="spark" title="Audience du site, 28 derniers jours">
+      <Panel icon="chart" title="Audience du site, 28 derniers jours" action={<Link href="/admin/audience" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Tout voir dans Audience <AIcon name="arrow" size={14} /></Link>}>
         {audience ? (
           <div className="grid gap-5">
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -134,27 +135,6 @@ export default async function AdminCrm({ searchParams }: { searchParams: Promise
                   <p className="mt-2 text-[14.5px] font-semibold text-[var(--ink-2)]">{l}</p>
                 </div>
               ))}
-            </div>
-            <p className="text-[15px] text-[var(--ink-2)]">
-              Du visiteur à la vente : {fmtNumber(audience.sessions)} visite(s), {fmtNumber(audience.events.demo)} clic(s) sur la démo, {fmtNumber(audience.events.checkout)} commande(s) commencée(s), {fmtNumber(audience.events.purchase)} achat(s), {fmtNumber(audience.events.contact)} message(s) de contact.
-            </p>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div>
-                <p className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--ink-3)]">Pages les plus vues</p>
-                <ul className="mt-2 divide-y divide-[var(--line-soft)] text-[15px]">
-                  {audience.pages.map((pg) => (
-                    <li key={pg.path} className="flex justify-between gap-3 py-2"><span className="min-w-0 truncate">{pg.path}</span><b className="tabular-nums">{fmtNumber(pg.views)}</b></li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--ink-3)]">D’où viennent les visiteurs</p>
-                <ul className="mt-2 divide-y divide-[var(--line-soft)] text-[15px]">
-                  {audience.sources.map((s) => (
-                    <li key={s.source} className="flex justify-between gap-3 py-2"><span className="min-w-0 truncate">{s.source === "(direct)" ? "Accès direct" : s.source}</span><b className="tabular-nums">{fmtNumber(s.sessions)}</b></li>
-                  ))}
-                </ul>
-              </div>
             </div>
             <p className="t-small">Chiffres de Google Analytics. Depuis le bandeau cookies, seuls les visiteurs qui acceptent la mesure sont comptés.</p>
           </div>

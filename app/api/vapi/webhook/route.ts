@@ -29,6 +29,7 @@ import { NextRequest, NextResponse, after } from 'next/server';
 import { findProfileByPhone, findActiveProject, getSystemPrompt, db, maskPhone } from '@/lib/loomina/db';
 import { toPhase } from '@/lib/loomina/phases';
 import { buildAssistant, buildUnknownCallerAssistant, buildRecoveryAssistant, canReceiveSms } from '@/lib/loomina/assistant';
+import type { TokenUsage } from '@/lib/loomina/usage';
 import { recordDemoCall, processDemoStory, purgeOldDemoStories } from '@/lib/loomina/demo-story';
 import { extractCallData } from '@/lib/loomina/pipeline';
 import type { VapiMessage } from '@/lib/loomina/pipeline';
@@ -214,7 +215,13 @@ async function handleEndOfCall(
     const metadata = message.call?.metadata ?? message.metadata ?? {};
     if (metadata.demo === true) {
         const rec = (metadata as { recordingSid?: unknown }).recordingSid;
-        return handleDemoEnd(data, typeof rec === 'string' ? rec : null);
+        // Les jetons de la conversation, pour le coût de la démo (onglet Coûts de l'admin).
+        const t = ((message as { costBreakdown?: { llmPromptTokens?: number; llmCompletionTokens?: number } }).costBreakdown ?? {});
+        const model = (metadata as { model?: unknown }).model;
+        const voiceUsage = t.llmPromptTokens || t.llmCompletionTokens
+            ? { model: typeof model === 'string' ? model : 'gpt-4.1', input: Number(t.llmPromptTokens) || 0, cached: 0, output: Number(t.llmCompletionTokens) || 0 }
+            : null;
+        return handleDemoEnd(data, typeof rec === 'string' ? rec : null, voiceUsage);
     }
 
     const { id: eventId, alreadySeen } = await recordEvent({
@@ -252,11 +259,11 @@ async function handleEndOfCall(
     return NextResponse.json({ received: true, eventId });
 }
 
-async function handleDemoEnd(data: ReturnType<typeof extractCallData>, recordingSid: string | null) {
+async function handleDemoEnd(data: ReturnType<typeof extractCallData>, recordingSid: string | null, voiceUsage: TokenUsage | null) {
     // Pas de SMS possible, mais un enregistrement : la démo est gardée pour
     // l'écoute dans l'admin, sans récit (demande de Solal, 20/11/2026).
     if (data.vapiCallId && recordingSid && (!data.phone || !data.transcript || !canReceiveSms(data.phone))) {
-        await recordDemoCall({ callId: data.vapiCallId, phone: data.phone ?? 'numéro masqué', transcript: data.transcript ?? '', durationSeconds: data.durationSeconds, recordingSid, status: 'no_sms' });
+        await recordDemoCall({ callId: data.vapiCallId, phone: data.phone ?? 'numéro masqué', transcript: data.transcript ?? '', durationSeconds: data.durationSeconds, recordingSid, status: 'no_sms', voiceUsage });
         after(purgeOldDemoStories);
         return NextResponse.json({ received: true, demo: true, stored: 'recording' });
     }
@@ -264,7 +271,7 @@ async function handleDemoEnd(data: ReturnType<typeof extractCallData>, recording
         console.info('[vapi] démo sans récit possible (pas de portable ou pas de transcript)');
         return NextResponse.json({ received: true, demo: true, stored: false });
     }
-    const id = await recordDemoCall({ callId: data.vapiCallId, phone: data.phone, transcript: data.transcript, durationSeconds: data.durationSeconds, recordingSid });
+    const id = await recordDemoCall({ callId: data.vapiCallId, phone: data.phone, transcript: data.transcript, durationSeconds: data.durationSeconds, recordingSid, voiceUsage });
     if (!id) return NextResponse.json({ received: true, demo: true, duplicate: true });
     after(async () => {
         const outcome = await processDemoStory(id);
