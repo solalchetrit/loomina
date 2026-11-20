@@ -46,9 +46,10 @@ export const config = {
         /** Format Twilio/ElevenLabs : voiceId[-modèle][-vitesse_stabilité_similarité] */
         // Stabilité 0,6 au lieu de 0,5 (19/11/2026) : une voix plus régulière,
         // moins de petits accrocs entendus à la démo.
-        // « Guillaume - Narrator » (Qrl71rx6Yg8RvyPYRGCQ). Nouvelle voix en
-        // cours de choix (20/11/2026) : candidates dans voix-loomina sur le Mac.
-        ttsVoice: optional('VOICE_TTS_VOICE', 'Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.6_0.75'),
+        // « Hugo - Deep French Storyteller » (6DEjyaHWnTHsvXM5Byys), choisie par
+        // Solal le 20/11/2026 : grave, calme, chaude. Avant : « Guillaume -
+        // Narrator » (Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.6_0.75).
+        ttsVoice: optional('VOICE_TTS_VOICE', '6DEjyaHWnTHsvXM5Byys-flash_v2_5-0.9_0.6_0.75'),
         language: optional('VOICE_LANGUAGE', 'fr-FR'),
         sttModel: optional('VOICE_STT_MODEL', 'nova-3-general'),
     },
