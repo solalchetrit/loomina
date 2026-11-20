@@ -49,7 +49,9 @@ export const config = {
         // « Hugo - Deep French Storyteller » (6DEjyaHWnTHsvXM5Byys), choisie par
         // Solal le 20/11/2026 : grave, calme, chaude. Avant : « Guillaume -
         // Narrator » (Qrl71rx6Yg8RvyPYRGCQ-flash_v2_5-0.9_0.6_0.75).
-        ttsVoice: optional('VOICE_TTS_VOICE', '6DEjyaHWnTHsvXM5Byys-flash_v2_5-0.9_0.6_0.75'),
+        // Vitesse normale (1,0) et réglages par défaut : à 0,9 ou en baissant la
+        // fidélité, Solal la trouvait trop douce et traînante (20/11/2026).
+        ttsVoice: optional('VOICE_TTS_VOICE', '6DEjyaHWnTHsvXM5Byys-flash_v2_5-1.0_0.5_0.75'),
         language: optional('VOICE_LANGUAGE', 'fr-FR'),
         sttModel: optional('VOICE_STT_MODEL', 'nova-3-general'),
     },
