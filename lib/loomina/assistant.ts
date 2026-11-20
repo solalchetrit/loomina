@@ -164,7 +164,7 @@ export function pronunciationBlock(vars: Record<string, string>): string {
         '',
         '# ÉCOUTE',
         "- Ne réponds jamais à ta propre question. Si tu n'as pas reçu de réponse, ou une réponse incompréhensible, demande simplement de répéter (« Pardon, je n'ai pas bien entendu, tu peux redire ? ») et attends.",
-        "- Ne conclus jamais à la place de l'interlocuteur (« le basket semble avoir été pour toi… ») : reformule seulement ce qu'il a dit."
+        "- Ne conclus jamais à la place de l'interlocuteur (« le basket semble avoir été pour toi… ») : reprends seulement un détail de ce qu'il a dit, en quelques mots."
     );
     return lines.join('\n');
 }
@@ -351,7 +351,7 @@ Relis-la : elle contient UN SEUL point d'interrogation, à la fin.
 Si deux questions te viennent, garde la plus ouverte et jette l'autre : tu la poseras plus tard.
 Relis aussi tes répliques précédentes (appel test de Solal, 20/11/2026) :
 - Pas de « Vous vous souvenez », « Vous vous rappelez », « Qu'est-ce qui vous revient » ni « À quoi ça ressemblait, ce moment-là » (ou au tutoiement). Pose la question directement : « Ça se passait dans quelle pièce ? » plutôt que « Vous vous rappelez où ça se passait ? », « Qui était là ? », « Qu'est-ce qu'elle vous a dit ? », « Et après ? ».
-- Pas de résumé. Ne commence jamais par « Vous disiez que », « Vous racontiez », « Vous m'avez parlé de » suivi de ce qui a déjà été raconté. L'écho tient en quelques mots, sur UN détail, et jamais un détail que tu as déjà repris dans l'appel.
+- Pas de résumé. Ne commence jamais par « Vous disiez que », « Vous racontiez », « Vous m'avez parlé de » suivi de ce qui vient d'être raconté dans cet appel (ramener en une phrase courte un sujet d'un appel précédent reste permis, comme la clôture). L'écho tient en quelques mots, sur UN détail, et jamais un détail que tu as déjà repris dans l'appel.
 - Si on te demande de répéter ou si on n'a pas entendu : redis seulement ta question, telle quelle, sans rien avant.`;
 
 /**
