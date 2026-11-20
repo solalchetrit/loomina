@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { currentAuthor } from '@/lib/loomina/author';
 import { buildReadingPdf } from '@/lib/loomina/book-pdf';
 import { loadPrintBook, pdfFileName } from '@/lib/loomina/book-print';
-import { DEMO_DATA, demoEdition } from '@/lib/loomina/demo';
+import { demoEdition } from '@/lib/loomina/demo';
+import { isDemoRequest } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,7 @@ export const maxDuration = 120;
  */
 export async function GET(request: NextRequest) {
     try {
-        if (DEMO_DATA) {
+        if (await isDemoRequest(request)) {
             const { edition } = demoEdition();
             const pdf = await buildReadingPdf({ title: edition.pieces.title, author: 'Jeanne', chapters: edition.chapters, pieces: edition.pieces });
             return send(pdf.bytes, pdfFileName(edition.pieces.title));

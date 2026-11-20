@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
-import { DEMO_DATA } from '@/lib/loomina/demo';
+import { isDemoRequest } from '@/lib/loomina/test-author';
 import { parseShipping, shippingLines } from '@/lib/loomina/shipping';
 import { alertTeam } from '@/lib/loomina/notify';
 
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
     const shipping = parseShipping(body);
     if (typeof shipping === 'string') return NextResponse.json({ message: shipping }, { status: 400 });
-    if (DEMO_DATA) return NextResponse.json({ saved: true, shipping });
+    if (await isDemoRequest(request)) return NextResponse.json({ saved: true, shipping });
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;

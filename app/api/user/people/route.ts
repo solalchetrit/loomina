@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
-import { DEMO_DATA, demoAddPerson, personTopic } from '@/lib/loomina/demo';
+import { demoAddPerson, personTopic } from '@/lib/loomina/demo';
+import { isDemoRequest } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     if (name.length < 2) return NextResponse.json({ error: 'Indiquez un prénom.' }, { status: 400 });
     if (relation.length < 2) return NextResponse.json({ error: 'Indiquez qui est cette personne pour vous.' }, { status: 400 });
 
-    if (DEMO_DATA) return NextResponse.json(demoAddPerson(name, relation));
+    if (await isDemoRequest(request)) return NextResponse.json(demoAddPerson(name, relation));
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;
