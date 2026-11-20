@@ -227,7 +227,7 @@ export default function ExperiencePage() {
                       </ul>
                       <div className="mt-6 flex flex-col gap-3">
                         <Button href="/order" className="w-full justify-center">
-                          Commander · {OFFER.price} €
+                          Commander
                         </Button>
                         <a href={`tel:${SITE.phone}`} className="link self-center text-[15px]">
                           Essayer d’abord la démo

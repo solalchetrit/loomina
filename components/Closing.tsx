@@ -9,7 +9,7 @@ import { OFFER } from "@/config/offer";
 export default function Closing({
   title = `${OFFER.demoMinutes} minutes au téléphone, gratuitement`,
   text = "Racontez un moment de votre vie : Loomina mène l’entretien, puis vous envoie votre récit écrit par SMS. Prix d’un appel normal.",
-  secondary = { href: "/order", label: `Commander · ${OFFER.price} €` },
+  secondary = { href: "/order", label: "Commander" },
 }: {
   title?: string;
   text?: string;
