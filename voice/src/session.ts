@@ -11,6 +11,7 @@
 import type { WebSocket } from 'ws';
 import OpenAI from 'openai';
 import { config } from './config.ts';
+import { forVoice } from './speech.ts';
 import type { CallPlan } from './plan.ts';
 import { buildEndOfCallReport, deliverReport } from './report.ts';
 import type { TurnRecord } from './report.ts';
@@ -573,7 +574,8 @@ export class CallSession {
     // ------------------------------------------------------------
 
     private sendText(token: string, last: boolean): void {
-        this.send({ type: 'text', token, last });
+        // Tout ce qui part vers la voix passe par forVoice (speech.ts).
+        this.send({ type: 'text', token: forVoice(token), last });
     }
 
     private send(payload: Record<string, unknown>): void {
