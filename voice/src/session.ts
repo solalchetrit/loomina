@@ -103,6 +103,8 @@ export class CallSession {
     private closingSaid = false;
     /** La toute petite phrase d'au revoir a été dite (une seule fois). */
     private farewellSaid = false;
+    /** Minuteur qui raccroche après la clôture. */
+    private endTimer: NodeJS.Timeout | null = null;
     /** Texte déjà envoyé à la voix pour la réponse en cours. */
     private spokenSoFar = '';
 
@@ -240,6 +242,7 @@ export class CallSession {
         setTimeout(() => this.ws?.terminate(), 3000);
         if (this.silenceTimer) clearTimeout(this.silenceTimer);
         if (this.maxTimer) clearTimeout(this.maxTimer);
+        if (this.endTimer) clearTimeout(this.endTimer);
         this.cancelPendingReply();
 
         const endedAt = new Date();
@@ -472,7 +475,7 @@ export class CallSession {
         if (this.endRequested) {
             // Laisser la voix finir la phrase d'au revoir avant de couper.
             const ms = Math.min(90_000, speechMs(spoken));
-            setTimeout(() => void this.end('assistant-ended-call'), ms);
+            if (!this.farewellSaid) this.endTimer = setTimeout(() => void this.end('assistant-ended-call'), ms);
         }
     }
 
@@ -547,7 +550,11 @@ export class CallSession {
         this.endRequested = true;
         this.cancelPendingReply();
         if (this.silenceTimer) clearTimeout(this.silenceTimer);
-        const name = typeof this.plan.metadata.first_name_spoken === 'string' ? this.plan.metadata.first_name_spoken.trim() : '';
+        // L'ancien minuteur de la clôture couperait la petite phrase.
+        if (this.endTimer) clearTimeout(this.endTimer);
+        // Prénom du profil, sinon (démo) celui que Loomina vient de dire dans sa clôture.
+        const known = typeof this.plan.metadata.first_name_spoken === 'string' ? this.plan.metadata.first_name_spoken.trim() : '';
+        const name = known || closingName(this.turns);
         const text = name ? `À bientôt, ${name}. C'était un plaisir.` : "À bientôt. C'était un plaisir.";
         this.sendText(text, true);
         this.turns.push({ role: 'bot', message: text, time: Date.now() });
@@ -584,4 +591,14 @@ function partialMarkerLength(text: string): number {
         if (END_MARKER.startsWith(text.slice(text.length - len))) return len;
     }
     return 0;
+}
+
+/** Le prénom employé dans la clôture (« Merci, Ethan, à bientôt ! »), ou ''. */
+export function closingName(turns: { role: string; message: string }[]): string {
+    for (let i = turns.length - 1; i >= Math.max(0, turns.length - 4); i--) {
+        if (turns[i].role !== 'bot') continue;
+        const found = [...turns[i].message.matchAll(/(?:Merci|Au revoir|À bientôt),\s+([A-ZÀ-Ý][\p{L}'’-]{1,30})\s*[,.!]/gu)];
+        if (found.length) return found[found.length - 1][1];
+    }
+    return '';
 }
