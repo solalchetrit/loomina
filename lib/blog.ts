@@ -76,7 +76,7 @@ export function allPosts(): Post[] {
     .readdirSync(DIR)
     .filter((f) => f.endsWith(".md") && f !== "LISEZ-MOI.md")
     .map((f) => parse(f.replace(/\.md$/, ""), fs.readFileSync(path.join(DIR, f), "utf8")))
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+    .sort((a, b) => (a.date === b.date ? a.title.localeCompare(b.title, "fr") : a.date < b.date ? 1 : -1));
 }
 
 export function getPost(slug: string): Post | undefined {
