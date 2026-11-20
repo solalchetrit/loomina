@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
-import { findGiftProjects } from '@/lib/loomina/giver';
+import { findGiftProjects, markFamilyWelcome } from '@/lib/loomina/giver';
 import { familySetupOpen } from '@/lib/loomina/family-setup';
 
 export const runtime = 'nodejs';
@@ -31,7 +31,7 @@ export async function PATCH(request: NextRequest) {
         const project = (await findGiftProjects(session.phone)).find((p) => p.id === body.projectId);
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-        const meta: Record<string, unknown> = { ...(project.project_metadata ?? {}), giver_welcome_done_at: new Date().toISOString() };
+        const meta: Record<string, unknown> = { ...(project.project_metadata ?? {}), family_welcome_done: markFamilyWelcome(project.project_metadata, session.phone) };
 
         const wantsSetup = body.politeness !== undefined || body.sensitiveTopics !== undefined || body.firstName !== undefined || body.firstNamePhonetic !== undefined;
         if (wantsSetup) {

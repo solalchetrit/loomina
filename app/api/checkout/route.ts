@@ -3,6 +3,7 @@ import { OFFER } from "@/config/offer";
 import { stripe } from "@/lib/stripe";
 import { normalizeCallMinutes } from "@/lib/loomina/call-length";
 import { isTestAuthorPhone } from "@/lib/loomina/test-author";
+import { encodeFamilyForStripe } from "@/lib/loomina/giver";
 
 export async function POST(request: NextRequest) {
     try {
@@ -81,6 +82,8 @@ export async function POST(request: NextRequest) {
                 // Livre offert : la personne qui offre, pour son espace famille.
                 giverFirstName: isGift && typeof giverFirstName === "string" ? giverFirstName.trim().slice(0, 60) : "",
                 giverPhone: isGift && typeof giverPhone === "string" ? giverPhone.trim().slice(0, 20) : "",
+                // Les autres proches qui suivront le livre dans l'espace famille.
+                family: isGift ? encodeFamilyForStripe(body.familyMembers) : "",
                 // On pourrait ajouter un userId ici si l'utilisateur était authentifié via Supabase Auth
                 // userId: user.id
             },

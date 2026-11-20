@@ -11,7 +11,7 @@ import { readEditions } from '@/lib/loomina/book-edition';
 import type { Edition } from '@/lib/loomina/book-edition';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
-import { readGiver } from '@/lib/loomina/giver';
+import { readFamilyMembers, readGiver } from '@/lib/loomina/giver';
 import type { Giver } from '@/lib/loomina/giver';
 import { isTestMeta } from '@/lib/loomina/test-flag';
 import { readFulfillment, type Fulfillment } from '@/lib/loomina/fulfillment';
@@ -91,6 +91,8 @@ export interface ClientDetail {
         buyerEmail: string | null;
         callMinutes: number;
         giver: Giver | null;
+        /** Les autres proches qui ouvrent l'espace famille. */
+        family: { firstName: string | null; phone: string }[];
         stripeSessionId: string | null;
         paidAt: string | null;
         /** Adresse d'envoi du livre, donnée par l'auteur une fois le livre terminé. */
@@ -163,6 +165,7 @@ export async function getClient(profileId: string): Promise<ClientDetail | null>
             buyerEmail: typeof meta.buyer_email === 'string' ? meta.buyer_email : null,
             callMinutes: normalizeCallMinutes(meta.call_minutes),
             giver: readGiver(meta),
+            family: readFamilyMembers(meta).map((m) => ({ firstName: m.firstName, phone: m.phone })),
             stripeSessionId: project?.stripe_session_id ?? null,
             paidAt: project?.created_at ?? null,
             shipping: readShipping(meta) ? shippingLines(readShipping(meta)!) : null,

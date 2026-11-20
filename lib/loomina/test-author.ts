@@ -187,6 +187,7 @@ function overview(essai: Essai) {
 
 export type TestRoute =
     | 'overview'
+    | 'family'
     | 'stories'
     | 'book'
     | 'book-compose'
@@ -235,6 +236,8 @@ export async function testAuthorReply(request: NextRequest, route: TestRoute): P
             return NextResponse.json({ error: 'Les photos ne s’envoient pas depuis l’espace de test.' }, { status: 501 });
         case 'address':
             return NextResponse.json({ saved: true });
+        case 'family':
+            return NextResponse.json({ error: 'Les proches ne s’ajoutent pas depuis l’espace de test.' }, { status: 501 });
         case 'preferences': {
             const next = applyPrefs({ ...essai, welcomeDone: essai.welcomeDone || body.welcomeDone === true }, body);
             return withEssai(NextResponse.json({ saved: true }), next);

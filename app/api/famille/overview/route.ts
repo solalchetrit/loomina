@@ -2,7 +2,7 @@ import { readFulfillment } from '@/lib/loomina/fulfillment';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
-import { findGiftProjects, giverPendingTopics, readGiver, sharesWithGiver } from '@/lib/loomina/giver';
+import { familyMemberOf, familyWelcomeDone, findGiftProjects, giverPendingTopics, sharesWithGiver } from '@/lib/loomina/giver';
 import { normalizeContext } from '@/lib/loomina/context';
 import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
                         hasSchedule: schedule.active,
                     }),
                     words: shared ? words : null,
-                    // L'accueil de l'espace famille, montré une fois (giver_welcome_done_at).
-                    welcome: !meta.giver_welcome_done_at,
+                    // L'accueil de l'espace famille, montré une fois à chaque proche (familyWelcomeDone).
+                    welcome: !familyWelcomeDone(meta, session.phone),
                     // Préparer le premier appel : seulement avant tout appel, et tant que le narrateur n'a rien réglé.
                     setup: familySetupOpen({ meta, status: project.status, calls: anyCall.count ?? 0 })
                         ? {
@@ -123,7 +123,8 @@ export async function GET(request: NextRequest) {
         );
 
         return NextResponse.json({
-            giverFirstName: readGiver(projects[0].project_metadata)?.firstName ?? null,
+            // Le prénom de la personne connectée : celle qui a offert le livre, ou un autre proche.
+            giverFirstName: familyMemberOf(projects[0].project_metadata, session.phone)?.firstName ?? null,
             books,
         });
     } catch (err) {

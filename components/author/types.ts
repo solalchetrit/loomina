@@ -17,6 +17,8 @@ export interface Prefs {
   giverFirstName: string | null;
   /** L'auteur laisse cette personne lire ses récits dans l'espace famille (non par défaut). */
   shareWithGiver: boolean;
+  /** Qui ouvre l'espace famille : celui qui a offert le livre (giver), puis les proches ajoutés. */
+  family?: { firstName: string | null; phone: string; giver: boolean }[];
 }
 
 export interface ProjectOverview {

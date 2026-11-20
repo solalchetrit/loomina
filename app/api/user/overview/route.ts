@@ -7,7 +7,7 @@ import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
 import { testAuthorReply } from '@/lib/loomina/test-author';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
-import { readGiver, sharesWithGiver } from '@/lib/loomina/giver';
+import { familyAudience, readGiver, sharesWithGiver } from '@/lib/loomina/giver';
 import { readFulfillment } from '@/lib/loomina/fulfillment';
 import { readShipping } from '@/lib/loomina/shipping';
 import { readPhaseState } from '@/lib/loomina/phase-plan';
@@ -38,6 +38,8 @@ export async function GET(request: NextRequest) {
             // Livre offert : qui l'a offert, et si l'auteur lui laisse lire ses récits.
             giverFirstName: readGiver(project?.project_metadata)?.firstName ?? (readGiver(project?.project_metadata) ? '' : null),
             shareWithGiver: sharesWithGiver(project?.project_metadata),
+            // Qui ouvre l'espace famille : celui qui a offert le livre, puis les proches ajoutés.
+            family: familyAudience(project?.project_metadata).map((p) => ({ firstName: p.firstName, phone: p.phone, giver: p.giver })),
         };
 
         if (!project) {
