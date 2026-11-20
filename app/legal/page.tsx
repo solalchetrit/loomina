@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
+import { SELLER } from "@/config/legal";
 
 export const metadata: Metadata = {
   title: "Mentions légales",
@@ -10,28 +11,43 @@ export const metadata: Metadata = {
 
 export default function LegalMentionsPage() {
   return (
-    <LegalPage title="Qui édite ce site" updated="7 octobre 2026">
+    <LegalPage title="Qui édite ce site" updated="20 novembre 2026">
       <h2>1. Éditeur</h2>
       <p>
-        Le site www.loomina.eu est édité par <strong>Loomina</strong>, projet en cours de création porté par Solal Chetrit,
-        personne physique. Les informations d’immatriculation seront publiées ici dès la création de la société.
+        Le site www.loomina.eu est édité par <strong>{SELLER.name}</strong>, {SELLER.form}, qui exploite la marque{" "}
+        <strong>{SELLER.brand}</strong>.
       </p>
-      <p>
-        Directeur de la publication : Solal Chetrit.
-        <br />
-        Contact : contact@loomina.eu.
-      </p>
+      <ul>
+        <li>Adresse : {SELLER.address}</li>
+        <li>SIREN : {SELLER.siren} · SIRET : {SELLER.siret}</li>
+        <li>Immatriculation : {SELLER.registry}</li>
+        <li>{SELLER.vat}</li>
+        <li>E-mail : {SELLER.email}</li>
+        {SELLER.phone && <li>Téléphone : {SELLER.phone}</li>}
+      </ul>
+      <p>Directeur de la publication : {SELLER.director}.</p>
 
       <h2>2. Hébergement</h2>
+      <ul>
+        <li>
+          <strong>Site</strong> : Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis (vercel.com).
+        </li>
+        <li>
+          <strong>Données des clients</strong> : Supabase Inc., 970 Toa Payoh North #07-04, Singapour 318992 (supabase.com),
+          dans un centre de données situé à Paris.
+        </li>
+        <li>
+          <strong>Serveur des appels</strong> : Render Services Inc., 525 Brannan Street, Suite 300, San Francisco, CA 94107,
+          États-Unis (render.com), dans un centre de données situé à Francfort.
+        </li>
+      </ul>
       <p>
-        Le site est hébergé par Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis (vercel.com). Les données
-        des clients sont stockées par Supabase, dans un centre de données situé à Paris (voir la{" "}
-        <Link href="/privacy">politique de confidentialité</Link>).
+        Le détail des prestataires est dans la <Link href="/privacy">politique de confidentialité</Link>.
       </p>
 
       <h2>3. Propriété intellectuelle</h2>
       <p>
-        Les textes, images et éléments graphiques du site sont la propriété de Loomina, sauf mention contraire. Toute
+        Les textes, images et éléments graphiques du site sont la propriété de l’éditeur, sauf mention contraire. Toute
         reproduction sans autorisation écrite est interdite (articles L.335-2 et suivants du Code de la propriété
         intellectuelle). Les récits des clients leur appartiennent.
       </p>
@@ -39,7 +55,7 @@ export default function LegalMentionsPage() {
       <h2>4. Données personnelles</h2>
       <p>
         Les données collectées sur le site sont traitées conformément au RGPD. Vous disposez d’un droit d’accès, de
-        rectification, de suppression, de limitation, d’opposition et de portabilité, à exercer par e-mail à contact@loomina.eu.
+        rectification, de suppression, de limitation, d’opposition et de portabilité, à exercer par e-mail à {SELLER.email}.
         Le détail est dans la <Link href="/privacy">politique de confidentialité</Link>.
       </p>
 
