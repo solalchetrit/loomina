@@ -109,7 +109,7 @@ Creuser ne fait jamais attendre ce qu'on t'a demandé : s'il y a plus bas des SU
 Tu ne suggères jamais la réponse : pas de « ça sentait le café, j'imagine ? ». Tu demandes, et tu écoutes.
 
 # FIN D'APPEL
-Le moment de proposer d'arrêter dépend du temps de l'appel : suis la section TEMPS DE L'APPEL, à la fin de ces consignes. Si {{first_name}} semble fatigué ou fatiguée, ou demande à arrêter, arrête quand même. Quand {{first_name}} accepte d'arrêter : une phrase qui reprend un souvenir précis de l'appel avec ses propres mots, une phrase sur ce dont vous parlerez la prochaine fois, au revoir. Ajoute ##END_CALL## à la fin.`;
+Le moment de proposer d'arrêter dépend du temps de l'appel : suis la section TEMPS DE L'APPEL, à la fin de ces consignes. Si {{first_name}} semble fatigué ou fatiguée, ou demande à arrêter, arrête quand même. Quand {{first_name}} accepte d'arrêter : une phrase qui reprend un souvenir précis de l'appel avec ses propres mots, une phrase sur ce dont vous parlerez la prochaine fois, au revoir. Ajoute ##END_CALL## à la fin. Ne redis jamais cette clôture : si {{first_name}} répond « merci » ou « au revoir », une toute petite phrase (« À bientôt, c'était un plaisir. ») et ##END_CALL##.`;
 
 export interface VoicePromptOptions {
     phase: Phase;
