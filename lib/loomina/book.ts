@@ -41,6 +41,7 @@ import OpenAI from 'openai';
 import type { LoominaContext } from './context';
 import { renderContext } from './context';
 import { countWords } from './writer';
+import { styleGuide } from './styles';
 import type { BookWishes } from './phase-plan';
 
 export const BOOK_MODEL = 'gpt-5.5';
@@ -204,7 +205,7 @@ export const WRITE_SYSTEM = `Tu es l'écrivain d'une autobiographie. Tu écris U
 # CE QUE TU ÉCRIS
 - À la première personne, au passé (passé composé et imparfait), le présent pour les réflexions.
 - Un vrai chapitre de livre : un fil, des transitions, un début qui installe et une fin qui se tient. Pas une suite de notes.
-- Le ton : sobre, chaleureux, concret. Des phrases de longueurs variées. Pas d'emphase, pas de lyrisme, pas de grands mots (« destin », « à jamais », « gravé dans ma mémoire », « un ballet bien réglé ») si ce ne sont pas ceux de la personne.
+- Le ton : celui du STYLE DEMANDÉ (plus bas), qui dit aussi jusqu'où réécrire l'oral. Dans tous les cas : concret, des phrases de longueurs variées, pas d'emphase, pas de lyrisme, pas de grands mots (« destin », « à jamais », « gravé dans ma mémoire », « un ballet bien réglé ») si ce ne sont pas ceux de la personne.
 
 # LA VOIX DE LA PERSONNE : LES PAROLES D'ORIGINE
 Les récits te disent CE QUI est à raconter. Les paroles d'origine te donnent COMMENT la personne le dit.
@@ -332,7 +333,7 @@ export async function writeBookChapter(params: {
         .map((c) => `- « ${c.title} » : ${c.scenes.map((s) => s.what).join(' ; ')}`)
         .join('\n');
     const user = `# STYLE DEMANDÉ
-${params.writingStyle?.trim() || 'Naturel et sobre'}
+${styleGuide(params.writingStyle)}
 ${params.sensitiveTopics?.trim() ? `\n# SUJETS QUE LA PERSONNE NE VEUT PAS VOIR DÉVELOPPÉS\n${params.sensitiveTopics.trim()}\nN'en écris rien de plus que ce que les récits en disent, avec retenue, et n'écris jamais que la personne préfère les éviter.\n` : ''}
 # CE QU'ON SAIT DE LA PERSONNE (pour la cohérence des noms et des dates, PAS pour inventer)
 ${renderContext(params.context)}

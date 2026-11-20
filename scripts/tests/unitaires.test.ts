@@ -631,3 +631,11 @@ test('laisser finir : attendre plus longtemps une phrase pas finie', async () =>
     assert.equal(holdFor('On regardait des vidéos.'), 1900);
     assert.equal(holdFor('Il y avait mon oncle, ma mère, ma grand-mère, Sam et moi.'), 1200);
 });
+
+test('ton d’écriture : « Naturel » devient le défaut, chaque ton est expliqué', async () => {
+    const { normalizeStyle, styleGuide, WRITING_STYLES } = await import('../../lib/loomina/styles');
+    assert.equal(normalizeStyle('Naturel'), 'Naturel et sobre');
+    assert.equal(normalizeStyle(null), 'Naturel et sobre');
+    for (const s of WRITING_STYLES) assert.ok(styleGuide(s).length > 80, s);
+    assert.match(styleGuide('Un ton libre'), /Un ton libre/);
+});

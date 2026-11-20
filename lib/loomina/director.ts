@@ -28,6 +28,7 @@ import { PHASE_AXES, AXIS_RULE, stepPhase, mergeTopics, mergeTold, mergeDeepen, 
 import type { PhaseState, PhaseAnswer, Topic, ToldScene, DeepenItem, BookWishes } from './phase-plan';
 import type { LoominaContext } from './context';
 import { normalizeContext, renderContext } from './context';
+import { WRITING_STYLES } from './styles';
 
 let client: OpenAI | null = null;
 function openai(): OpenAI {
@@ -318,6 +319,7 @@ Réponds UNIQUEMENT avec cet objet JSON, sans texte autour :
 }
 
 Pour \`profile_updates\` : ne renseigne un champ que si l'interlocuteur l'a EXPRIMÉ pendant cet appel. Sinon laisse \`null\` ou un tableau vide.
+- \`writing_style\` reste \`null\`, sauf si l'interlocuteur a dit lui-même, pendant cet appel, comment il veut que son livre soit écrit (« écrivez comme je parle », « je voudrais quelque chose de plus littéraire »). Dans ce cas, choisis EXACTEMENT l'un de ces quatre : "Naturel et sobre", "Chaleureux et vivant", "Littéraire et soigné", "Simple, comme je parle". Ne déduis jamais un ton de sa façon de parler : c'est l'auteur qui le choisit dans son espace.
 - \`politeness_preference\` vaut EXACTEMENT "tu" ou "vous" (rien d'autre) : "tu" s'il a demandé le tutoiement, "vous" s'il a demandé le vouvoiement.
 - \`sensitive_topics\` ne contient que les sujets que l'interlocuteur a DEMANDÉ de laisser de côté dans cet appel (« je préfère ne pas en parler », « je ne veux pas que ce soit dans le livre »), en quelques mots chacun (ex. "son père", "le divorce de 1998"). Un souvenir douloureux qu'il raconte de lui-même, ou dont il dit qu'on peut lui parler, n'en fait PAS partie : un deuil raconté est souvent une des pages les plus importantes du livre. N'écris nulle part ailleurs dans le contexte qu'un sujet est « à laisser de côté ».`;
 }
@@ -533,7 +535,7 @@ function profileUpdates(v: unknown): DirectorResult['profile_updates'] {
               .slice(0, 20)
         : [];
     return {
-        writing_style: text(raw.writing_style, 200) ?? null,
+        writing_style: (WRITING_STYLES as readonly string[]).includes(String(raw.writing_style ?? '').trim()) ? String(raw.writing_style).trim() : null,
         politeness_preference: politeness(raw.politeness_preference),
         sensitive_topics: topics,
     };

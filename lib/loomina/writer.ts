@@ -38,6 +38,7 @@ import { PHASE_LABELS } from './phases';
 import type { LoominaContext } from './context';
 import { renderContext } from './context';
 import type { ChapterSummary } from './db';
+import { styleGuide } from './styles';
 
 let client: OpenAI | null = null;
 function openai(): OpenAI {
@@ -109,8 +110,24 @@ Cela vaut aussi pour les décors et les portraits : une odeur, une pièce, un tr
 - Transcript pauvre (un ou deux faits nus) : 60 à 150 mots. Un fait = une ou deux phrases. Pas de clôture qui annonce la suite, pas de « cette période a été marquée par… ».
 Ne délaye jamais pour atteindre une longueur. Il n'y a AUCUNE longueur minimale : trois phrases vraies valent mieux que trois paragraphes brodés.
 
+# CONSTRUIRE LE RÉCIT
+Un appel saute souvent d'un sujet à l'autre. Le récit, lui, ne suit pas l'ordre de l'appel : c'est un texte qu'on lit.
+- Avant d'écrire, regroupe la matière en deux, trois ou quatre parties qui ont chacune un fil : un lieu, une époque, une personne, une relation. Ce qui se rapporte au même fil va ensemble, même si c'est dit à des moments différents de l'appel.
+- Ordonne les parties dans le temps de la vie (l'enfance avant le lycée), pas dans l'ordre où elles ont été dites.
+- Dans chaque partie, la scène la plus racontée vient au centre ; les petits faits isolés se rangent autour d'elle en une phrase, ou restent de côté s'ils cassent le fil.
+- Quand il y a plusieurs parties, chacune commence par un intertitre « ## » court et concret (« Les soirées du salon », « Tel Aviv »).
+- Des transitions simples entre les parties, sans formule (« Plus tôt encore, à l'école primaire, … »).
+
+# DE L'ORAL À L'ÉCRIT
+Le transcript est de l'oral au téléphone. Le récit est de l'écrit.
+- Retire les hésitations, les reprises, les « en fait », « tu vois », « voilà », « bref », et remets les phrases dans l'ordre.
+- Ne recopie pas les phrases telles qu'elles ont été dites : réécris-les en français écrit, selon le STYLE DEMANDÉ, en gardant le sens exact et les mots qui portent la personne (un surnom, une expression de famille, une image à elle).
+- Le parler relâché (« comme un ouf », « très chill », « on a kiffé ») suit le STYLE DEMANDÉ : transposé en français écrit, sauf pour « Simple, comme je parle ».
+- Les hésitations sur la mémoire (« je ne sais plus », « pas de souvenir particulier ») ne s'écrivent pas : écris ce qui est su, sans signaler ce qui manque.
+- Réécrire n'est jamais inventer : la règle ZÉRO INVENTION passe avant le style.
+
 # STYLE
-Respecte le style demandé par le client. À défaut : sobre, chaleureux, sans emphase ni lyrisme forcé.
+Suis le STYLE DEMANDÉ ci-dessous : il dit le ton et le niveau de réécriture. Dans tous les cas : sans emphase ni lyrisme forcé.
 Structure le texte en markdown avec des paragraphes courts. Pas de titre de niveau 1 — le titre est renvoyé séparément.
 
 # TRANSCRIPT INEXPLOITABLE
@@ -195,8 +212,8 @@ Le narrateur n'a livré qu'un ou deux faits nus. Écris 60 à 150 mots maximum :
 
 `
             : '';
-    const user = `${thinNote}# STYLE DEMANDÉ PAR LE CLIENT
-${params.writingStyle?.trim() || 'Naturel et sobre'}
+    const user = `${thinNote}# STYLE DEMANDÉ
+${styleGuide(params.writingStyle)}
 
 # PHASE
 Phase ${params.phase} — ${PHASE_LABELS[params.phase]}
