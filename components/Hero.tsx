@@ -34,7 +34,7 @@ export default function Hero() {
           <div className="mt-9">
           <div className="rise flex flex-col gap-3 sm:flex-row" style={{ "--i": 3 } as CSSProperties}>
             <Button href="/order" size="lg">
-              Commander · {OFFER.price} €
+              Commander
             </Button>
             <Button href={`tel:${SITE.phone}`} variant="secondary" size="lg">
               Essayer gratuitement
