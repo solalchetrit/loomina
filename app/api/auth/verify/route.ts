@@ -4,6 +4,7 @@ import { findProfileByPhone } from "@/lib/loomina/db";
 import { findGiftProjects } from "@/lib/loomina/giver";
 import { signSession, SESSION_COOKIE, SESSION_MAX_AGE_S } from "@/lib/loomina/session";
 import { isTestAuthorPhone, resetEssai, TEST_AUTHOR_PHONE } from "@/lib/loomina/test-author";
+import { isTestFamilyPhone, resetFamilyVisit, TEST_FAMILY_PHONE } from "@/lib/loomina/test-family";
 
 // Twilio credentials from environment variables
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
@@ -49,6 +50,20 @@ export async function POST(request: NextRequest) {
                 path: "/",
             });
             return resetEssai(open);
+        }
+
+        // Espace famille de test (07 12 34 56 78) : ouvert sans code SMS, comme une personne
+        // qui vient d'offrir un livre (lib/loomina/test-family.ts). Aucun autre numéro n'est concerné.
+        if (isTestFamilyPhone(formattedPhone)) {
+            const open = NextResponse.json({ status: "approved", valid: true, open: true });
+            open.cookies.set(SESSION_COOKIE, await signSession(TEST_FAMILY_PHONE), {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: SESSION_MAX_AGE_S,
+                path: "/",
+            });
+            return resetFamilyVisit(open);
         }
         const authHeader = "Basic " + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString("base64");
 

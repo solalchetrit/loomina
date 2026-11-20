@@ -10,6 +10,7 @@ import { findProfileByPhone, findActiveProject } from './db';
 import type { Profile, Project } from './db';
 import { readSession } from './session';
 import { isTestAuthorPhone } from './test-author';
+import { isTestFamilyPhone } from './test-family';
 
 export type Author = { profile: Profile; project: Project | null };
 
@@ -19,6 +20,8 @@ export async function currentAuthor(request: NextRequest): Promise<Author | Next
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     // Garde-fou : la session de test (06 12 34 56 78) ne lit ni n'écrit jamais un vrai livre,
     // même si un profil portait un jour ce numéro.
+    // L'espace famille de test (07 12 34 56 78) n'est pas un auteur : 404, et l'espace famille s'ouvre.
+    if (isTestFamilyPhone(session.phone)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     if (isTestAuthorPhone(session.phone)) return NextResponse.json({ error: 'Espace de test : rien n’est enregistré.' }, { status: 403 });
 
     const profile = await findProfileByPhone(session.phone);

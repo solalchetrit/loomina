@@ -2,6 +2,7 @@ import { readFulfillment } from '@/lib/loomina/fulfillment';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
+import { testFamilyReply } from '@/lib/loomina/test-family';
 import { familyMemberOf, familyWelcomeDone, findGiftProjects, giverPendingTopics, sharesWithGiver } from '@/lib/loomina/giver';
 import { normalizeContext } from '@/lib/loomina/context';
 import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
@@ -19,6 +20,8 @@ export const dynamic = 'force-dynamic';
  * seulement si le narrateur l'a permis dans ses réglages.
  */
 export async function GET(request: NextRequest) {
+    const essai = await testFamilyReply(request, 'overview');
+    if (essai) return essai;
     const session = await readSession(request);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
