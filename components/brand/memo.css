@@ -33,6 +33,20 @@
   transform-origin: 50% 92%;
 }
 
+/* Plus il est grand, moins il saute haut : il reste dans sa scène. */
+.memo--k2 {
+  --hop: 0.85;
+}
+.memo--k3 {
+  --hop: 0.7;
+}
+.memo--k4 {
+  --hop: 0.58;
+}
+.memo--k5 {
+  --hop: 0.46;
+}
+
 .memo-pose {
   position: absolute;
   left: 50%;
@@ -206,10 +220,10 @@
     transform: translateY(-2%) scale(0.95, 1.07) rotate(0);
   }
   40% {
-    transform: translateY(-21%) scale(1, 1) rotate(-5deg);
+    transform: translateY(calc(-21% * var(--hop, 1))) scale(1, 1) rotate(-5deg);
   }
   52% {
-    transform: translateY(-23%) scale(1, 1) rotate(4deg);
+    transform: translateY(calc(-23% * var(--hop, 1))) scale(1, 1) rotate(4deg);
   }
   72% {
     transform: translateY(-1%) scale(0.97, 1.04) rotate(0);
@@ -790,7 +804,7 @@
     transform: translateY(0) scale(1.08, 0.9) rotate(0);
   }
   12% {
-    transform: translateY(-6%) scale(0.96, 1.05) rotate(0);
+    transform: translateY(calc(-6% * var(--hop, 1))) scale(0.96, 1.05) rotate(0);
   }
   20% {
     transform: translateY(0) scale(1.05, 0.95) rotate(0);

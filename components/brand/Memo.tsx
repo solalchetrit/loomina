@@ -9,7 +9,7 @@ import { MEMO_SPRITES } from "./memo-sprites";
  * Il grandit avec le livre : cinq âges, huit poses par âge (public/memo/<âge>-<pose>.webp).
  *   a : sa pose de base      b : la même, les yeux fermés (clignement, rire)
  *   c : le saut de joie      d : son activité (il dort, marche, écrit, relit, lit son livre)
- *   e : merci (la trompe sur le cœur)        f : un souvenir de plus (une lumière au bout de la trompe)
+ *   e : merci (la trompe sur le cœur)        f : un souvenir de plus (la trompe levée ; la lumière, c'est .memo-orb)
  *   g : vous revoilà (il salue)              h : je vous écoute (la tête penchée, une oreille tendue)
  * Les animations sont dans memo.css ; ce composant ne fait que poser les images.
  */
@@ -26,8 +26,8 @@ export type MemoAge = 1 | 2 | 3 | 4 | 5;
  */
 export type MemoClip = "idle" | "joy" | "laugh" | "act" | "rest" | "pop" | "charge" | "thanks" | "memory" | "hello" | "listen";
 
-/** Hauteur de Mémo dans la scène, par âge (mesurée sur la planche des cinq âges). */
-const TALL: Record<MemoAge, number> = { 1: 0.5, 2: 0.62, 3: 0.7, 4: 0.79, 5: 0.9 };
+/** Hauteur de Mémo dans la scène, par âge (proportions de la planche des cinq âges ; assez de place au-dessus pour ses sauts). */
+const TALL: Record<MemoAge, number> = { 1: 0.46, 2: 0.59, 3: 0.66, 4: 0.73, 5: 0.84 };
 
 /** Huit étoiles en couronne : la gerbe du saut et de la croissance. */
 const STARS = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
@@ -61,9 +61,9 @@ export default function Memo({
   // Tous les dessins d'un âge viennent de la même planche : une seule échelle, réglée sur la pose de base.
   const k = TALL[age] / sp.a.h;
   const pct = (n: number) => `${(n * k * 100).toFixed(2)}%`;
-  // La lumière du souvenir : posée sur celle que Mémo tient dans la pose f.
+  // La lumière du souvenir : dessinée ici (pas dans le dessin, pour rester nette sur fond sombre), au bout de la trompe de la pose f.
   const f = sp.f;
-  const orbLeft = 50 - (f.w * k * 100) / 2 + (f.orb?.[0] ?? 0.8) * f.w * k * 100;
+  const orbLeft = 50 + (0.5 - f.x) * f.w * k * 100 - (f.w * k * 100) / 2 + (f.orb?.[0] ?? 0.8) * f.w * k * 100;
   const orbBottom = 8 + (1 - (f.orb?.[1] ?? 0.2)) * f.h * k * 100;
   return (
     <span
@@ -82,7 +82,15 @@ export default function Memo({
       >
         {/* eslint-disable @next/next/no-img-element -- quarante petits dessins détourés, posés au pixel : pas de recadrage ni de redimensionnement à la volée */}
         {MEMO_POSES.map((p) => (
-          <img key={p} className={`memo-pose memo-${p}`} src={memoSrc(age, p)} alt="" style={{ width: pct(sp[p].w) }} draggable={false} />
+          <img
+            key={p}
+            className={`memo-pose memo-${p}`}
+            src={memoSrc(age, p)}
+            alt=""
+            // Chaque pose est calée sur ses pattes : il ne glisse pas de côté en changeant de pose.
+            style={{ width: pct(sp[p].w), left: `${(50 + (0.5 - sp[p].x) * sp[p].w * k * 100).toFixed(2)}%` }}
+            draggable={false}
+          />
         ))}
         {/* eslint-enable @next/next/no-img-element */}
         <span className="memo-orb" style={{ left: `${orbLeft.toFixed(2)}%`, bottom: `${orbBottom.toFixed(2)}%` }} />
