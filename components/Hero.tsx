@@ -20,7 +20,7 @@ const REASSURANCE: { title: string; detail: string; href?: string }[] = [
 /** Haut de page, en deux colonnes : à gauche le titre, la promesse et les deux actions ; à droite la scène « de la voix au livre », à leur hauteur. */
 export default function Hero() {
   return (
-    <section className="page-top flex w-full flex-col pb-8 lg:pb-4 lg:!pt-[7.25rem]">
+    <section className="page-top flex w-full flex-col pb-8 max-lg:!pt-[5.75rem] lg:pb-4 lg:!pt-[7.25rem]">
       <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center lg:items-stretch px-5 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14">
         {/* Sur mobile, cette colonne s’efface (contents) pour glisser la scène entre le texte et les boutons (Solal, 23/11/2026). */}
         <div className="flex min-w-0 flex-col max-lg:contents lg:justify-between lg:py-1">
@@ -28,7 +28,7 @@ export default function Hero() {
           <h1 className="rise t-hero text-balance" style={{ "--i": 0 } as CSSProperties}>
             Votre livre, sans avoir à écrire
           </h1>
-          <p className="rise mt-7 max-w-[35rem] text-[clamp(1.15rem,1.6vw,1.4rem)] font-medium leading-[1.45] tracking-[-0.015em] text-[var(--ink)]" style={{ "--i": 1 } as CSSProperties}>
+          <p className="rise mt-5 lg:mt-7 max-w-[35rem] text-[clamp(1.15rem,1.6vw,1.4rem)] font-medium leading-[1.45] tracking-[-0.015em] text-[var(--ink)]" style={{ "--i": 1 } as CSSProperties}>
             Vous racontez au téléphone, Loomina écrit le récit de chaque appel et en compose votre livre. Vous le relisez dans votre espace auteur, et le livre arrive chez vous.
           </p>
           </div>
@@ -73,7 +73,7 @@ export default function Hero() {
           </ul>
         </div>
 
-        <div className="rise mx-auto mt-9 w-full min-w-0 max-w-[460px] self-center max-lg:order-2 lg:mt-0 lg:mr-0 lg:max-w-[clamp(340px,calc((100svh-17.5rem)*0.8),460px)]" style={{ "--i": 2 } as CSSProperties}>
+        <div className="rise mx-auto mt-6 w-full min-w-0 max-w-[460px] self-center max-lg:order-2 lg:mt-0 lg:mr-0 lg:max-w-[clamp(340px,calc((100svh-17.5rem)*0.8),460px)]" style={{ "--i": 2 } as CSSProperties}>
           <VoiceToBook />
         </div>
       </div>
