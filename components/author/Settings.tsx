@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import type { Prefs } from "./types";
 import { CALL_MINUTES_OPTIONS } from "@/lib/loomina/call-length";
 import { WRITING_STYLES, normalizeStyle } from "@/lib/loomina/styles";
 
-const DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-const DAY_LABELS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
-const HOURS = Array.from({ length: 12 }, (_, i) => `${String(9 + i).padStart(2, "0")}:00`).flatMap((h) => [h, h.replace(":00", ":30")]).filter((h) => h <= "20:30");
+export const DAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+export const DAY_LABELS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
+export const CALL_HOURS = Array.from({ length: 12 }, (_, i) => `${String(9 + i).padStart(2, "0")}:00`).flatMap((h) => [h, h.replace(":00", ":30")]).filter((h) => h <= "20:30");
 
 const STYLES: readonly string[] = WRITING_STYLES;
 
@@ -28,6 +28,34 @@ export default function Settings({
   const [form, setForm] = useState(prefs);
   const [topic, setTopic] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
+  // Le rendez-vous s'enregistre dès qu'on touche un jour ou l'heure, sans attendre
+  // « Enregistrer » en bas de page (23/11/2026 : un rendez-vous choisi mais jamais
+  // enregistré, l'appel n'est pas parti). Seul le dernier choix compte.
+  const [scheduleStatus, setScheduleStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const scheduleSeq = useRef(0);
+  const saveSchedule = async (callSchedule: Prefs["callSchedule"]) => {
+    const seq = ++scheduleSeq.current;
+    setScheduleStatus("saving");
+    try {
+      const res = await fetch("/api/user/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callSchedule }),
+      });
+      if (res.status === 401) return onUnauthorized();
+      if (!res.ok) throw new Error();
+      if (seq !== scheduleSeq.current) return;
+      onSaved({ ...prefs, callSchedule });
+      setScheduleStatus("saved");
+    } catch {
+      if (seq === scheduleSeq.current) setScheduleStatus("error");
+    }
+  };
+  const updateSchedule = (callSchedule: Prefs["callSchedule"]) => {
+    setForm((f) => ({ ...f, callSchedule }));
+    void saveSchedule(callSchedule);
+  };
 
   const update = (patch: Partial<Prefs>) => {
     setForm((f) => ({ ...f, ...patch }));
@@ -194,7 +222,7 @@ export default function Settings({
                     aria-label={DAY_LABELS[i]}
                     onClick={() => {
                       const days = on ? form.callSchedule.days.filter((x) => x !== day) : [...form.callSchedule.days, day].sort();
-                      update({ callSchedule: { ...form.callSchedule, days, active: days.length > 0 } });
+                      updateSchedule({ ...form.callSchedule, days, active: days.length > 0 });
                     }}
                     className={`press min-h-11 min-w-0 flex-1 rounded-full px-0 text-[13.5px] font-bold sm:text-[14px] ${
                       on ? "bg-[var(--ink)] text-white" : "bg-[var(--canvas)] hover:bg-[var(--surface-2)]"
@@ -213,9 +241,9 @@ export default function Settings({
               id="heure-appel"
               className="field max-w-[8.5rem]"
               value={form.callSchedule.time}
-              onChange={(e) => update({ callSchedule: { ...form.callSchedule, time: e.target.value } })}
+              onChange={(e) => updateSchedule({ ...form.callSchedule, time: e.target.value })}
             >
-              {HOURS.map((h) => (
+              {CALL_HOURS.map((h) => (
                 <option key={h} value={h}>
                   {`${Number(h.slice(0, 2))} h${h.endsWith("30") ? " 30" : ""}`}
                 </option>
@@ -223,6 +251,10 @@ export default function Settings({
             </select>
             </div>
             {form.callSchedule.days.length === 0 && <p className="t-small mt-1.5">Sans jour choisi, c’est vous qui appelez, quand vous voulez.</p>}
+            <p role="status" className="mt-1.5 text-[14px] font-semibold">
+              {scheduleStatus === "saved" && <span className="text-[var(--success)]">{form.callSchedule.days.length ? "Rendez-vous enregistré." : "Rendez-vous retiré."}</span>}
+              {scheduleStatus === "error" && <span className="text-[var(--danger)]">Le rendez-vous n’a pas été enregistré. Réessayez.</span>}
+            </p>
           </fieldset>
           <fieldset className="min-w-0">
             <legend className="field-label">Durée d’un appel</legend>
