@@ -69,14 +69,17 @@ export default function Onboarding({
     try {
       // Un sujet tapé mais pas encore ajouté compte aussi.
       const all = draft.trim() && !topics.includes(draft.trim()) ? [...topics, draft.trim()] : topics;
+      // « Plus tard » garde quand même un rendez-vous choisi (jours cochés) : c'est un geste
+      // explicite, contrairement au tu/vous ou à la durée, qui ont une valeur par défaut.
+      const schedule = days.length ? { callSchedule: { active: true, days, time } } : {};
       const body = skip
-        ? { welcomeDone: true }
+        ? { welcomeDone: true, ...schedule }
         : {
             welcomeDone: true,
             ...(ask.politeness ? { politeness } : {}),
             ...(ask.topics ? { sensitiveTopics: all } : {}),
             callMinutes: minutes,
-            ...(days.length ? { callSchedule: { active: true, days, time } } : {}),
+            ...schedule,
           };
       const res = await fetch("/api/user/preferences", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (res.status === 401) return onUnauthorized();
