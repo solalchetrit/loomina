@@ -11,8 +11,8 @@
   box-shadow: 0 40px 80px -40px rgba(20, 24, 34, 0.34);
 }
 
-/* Sur mobile, la scène est un peu moins haute pour que les trois étapes restent visibles sous le texte (Solal, 23/11/2026). */
-@media (max-width: 1023.98px) {
+/* Sur téléphone, la scène est un peu moins haute pour que les trois étapes restent visibles sous le texte (Solal, 23/11/2026). */
+@media (max-width: 639.98px) {
   .stage { aspect-ratio: 1 / 1; }
 }
 

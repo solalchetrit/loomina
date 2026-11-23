@@ -73,7 +73,7 @@ export default function Hero() {
           </ul>
         </div>
 
-        <div className="rise mx-auto mt-6 w-full min-w-0 max-w-[460px] self-center max-lg:order-2 lg:mt-0 lg:mr-0 lg:max-w-[clamp(340px,calc((100svh-17.5rem)*0.8),460px)]" style={{ "--i": 2 } as CSSProperties}>
+        <div className="rise mx-auto mt-6 w-full min-w-0 max-w-[460px] self-center max-lg:order-2 lg:mt-0 lg:mr-0 lg:max-w-[clamp(360px,calc((100svh-12.5rem)*0.8),500px)]" style={{ "--i": 2 } as CSSProperties}>
           <VoiceToBook />
         </div>
       </div>
