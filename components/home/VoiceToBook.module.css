@@ -14,6 +14,27 @@
 /* Sur téléphone, la scène est un peu moins haute pour que les trois étapes restent visibles sous le texte (Solal, 23/11/2026). */
 @media (max-width: 639.98px) {
   .stage { aspect-ratio: 1 / 1; }
+  /* Les photos gardent leur cadrage 4/5 d'origine, centrées : le fond du studio prolonge les côtés (Solal, 23/11/2026). */
+  .open,
+  .shot {
+    left: 10% !important; /* next/image pose left et width en style en ligne */
+    width: 80% !important;
+  }
+  .open { container-type: size; }
+  .open .shot { left: 0 !important; width: 100% !important; }
+  /* Bords des photos fondus dans le fond, sans ligne visible */
+  .open,
+  .closed,
+  .standing {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  }
+  .open .shot { -webkit-mask-image: none; mask-image: none; }
+  /* Le livre ouvert, agrandi, ne doit pas dépasser derrière le livre refermé */
+  .stage[data-act="3"] .open {
+    opacity: 0;
+    transition: opacity 0s 1.7s;
+  }
 }
 
 /* L'appel : un voile sombre posé sur les photos du livre */
