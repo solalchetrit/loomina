@@ -21,9 +21,10 @@ const REASSURANCE: { title: string; detail: string; href?: string }[] = [
 export default function Hero() {
   return (
     <section className="page-top flex w-full flex-col pb-8 lg:pb-4 lg:!pt-[7.25rem]">
-      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center gap-10 lg:items-stretch px-5 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14">
-        <div className="flex min-w-0 flex-col lg:justify-between lg:py-1">
-          <div>
+      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center lg:items-stretch px-5 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14">
+        {/* Sur mobile, cette colonne s’efface (contents) pour glisser la scène entre le texte et les boutons (Solal, 23/11/2026). */}
+        <div className="flex min-w-0 flex-col max-lg:contents lg:justify-between lg:py-1">
+          <div className="max-lg:order-1">
           <h1 className="rise t-hero text-balance" style={{ "--i": 0 } as CSSProperties}>
             Votre livre, sans avoir à écrire
           </h1>
@@ -31,7 +32,7 @@ export default function Hero() {
             Vous racontez au téléphone, Loomina écrit le récit de chaque appel et en compose votre livre. Vous le relisez dans votre espace auteur, et le livre arrive chez vous.
           </p>
           </div>
-          <div className="mt-9">
+          <div className="mt-9 max-lg:order-3">
           <div className="rise flex flex-col gap-3 sm:flex-row" style={{ "--i": 3 } as CSSProperties}>
             <Button href="/order" size="lg">
               Commander
@@ -49,7 +50,7 @@ export default function Hero() {
           </p>
           </div>
           <ul
-            className="rise mt-9 grid max-w-[41rem] gap-x-5 gap-y-4 border-t border-[var(--line)] pt-7 sm:grid-cols-[auto_auto_auto] sm:justify-between"
+            className="rise mt-9 grid max-w-[41rem] max-lg:order-4 gap-x-5 gap-y-4 border-t border-[var(--line)] pt-7 sm:grid-cols-[auto_auto_auto] sm:justify-between"
             style={{ "--i": 4 } as CSSProperties}
           >
             {REASSURANCE.map((r) => (
@@ -72,7 +73,7 @@ export default function Hero() {
           </ul>
         </div>
 
-        <div className="rise mx-auto w-full min-w-0 max-w-[460px] self-center lg:mr-0 lg:max-w-[clamp(340px,calc((100svh-17.5rem)*0.8),460px)]" style={{ "--i": 2 } as CSSProperties}>
+        <div className="rise mx-auto mt-9 w-full min-w-0 max-w-[460px] self-center max-lg:order-2 lg:mt-0 lg:mr-0 lg:max-w-[clamp(340px,calc((100svh-17.5rem)*0.8),460px)]" style={{ "--i": 2 } as CSSProperties}>
           <VoiceToBook />
         </div>
       </div>
