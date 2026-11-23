@@ -8,11 +8,14 @@ import Button from "@/components/ui/Button";
 import { CALL_MINUTES_OPTIONS } from "@/lib/loomina/call-length";
 import type { Overview } from "./types";
 import s from "./Onboarding.module.css";
+import { DAYS, DAY_LABELS, CALL_HOURS } from "./Settings";
 
 /**
  * L'accueil du premier passage dans l'espace auteur, en trois écrans, une idée par écran :
  * 1. comment le livre s'écrit, 2. Mémo, 3. les préférences d'appel (demande de Solal du
- * 17/11/2026, reprise le 19/11/2026 : « simple mais bien fait, pur »).
+ * 17/11/2026, reprise le 19/11/2026 : « simple mais bien fait, pur »). Depuis le 23/11/2026,
+ * l'écran 3 propose aussi les jours et l'heure où Loomina appelle : sans cela, le rendez-vous
+ * n'existait que dans Réglages, et un rendez-vous convenu à voix haute n'était jamais enregistré.
  *
  * On ne pose que les questions dont on n'a pas déjà la réponse (voir `welcome` dans
  * /api/user/overview). « Plus tard » ferme pour de bon : tout reste dans Réglages.
@@ -39,6 +42,8 @@ export default function Onboarding({
   const [topics, setTopics] = useState<string[]>(prefs.sensitiveTopics);
   const [draft, setDraft] = useState("");
   const [minutes, setMinutes] = useState(prefs.callMinutes);
+  const [days, setDays] = useState<number[]>(prefs.callSchedule?.days ?? []);
+  const [time, setTime] = useState(prefs.callSchedule?.time ?? "15:00");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
 
@@ -66,7 +71,13 @@ export default function Onboarding({
       const all = draft.trim() && !topics.includes(draft.trim()) ? [...topics, draft.trim()] : topics;
       const body = skip
         ? { welcomeDone: true }
-        : { welcomeDone: true, ...(ask.politeness ? { politeness } : {}), ...(ask.topics ? { sensitiveTopics: all } : {}), callMinutes: minutes };
+        : {
+            welcomeDone: true,
+            ...(ask.politeness ? { politeness } : {}),
+            ...(ask.topics ? { sensitiveTopics: all } : {}),
+            callMinutes: minutes,
+            ...(days.length ? { callSchedule: { active: true, days, time } } : {}),
+          };
       const res = await fetch("/api/user/preferences", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (res.status === 401) return onUnauthorized();
       if (!res.ok) throw new Error();
@@ -132,6 +143,45 @@ export default function Onboarding({
                   </div>
                 </fieldset>
               )}
+              <fieldset>
+                <legend className="field-label">
+                  Loomina vous appelle le <span className="font-normal text-[var(--ink-3)]">(facultatif)</span>
+                </legend>
+                <div className="flex gap-1.5">
+                  {DAYS.map((d, i) => {
+                    const day = i + 1;
+                    const on = days.includes(day);
+                    return (
+                      <button
+                        key={d}
+                        type="button"
+                        aria-pressed={on}
+                        aria-label={DAY_LABELS[i]}
+                        onClick={() => setDays(on ? days.filter((x) => x !== day) : [...days, day].sort())}
+                        className={`${choice(on)} !min-h-11 !px-0 text-[13.5px] sm:text-[14px]`}
+                      >
+                        {d}
+                      </button>
+                    );
+                  })}
+                </div>
+                {days.length > 0 ? (
+                  <div className="mt-3 flex items-center gap-3">
+                    <label htmlFor="accueil-heure" className="field-label !mb-0">
+                      À quelle heure
+                    </label>
+                    <select id="accueil-heure" className="field max-w-[8.5rem]" value={time} onChange={(e) => setTime(e.target.value)}>
+                      {CALL_HOURS.map((h) => (
+                        <option key={h} value={h}>
+                          {`${Number(h.slice(0, 2))} h${h.endsWith("30") ? " 30" : ""}`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <p className="t-small mt-1.5">Sans jour choisi, c’est vous qui appelez, quand vous voulez.</p>
+                )}
+              </fieldset>
               <fieldset>
                 <legend className="field-label">Durée d’un appel</legend>
                 <div className="flex gap-2">
