@@ -4,7 +4,8 @@ import { formatToE164 } from '@/lib/phone';
 import { db, findProfileByPhone } from '@/lib/loomina/db';
 import { stripe } from '@/lib/stripe';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
-import { notifyNewOrder, notifyAbandonedCart, notifyFamilyInvite } from '@/lib/loomina/notify';
+import { notifyNewOrder, notifyFamilyInvite } from '@/lib/loomina/notify';
+import { relanceAbandonedCarts } from '@/lib/loomina/abandoned-cart';
 import { decodeFamilyFromStripe, storeFamilyMembers } from '@/lib/loomina/giver';
 import { DEFAULT_WRITING_STYLE } from '@/lib/loomina/styles';
 
@@ -285,36 +286,13 @@ async function findAuthUserIdByEmail(email: string): Promise<string | null> {
 }
 
 /**
- * Une commande commencée et jamais payée : si on a l'e-mail et le téléphone,
- * on envoie UN message avec le lien qui rouvre la commande (demande de
- * Solal, 17/11/2026). Jamais deux fois, et pas si la personne a payé depuis.
+ * Une commande commencée et jamais payée : le premier des trois e-mails de
+ * relance part tout de suite (lib/loomina/abandoned-cart.ts, demande de Solal
+ * du 23/11/2026 ; les deux suivants partent du rattrapage de /api/jobs/process).
  */
 async function handleAbandonedCart(session: Stripe.Checkout.Session): Promise<void> {
-    const meta = session.metadata ?? {};
-    const email = meta.email?.trim();
-    // superseded : le client a changé de moyen de paiement (carte ↔ Klarna),
-    // une autre session a pris le relais.
-    if (!email || meta.relance_sent === 'true' || meta.superseded === 'true') return;
-
-    // A-t-elle finalement commandé (autre onglet, autre essai) ?
-    const { data: paid } = await db().from('projects').select('id').eq('project_metadata->>buyer_email', email).limit(1);
-    if (paid?.length) return;
-
-    const isGift = meta.isGift === 'true' || meta.isGift === '1';
-    // Le SMS va à la personne qui commandait : celle qui offre, si c'est un cadeau.
-    const rawPhone = isGift ? meta.giverPhone : meta.phone;
-    const phone = rawPhone ? formatToE164(rawPhone) : null;
-
-    // Marqué AVANT l'envoi : un rejeu de Stripe ne relance pas deux fois.
-    await stripe().checkout.sessions.update(session.id, { metadata: { ...meta, relance_sent: 'true' } });
-
-    await notifyAbandonedCart({
-        email,
-        phone: phone && /^\+\d{8,15}$/.test(phone) ? phone : null,
-        firstName: (isGift ? meta.giverFirstName : meta.firstName)?.trim() || null,
-        isGift,
-        narratorFirstName: meta.firstName?.trim() || null,
-        recoveryUrl: session.after_expiration?.recovery?.url ?? null,
-    });
-    console.log(`[stripe] panier abandonné relancé (${session.id})`);
+    const email = session.metadata?.email?.trim();
+    if (!email) return;
+    const { results } = await relanceAbandonedCarts({ only: email, session });
+    if (results.length) console.log(`[stripe] panier abandonné : ${results.join(', ')}`);
 }

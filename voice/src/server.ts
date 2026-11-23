@@ -20,6 +20,7 @@ import { config, wsUrl } from './config.ts';
 import { flushSpool } from './report.ts';
 import { conversationRelayTwiml, demoVoice, sayAndHangupTwiml } from './twiml.ts';
 import { planForCaller } from './plan.ts';
+import { findProfileByPhone } from '../../lib/loomina/db';
 import { forVoice } from './speech.ts';
 import { CallSession } from './session.ts';
 import { startTimers } from './scheduler.ts';
@@ -59,6 +60,13 @@ function reply(res: http.ServerResponse, status: number, body: string, type = 't
 // Routes
 // ------------------------------------------------------------
 
+/** L'auteur joint a-t-il choisi le tutoiement ? (pour le message laissé sur son répondeur) */
+async function prefersTu(phone: string): Promise<boolean> {
+    if (!phone) return false;
+    const profile = await findProfileByPhone(phone);
+    return profile?.politeness_preference === 'tu';
+}
+
 async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
     const params = await readForm(req);
     if (!isFromTwilio(req, params)) {
@@ -76,10 +84,16 @@ async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse):
     // on raccroche plutôt que de mener un entretien avec une messagerie.
     if ((params.AnsweredBy ?? '').startsWith('machine') || params.AnsweredBy === 'fax') {
         console.info(`[voice] ${callSid} : répondeur, message laissé`);
+        // Au tutoiement si l'auteur l'a choisi (« c'est Loumina » : l'orthographe qui se prononce bien).
+        const tu = await prefersTu(customer).catch(() => false);
         return reply(
             res,
             200,
-            sayAndHangupTwiml("Bonjour, c'est Loumina, votre biographe, pour notre rendez-vous. Je vous rappellerai au prochain créneau. Vous pouvez aussi m'appeler quand vous voulez. À bientôt !"),
+            sayAndHangupTwiml(
+                tu
+                    ? "Bonjour, c'est Loumina, ton biographe, pour notre rendez-vous. Je te rappellerai au prochain créneau. Tu peux aussi m'appeler quand tu veux. À bientôt !"
+                    : "Bonjour, c'est Loumina, votre biographe, pour notre rendez-vous. Je vous rappellerai au prochain créneau. Vous pouvez aussi m'appeler quand vous voulez. À bientôt !"
+            ),
             'text/xml'
         );
     }

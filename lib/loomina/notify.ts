@@ -98,6 +98,8 @@ export async function sendEmail(params: {
     attachments?: { filename: string; content: Buffer; contentType: string }[];
     /** Une mise en page HTML à la place de celle tirée du texte (le texte reste la version brute). */
     html?: string;
+    /** En-têtes en plus (List-Unsubscribe des relances). */
+    headers?: Record<string, string>;
 }): Promise<boolean> {
     const smtp = smtpConfig();
     if (!smtp) {
@@ -126,6 +128,7 @@ export async function sendEmail(params: {
             html,
             ...(params.replyTo ? { replyTo: params.replyTo } : {}),
             ...(params.attachments?.length ? { attachments: params.attachments } : {}),
+            ...(params.headers && Object.keys(params.headers).length ? { headers: params.headers } : {}),
         };
         const info = await transporter.sendMail(message);
         // Une copie dans « Envoyés », pour retrouver dans la boîte (et dans l'admin,
@@ -255,18 +258,33 @@ export function bookCompleteTexts(author: { first_name: string | null; politenes
     };
 }
 
+/**
+ * L'adresse e-mail de l'auteur lui-même, ou null. Pour un livre offert, le compte
+ * porte l'adresse de la personne qui a offert (ou un alias « +numéro » qui arrive
+ * dans sa boîte) : un e-mail « Bonjour Jeanne » partirait chez elle. L'auteur est
+ * alors prévenu par SMS, et la personne qui a offert reçoit son propre message.
+ */
+export function authorOwnEmail(author: { email?: string | null }, projectMetadata?: Record<string, unknown> | null): string | null {
+    if (projectMetadata?.is_gift === true) return null;
+    return author.email?.trim() || null;
+}
+
 /** Prévient l'auteur, par SMS et par e-mail, que son livre est terminé. Ne lève jamais. */
-export async function notifyAuthorBookComplete(author: {
-    first_name: string | null;
-    politeness_preference?: string | null;
-    phone_number?: string | null;
-    email?: string | null;
-}): Promise<void> {
+export async function notifyAuthorBookComplete(
+    author: {
+        first_name: string | null;
+        politeness_preference?: string | null;
+        phone_number?: string | null;
+        email?: string | null;
+    },
+    projectMetadata?: Record<string, unknown> | null
+): Promise<void> {
     try {
         const t = bookCompleteTexts(author);
+        const email = authorOwnEmail(author, projectMetadata);
         await Promise.allSettled([
             author.phone_number ? sendSms(author.phone_number, t.sms) : Promise.resolve(false),
-            author.email ? sendEmail({ to: author.email, subject: t.subject, text: t.email }) : Promise.resolve(false),
+            email ? sendEmail({ to: email, subject: t.subject, text: t.email }) : Promise.resolve(false),
         ]);
     } catch (e) {
         console.error('[notify] livre terminé, auteur non prévenu', e);
@@ -348,7 +366,6 @@ export async function notifyFamilyInvite(params: { phone: string; firstName: str
 
 export interface AbandonedCart {
     email: string;
-    phone: string | null;
     /** Prénom de la personne qui commandait. */
     firstName: string | null;
     isGift: boolean;
@@ -357,32 +374,74 @@ export interface AbandonedCart {
     recoveryUrl: string | null;
 }
 
-export function abandonedCartTexts(cart: AbandonedCart): { subject: string; email: string; sms: string } {
+/** Les trois relances d'un panier abandonné : à l'expiration, deux jours après, cinq jours après. */
+export type CartStep = 1 | 2 | 3;
+
+/**
+ * Les trois e-mails d'un panier abandonné (demande de Solal, 23/11/2026 :
+ * plus de SMS, trois e-mails sur la semaine). Le premier rappelle le lien,
+ * le deuxième explique comment se passe un livre, le troisième est le dernier.
+ */
+export function abandonedCartTexts(cart: AbandonedCart, step: CartStep = 1): { subject: string; email: string } {
     const hello = cart.firstName ? `Bonjour ${cart.firstName},` : 'Bonjour,';
     const link = cart.recoveryUrl ?? `${SITE.url}/order`;
-    const what = cart.isGift && cart.narratorFirstName ? `le livre de ${cart.narratorFirstName}` : 'votre livre';
+    const narrator = cart.isGift ? cart.narratorFirstName?.trim() || null : null;
+    const what = narrator ? `le livre de ${narrator}` : 'votre livre';
+    const sign = `L'équipe Loomina`;
+    if (step === 2) {
+        return {
+            subject: narrator ? `Comment se passera le livre de ${narrator}` : 'Comment se passe un livre Loomina',
+            email: [
+                hello,
+                `Vous aviez commencé à commander ${what}. Voici, en bref, comment cela se passe :`,
+                narrator
+                    ? `1. ${narrator} appelle Loomina au ${SITE.phoneDisplay} depuis son téléphone, quand bon lui semble, ou choisit des jours et une heure, et Loomina l'appelle. Il n'y a rien à préparer : Loomina pose les questions et écoute.`
+                    : `1. Vous appelez Loomina au ${SITE.phoneDisplay} depuis votre téléphone, quand vous le souhaitez, ou vous choisissez des jours et une heure, et Loomina vous appelle. Il n'y a rien à préparer : Loomina pose les questions et écoute.`,
+                `2. Après chaque appel, le récit est écrit. On le lit dans l'espace auteur, où l'on peut le corriger.`,
+                `3. Quand l'histoire est complète, notre équipe relit le livre, puis il est imprimé et livré.`,
+                `Pour vous faire une idée, le plus simple est la démonstration gratuite : appelez le ${SITE.phoneDisplay}, racontez un souvenir pendant cinq minutes, et vous recevez son récit écrit par SMS.`,
+                `Reprendre la commande : ${link}`,
+                sign,
+            ].join('\n\n'),
+        };
+    }
+    if (step === 3) {
+        return {
+            subject: narrator ? `Dernier rappel pour le livre de ${narrator}` : 'Dernier rappel pour votre livre',
+            email: [
+                hello,
+                `C'est notre dernier message au sujet de votre commande. Si vous souhaitez toujours ${narrator ? `offrir son livre à ${narrator}` : 'écrire votre livre'}, elle vous attend ici :`,
+                link,
+                `Si ce n'est pas le bon moment, aucun souci. Et si quelque chose vous fait hésiter, dites-le-nous en répondant à ce message : nous lisons tout.`,
+                sign,
+            ].join('\n\n'),
+        };
+    }
     return {
-        subject: cart.isGift && cart.narratorFirstName ? `Le livre de ${cart.narratorFirstName} vous attend` : 'Votre livre Loomina vous attend',
+        subject: narrator ? `Le livre de ${narrator} vous attend` : 'Votre livre Loomina vous attend',
         email: [
             hello,
             `Vous avez commencé une commande sur Loomina sans la terminer. Si vous le souhaitez, vous pouvez la reprendre là où vous l'avez laissée :`,
             link,
             `Pour rappel : si le premier entretien ne convient pas, nous vous remboursons intégralement, sur simple demande dans les 7 jours qui suivent.`,
             `Une question avant de vous décider ? Répondez simplement à ce message, ou essayez la démonstration gratuite en appelant le ${SITE.phoneDisplay}.`,
-            `Nous ne vous écrirons pas une seconde fois à ce sujet.`,
-            `L'équipe Loomina`,
+            sign,
         ].join('\n\n'),
-        sms: `Loomina : votre commande pour ${what} n'a pas été terminée. Vous pouvez la reprendre ici : ${link} Une question ? ${SITE.phoneDisplay}`,
     };
 }
 
-/** Relance unique d'une commande commencée et jamais payée : e-mail et SMS. Ne lève pas. */
-export async function notifyAbandonedCart(cart: AbandonedCart): Promise<void> {
-    const t = abandonedCartTexts(cart);
-    await Promise.allSettled([
-        sendEmail({ to: cart.email, subject: t.subject, text: t.email, replyTo: teamContacts().email }),
-        cart.phone ? sendSms(cart.phone, t.sms) : Promise.resolve(false),
-    ]);
+/** Une relance de panier abandonné, par e-mail seulement, avec le lien pour ne plus en recevoir. Ne lève pas. */
+export async function notifyAbandonedCart(cart: AbandonedCart, step: CartStep = 1): Promise<boolean> {
+    const t = abandonedCartTexts(cart, step);
+    const { optOutLine, optOutHeaders } = await import('./optout');
+    const stop = optOutLine(cart.email);
+    return sendEmail({
+        to: cart.email,
+        subject: t.subject,
+        text: stop ? `${t.email}\n\n${stop}` : t.email,
+        replyTo: teamContacts().email,
+        headers: optOutHeaders(cart.email),
+    }).catch(() => false);
 }
 
 // ------------------------------------------------------------
@@ -419,8 +478,8 @@ export function bookStageTexts(
         return {
             subject: `${Book} est relu : ${tu ? 'découvre-le' : 'découvrez-le'}`,
             sms: tu
-                ? `${hello}, ton livre est relu. Sa version complète t'attend sur ${where}. Un détail à changer ? Appelle le ${SITE.phoneDisplay} ou réponds à notre e-mail. Ensuite, il part à l'impression. Loomina`
-                : `${hello}, votre livre est relu. Sa version complète vous attend sur ${where}. Un détail à changer ? Appelez le ${SITE.phoneDisplay} ou répondez à notre e-mail. Ensuite, il part à l'impression. Loomina`,
+                ? `${hello}, ton livre est relu. Sa version complète t'attend sur ${where}. Un détail à changer ? Appelle le ${SITE.phoneDisplay}. Ensuite, il part à l'impression. Loomina`
+                : `${hello}, votre livre est relu. Sa version complète vous attend sur ${where}. Un détail à changer ? Appelez le ${SITE.phoneDisplay}. Ensuite, il part à l'impression. Loomina`,
             email: tu
                 ? `${hello},\n\nNous avons relu ton livre en entier. Sa version complète t'attend sur ${where} : connecte-toi avec ton numéro de téléphone, puis ouvre « Mon livre ». Tu peux aussi l'y télécharger.\n\nPrends le temps de le lire. Un nom mal écrit, un souvenir à ajouter ? Appelle le ${SITE.phoneDisplay} ou réponds simplement à ce message.\n\nEnsuite, ton livre part à l'impression. Nous te préviendrons à chaque étape, jusqu'à son arrivée chez toi.\n\n${sign}`
                 : `${hello},\n\nNous avons relu votre livre en entier. Sa version complète vous attend sur ${where} : connectez-vous avec votre numéro de téléphone, puis ouvrez « Mon livre ». Vous pouvez aussi l'y télécharger.\n\nPrenez le temps de le lire. Un nom mal écrit, un souvenir à ajouter ? Appelez le ${SITE.phoneDisplay} ou répondez simplement à ce message.\n\nEnsuite, votre livre part à l'impression. Nous vous préviendrons à chaque étape, jusqu'à son arrivée chez vous.\n\n${sign}`,
@@ -457,10 +516,11 @@ export async function notifyBookStage(params: {
         const jobs: Promise<unknown>[] = [];
         const t = bookStageTexts(params.step, params.author, params.tracking);
         const team = teamContacts().email;
-        if (params.author.phone_number) jobs.push(sendSms(params.author.phone_number, t.sms));
-        if (params.author.email) jobs.push(sendEmail({ to: params.author.email, subject: t.subject, text: t.email, replyTo: team }));
-
         const meta = params.projectMetadata ?? {};
+        const authorEmail = authorOwnEmail(params.author, meta);
+        if (params.author.phone_number) jobs.push(sendSms(params.author.phone_number, t.sms));
+        if (authorEmail) jobs.push(sendEmail({ to: authorEmail, subject: t.subject, text: t.email, replyTo: team }));
+
         if (meta.family_news !== false) {
             // Celui qui a offert le livre, et les autres proches ajoutés (lib/loomina/giver.ts).
             for (const person of familyAudience(meta)) {
@@ -468,7 +528,7 @@ export async function notifyBookStage(params: {
                 const f = bookStageTexts(params.step, { first_name: person.firstName, family: true, narratorFirstName: params.author.first_name }, params.tracking);
                 jobs.push(sendSms(person.phone, f.sms));
                 const email = person.giver && meta.is_gift === true && typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
-                if (email && email !== params.author.email) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, replyTo: team }));
+                if (email && email !== authorEmail) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, replyTo: team }));
             }
         }
         await Promise.allSettled(jobs);

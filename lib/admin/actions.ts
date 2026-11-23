@@ -108,7 +108,7 @@ export function relanceTexts(params: { firstName: string | null; tu: boolean; to
     const host = SITE.url.replace(/^https?:\/\/(www\.)?/, '');
     if (params.toGiver) {
         return {
-            sms: `Loomina : le livre de ${params.narrator} n'attend plus que son premier appel. ${params.narrator} peut appeler le ${SITE.phoneDisplay} depuis son téléphone, quand il ou elle veut. Besoin d'aide ? Répondez à contact@loomina.eu`,
+            sms: `Loomina : le livre de ${params.narrator} n'attend plus que son premier appel. ${params.narrator} peut appeler le ${SITE.phoneDisplay} depuis son téléphone, quand il ou elle veut. Besoin d'aide ? Écrivez à contact@loomina.eu`,
             subject: `Le livre de ${params.narrator} n'attend plus que son premier appel`,
             email: `Bonjour${params.firstName ? ` ${params.firstName}` : ''},\n\nLe livre que vous avez offert à ${params.narrator} est prêt, mais nous n'avons pas encore eu son premier appel.\n\nPour commencer, ${params.narrator} n'a qu'à appeler le ${SITE.phoneDisplay} depuis son propre téléphone, quand il ou elle le souhaite. Il n'y a rien à préparer : Loomina mène la conversation.\n\nSi quelque chose bloque, répondez simplement à ce message : nous vous aidons volontiers.\n\nL'équipe Loomina`,
         };
@@ -118,16 +118,21 @@ export function relanceTexts(params: { firstName: string | null; tu: boolean; to
         sms: params.tu
             ? `${hello}, c'est Loomina. Ton livre t'attend : appelle le ${SITE.phoneDisplay} quand tu veux, je serai ravi de t'écouter. Ton espace : ${host}/dashboard`
             : `${hello}, c'est Loomina. Votre livre vous attend : appelez le ${SITE.phoneDisplay} quand vous voulez, je serai ravi de vous écouter. Votre espace : ${host}/dashboard`,
-        subject: 'Votre livre vous attend',
-        email: `${hello},\n\nVotre livre vous attend. Pour continuer, appelez le ${SITE.phoneDisplay} depuis votre téléphone, quand vous le souhaitez : il n'y a rien à préparer, Loomina mène la conversation.\n\nVous pouvez aussi choisir des jours et une heure dans votre espace (${host}/dashboard) : Loomina vous appellera.\n\nSi quelque chose vous gêne, répondez simplement à ce message.\n\nL'équipe Loomina`,
+        subject: params.tu ? 'Ton livre t’attend' : 'Votre livre vous attend',
+        // Au tutoiement si l'auteur l'a choisi, comme le SMS (23/11/2026).
+        email: params.tu
+            ? `${hello},\n\nTon livre t'attend. Pour continuer, appelle le ${SITE.phoneDisplay} depuis ton téléphone, quand tu veux : il n'y a rien à préparer, Loomina mène la conversation.\n\nTu peux aussi choisir des jours et une heure dans ton espace (${host}/dashboard) : Loomina t'appellera.\n\nSi quelque chose te gêne, réponds simplement à ce message.\n\nL'équipe Loomina`
+            : `${hello},\n\nVotre livre vous attend. Pour continuer, appelez le ${SITE.phoneDisplay} depuis votre téléphone, quand vous le souhaitez : il n'y a rien à préparer, Loomina mène la conversation.\n\nVous pouvez aussi choisir des jours et une heure dans votre espace (${host}/dashboard) : Loomina vous appellera.\n\nSi quelque chose vous gêne, répondez simplement à ce message.\n\nL'équipe Loomina`,
     };
 }
 
 /**
  * Envoie une relance par SMS et par e-mail. Livre offert sans aucun appel :
  * elle va à celui qui a offert (le narrateur ne sait peut-être pas encore).
+ * `auto` : relance automatique après 14 jours sans appel (lib/admin/watch.ts) ;
+ * on note alors depuis quand le client n'appelle plus, pour ne la faire qu'une fois.
  */
-export async function relanceClient(profileId: string): Promise<RefundResult> {
+export async function relanceClient(profileId: string, opts: { auto?: string } = {}): Promise<RefundResult> {
     const [profile, project] = await Promise.all([readProfile(profileId), latestProject(profileId)]);
     if (!profile || !project) return { ok: false, message: 'Client ou livre introuvable.' };
     const meta = (project.project_metadata ?? {}) as Meta;
@@ -154,7 +159,13 @@ export async function relanceClient(profileId: string): Promise<RefundResult> {
     const history = Array.isArray(meta.relances) ? (meta.relances as unknown[]).slice(-9) : [];
     await db()
         .from('projects')
-        .update({ project_metadata: { ...meta, relances: [...history, { at: new Date().toISOString(), sms, mail, to: toGiver ? 'offreur' : 'narrateur' }] } })
+        .update({
+            project_metadata: {
+                ...meta,
+                relances: [...history, { at: new Date().toISOString(), sms, mail, to: toGiver ? 'offreur' : 'narrateur', ...(opts.auto ? { auto: true } : {}) }],
+                ...(opts.auto ? { auto_relance: { since: opts.auto, at: new Date().toISOString() } } : {}),
+            },
+        })
         .eq('id', project.id);
     return { ok: true, message: `Relance envoyée ${toGiver ? 'à celui qui a offert le livre' : 'au narrateur'} (${[sms ? 'SMS' : null, mail ? 'e-mail' : null].filter(Boolean).join(' et ')}).` };
 }

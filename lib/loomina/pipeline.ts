@@ -542,7 +542,7 @@ async function persistDirectorResult(params: {
             console.warn('[pipeline] date de fin non notée :', err instanceof Error ? err.message : String(err));
         }
         // L'auteur d'abord : ce que Loomina vient de lui dire au téléphone, par écrit.
-        await notifyAuthorBookComplete(profile);
+        await notifyAuthorBookComplete(profile, project.project_metadata);
         await notifyFamily({ projectMetadata: project.project_metadata, narratorFirstName: profile.first_name, kind: 'book_complete' });
         await alertTeam({
             subject: `Livre terminé : ${name}`,
