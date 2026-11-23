@@ -23,7 +23,8 @@ import { sweepPending } from '@/lib/loomina/events';
 import { sweepCorrections } from '@/lib/loomina/corrections';
 import { sweepReviews, sweepRelanceAlerts } from '@/lib/admin/watch';
 import { checkSharedSecret } from '@/lib/loomina/secret';
-import { sweepDemoStories } from '@/lib/loomina/demo-story';
+import { sweepDemoStories, sweepDemoReminders } from '@/lib/loomina/demo-story';
+import { relanceAbandonedCarts } from '@/lib/loomina/abandoned-cart';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -69,10 +70,16 @@ async function handle(request: NextRequest) {
         const demos = await sweepDemoStories();
         if (demos.retried || demos.sms) console.info('[jobs] récits de démo :', demos.results);
 
-        // La veille de l'admin : clients à relancer signalés, avis de l'IA sur
-        // un livre qui vient d'être terminé.
+        // La veille de l'admin : clients à relancer signalés (et relancés tout
+        // seuls après 14 jours sans appel), avis de l'IA sur un livre terminé.
         const watch = { relances: await sweepRelanceAlerts(), reviews: await sweepReviews() };
         if (watch.relances || watch.reviews) console.info('[jobs] veille :', watch);
+
+        // Les e-mails de relance (23/11/2026) : paniers abandonnés (2e et 3e
+        // e-mails) et fin de la réduction d'une démo sans commande.
+        const carts = await relanceAbandonedCarts();
+        const reminders = await sweepDemoReminders();
+        if (carts.results.length || reminders.results.length) console.info('[jobs] relances :', { carts: carts.results, reminders: reminders.results });
 
         return NextResponse.json({
             ok: true,
@@ -81,6 +88,8 @@ async function handle(request: NextRequest) {
             corrections,
             demos,
             watch,
+            carts: carts.sent,
+            reminders: reminders.sent,
             durationMs: Date.now() - startedAt,
         });
     } catch (err) {

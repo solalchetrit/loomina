@@ -425,12 +425,89 @@ test('famille : les nouvelles ne contiennent jamais le texte du récit', () => {
 
 import { abandonedCartTexts } from '../../lib/loomina/notify';
 
-test('panier abandonné : le message donne le lien de reprise et ne promet qu’un seul envoi', () => {
-    const t = abandonedCartTexts({ email: 'a@b.fr', phone: '+33611111111', firstName: 'Paul', isGift: true, narratorFirstName: 'Jeanne', recoveryUrl: 'https://checkout.stripe.com/c/pay/abc' });
-    assert.match(t.email, /https:\/\/checkout\.stripe\.com\/c\/pay\/abc/);
-    assert.match(t.email, /pas une seconde fois/);
-    assert.match(t.sms, /le livre de Jeanne/);
-    assert.match(abandonedCartTexts({ email: 'a@b.fr', phone: null, firstName: null, isGift: false, narratorFirstName: null, recoveryUrl: null }).email, /loomina\.eu\/order/);
+test('panier abandonné : trois e-mails, le lien de reprise, sans SMS', () => {
+    const cart = { email: 'a@b.fr', firstName: 'Paul', isGift: true, narratorFirstName: 'Jeanne', recoveryUrl: 'https://checkout.stripe.com/c/pay/abc' };
+    const [one, two, three] = ([1, 2, 3] as const).map((step) => abandonedCartTexts(cart, step));
+    for (const t of [one, two, three]) {
+        assert.match(t.email, /https:\/\/checkout\.stripe\.com\/c\/pay\/abc/);
+        assert.doesNotMatch(t.email, /pas une seconde fois/);
+        assert.equal('sms' in t, false);
+    }
+    assert.match(one.subject, /Le livre de Jeanne/);
+    assert.match(two.email, /Jeanne appelle Loomina/);
+    assert.match(three.subject, /Dernier rappel/);
+    assert.match(three.email, /dernier message/);
+    const self = abandonedCartTexts({ email: 'a@b.fr', firstName: null, isGift: false, narratorFirstName: null, recoveryUrl: null }, 2);
+    assert.match(self.email, /loomina\.eu\/order/);
+    assert.match(self.email, /Vous appelez Loomina/);
+});
+
+test('panier abandonné : à l’expiration, deux jours puis cinq jours après, une seule suite par adresse', async () => {
+    const { cartStepDue } = await import('../../lib/loomina/abandoned-cart');
+    const H = 3600_000, D = 24 * H;
+    const t0 = Date.UTC(2026, 10, 23, 10);
+    const cart = (over: Partial<{ id: string; expires: number; meta: Record<string, string>; status: 'expired' | 'open' | 'complete' }> = {}) => ({
+        id: over.id ?? 'cs_1',
+        created: Math.floor(((over.expires ?? t0) - 2 * H) / 1000),
+        expires_at: Math.floor((over.expires ?? t0) / 1000),
+        status: over.status ?? ('expired' as const),
+        metadata: { email: 'a@b.fr', ...(over.meta ?? {}) },
+    });
+    assert.equal(cartStepDue([cart()], t0), 1);
+    // Le rattrapage laisse au webhook une demi-heure pour le premier e-mail.
+    assert.equal(cartStepDue([cart()], t0 + 10 * 60_000, 30 * 60_000), null);
+    const sent1 = { relances: '1', relance_at: new Date(t0).toISOString() };
+    assert.equal(cartStepDue([cart({ meta: sent1 })], t0 + D), null);
+    assert.equal(cartStepDue([cart({ meta: sent1 })], t0 + 2 * D), 2);
+    const sent2 = { relances: '2', relance_at: new Date(t0 + 2 * D).toISOString() };
+    assert.equal(cartStepDue([cart({ meta: sent2 })], t0 + 4 * D), null);
+    assert.equal(cartStepDue([cart({ meta: sent2 })], t0 + 5 * D), 3);
+    assert.equal(cartStepDue([cart({ meta: { relances: '3', relance_at: new Date(t0 + 5 * D).toISOString() } })], t0 + 7 * D), null);
+    // Un second panier le lendemain ne relance pas la suite.
+    assert.equal(cartStepDue([cart({ meta: sent1 }), cart({ id: 'cs_2', expires: t0 + D })], t0 + D + H), null);
+    // En retard (serveur arrêté) : jamais deux e-mails à moins de 20 h.
+    assert.equal(cartStepDue([cart({ meta: { relances: '2', relance_at: new Date(t0 + 5 * D - 2 * H).toISOString() } })], t0 + 5 * D), null);
+    // Ancienne relance unique : son e-mail promettait de ne pas réécrire.
+    assert.equal(cartStepDue([cart({ meta: { relance_sent: 'true' } })], t0 + 3 * D), null);
+    // Changement de moyen de paiement : pas un panier.
+    assert.equal(cartStepDue([cart({ meta: { superseded: 'true' } })], t0), null);
+    // Au-delà de huit jours : fini.
+    assert.equal(cartStepDue([cart()], t0 + 9 * D), null);
+});
+
+test('désinscription : une empreinte de l’adresse, jamais l’adresse, la même quelle que soit la casse', async () => {
+    process.env.JWT_SECRET = process.env.JWT_SECRET || 'secret-de-test';
+    const { optOutToken, optOutUrl, isOptOutToken, optOutHeaders } = await import('../../lib/loomina/optout');
+    const t = optOutToken('Paul@Exemple.fr ')!;
+    assert.equal(t, optOutToken('paul@exemple.fr'));
+    assert.notEqual(t, optOutToken('jeanne@exemple.fr'));
+    assert.ok(isOptOutToken(t));
+    assert.doesNotMatch(optOutUrl('paul@exemple.fr')!, /paul|exemple/);
+    assert.match(optOutHeaders('paul@exemple.fr')['List-Unsubscribe'], /\/api\/desinscription\?t=/);
+});
+
+test('relance automatique : après 14 jours sans appel, une fois par silence, jamais pour un test', async () => {
+    const { autoRelanceDue } = await import('../../lib/admin/watch');
+    const base = { health: 'inactif', test: false, lastCallAt: '2026-11-01T10:00:00Z', orderedAt: '2026-10-01T10:00:00Z', daysSinceLastCall: 15, daysSinceOrder: 45 };
+    assert.equal(autoRelanceDue(base, {}), '2026-11-01T10:00:00Z');
+    assert.equal(autoRelanceDue({ ...base, daysSinceLastCall: 14 }, {}), null);
+    assert.equal(autoRelanceDue(base, { auto_relance: { since: '2026-11-01T10:00:00Z' } }), null);
+    // Il a rappelé puis s'est tu à nouveau : nouvelle relance.
+    assert.equal(autoRelanceDue(base, { auto_relance: { since: '2026-10-10T10:00:00Z' } }), '2026-11-01T10:00:00Z');
+    assert.equal(autoRelanceDue({ ...base, test: true }, {}), null);
+    assert.equal(autoRelanceDue(base, { refunded_at: '2026-11-02' }), null);
+    // Jamais appelé : compté depuis la commande.
+    const never = { ...base, health: 'relancer', lastCallAt: null, daysSinceLastCall: null };
+    assert.equal(autoRelanceDue({ ...never, daysSinceOrder: 10 }, {}), null);
+    assert.equal(autoRelanceDue({ ...never, daysSinceOrder: 15 }, {}), '2026-10-01T10:00:00Z');
+});
+
+test('relance d’un client : l’e-mail suit aussi le tutoiement', async () => {
+    const { relanceTexts } = await import('../../lib/admin/actions');
+    const tu = relanceTexts({ firstName: 'Léo', tu: true, toGiver: false, narrator: 'Léo' });
+    assert.match(tu.email, /Ton livre t'attend/);
+    assert.doesNotMatch(tu.email, /vous/i);
+    assert.match(relanceTexts({ firstName: 'Jeanne', tu: false, toGiver: false, narrator: 'Jeanne' }).email, /Votre livre vous attend/);
 });
 
 test('démo : un récit en échec est retenté avec un délai croissant, cinq fois au plus, sur 24 h', async () => {
@@ -652,4 +729,21 @@ test('e-mail de la démo : « 1er décembre »', async () => {
     const { demoEmail } = await import('../../lib/loomina/demo-story');
     const e = demoEmail({ firstName: 'Jeanne', title: 'La maison', promo: { code: 'X', expires: new Date('2026-12-01T12:00:00Z') } });
     assert.match(e.text, /jusqu’au 1er décembre/);
+});
+
+test('démo sans commande : rappel deux jours avant la fin du code, une seule fois', async () => {
+    const { demoReminderDue, demoReminderEmail } = await import('../../lib/loomina/demo-story');
+    const now = Date.UTC(2026, 11, 1, 10);
+    const row = { email: 'a@b.fr', promo_code: 'RECITX', promo_expires_at: new Date(now + 40 * 3600_000).toISOString(), promo_reminded_at: null };
+    assert.equal(demoReminderDue(row, now), true);
+    assert.equal(demoReminderDue({ ...row, promo_expires_at: new Date(now + 60 * 3600_000).toISOString() }, now), false);
+    assert.equal(demoReminderDue({ ...row, promo_expires_at: new Date(now + 2 * 3600_000).toISOString() }, now), false);
+    assert.equal(demoReminderDue({ ...row, promo_reminded_at: new Date(now).toISOString() }, now), false);
+    assert.equal(demoReminderDue({ ...row, email: null }, now), false);
+    const e = demoReminderEmail({ firstName: 'Jeanne', title: 'La maison', code: 'RECITX', expires: new Date('2026-12-03T12:00:00Z'), storyUrl: 'https://loomina.eu/recit/abc', optOut: 'Vous ne souhaitez plus recevoir ces rappels ? https://loomina.eu/desinscription?t=x' });
+    assert.match(e.subject, /se termine le 3\u00a0décembre/);
+    assert.match(e.text, /order\?code=RECITX/);
+    assert.match(e.text, /recit\/abc/);
+    assert.match(e.html, /desinscription/);
+    assert.doesNotMatch(e.text, /€/);
 });

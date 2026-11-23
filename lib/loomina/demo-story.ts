@@ -16,7 +16,8 @@
 
 import crypto from 'node:crypto';
 import OpenAI from 'openai';
-import { db } from './db';
+import { db, findProfileByPhone } from './db';
+import { isOptedOut, optOutLine, optOutHeaders } from './optout';
 import { sendSms } from './sms';
 import { brandEmailHtml, sendEmail } from './notify';
 import { promptText, refreshPrompts } from './prompt-store';
@@ -57,6 +58,8 @@ export interface DemoStory {
     email: string | null;
     email_count: number;
     promo_code: string | null;
+    /** Fin de validité du code (depuis le 23/11/2026). */
+    promo_expires_at?: string | null;
     created_at: string;
 }
 
@@ -204,7 +207,7 @@ export async function getDemoStory(token: string): Promise<DemoStory | null> {
     if (!/^[A-Za-z0-9_-]{16,40}$/.test(token)) return null;
     const { data } = await db()
         .from('demo_stories')
-        .select('id, token, phone, status, first_name, title, content, email, email_count, promo_code, created_at')
+        .select('id, token, phone, status, first_name, title, content, email, email_count, promo_code, promo_expires_at, created_at')
         .eq('token', token)
         .maybeSingle();
     return (data as DemoStory | null) ?? null;
@@ -228,8 +231,12 @@ export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  * l'e-mail part quand même, avec le bouton sans réduction).
  */
 async function demoPromoCode(story: DemoStory): Promise<{ code: string; expires: Date } | null> {
+    // Déjà créé (second envoi du récit) : sa vraie date de fin, pas 14 jours de plus.
+    if (story.promo_code) {
+        const known = story.promo_expires_at ? new Date(story.promo_expires_at) : await promoExpiry(story.id, story.promo_code);
+        return { code: story.promo_code, expires: known ?? new Date(Date.now() + DEMO_PROMO.days * 86_400_000) };
+    }
     const expires = new Date(Date.now() + DEMO_PROMO.days * 86_400_000);
-    if (story.promo_code) return { code: story.promo_code, expires };
     const code = `RECIT${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
     try {
         await stripe().promotionCodes.create({
@@ -239,12 +246,40 @@ async function demoPromoCode(story: DemoStory): Promise<{ code: string; expires:
             expires_at: Math.floor(expires.getTime() / 1000),
             metadata: { source: 'demo', demo_story: story.id },
         });
-        await db().from('demo_stories').update({ promo_code: code }).eq('id', story.id);
+        await db().from('demo_stories').update({ promo_code: code, promo_expires_at: expires.toISOString() }).eq('id', story.id);
         return { code, expires };
     } catch (err) {
         console.warn('[demo] code promo non créé :', err instanceof Error ? err.message : String(err));
         return null;
     }
+}
+
+/** Le code tel que Stripe le connaît : sa date de fin, s'il est encore actif, s'il a servi. */
+async function readPromo(code: string): Promise<{ expires: Date | null; active: boolean; used: boolean } | null> {
+    const found = (await stripe().promotionCodes.list({ code, limit: 1 })).data[0];
+    if (!found) return null;
+    return { expires: found.expires_at ? new Date(found.expires_at * 1000) : null, active: found.active, used: (found.times_redeemed ?? 0) > 0 };
+}
+
+/** Date de fin d'un code créé avant le 23/11/2026, lue chez Stripe puis gardée. */
+async function promoExpiry(storyId: string, code: string): Promise<Date | null> {
+    try {
+        const promo = await readPromo(code);
+        if (!promo?.expires) return null;
+        await db().from('demo_stories').update({ promo_expires_at: promo.expires.toISOString() }).eq('id', storyId);
+        return promo.expires;
+    } catch (err) {
+        console.warn('[demo] date du code introuvable :', err instanceof Error ? err.message : String(err));
+        return null;
+    }
+}
+
+/** « 1er décembre », « 3 décembre », avec des espaces insécables. */
+export function frenchDay(d: Date): string {
+    return d
+        .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' })
+        .replace(/^1 /, '1er ')
+        .replace(/ /g, '\u00a0');
 }
 
 function esc(s: string): string {
@@ -256,10 +291,7 @@ export function demoEmail(params: { firstName: string | null; title: string; pro
     const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
     const orderUrl = `https://${HOST}/order${params.promo ? `?code=${params.promo.code}` : ''}`;
     // « 1er décembre », pas « 1 décembre ».
-    const until = params.promo?.expires
-        .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' })
-        .replace(/^1 /, '1er ')
-        .replace(/ /g, '\u00a0');
+    const until = params.promo ? frenchDay(params.promo.expires) : '';
     const intro = [
         hello,
         `Voici votre récit, « ${params.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page comme il le serait dans votre livre.`,
@@ -409,4 +441,131 @@ export async function deleteTwilioRecording(recordingSid: string): Promise<void>
     } catch (err) {
         console.warn(`[demo] effacement de l’enregistrement ${recordingSid} :`, err instanceof Error ? err.message : String(err));
     }
+}
+
+// ------------------------------------------------------------
+// Démo sans commande : rappel avant la fin de la réduction
+// (demande de Solal, 23/11/2026)
+// ------------------------------------------------------------
+
+/** Le rappel part deux jours avant la fin du code. */
+export const DEMO_REMINDER_BEFORE_H = 48;
+
+/** Ce récit attend-il son rappel ? (code connu, e-mail laissé, pas encore rappelé, fin dans moins de 48 h mais plus de 3 h) */
+export function demoReminderDue(row: { email: string | null; promo_code: string | null; promo_expires_at: string | null; promo_reminded_at: string | null }, now = Date.now()): boolean {
+    if (!row.email || !row.promo_code || !row.promo_expires_at || row.promo_reminded_at) return false;
+    const left = Date.parse(row.promo_expires_at) - now;
+    return left <= DEMO_REMINDER_BEFORE_H * 3600_000 && left > 3 * 3600_000;
+}
+
+/** L'e-mail du rappel : la date de fin, le bouton avec la réduction appliquée, le lien du récit s'il vit encore. */
+export function demoReminderEmail(params: { firstName: string | null; title: string; code: string; expires: Date; storyUrl: string | null; optOut: string | null }) {
+    const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
+    const until = frenchDay(params.expires);
+    const orderUrl = `https://${HOST}/order?code=${params.code}`;
+    const subject = `Votre réduction de ${DEMO_PROMO.percentOff} % se termine le ${until}`;
+    const intro = [
+        hello,
+        `Il y a quelques jours, vous avez raconté à Loomina « ${params.title} ». Votre réduction de ${DEMO_PROMO.percentOff} % pour écrire votre livre se termine le ${until}.`,
+        `Elle est déjà appliquée sur ce lien :`,
+    ];
+    const button = 'Écrire mon livre';
+    const outro = [
+        ...(params.storyUrl ? [`Votre récit est toujours à lire ici : ${params.storyUrl}`] : []),
+        'Pour nous poser une question, répondez simplement à cet e‑mail.',
+        'À très bientôt,\nLoomina',
+    ];
+    const text = [...intro, `${button} : ${orderUrl}`, ...outro, ...(params.optOut ? [params.optOut] : [])].join('\n\n');
+    const p = (t: string) => `<p style="margin:0 0 16px">${esc(t).replace(/\n/g, '<br>')}</p>`;
+    const html = brandEmailHtml(
+        intro.map(p).join('') +
+            `<p style="margin:8px 0 28px"><a href="${esc(orderUrl)}" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#161616;color:#ffffff;font-weight:800;text-decoration:none">${esc(button)}</a></p>` +
+            outro.map(p).join('') +
+            (params.optOut ? `<p style="margin:24px 0 0;font-size:13px;color:#6b6b6b">${esc(params.optOut)}</p>` : '')
+    );
+    return { subject, text, html, orderUrl };
+}
+
+function parisHour(now: number): number {
+    return Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false }).format(new Date(now)));
+}
+
+/**
+ * Envoie les rappels dus, entre 10 h et 19 h (heure de Paris). Une seule fois
+ * par récit : la ligne est marquée avant l'envoi. Rien si la personne a
+ * commandé, si son code a servi, si elle a reçu les relances de son panier
+ * (elle a déjà eu nos e-mails cette semaine), ou si elle s'est désinscrite.
+ * Appelé par /api/jobs/process. Ne lève pas.
+ */
+export async function sweepDemoReminders(now = Date.now()): Promise<{ sent: number; results: string[] }> {
+    const results: string[] = [];
+    try {
+        const h = parisHour(now);
+        if (h < 10 || h >= 19) return { sent: 0, results };
+
+        // Codes créés avant le 23/11/2026 sans date de fin connue : lue chez Stripe, une fois.
+        const { data: unknown } = await db().from('demo_stories').select('id, promo_code').not('promo_code', 'is', null).is('promo_expires_at', null).limit(5);
+        for (const row of unknown ?? []) await promoExpiry(row.id as string, row.promo_code as string);
+
+        const { data: rows, error } = await db()
+            .from('demo_stories')
+            .select('id, token, phone, first_name, title, email, promo_code, promo_expires_at, promo_reminded_at, created_at')
+            .not('promo_code', 'is', null)
+            .not('email', 'is', null)
+            .is('promo_reminded_at', null)
+            .lte('promo_expires_at', new Date(now + DEMO_REMINDER_BEFORE_H * 3600_000).toISOString())
+            .gt('promo_expires_at', new Date(now + 3 * 3600_000).toISOString())
+            .limit(10);
+        if (error) throw new Error(error.message);
+        const due = (rows ?? []).filter((r) => demoReminderDue(r as never, now));
+        if (!due.length) return { sent: 0, results };
+
+        // Les adresses relancées pour un panier ces dix derniers jours.
+        const cartEmails = new Set<string>();
+        for await (const s of stripe().checkout.sessions.list({ created: { gte: Math.floor((now - 10 * 86_400_000) / 1000) }, limit: 100 })) {
+            const m = s.metadata ?? {};
+            if (m.email && (m.relances || m.relance_sent === 'true' || s.status === 'complete')) cartEmails.add(m.email.trim().toLowerCase());
+        }
+
+        for (const row of due) {
+            const id = row.id as string;
+            const email = String(row.email).trim();
+            // Marqué avant l'envoi : jamais deux rappels.
+            const { data: claimed } = await db().from('demo_stories').update({ promo_reminded_at: new Date(now).toISOString() }).eq('id', id).is('promo_reminded_at', null).select('id');
+            if (!claimed?.length) continue;
+
+            const promo = await readPromo(row.promo_code as string).catch(() => null);
+            if (!promo || promo.used || !promo.active) {
+                results.push(`${id}: code ${promo?.used ? 'déjà utilisé' : 'inactif'}`);
+                continue;
+            }
+            if (cartEmails.has(email.toLowerCase())) {
+                results.push(`${id}: panier en cours de relance`);
+                continue;
+            }
+            const { data: paid } = await db().from('projects').select('id').eq('project_metadata->>buyer_email', email).limit(1);
+            if (paid?.length || (await findProfileByPhone(row.phone as string).catch(() => null))) {
+                results.push(`${id}: déjà client`);
+                continue;
+            }
+            if (await isOptedOut(email)) {
+                results.push(`${id}: désinscrit`);
+                continue;
+            }
+            const expires = promo.expires ?? new Date(row.promo_expires_at as string);
+            const mail = demoReminderEmail({
+                firstName: (row.first_name as string | null) ?? null,
+                title: (row.title as string | null) ?? 'Un souvenir',
+                code: row.promo_code as string,
+                expires,
+                storyUrl: isExpired(row.created_at as string) ? null : demoStoryUrl(row.token as string),
+                optOut: optOutLine(email),
+            });
+            const ok = await sendEmail({ to: email, subject: mail.subject, text: mail.text, html: mail.html, headers: optOutHeaders(email) });
+            results.push(`${id}: ${ok ? 'rappel envoyé' : 'e-mail refusé'}`);
+        }
+    } catch (err) {
+        console.error('[demo] rappels de réduction :', err instanceof Error ? err.message : String(err));
+    }
+    return { sent: results.filter((r) => r.endsWith('rappel envoyé')).length, results };
 }

@@ -6,7 +6,8 @@
  *  - l'avis de l'IA sur un livre qui vient d'être terminé, avant la relecture
  *    par l'équipe (demande de Solal, 17/11/2026) ;
  *  - l'alerte « client à relancer » : un client qui n'a pas appelé depuis trop
- *    longtemps est signalé une fois, par e-mail et par SMS.
+ *    longtemps est signalé une fois, par e-mail et par SMS ;
+ *  - la relance automatique du client après 14 jours sans appel (23/11/2026).
  * Rien ici ne lève.
  */
 
@@ -14,7 +15,8 @@ import { db } from '@/lib/loomina/db';
 import { readEditions } from '@/lib/loomina/book-edition';
 import { beginReview, runReview, readReview } from '@/lib/loomina/book-review';
 import { alertTeam } from '@/lib/loomina/notify';
-import { getCrm } from '@/lib/admin/data';
+import { getCrm, INACTIVE_AFTER_DAYS } from '@/lib/admin/data';
+import { relanceClient } from '@/lib/admin/actions';
 import { SITE } from '@/config/site';
 
 type Meta = Record<string, unknown>;
@@ -54,9 +56,30 @@ function parisHour(now = new Date()): number {
 }
 
 /**
+ * Quand la relance automatique est due : 14 jours sans appel, comptés depuis
+ * le dernier vrai appel, ou depuis la commande s'il n'y en a jamais eu
+ * (demande de Solal, 23/11/2026 ; avant, il fallait appuyer sur « Relancer »).
+ * Une seule fois par silence : `since` est la date à partir de laquelle on compte.
+ */
+export function autoRelanceDue(
+    c: { health: string; test: boolean; lastCallAt: string | null; orderedAt: string; daysSinceLastCall: number | null; daysSinceOrder: number },
+    meta: Meta
+): string | null {
+    if (c.test || meta.banc === true || typeof meta.refunded_at === 'string') return null;
+    if (c.health !== 'relancer' && c.health !== 'inactif') return null;
+    const quiet = c.daysSinceLastCall ?? c.daysSinceOrder;
+    if (quiet <= INACTIVE_AFTER_DAYS) return null;
+    const since = c.lastCallAt ?? c.orderedAt;
+    const done = meta.auto_relance as { since?: string } | undefined;
+    return done?.since === since ? null : since;
+}
+
+/**
  * Prévient l'équipe quand un client devient « à relancer » (pas de vrai appel
  * 3 jours après la commande) ou « inactif » (pas d'appel depuis 14 jours).
- * Une seule alerte par client et par état, entre 9 h et 20 h.
+ * Une seule alerte par client, par état et par silence, entre 9 h et 20 h.
+ * Après 14 jours sans appel, la relance part aussi toute seule au client
+ * (entre 10 h et 19 h), et l'alerte le dit.
  */
 export async function sweepRelanceAlerts(now = new Date()): Promise<number> {
     try {
@@ -74,23 +97,43 @@ export async function sweepRelanceAlerts(now = new Date()): Promise<number> {
             if (!project) continue;
             const meta = (project.project_metadata ?? {}) as Meta;
             if (meta.banc === true || typeof meta.refunded_at === 'string') continue;
-            const already = meta.relance_alert as { health?: string } | undefined;
-            if (already?.health === c.health) continue;
-            const { error } = await db()
-                .from('projects')
-                .update({ project_metadata: { ...meta, relance_alert: { health: c.health, at: now.toISOString() } } })
-                .eq('id', project.id);
-            if (error) continue;
-            fresh.push({
-                name: c.name,
-                why: c.health === 'relancer' ? `a commandé il y a ${c.daysSinceOrder} jours et n'a pas encore fait de vrai appel` : `n'a pas appelé depuis ${c.daysSinceLastCall} jours`,
-            });
+            const since = c.lastCallAt ?? c.orderedAt;
+            const why = c.health === 'relancer' ? `a commandé il y a ${c.daysSinceOrder} jours et n'a pas encore fait de vrai appel` : `n'a pas appelé depuis ${c.daysSinceLastCall} jours`;
+
+            // L'alerte d'abord (elle écrit la fiche), la relance ensuite (elle relit la fiche).
+            const already = meta.relance_alert as { health?: string; since?: string } | undefined;
+            // Alerte d'avant le 23/11/2026, sans `since` : tenue pour celle de ce silence.
+            const alerted = already?.health === c.health && (already.since ?? since) === since;
+            if (!alerted) {
+                const { error } = await db()
+                    .from('projects')
+                    .update({ project_metadata: { ...meta, relance_alert: { health: c.health, since, at: now.toISOString() } } })
+                    .eq('id', project.id);
+                if (!error) fresh.push({ name: c.name, why });
+            }
+
+            const auto = hour >= 10 && hour < 19 ? autoRelanceDue(c, meta) : null;
+            if (auto) {
+                const r = await relanceClient(c.id, { auto });
+                if (!r.ok) {
+                    // Rien n'est parti (numéro manquant…) : noté, pour ne pas réessayer toutes les heures.
+                    const { data: again } = await db().from('projects').select('project_metadata').eq('id', project.id).maybeSingle();
+                    await db()
+                        .from('projects')
+                        .update({ project_metadata: { ...((again?.project_metadata ?? {}) as Meta), auto_relance: { since: auto, at: now.toISOString(), failed: r.message } } })
+                        .eq('id', project.id);
+                }
+                const said = r.ok ? `relance envoyée automatiquement ${r.message.replace(/^Relance envoyée /, '').replace(/\.$/, '')}` : `relance automatique impossible : ${r.message}`;
+                const mine = fresh.find((f) => f.name === c.name && f.why === why);
+                if (mine) mine.why = `${why} ; ${said}`;
+                else fresh.push({ name: c.name, why: `${why} ; ${said}` });
+            }
         }
         if (!fresh.length) return 0;
         await alertTeam({
             subject: fresh.length === 1 ? `Client à relancer : ${fresh[0].name}` : `${fresh.length} clients à relancer`,
             text: `${fresh.map((f) => `- ${f.name} ${f.why}.`).join('\n')}\n\nLe bouton « Relancer » est dans Clients : ${SITE.url}/admin/clients`,
-            sms: fresh.length === 1 ? `${fresh[0].name} ${fresh[0].why}. À relancer.` : `${fresh.length} clients à relancer : ${fresh.map((f) => f.name).join(', ')}.`,
+            sms: fresh.length === 1 ? `${fresh[0].name} ${fresh[0].why}.` : `${fresh.length} clients à relancer : ${fresh.map((f) => f.name).join(', ')}.`,
         });
         return fresh.length;
     } catch (err) {

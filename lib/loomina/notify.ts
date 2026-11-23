@@ -98,6 +98,8 @@ export async function sendEmail(params: {
     attachments?: { filename: string; content: Buffer; contentType: string }[];
     /** Une mise en page HTML à la place de celle tirée du texte (le texte reste la version brute). */
     html?: string;
+    /** En-têtes en plus (List-Unsubscribe des relances). */
+    headers?: Record<string, string>;
 }): Promise<boolean> {
     const smtp = smtpConfig();
     if (!smtp) {
@@ -126,6 +128,7 @@ export async function sendEmail(params: {
             html,
             ...(params.replyTo ? { replyTo: params.replyTo } : {}),
             ...(params.attachments?.length ? { attachments: params.attachments } : {}),
+            ...(params.headers && Object.keys(params.headers).length ? { headers: params.headers } : {}),
         };
         const info = await transporter.sendMail(message);
         // Une copie dans « Envoyés », pour retrouver dans la boîte (et dans l'admin,
@@ -363,7 +366,6 @@ export async function notifyFamilyInvite(params: { phone: string; firstName: str
 
 export interface AbandonedCart {
     email: string;
-    phone: string | null;
     /** Prénom de la personne qui commandait. */
     firstName: string | null;
     isGift: boolean;
@@ -372,32 +374,74 @@ export interface AbandonedCart {
     recoveryUrl: string | null;
 }
 
-export function abandonedCartTexts(cart: AbandonedCart): { subject: string; email: string; sms: string } {
+/** Les trois relances d'un panier abandonné : à l'expiration, deux jours après, cinq jours après. */
+export type CartStep = 1 | 2 | 3;
+
+/**
+ * Les trois e-mails d'un panier abandonné (demande de Solal, 23/11/2026 :
+ * plus de SMS, trois e-mails sur la semaine). Le premier rappelle le lien,
+ * le deuxième explique comment se passe un livre, le troisième est le dernier.
+ */
+export function abandonedCartTexts(cart: AbandonedCart, step: CartStep = 1): { subject: string; email: string } {
     const hello = cart.firstName ? `Bonjour ${cart.firstName},` : 'Bonjour,';
     const link = cart.recoveryUrl ?? `${SITE.url}/order`;
-    const what = cart.isGift && cart.narratorFirstName ? `le livre de ${cart.narratorFirstName}` : 'votre livre';
+    const narrator = cart.isGift ? cart.narratorFirstName?.trim() || null : null;
+    const what = narrator ? `le livre de ${narrator}` : 'votre livre';
+    const sign = `L'équipe Loomina`;
+    if (step === 2) {
+        return {
+            subject: narrator ? `Comment se passera le livre de ${narrator}` : 'Comment se passe un livre Loomina',
+            email: [
+                hello,
+                `Vous aviez commencé à commander ${what}. Voici, en bref, comment cela se passe :`,
+                narrator
+                    ? `1. ${narrator} appelle Loomina au ${SITE.phoneDisplay} depuis son téléphone, quand bon lui semble, ou choisit des jours et une heure, et Loomina l'appelle. Il n'y a rien à préparer : Loomina pose les questions et écoute.`
+                    : `1. Vous appelez Loomina au ${SITE.phoneDisplay} depuis votre téléphone, quand vous le souhaitez, ou vous choisissez des jours et une heure, et Loomina vous appelle. Il n'y a rien à préparer : Loomina pose les questions et écoute.`,
+                `2. Après chaque appel, le récit est écrit. On le lit dans l'espace auteur, où l'on peut le corriger.`,
+                `3. Quand l'histoire est complète, notre équipe relit le livre, puis il est imprimé et livré.`,
+                `Pour vous faire une idée, le plus simple est la démonstration gratuite : appelez le ${SITE.phoneDisplay}, racontez un souvenir pendant cinq minutes, et vous recevez son récit écrit par SMS.`,
+                `Reprendre la commande : ${link}`,
+                sign,
+            ].join('\n\n'),
+        };
+    }
+    if (step === 3) {
+        return {
+            subject: narrator ? `Dernier rappel pour le livre de ${narrator}` : 'Dernier rappel pour votre livre',
+            email: [
+                hello,
+                `C'est notre dernier message au sujet de votre commande. Si vous souhaitez toujours ${narrator ? `offrir son livre à ${narrator}` : 'écrire votre livre'}, elle vous attend ici :`,
+                link,
+                `Si ce n'est pas le bon moment, aucun souci. Et si quelque chose vous fait hésiter, dites-le-nous en répondant à ce message : nous lisons tout.`,
+                sign,
+            ].join('\n\n'),
+        };
+    }
     return {
-        subject: cart.isGift && cart.narratorFirstName ? `Le livre de ${cart.narratorFirstName} vous attend` : 'Votre livre Loomina vous attend',
+        subject: narrator ? `Le livre de ${narrator} vous attend` : 'Votre livre Loomina vous attend',
         email: [
             hello,
             `Vous avez commencé une commande sur Loomina sans la terminer. Si vous le souhaitez, vous pouvez la reprendre là où vous l'avez laissée :`,
             link,
             `Pour rappel : si le premier entretien ne convient pas, nous vous remboursons intégralement, sur simple demande dans les 7 jours qui suivent.`,
             `Une question avant de vous décider ? Répondez simplement à ce message, ou essayez la démonstration gratuite en appelant le ${SITE.phoneDisplay}.`,
-            `Nous ne vous écrirons pas une seconde fois à ce sujet.`,
-            `L'équipe Loomina`,
+            sign,
         ].join('\n\n'),
-        sms: `Loomina : votre commande pour ${what} n'a pas été terminée. Vous pouvez la reprendre ici : ${link} Une question ? ${SITE.phoneDisplay}`,
     };
 }
 
-/** Relance unique d'une commande commencée et jamais payée : e-mail et SMS. Ne lève pas. */
-export async function notifyAbandonedCart(cart: AbandonedCart): Promise<void> {
-    const t = abandonedCartTexts(cart);
-    await Promise.allSettled([
-        sendEmail({ to: cart.email, subject: t.subject, text: t.email, replyTo: teamContacts().email }),
-        cart.phone ? sendSms(cart.phone, t.sms) : Promise.resolve(false),
-    ]);
+/** Une relance de panier abandonné, par e-mail seulement, avec le lien pour ne plus en recevoir. Ne lève pas. */
+export async function notifyAbandonedCart(cart: AbandonedCart, step: CartStep = 1): Promise<boolean> {
+    const t = abandonedCartTexts(cart, step);
+    const { optOutLine, optOutHeaders } = await import('./optout');
+    const stop = optOutLine(cart.email);
+    return sendEmail({
+        to: cart.email,
+        subject: t.subject,
+        text: stop ? `${t.email}\n\n${stop}` : t.email,
+        replyTo: teamContacts().email,
+        headers: optOutHeaders(cart.email),
+    }).catch(() => false);
 }
 
 // ------------------------------------------------------------

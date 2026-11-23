@@ -120,10 +120,10 @@ async function main() {
         assert.doesNotMatch(familyNewsText('new_story', 'Jeanne').text, /«/);
         assert.match(familyNewsText('new_story', 'Jeanne', 'La maison').text, /« La maison »/);
     });
-    await check('A', 'Panier abandonné : lien de reprise, un seul message', () => {
-        const t = abandonedCartTexts({ email: 'a@b.fr', phone: null, firstName: 'Paul', isGift: false, narratorFirstName: 'Paul', recoveryUrl: 'https://checkout.stripe.com/c/pay/x' });
-        assert.match(t.email, /checkout\.stripe\.com/);
-        assert.match(t.email, /pas une seconde fois/);
+    await check('A', 'Panier abandonné : lien de reprise dans les trois e-mails, le dernier le dit', () => {
+        const cart = { email: 'a@b.fr', firstName: 'Paul', isGift: false, narratorFirstName: 'Paul', recoveryUrl: 'https://checkout.stripe.com/c/pay/x' };
+        for (const step of [1, 2, 3] as const) assert.match(abandonedCartTexts(cart, step).email, /checkout\.stripe\.com/);
+        assert.match(abandonedCartTexts(cart, 3).email, /dernier message/);
     });
     await check('A', 'Rappel de rendez-vous : 30 minutes avant, tu ou vous', () => {
         const s = { active: true, days: [1, 2, 3, 4, 5, 6, 7], time: '15:00' };

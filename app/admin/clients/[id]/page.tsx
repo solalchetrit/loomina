@@ -138,7 +138,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
             <div className="rounded-[18px] bg-[var(--canvas)] p-4">
               <p className="text-[16px] font-bold">Relancer ce client</p>
               <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">
-                Envoie un SMS et un e-mail qui rappellent le numéro à appeler. Pour un livre offert sans aucun appel, la relance va à celui qui l’a offert.
+                Envoie un SMS et un e-mail qui rappellent le numéro à appeler. Pour un livre offert sans aucun appel, la relance va à celui qui l’a offert. Elle part aussi toute seule après 14 jours sans appel.
                 {order.relances.length > 0 && ` Dernière relance : ${fmtDate(order.relances[order.relances.length - 1].at)} (${order.relances.length} en tout).`}
               </p>
               <form action={`/api/admin/clients/${id}/relance`} method="post" className="mt-3">
