@@ -11,9 +11,9 @@ import s from "./MemoSection.module.css";
  * il grandit avec le livre. La scène joue seule, âge après âge ; on peut toucher
  * une étape pour la voir, ou toucher Mémo pour le faire sauter.
  *
- * Le déroulé d'un âge : il apparaît (pop), s'occupe (act), saute de joie (joy), puis on passe au suivant.
+ * Le déroulé d'un âge : il apparaît (pop), s'occupe (act), reçoit un souvenir (memory), saute de joie (joy), puis on passe au suivant.
  */
-const SCRIPT: MemoClip[] = ["pop", "idle", "act", "idle", "joy", "idle"];
+const SCRIPT: MemoClip[] = ["pop", "idle", "act", "idle", "memory", "idle", "joy", "idle"];
 /** Durée d'une pause « idle » dans le déroulé, en ms. */
 const PAUSE = 900;
 
@@ -67,7 +67,7 @@ export default function MemoSection({ id = "memo" }: { id?: string }) {
       />
 
       <div ref={root} className="head-gap grid items-stretch gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10" data-reveal>
-        <button type="button" className={`card ${s.stage}`} onClick={() => clip === "idle" && setStep(4)} aria-label="Faire sauter Mémo">
+        <button type="button" className={`card ${s.stage}`} onClick={() => clip === "idle" && setStep(SCRIPT.indexOf("joy"))} aria-label="Faire sauter Mémo">
           <span className={s.halo} aria-hidden="true" />
           <span className={s.memo}>
             <Memo age={age} clip={visible ? clip : "idle"} size={380} onEnd={next} />

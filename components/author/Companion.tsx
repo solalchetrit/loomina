@@ -11,7 +11,10 @@ import s from "./Companion.module.css";
 const WORDS = ["Je n’oublie rien.", "Un autre souvenir ?", "Racontez-moi la suite."];
 
 /** Les prises qu'il enchaîne quand on le touche. */
-const TAPS: MemoClip[] = ["joy", "act", "laugh"];
+const TAPS: MemoClip[] = ["joy", "hello", "act", "memory", "laugh", "listen"];
+
+/** Au bout de combien de jours sans visite il dit « Vous revoilà ». */
+const AWAY_DAYS = 6;
 
 const SEEN_KEY = "loomina:memo";
 
@@ -83,10 +86,10 @@ export default function Companion({ project, demo = false, skipIntro = false, na
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    let seen: { age: number; told: number } | null = null;
+    let seen: { age: number; told: number; at?: number } | null = null;
     try {
       seen = JSON.parse(window.localStorage.getItem(seenKey) ?? "null");
-      window.localStorage.setItem(seenKey, JSON.stringify({ age: state.age, told: state.told }));
+      window.localStorage.setItem(seenKey, JSON.stringify({ age: state.age, told: state.told, at: Date.now() }));
     } catch {
       // Stockage indisponible : Mémo reste simplement là.
     }
@@ -99,23 +102,30 @@ export default function Companion({ project, demo = false, skipIntro = false, na
       const id = window.setTimeout(() => setGrowth({ age: state.age, intro: !seen }), 600);
       return () => window.clearTimeout(id);
     }
-    if (!moved && state.mood !== "fresh") return;
-    if (state.mood === "asleep" || state.mood === "done") return;
+    const away = Boolean(seen?.at && Date.now() - seen.at > AWAY_DAYS * 86_400_000);
+    if (!moved && !away && state.mood !== "fresh") return;
+    if (!away && (state.mood === "asleep" || state.mood === "done")) return;
     const id = window.setTimeout(() => {
-      setClip("joy");
       if (moved) {
+        // Un nouveau souvenir : une lumière naît au bout de sa trompe et s'envole vers le livre.
         const n = state.told - (seen?.told ?? 0);
+        setClip("memory");
         setNews(`Mémo a retenu ${n > 1 ? `${n} nouveaux souvenirs` : "un nouveau souvenir"}.`);
-      }
+      } else if (away) {
+        // Plusieurs jours sans venir : il vous salue.
+        setClip("hello");
+        say("Vous revoilà !");
+      } else setClip("joy");
     }, 700);
     return () => window.clearTimeout(id);
-  }, [skipIntro, state, seenKey]);
+  }, [skipIntro, state, seenKey, say]);
 
-  // Tout seul, de temps en temps, il s'occupe.
+  // Tout seul, de temps en temps, il s'occupe ou tend l'oreille.
   useEffect(() => {
     if (home !== "idle") return;
+    let n = 0;
     const id = window.setInterval(() => {
-      if (document.visibilityState === "visible") setClip((c) => (c === "idle" ? "act" : c));
+      if (document.visibilityState === "visible") setClip((c) => (c === "idle" ? (n++ % 2 ? "listen" : "act") : c));
     }, 11000);
     return () => window.clearInterval(id);
   }, [home]);
@@ -150,8 +160,8 @@ export default function Companion({ project, demo = false, skipIntro = false, na
   const onTap = () => {
     if (busy) return;
     if (home === "rest" && state.mood === "asleep") {
-      // Il dort : on le réveille un instant.
-      setClip("laugh");
+      // Il dort : on le réveille un instant, il vous salue.
+      setClip("hello");
       say("Bonjour !");
       return;
     }
@@ -307,7 +317,23 @@ export default function Companion({ project, demo = false, skipIntro = false, na
  */
 function Growth({ age, intro, narrator = null, onClose }: { age: MemoAge; intro: boolean; narrator?: string | null; onClose: () => void }) {
   const meta = MEMO_AGES[age - 1];
-  const [clip, setClip] = useState<MemoClip>("pop");
+  // Il a grandi : on le voit d'abord à son âge d'avant, il s'illumine, puis il apparaît plus grand.
+  // (Sans animation demandée, il est directement à son nouvel âge.)
+  const still = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const before = !intro && !still && age > 1 ? ((age - 1) as MemoAge) : null;
+  const [shownAge, setShownAge] = useState<MemoAge>(before ?? age);
+  const [clip, setClip] = useState<MemoClip>(before ? "charge" : "pop");
+  const ended = () => {
+    if (clip === "charge") {
+      setShownAge(age);
+      setClip("pop");
+    } else if (clip === "pop") setClip(before ? "joy" : "idle");
+    else setClip("idle");
+  };
+  // Les dessins du nouvel âge sont chargés pendant qu'il s'illumine.
+  useEffect(() => {
+    for (const p of ["a", "b", "c"] as const) new Image().src = memoSrc(age, p);
+  }, [age]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -320,7 +346,7 @@ function Growth({ age, intro, narrator = null, onClose }: { age: MemoAge; intro:
       <div className={s.growth} onClick={(e) => e.stopPropagation()}>
         <div className={s.growthStage}>
           <span className={s.growthHalo} aria-hidden="true" />
-          <Memo age={age} clip={clip} size={240} onEnd={() => setClip("idle")} />
+          <Memo age={shownAge} clip={clip} size={240} onEnd={ended} />
         </div>
         <p className="text-[14px] font-bold text-[var(--amber-ink)]">{intro ? (narrator ? `Il grandit avec le livre de ${narrator}` : "Il grandit avec votre livre") : "Mémo a grandi"}</p>
         <h2 id="memo-grandit" className="mt-1 text-[clamp(1.5rem,4vw,1.9rem)] font-extrabold leading-tight tracking-[-0.03em]">
