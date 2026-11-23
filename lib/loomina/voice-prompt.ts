@@ -148,17 +148,23 @@ export function voicePromptTemplate(o: VoicePromptOptions): string {
     parts.push(promptText('voix.intro', VOICE_INTRO));
 
     if (o.firstCall) {
+        // Depuis le 23/11/2026 (demande de Solal) : Loomina se présente et guide la
+        // personne AVANT de lui poser des questions. Avant, elle passait des
+        // préférences à l'enfance sans dire ce qu'on allait faire ni comment parler.
         const steps: string[] = [];
+        steps.push(`Présente-toi et le projet, en une seule réplique de quatre ou cinq phrases courtes (exception à la règle des 30 mots) : « Je vais vous expliquer comment ça marche. Ensemble, on va écrire le livre de votre vie. Au fil de nos appels, on passera par les grands thèmes : vos racines et votre enfance, votre jeunesse, votre vie d'adulte, et enfin ce que vous voulez transmettre à vos proches. Après chaque appel, vous retrouverez votre récit, écrit avec vos mots, dans votre espace auteur sur le site de Loomina. Ça vous va ? »`);
+        steps.push(`Donne les conseils pour bien se comprendre au téléphone, en deux ou trois phrases : « Pour que je vous comprenne bien : parlez tranquillement, en articulant bien, et attendez que j'aie fini ma phrase avant de répondre. Ne vous pressez pas, je ne vous couperai pas. »${!o.politenessAlreadySet ? ' Enchaîne dans la même réplique avec la question du tutoiement (étape suivante).' : ''}`);
         if (!o.politenessAlreadySet) steps.push('« Préférez-vous qu\'on se tutoie ou qu\'on se vouvoie ? »');
         if (!o.topicsAlreadyKnown) {
             steps.push('« Y a-t-il des sujets ou des personnes que vous préférez qu\'on laisse de côté ? » Prends acte sans commenter.');
         }
-        steps.push('Préviens en une phrase, simplement : « Nos conversations sont enregistrées, pour ne rien perdre de ce que vous me racontez. »');
-        steps.push('Explique en une phrase : « Je vais surtout vous écouter. Prenez votre temps, il n\'y a pas de bonne ou de mauvaise réponse. »');
+        steps.push('Préviens en une phrase, simplement : « Nos conversations sont enregistrées, pour ne rien perdre de ce que vous me racontez. Il n\'y a pas de bonne ou de mauvaise réponse. »');
         parts.push(`# PREMIER APPEL
-C'est la première fois que tu parles à {{first_name}} : tu ne sais rien de sa vie. Après la réponse à ta salutation, en ${steps.length === 1 ? 'un temps court' : `${['', '', 'deux', 'trois', 'quatre'][steps.length]} temps courts, une question à la fois`} :
+C'est la première fois que tu parles à {{first_name}} : tu ne sais rien de sa vie. Après la réponse à ta salutation, dans cet ordre, une question à la fois :
 ${steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}
-Puis ouvre : « Pour commencer, racontez-moi où vous avez grandi. À quoi ressemblait la maison ? »`);
+Puis ouvre : « Pour commencer, racontez-moi où vous avez grandi. À quoi ressemblait la maison ? »
+Une étape sans question s'enchaîne dans la même réplique que l'étape suivante : on ne laisse jamais {{first_name}} sans savoir quoi répondre.
+Si {{first_name}} pose une question sur le fonctionnement, réponds simplement en une ou deux phrases, puis reprends l'étape où tu en étais.`);
     } else {
         parts.push(`# MÉMOIRE DES APPELS PRÉCÉDENTS
 {{global_context}}
