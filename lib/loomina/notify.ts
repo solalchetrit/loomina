@@ -255,18 +255,33 @@ export function bookCompleteTexts(author: { first_name: string | null; politenes
     };
 }
 
+/**
+ * L'adresse e-mail de l'auteur lui-même, ou null. Pour un livre offert, le compte
+ * porte l'adresse de la personne qui a offert (ou un alias « +numéro » qui arrive
+ * dans sa boîte) : un e-mail « Bonjour Jeanne » partirait chez elle. L'auteur est
+ * alors prévenu par SMS, et la personne qui a offert reçoit son propre message.
+ */
+export function authorOwnEmail(author: { email?: string | null }, projectMetadata?: Record<string, unknown> | null): string | null {
+    if (projectMetadata?.is_gift === true) return null;
+    return author.email?.trim() || null;
+}
+
 /** Prévient l'auteur, par SMS et par e-mail, que son livre est terminé. Ne lève jamais. */
-export async function notifyAuthorBookComplete(author: {
-    first_name: string | null;
-    politeness_preference?: string | null;
-    phone_number?: string | null;
-    email?: string | null;
-}): Promise<void> {
+export async function notifyAuthorBookComplete(
+    author: {
+        first_name: string | null;
+        politeness_preference?: string | null;
+        phone_number?: string | null;
+        email?: string | null;
+    },
+    projectMetadata?: Record<string, unknown> | null
+): Promise<void> {
     try {
         const t = bookCompleteTexts(author);
+        const email = authorOwnEmail(author, projectMetadata);
         await Promise.allSettled([
             author.phone_number ? sendSms(author.phone_number, t.sms) : Promise.resolve(false),
-            author.email ? sendEmail({ to: author.email, subject: t.subject, text: t.email }) : Promise.resolve(false),
+            email ? sendEmail({ to: email, subject: t.subject, text: t.email }) : Promise.resolve(false),
         ]);
     } catch (e) {
         console.error('[notify] livre terminé, auteur non prévenu', e);
@@ -419,8 +434,8 @@ export function bookStageTexts(
         return {
             subject: `${Book} est relu : ${tu ? 'découvre-le' : 'découvrez-le'}`,
             sms: tu
-                ? `${hello}, ton livre est relu. Sa version complète t'attend sur ${where}. Un détail à changer ? Appelle le ${SITE.phoneDisplay} ou réponds à notre e-mail. Ensuite, il part à l'impression. Loomina`
-                : `${hello}, votre livre est relu. Sa version complète vous attend sur ${where}. Un détail à changer ? Appelez le ${SITE.phoneDisplay} ou répondez à notre e-mail. Ensuite, il part à l'impression. Loomina`,
+                ? `${hello}, ton livre est relu. Sa version complète t'attend sur ${where}. Un détail à changer ? Appelle le ${SITE.phoneDisplay}. Ensuite, il part à l'impression. Loomina`
+                : `${hello}, votre livre est relu. Sa version complète vous attend sur ${where}. Un détail à changer ? Appelez le ${SITE.phoneDisplay}. Ensuite, il part à l'impression. Loomina`,
             email: tu
                 ? `${hello},\n\nNous avons relu ton livre en entier. Sa version complète t'attend sur ${where} : connecte-toi avec ton numéro de téléphone, puis ouvre « Mon livre ». Tu peux aussi l'y télécharger.\n\nPrends le temps de le lire. Un nom mal écrit, un souvenir à ajouter ? Appelle le ${SITE.phoneDisplay} ou réponds simplement à ce message.\n\nEnsuite, ton livre part à l'impression. Nous te préviendrons à chaque étape, jusqu'à son arrivée chez toi.\n\n${sign}`
                 : `${hello},\n\nNous avons relu votre livre en entier. Sa version complète vous attend sur ${where} : connectez-vous avec votre numéro de téléphone, puis ouvrez « Mon livre ». Vous pouvez aussi l'y télécharger.\n\nPrenez le temps de le lire. Un nom mal écrit, un souvenir à ajouter ? Appelez le ${SITE.phoneDisplay} ou répondez simplement à ce message.\n\nEnsuite, votre livre part à l'impression. Nous vous préviendrons à chaque étape, jusqu'à son arrivée chez vous.\n\n${sign}`,
@@ -457,10 +472,11 @@ export async function notifyBookStage(params: {
         const jobs: Promise<unknown>[] = [];
         const t = bookStageTexts(params.step, params.author, params.tracking);
         const team = teamContacts().email;
-        if (params.author.phone_number) jobs.push(sendSms(params.author.phone_number, t.sms));
-        if (params.author.email) jobs.push(sendEmail({ to: params.author.email, subject: t.subject, text: t.email, replyTo: team }));
-
         const meta = params.projectMetadata ?? {};
+        const authorEmail = authorOwnEmail(params.author, meta);
+        if (params.author.phone_number) jobs.push(sendSms(params.author.phone_number, t.sms));
+        if (authorEmail) jobs.push(sendEmail({ to: authorEmail, subject: t.subject, text: t.email, replyTo: team }));
+
         if (meta.family_news !== false) {
             // Celui qui a offert le livre, et les autres proches ajoutés (lib/loomina/giver.ts).
             for (const person of familyAudience(meta)) {
@@ -468,7 +484,7 @@ export async function notifyBookStage(params: {
                 const f = bookStageTexts(params.step, { first_name: person.firstName, family: true, narratorFirstName: params.author.first_name }, params.tracking);
                 jobs.push(sendSms(person.phone, f.sms));
                 const email = person.giver && meta.is_gift === true && typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
-                if (email && email !== params.author.email) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, replyTo: team }));
+                if (email && email !== authorEmail) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, replyTo: team }));
             }
         }
         await Promise.allSettled(jobs);

@@ -639,3 +639,17 @@ test('ton d’écriture : « Naturel » devient le défaut, chaque ton est expli
     for (const s of WRITING_STYLES) assert.ok(styleGuide(s).length > 80, s);
     assert.match(styleGuide('Un ton libre'), /Un ton libre/);
 });
+
+test('livre offert : l’e-mail de l’auteur ne part pas chez la personne qui a offert', async () => {
+    const { authorOwnEmail } = await import('../../lib/loomina/notify');
+    assert.equal(authorOwnEmail({ email: 'paul@x.fr' }, { is_gift: true, buyer_email: 'paul@x.fr' }), null);
+    assert.equal(authorOwnEmail({ email: 'paul+33611111111@x.fr' }, { is_gift: true }), null);
+    assert.equal(authorOwnEmail({ email: 'jeanne@x.fr' }, { is_gift: false }), 'jeanne@x.fr');
+    assert.equal(authorOwnEmail({ email: null }, null), null);
+});
+
+test('e-mail de la démo : « 1er décembre »', async () => {
+    const { demoEmail } = await import('../../lib/loomina/demo-story');
+    const e = demoEmail({ firstName: 'Jeanne', title: 'La maison', promo: { code: 'X', expires: new Date('2026-12-01T12:00:00Z') } });
+    assert.match(e.text, /jusqu’au 1er décembre/);
+});

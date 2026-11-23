@@ -108,7 +108,7 @@ export function relanceTexts(params: { firstName: string | null; tu: boolean; to
     const host = SITE.url.replace(/^https?:\/\/(www\.)?/, '');
     if (params.toGiver) {
         return {
-            sms: `Loomina : le livre de ${params.narrator} n'attend plus que son premier appel. ${params.narrator} peut appeler le ${SITE.phoneDisplay} depuis son téléphone, quand il ou elle veut. Besoin d'aide ? Répondez à contact@loomina.eu`,
+            sms: `Loomina : le livre de ${params.narrator} n'attend plus que son premier appel. ${params.narrator} peut appeler le ${SITE.phoneDisplay} depuis son téléphone, quand il ou elle veut. Besoin d'aide ? Écrivez à contact@loomina.eu`,
             subject: `Le livre de ${params.narrator} n'attend plus que son premier appel`,
             email: `Bonjour${params.firstName ? ` ${params.firstName}` : ''},\n\nLe livre que vous avez offert à ${params.narrator} est prêt, mais nous n'avons pas encore eu son premier appel.\n\nPour commencer, ${params.narrator} n'a qu'à appeler le ${SITE.phoneDisplay} depuis son propre téléphone, quand il ou elle le souhaite. Il n'y a rien à préparer : Loomina mène la conversation.\n\nSi quelque chose bloque, répondez simplement à ce message : nous vous aidons volontiers.\n\nL'équipe Loomina`,
         };

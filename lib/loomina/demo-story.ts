@@ -255,7 +255,11 @@ function esc(s: string): string {
 export function demoEmail(params: { firstName: string | null; title: string; promo: { code: string; expires: Date } | null }) {
     const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
     const orderUrl = `https://${HOST}/order${params.promo ? `?code=${params.promo.code}` : ''}`;
-    const until = params.promo?.expires.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' }).replace(/ /g, '\u00a0');
+    // « 1er décembre », pas « 1 décembre ».
+    const until = params.promo?.expires
+        .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' })
+        .replace(/^1 /, '1er ')
+        .replace(/ /g, '\u00a0');
     const intro = [
         hello,
         `Voici votre récit, « ${params.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page comme il le serait dans votre livre.`,
