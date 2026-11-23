@@ -153,15 +153,23 @@ export function voicePromptTemplate(o: VoicePromptOptions): string {
         // préférences à l'enfance sans dire ce qu'on allait faire ni comment parler.
         const steps: string[] = [];
         steps.push(`Présente-toi et le projet, puis donne un conseil pour bien se comprendre, dans une seule réplique de phrases courtes (exception à la règle des 30 mots), sans demander « ça vous va ? » : « Avant de commencer, je vous explique en quelques mots. Mon rôle, c'est de vous aider à écrire le livre de votre vie : vous racontez, et moi j'écris. Appel après appel, nous parcourrons les grands moments de votre vie : l'histoire de votre famille et votre enfance, votre jeunesse, votre vie d'adulte, vos premiers amours, votre vie professionnelle, puis ce que vous aimeriez transmettre. Après chaque appel, vous pourrez lire votre récit, avec vos propres mots, dans votre espace auteur sur le site de Loomina. Un petit conseil pour qu'on se comprenne bien au téléphone : prenez votre temps et parlez distinctement. » Enchaîne dans la même réplique avec l'étape suivante.`);
-        if (!o.politenessAlreadySet) steps.push('« Préférez-vous qu\'on se tutoie ou qu\'on se vouvoie ? »');
+        // La première question après la présentation s'annonce par « Pour commencer, »
+        // (Solal, 23/11/2026 : sans transition, le passage au tu/vous tombait d'un coup).
+        let lead = 'Pour commencer, ';
+        const ask = (q: string) => {
+            const out = lead ? `« ${lead}${q.charAt(0).toLowerCase()}${q.slice(1)} »` : `« ${q} »`;
+            lead = '';
+            return out;
+        };
+        if (!o.politenessAlreadySet) steps.push(ask("Préférez-vous qu'on se tutoie ou qu'on se vouvoie ?"));
         if (!o.topicsAlreadyKnown) {
-            steps.push('« Y a-t-il des sujets ou des personnes que vous préférez qu\'on laisse de côté ? » Prends acte sans commenter.');
+            steps.push(`${ask("Y a-t-il des sujets ou des personnes que vous préférez qu'on laisse de côté ?")} Prends acte sans commenter.`);
         }
         steps.push('Préviens en une phrase, simplement : « Nos conversations sont enregistrées, pour ne rien perdre de ce que vous me racontez. Il n\'y a pas de bonne ou de mauvaise réponse. »');
         parts.push(`# PREMIER APPEL
-C'est la première fois que tu parles à {{first_name}} : tu ne sais rien de sa vie. Après la réponse à ta salutation, dans cet ordre, une question à la fois :
+C'est la première fois que tu parles à {{first_name}} : tu ne sais rien de sa vie. Si {{first_name}} te demande comment tu vas, réponds-lui d'abord, simplement et en quelques mots (« Très bien, merci, ça me fait plaisir de vous avoir au téléphone. »). Puis, dans cet ordre, une question à la fois :
 ${steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}
-Puis ouvre : « Pour commencer, racontez-moi où vous avez grandi. À quoi ressemblait la maison ? »
+Puis ouvre : « ${lead ? 'Pour commencer, racontez-moi' : 'Alors, racontez-moi'} où vous avez grandi. À quoi ressemblait la maison ? »
 Une étape sans question s'enchaîne dans la même réplique que l'étape suivante : on ne laisse jamais {{first_name}} sans savoir quoi répondre.
 Si {{first_name}} pose une question sur le fonctionnement, réponds simplement en une ou deux phrases, puis reprends l'étape où tu en étais.`);
     } else {
