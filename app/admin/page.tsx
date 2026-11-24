@@ -3,7 +3,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getOverview, getAgenda, configWarnings, listOrders, type AgendaSlot } from "@/lib/admin/data";
 import { fmtDate, fmtDuration, fmtNumber, INTERVIEW_STATUS, EVENT_STATUS } from "@/lib/admin/format";
-import { Badge, Panel, Empty, PageHeader, Avatar, NightFigure, Delta, Fold } from "@/components/admin/ui";
+import { Badge, Panel, Empty, PageHeader, NightFigure, Delta, Fold } from "@/components/admin/ui";
 import { audienceConfigured, type Audience } from "@/lib/admin/audience";
 import { monthRange } from "@/lib/admin/spend";
 import { getAudienceKept, getSpendKept, realRevenueKept, voiceHealthKept } from "@/lib/admin/cached";
@@ -213,9 +213,9 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
                     <tr key={String(c.id)} className="[&>td]:border-t [&>td]:border-[var(--line)] [&>td]:px-4 [&>td]:py-2.5 hover:[&>td]:bg-[var(--canvas)]">
                       <td>
                         {c.profileId ? (
-                          <Link href={`/admin/clients/${c.profileId}`} className="flex items-center gap-2.5 whitespace-nowrap font-medium hover:underline"><Avatar name={name} size={28} /> {name}</Link>
+                          <Link href={`/admin/clients/${c.profileId}`} className="flex items-center gap-2.5 whitespace-nowrap font-medium hover:underline">{name}</Link>
                         ) : (
-                          <span className="flex items-center gap-2.5 whitespace-nowrap font-medium"><Avatar name={name} size={28} /> {name}</span>
+                          <span className="flex items-center gap-2.5 whitespace-nowrap font-medium">{name}</span>
                         )}
                       </td>
                       <td className="max-w-[420px] truncate text-[var(--ink-2)]">{String(c.topics_summary ?? "") || "Pas de résumé"}</td>

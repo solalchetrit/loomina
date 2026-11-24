@@ -9,7 +9,7 @@ import { describeSchedule } from "@/lib/loomina/schedule";
 import { readTopics } from "@/lib/loomina/phase-plan";
 import { buildAssistant } from "@/lib/loomina/assistant";
 import { getSystemPrompt } from "@/lib/loomina/db";
-import { Badge, Panel, Field, Fold, Empty, Avatar, Progress, NightFigure } from "@/components/admin/ui";
+import { Badge, Panel, Field, Fold, Empty, Progress, NightFigure } from "@/components/admin/ui";
 import AIcon from "@/components/admin/icons";
 import { sumCosts, fmtEur, type CallCost } from "@/lib/admin/costs";
 import { callCostsKept } from "@/lib/admin/cached";
@@ -73,7 +73,6 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
   return (
     <div className="grid grid-cols-1 gap-[22px]">
       <header className="flex flex-wrap items-center gap-x-4 gap-y-3">
-        <Avatar name={name} size={48} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-[24px] font-semibold leading-tight tracking-[-0.025em]">{name}</h1>

@@ -215,19 +215,6 @@ export function Empty({ children }: { children: React.ReactNode }) {
   return <p className="t-small rounded-[8px] border border-dashed border-[var(--line)] px-4 py-6 text-center">{children}</p>;
 }
 
-/** Les initiales d'une personne, sur une teinte pâle qui lui est propre (tirée de son nom, donc stable). */
-export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
-  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "?";
-  let hue = 0;
-  for (const ch of name) hue = (hue * 31 + ch.charCodeAt(0)) % 360;
-  const s = Math.min(size, 34);
-  return (
-    <span className="inline-flex shrink-0 items-center justify-center rounded-[8px] font-semibold" style={{ width: s, height: s, fontSize: s * 0.38, background: `hsl(${hue} 42% 50% / 0.18)`, color: `color-mix(in srgb, hsl(${hue} 55% 55%) 70%, var(--ink))` }}>
-      {initials}
-    </span>
-  );
-}
-
 /** Barre d'avancement d'une phase. */
 export function Progress({ value }: { value: number }) {
   const v = Math.max(0, Math.min(100, Math.round(value)));
