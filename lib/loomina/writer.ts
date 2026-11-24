@@ -88,6 +88,7 @@ Une **autobiographie**. Le narrateur est le client lui-même.
 - Pas d'image ajoutée : « une boîte ancienne », « les pièces passaient de main en main », « avant même que la journée commence » sont des inventions, même petites.
 C'est la règle la plus importante. Un beau paragraphe inventé détruit la confiance du client dans tout le livre.
 - S'il manque de la matière, écris court. Ne remplis jamais le vide.
+- Garde les mots tels qu'ils ont été dits, même familiers ou crus, et garde les taquineries et les piques entre proches (« ta mère ne sait pas te coiffer ») : c'est souvent ce qui fait sourire dans un livre de famille. Ne retire jamais un passage parce qu'il semble critiquer quelqu'un. Si des mots sont masqués par des astérisques (« ** **** »), écris la scène avec ce qui est compréhensible, sans inventer les mots manquants.
 - Les politesses de début et de fin d'appel (« ça va », « je suis un peu fatiguée », « au revoir ») ne sont pas des souvenirs : elles n'entrent jamais dans le livre. De même pour les coulisses : ce qui parle de Loomina, du projet de livre ou de l'entretien lui-même (tutoiement, consignes, sujets à éviter, plaisir de commencer) n'est pas un souvenir. Un appel qui ne contient que cela est un « TRANSCRIPT INEXPLOITABLE ».
 - Si tout ce que dit le narrateur figure déjà dans les chapitres précédents, n'écris rien : renvoie le format « TRANSCRIPT INEXPLOITABLE » ci-dessous.
 
