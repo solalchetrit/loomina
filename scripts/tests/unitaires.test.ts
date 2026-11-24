@@ -787,8 +787,11 @@ test('écoute : Loomina qui parle pendant une pause du narrateur est comptée co
     assert.equal(t.loominaWait.median, 0.7);
 });
 
+const speechModule = '../../voice/src/speech.ts';
+const planModule = '../../voice/src/plan.ts';
+
 test('voix : les tournures interdites sont retirées avant la voix (24/11/2026)', async () => {
-    const { tidyReply } = await import('../../voice/src/speech.ts');
+    const { tidyReply } = (await import(speechModule)) as { tidyReply: (t: string) => string };
     assert.equal(tidyReply('Tu te souviens d’un moment précis où il t’a fait rire, ou d’une blague qu’il aimait faire ?'), 'Parle-moi d’un moment précis où il t’a fait rire.');
     assert.equal(tidyReply('Merci. Tu te souviens du costume, ou d’un moment sur scène ce jour-là ?'), 'Merci. Parle-moi du costume.');
     assert.equal(tidyReply('Tu disais que tu dormais souvent chez tes parents. Avec qui ?'), 'Tu dormais souvent chez tes parents. Avec qui ?');
@@ -799,7 +802,7 @@ test('voix : les tournures interdites sont retirées avant la voix (24/11/2026)'
 });
 
 test('voix : les noms propres de l’auteur vont à la transcription', async () => {
-    const { authorHints } = await import('../../voice/src/plan.ts');
+    const { authorHints } = (await import(planModule)) as { authorHints: (c: unknown) => string[] };
     const hints = authorHints({ identity: { full_name: 'Patricia', places: ['Alger', 'la Casbah', 'Bab El Oued'] }, family: [{ name: 'Charlie' }, { name: 'Charlie' }] });
     assert.deepEqual(hints, ['Patricia', 'Alger', 'Casbah', 'Bab El Oued', 'Charlie']);
 });
