@@ -49,6 +49,8 @@ export interface Overview {
   essai?: boolean;
   prefs: Prefs;
   project: ProjectOverview | null;
+  /** Exemplaires en plus déjà commandés pour ce livre. */
+  extraCopies?: number;
   /**
    * L'accueil du premier passage : ce qu'il reste à demander à l'auteur
    * (rien si un appel a déjà donné la réponse). Absent : pas d'accueil.

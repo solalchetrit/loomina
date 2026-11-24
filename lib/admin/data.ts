@@ -4,6 +4,7 @@
  * Lecture seule : l'admin ne modifie rien dans la base.
  */
 
+import { extraCopiesOrders, type ExtraCopiesOrder } from '@/lib/loomina/extra-copies';
 import { readShipping, shippingLines } from '@/lib/loomina/shipping';
 import { db } from '@/lib/loomina/db';
 import type { Profile, Project } from '@/lib/loomina/db';
@@ -90,6 +91,8 @@ export interface ClientDetail {
         isGift: boolean;
         buyerEmail: string | null;
         callMinutes: number;
+        /** Exemplaires en plus du livre de l'auteur : à la commande ou depuis l'espace famille. */
+        extraCopies: ExtraCopiesOrder[];
         giver: Giver | null;
         /** Les autres proches qui ouvrent l'espace famille. */
         family: { firstName: string | null; phone: string }[];
@@ -164,6 +167,7 @@ export async function getClient(profileId: string): Promise<ClientDetail | null>
             isGift: meta.is_gift === true,
             buyerEmail: typeof meta.buyer_email === 'string' ? meta.buyer_email : null,
             callMinutes: normalizeCallMinutes(meta.call_minutes),
+            extraCopies: extraCopiesOrders(meta),
             giver: readGiver(meta),
             family: readFamilyMembers(meta).map((m) => ({ firstName: m.firstName, phone: m.phone })),
             stripeSessionId: project?.stripe_session_id ?? null,

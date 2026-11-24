@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ComposedBook from "./ComposedBook";
+import BookCopies from "./BookCopies";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { SITE } from "@/config/site";
 import Progress from "./Progress";
@@ -76,6 +77,12 @@ export default function AuthorSpace({
   const setTab = useCallback((next: Tab) => {
     setTabState(next);
     if (typeof window !== "undefined" && window.scrollY > 0) window.scrollTo({ top: 0 });
+  }, []);
+  // Retour de Stripe après des exemplaires payés : l'onglet « Le livre », où BookCopies dit merci.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("exemplaires") !== "merci") return;
+    const id = window.setTimeout(() => setTabState("livre"), 0);
+    return () => window.clearTimeout(id);
   }, []);
   const [data, setData] = useState<Overview | null>(null);
   const [failed, setFailed] = useState(false);
@@ -243,7 +250,11 @@ export default function AuthorSpace({
           )}
 
           {data && tab === "livre" && (
-            <ComposedBook onUnauthorized={onUnauthorized} aside={<Photos onUnauthorized={onUnauthorized} />} />
+            <ComposedBook
+              onUnauthorized={onUnauthorized}
+              aside={<Photos onUnauthorized={onUnauthorized} />}
+              after={project ? <BookCopies compact extraCopies={data.extraCopies ?? 0} endpoint="/api/user/exemplaires" onUnauthorized={onUnauthorized} /> : null}
+            />
           )}
 
           {data && tab === "vie" &&

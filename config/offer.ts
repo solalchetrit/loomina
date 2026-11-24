@@ -28,6 +28,29 @@ export const OFFER = {
 };
 
 /**
+ * Les exemplaires en plus du livre de l'auteur, pour la famille
+ * (Solal, 24/11/2026 : 25 € pièce, « on verra pour changer le prix par la suite »).
+ * Le prix se change ici seulement : commande, espace famille et Stripe le lisent.
+ * Même livre, même format ; imprimés et envoyés avec le livre de l'auteur.
+ */
+export const EXTRA_COPY = {
+  price: 25,
+  /** Au plus, par commande. */
+  max: 20,
+};
+
+/** « 1 exemplaire en plus », « 3 exemplaires en plus ». */
+export function extraCopiesLabel(n: number): string {
+  return `${n} exemplaire${n > 1 ? "s" : ""} en plus`;
+}
+
+/** Un nombre d'exemplaires reçu d'un formulaire ou de Stripe, ramené entre 0 et le maximum. */
+export function normalizeExtraCopies(raw: unknown): number {
+  const n = typeof raw === "number" ? raw : typeof raw === "string" ? Number.parseInt(raw, 10) : 0;
+  return Number.isFinite(n) ? Math.min(EXTRA_COPY.max, Math.max(0, Math.floor(n))) : 0;
+}
+
+/**
  * La réduction offerte dans l'e-mail du récit de démonstration : un code
  * personnel, utilisable une fois, créé dans Stripe sur ce coupon.
  * Le coupon est créé une fois dans Stripe avec cet identifiant.

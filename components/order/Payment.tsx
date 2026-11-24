@@ -1,5 +1,6 @@
 "use client";
 
+import { extraCopiesLabel } from "@/config/offer";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 // « /pure » : le script de Stripe ne se charge qu'à l'ouverture du paiement, pas sur toutes les pages du site.
@@ -171,10 +172,13 @@ function PaymentForm({
     <div>
       {/* Récapitulatif */}
       <div className="rounded-[18px] bg-[var(--canvas)] p-4 sm:p-5">
-        <div className="flex items-baseline justify-between gap-4 text-[16px]">
-          <span className="font-semibold">{label}</span>
-          <span className="tabular-nums">{checkout.total.subtotal.amount}</span>
-        </div>
+        {/* Une ligne par article : le livre, puis les exemplaires en plus s'il y en a. */}
+        {(checkout.lineItems.length > 1 ? checkout.lineItems : [null]).map((item, i) => (
+          <div key={item?.id ?? "livre"} className={`flex items-baseline justify-between gap-4 text-[16px] ${i ? "mt-2" : ""}`}>
+            <span className="font-semibold">{i === 0 ? label : extraCopiesLabel(item?.quantity ?? 0)}</span>
+            <span className="tabular-nums">{item ? item.subtotal.amount : checkout.total.subtotal.amount}</span>
+          </div>
+        ))}
         {discount && (
           <div className="mt-2 flex items-center justify-between gap-4 text-[15px] text-[var(--success)]">
             <span className="flex items-center gap-2">

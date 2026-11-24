@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import BookCopies from "./BookCopies";
 import Companion from "./Companion";
 import FamilyOnboarding, { type FamilySetup } from "./FamilyOnboarding";
 import type { ProjectOverview } from "./types";
@@ -42,6 +43,8 @@ interface FamilyBook {
   calls: { date: string; minutes: number | null; title?: string | null }[];
   chapters: { number: number; title: string | null; date: string; text: string | null }[];
   openQuestions: string[];
+  /** Exemplaires en plus déjà commandés pour ce livre. */
+  extraCopies?: number;
 }
 
 interface FamilyOverview {
@@ -90,7 +93,7 @@ function paragraphs(markdown: string): string[] {
     .filter(Boolean);
 }
 
-/** Souffler un souvenir ou une question, que Loomina abordera à un prochain appel. */
+/** Poser une question ou souffler un souvenir, que Loomina abordera à un prochain appel. */
 function Suggest({ book, onAdded, onUnauthorized }: { book: FamilyBook; onAdded: (questions: string[]) => void; onUnauthorized: () => void }) {
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -125,7 +128,7 @@ function Suggest({ book, onAdded, onUnauthorized }: { book: FamilyBook; onAdded:
   return (
     <section className="card p-6 md:p-8" aria-labelledby={`souffler-${book.id}`}>
       <h3 id={`souffler-${book.id}`} className="t-heading">
-        Souffler un souvenir
+        Poser une question ou souffler un souvenir
       </h3>
       <p className="t-body mt-1">Une histoire que vous aimeriez lire, une question que vous n’avez jamais osé poser : Loomina en parlera à {name} à un prochain appel.</p>
       <form onSubmit={submit} className="mt-5">
@@ -338,6 +341,8 @@ function Book({ book, giverFirstName, onChange, onReload, onUnauthorized }: { bo
           </>
         )}
       </section>
+
+      <BookCopies extraCopies={book.extraCopies ?? 0} narrator={book.narratorFirstName} endpoint="/api/famille/exemplaires" projectId={book.id} onUnauthorized={onUnauthorized} />
     </div>
   );
 }
@@ -345,7 +350,8 @@ function Book({ book, giverFirstName, onChange, onReload, onUnauthorized }: { bo
 /**
  * L'espace famille : pour la personne qui a offert le livre.
  * Elle suit le livre et Mémo, prépare le premier appel, voit les récits
- * arriver (si le narrateur partage) et peut souffler un souvenir.
+ * arriver (si le narrateur partage), pose une question ou souffle un souvenir,
+ * et peut commander des exemplaires en plus.
  * `onNotFound` : ce numéro n'a offert aucun livre.
  */
 export default function FamilySpace({ onLogout, onUnauthorized, onNotFound }: { onLogout: () => void; onUnauthorized: () => void; onNotFound: () => void }) {

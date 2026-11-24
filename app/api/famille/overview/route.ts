@@ -1,3 +1,4 @@
+import { totalExtraCopies } from '@/lib/loomina/extra-copies';
 import { readFulfillment } from '@/lib/loomina/fulfillment';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
@@ -120,6 +121,8 @@ export async function GET(request: NextRequest) {
                         text: shared ? ((c.content_markdown as string | null) ?? null) : null,
                     })),
                     // Seulement les souvenirs que l'offreur a soufflés lui-même.
+                    // Exemplaires en plus déjà commandés pour ce livre (lib/loomina/extra-copies.ts).
+                    extraCopies: totalExtraCopies(project.project_metadata),
                     openQuestions: giverPendingTopics(project.project_metadata, normalizeContext(project.context).suggested_topics),
                 };
             })

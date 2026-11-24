@@ -10,7 +10,8 @@ import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
 import CheckoutBar, { CheckoutFooter } from "@/components/order/CheckoutBar";
-import { OFFER } from "@/config/offer";
+import { OFFER, EXTRA_COPY } from "@/config/offer";
+import CopiesStepper from "@/components/order/CopiesStepper";
 import { track } from "@/lib/analytics";
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
@@ -35,6 +36,8 @@ export default function OrderPage() {
   const [relatives, setRelatives] = useState<{ firstName: string; phone: string }[]>([]);
   const [relativeErrors, setRelativeErrors] = useState<Record<number, { firstName?: string; phone?: string }>>({});
   const [callMinutes, setCallMinutes] = useState<number>(DEFAULT_CALL_MINUTES);
+  // Exemplaires en plus du livre, pour la famille (config/offer.ts).
+  const [extraCopies, setExtraCopies] = useState(0);
   // Paiement intégré : le formulaire Stripe s'affiche ici, à l'étape 3.
   const [checkout, setCheckout] = useState<{ clientSecret: string; publishableKey: string; installments: boolean; method: PayMethod } | null>(null);
   // Code promo appliqué : réappliqué si le client passe de la carte à Klarna (nouvelle session).
@@ -109,6 +112,7 @@ export default function OrderPage() {
         phone,
         isGift,
         callMinutes,
+        extraCopies,
         giverFirstName: isGift ? form.giverFirstName.trim() : "",
         giverPhone: isGift ? formatToE164(form.giverPhone) : "",
         familyMembers: isGift
@@ -147,9 +151,12 @@ export default function OrderPage() {
     const phone = formatToE164(form.phone);
     track("begin_checkout", {
       currency: "EUR",
-      value: OFFER.price,
+      value: OFFER.price + extraCopies * EXTRA_COPY.price,
       pour: isGift ? "offrir" : "soi",
-      items: [{ item_id: "livre", item_name: OFFER.name, price: OFFER.price, quantity: 1 }],
+      items: [
+        { item_id: "livre", item_name: OFFER.name, price: OFFER.price, quantity: 1 },
+        ...(extraCopies ? [{ item_id: "exemplaire", item_name: "Exemplaire en plus", price: EXTRA_COPY.price, quantity: extraCopies }] : []),
+      ],
       transport_type: "beacon",
     });
     try {
@@ -418,6 +425,19 @@ export default function OrderPage() {
                       ))}
                     </div>
                     <p className="mt-2 text-[14px] text-[var(--ink-3)]">Environ : Loomina laisse toujours finir le souvenir en cours. Modifiable à tout moment.</p>
+                  </fieldset>
+                  {/* Exemplaires en plus (Solal, 24/11/2026) : le prix vient de config/offer.ts. */}
+                  <fieldset className="sm:col-span-2">
+                    <legend className="field-label !text-[14px]">Exemplaires en plus</legend>
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                      <CopiesStepper value={extraCopies} onChange={setExtraCopies} label="Nombre d’exemplaires en plus" />
+                      <p className="text-[15px] font-semibold text-[var(--ink-2)]">
+                        {extraCopies ? `+ ${extraCopies * EXTRA_COPY.price} €` : `${EXTRA_COPY.price} € l’exemplaire`}
+                      </p>
+                    </div>
+                    <p className="mt-2 text-[14px] text-[var(--ink-3)]">
+                      Un livre est inclus. Les autres, identiques, sont pour la famille. Ils sont envoyés avec le livre.
+                    </p>
                   </fieldset>
                 </div>
 

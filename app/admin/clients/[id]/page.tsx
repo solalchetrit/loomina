@@ -223,6 +223,18 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
             {order.giver && <Field label="Offert par">{`${order.giver.firstName ?? "?"} · ${order.giver.phone}`}</Field>}
             {order.family.length > 0 && <Field label="Espace famille">{order.family.map((m) => `${m.firstName ?? "?"} · ${m.phone}`).join(", ")}</Field>}
             <Field label="Durée d’appel voulue">{`${order.callMinutes} min`}</Field>
+            <Field label="Exemplaires en plus">
+              {order.extraCopies.length
+                ? `${order.extraCopies.reduce((n, o) => n + o.copies, 0)} à imprimer : ` +
+                  order.extraCopies
+                    .map((o) =>
+                      o.source === "commande"
+                        ? `${o.copies} à la commande, avec le livre`
+                        : `${o.copies} par ${o.by?.first_name ?? (o.source === "auteur" ? "l’auteur" : "un proche")} (espace ${o.source}) le ${fmtDate(o.at)}, ${o.shipping ? `à envoyer à ${o.shipping}` : "avec le livre"}`
+                    )
+                    .join(" ; ")
+                : "aucun"}
+            </Field>
             <Field label="Adresse de livraison">{order.shipping ? order.shipping.join(", ") : "pas encore demandée (elle l’est quand le livre est terminé)"}</Field>
             <Field label="Paiement Stripe">
               {order.stripeSessionId ? (
