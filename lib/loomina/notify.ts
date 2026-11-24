@@ -177,6 +177,8 @@ export interface Order {
     narratorPhone: string | null;
     isGift: boolean;
     giver: { first_name: string | null; phone: string } | null;
+    /** Exemplaires en plus du livre de l'auteur, pris à la commande. */
+    extraCopies?: number;
 }
 
 /** Les textes de bienvenue (e-mail et SMS), pour soi ou pour un livre offert. */
@@ -228,8 +230,8 @@ export async function notifyNewOrder(order: Order): Promise<void> {
         w.smsTo ? sendSms(w.smsTo, w.sms) : Promise.resolve(false),
         alertTeam({
             subject: `Nouvelle commande : ${who}`,
-            text: `${who}.\nE-mail de l'acheteur : ${order.buyerEmail}\nTéléphone du narrateur : ${order.narratorPhone ?? 'non renseigné'}`,
-            sms: `nouvelle commande. ${who}.`,
+            text: `${who}.\nE-mail de l'acheteur : ${order.buyerEmail}\nTéléphone du narrateur : ${order.narratorPhone ?? 'non renseigné'}${order.extraCopies ? `\nExemplaires en plus : ${order.extraCopies}` : ''}`,
+            sms: `nouvelle commande. ${who}.${order.extraCopies ? ` + ${order.extraCopies} ex.` : ''}`,
             replyTo: order.buyerEmail,
         }),
     ]);

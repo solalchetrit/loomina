@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { OFFER } from "@/config/offer";
+import { OFFER, normalizeExtraCopies } from "@/config/offer";
+import { extraCopiesLineItem } from "@/lib/loomina/extra-copies";
 import { stripe } from "@/lib/stripe";
 import { normalizeCallMinutes } from "@/lib/loomina/call-length";
 import { isTestAuthorPhone } from "@/lib/loomina/test-author";
@@ -14,6 +15,8 @@ export async function POST(request: NextRequest) {
         // Chaque choix a sa propre session Stripe : c'est ce qui permet d'afficher
         // nos propres boutons « Carte » et « 3 ou 4 fois » au lieu de la liste de Stripe.
         const method: "card" | "klarna" = body.method === "klarna" ? "klarna" : "card";
+        // Exemplaires en plus du livre de l'auteur, pour la famille (config/offer.ts).
+        const extraCopies = normalizeExtraCopies(body.extraCopies);
         const replaces = typeof body.replaces === "string" && /^cs_(live|test)_[A-Za-z0-9]+$/.test(body.replaces) ? body.replaces : null;
 
         // Validation simple
@@ -60,6 +63,7 @@ export async function POST(request: NextRequest) {
                     },
                     quantity: 1,
                 },
+                ...(extraCopies ? [extraCopiesLineItem(extraCopies)] : []),
             ],
             mode: "payment",
             // Panier abandonné : la page de paiement expire au bout de deux heures.
@@ -80,6 +84,7 @@ export async function POST(request: NextRequest) {
                 email,
                 isGift: isGift ? "true" : "false",
                 callMinutes: String(normalizeCallMinutes(callMinutes)),
+                extraCopies: String(extraCopies),
                 // Livre offert : la personne qui offre, pour son espace famille.
                 giverFirstName: isGift && typeof giverFirstName === "string" ? giverFirstName.trim().slice(0, 60) : "",
                 giverPhone: isGift && typeof giverPhone === "string" ? giverPhone.trim().slice(0, 20) : "",

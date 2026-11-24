@@ -4,10 +4,12 @@ import { formatToE164 } from '@/lib/phone';
 import { db, findProfileByPhone } from '@/lib/loomina/db';
 import { stripe } from '@/lib/stripe';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
-import { notifyNewOrder, notifyFamilyInvite } from '@/lib/loomina/notify';
+import { notifyNewOrder, notifyFamilyInvite, alertTeam } from '@/lib/loomina/notify';
 import { relanceAbandonedCarts } from '@/lib/loomina/abandoned-cart';
 import { decodeFamilyFromStripe, storeFamilyMembers } from '@/lib/loomina/giver';
 import { DEFAULT_WRITING_STYLE } from '@/lib/loomina/styles';
+import { normalizeExtraCopies, extraCopiesLabel, EXTRA_COPY } from '@/config/offer';
+import { extraCopiesOrders, type ExtraCopiesOrder } from '@/lib/loomina/extra-copies';
 
 /**
  * Provisionnement d'un client après paiement.
@@ -65,6 +67,19 @@ export async function POST(request: NextRequest) {
 
     const session = event.data.object as Stripe.Checkout.Session;
     const meta = session.metadata ?? {};
+
+    // Exemplaires en plus commandés depuis l'espace famille : rien à créer,
+    // on les ajoute au livre (app/api/famille/exemplaires).
+    if (meta.kind === 'extra_copies') {
+        try {
+            await recordFamilyCopies(session);
+            return NextResponse.json({ received: true });
+        } catch (err) {
+            console.error(`[stripe] exemplaires non notés (${session.id}) :`, err instanceof Error ? err.message : String(err));
+            return NextResponse.json({ error: 'extra_copies_failed' }, { status: 500 });
+        }
+    }
+
     const email = meta.email?.trim();
 
     // Sans metadata, c'est le Payment Link concurrent : on ne peut rien créer.
@@ -89,6 +104,11 @@ export async function POST(request: NextRequest) {
             : null;
     // Les autres proches ajoutés à la commande (lib/loomina/giver.ts).
     const family = giver ? decodeFamilyFromStripe(meta.family, [phone, giver.phone], new Date().toISOString()) : [];
+    // Exemplaires en plus pris avec le livre (config/offer.ts).
+    const extraCopies = normalizeExtraCopies(meta.extraCopies);
+    const extraOrder: ExtraCopiesOrder | null = extraCopies
+        ? { copies: extraCopies, unit_price: EXTRA_COPY.price, source: 'commande', stripe_session_id: session.id, at: new Date().toISOString() }
+        : null;
 
     try {
         const supabase = db();
@@ -178,6 +198,7 @@ export async function POST(request: NextRequest) {
                 call_minutes: normalizeCallMinutes(meta.callMinutes),
                 ...(giver ? { giver } : {}),
                 ...(family.length ? { family_members: storeFamilyMembers(family) } : {}),
+                ...(extraOrder ? { extra_copies: [extraOrder] } : {}),
                 ...(queuedBehind ? { queued_behind: queuedBehind } : {}),
                 // Payée 0 € (code promo à 100 %) : une commande d'essai, sortie des chiffres de l'admin.
                 ...(session.amount_total === 0 ? { test: true } : {}),
@@ -198,7 +219,7 @@ export async function POST(request: NextRequest) {
         console.log(`[stripe] compte et projet créés pour ${email} (phase 1)`);
         // Bienvenue au client (e-mail et SMS) et alerte à l'équipe. Une seule
         // fois : un rejeu de Stripe est arrêté plus haut. Ne lève jamais.
-        await notifyNewOrder({ buyerEmail: email, narratorFirstName: firstName, narratorPhone: phone, isGift, giver });
+        await notifyNewOrder({ buyerEmail: email, narratorFirstName: firstName, narratorPhone: phone, isGift, giver, extraCopies });
         // Chaque proche ajouté reçoit son accès à l'espace famille.
         await Promise.allSettled(family.map((m) => notifyFamilyInvite({ phone: m.phone, firstName: m.firstName, narratorFirstName: firstName, invitedBy: giver?.first_name ?? null })));
         return NextResponse.json({ received: true, provisioned: true });
@@ -299,4 +320,51 @@ async function handleAbandonedCart(session: Stripe.Checkout.Session): Promise<vo
     if (!email) return;
     const { results } = await relanceAbandonedCarts({ only: email, session });
     if (results.length) console.log(`[stripe] panier abandonné : ${results.join(', ')}`);
+}
+
+/**
+ * Des exemplaires en plus payés depuis l'espace famille : notés sur le livre
+ * (project_metadata.extra_copies), une seule fois par paiement, et l'équipe est prévenue.
+ * Lève en cas d'échec : Stripe rejouera.
+ */
+async function recordFamilyCopies(session: Stripe.Checkout.Session): Promise<void> {
+    const meta = session.metadata ?? {};
+    const copies = normalizeExtraCopies(meta.copies);
+    const projectId = meta.projectId;
+    if (!copies || !projectId) {
+        console.error(`[stripe] exemplaires : session ${session.id} incomplète`);
+        return;
+    }
+    const supabase = db();
+    const { data: project, error } = await supabase.from('projects').select('id, title, project_metadata').eq('id', projectId).maybeSingle();
+    if (error) throw new Error(`lecture projet : ${error.message}`);
+    if (!project) {
+        console.error(`[stripe] exemplaires : livre ${projectId} introuvable (session ${session.id})`);
+        return;
+    }
+    const current = (project.project_metadata ?? {}) as Record<string, unknown>;
+    const orders = extraCopiesOrders(current);
+    if (orders.some((o) => o.stripe_session_id === session.id)) return; // rejeu de Stripe
+    const unitPrice = Number.parseInt(meta.unitPrice ?? '', 10) || EXTRA_COPY.price;
+    const by = meta.byPhone ? { first_name: meta.byFirstName?.trim() || null, phone: formatToE164(meta.byPhone) } : null;
+    // L'adresse où envoyer ces exemplaires, demandée par Stripe.
+    const ship = session.collected_information?.shipping_details ?? null;
+    const a = ship?.address;
+    const shipping = ship && a ? [ship.name, a.line1, a.line2, `${a.postal_code ?? ''} ${a.city ?? ''}`.trim(), a.country].filter(Boolean).join(', ') : null;
+    const order: ExtraCopiesOrder = { copies, unit_price: unitPrice, source: 'famille', stripe_session_id: session.id, at: new Date().toISOString(), by, shipping };
+    const { error: upErr } = await supabase
+        .from('projects')
+        .update({ project_metadata: { ...current, extra_copies: [...orders, order] } })
+        .eq('id', project.id);
+    if (upErr) throw new Error(`mise à jour projet : ${upErr.message}`);
+
+    const who = by?.first_name || 'Un proche';
+    const book = project.title || 'un livre';
+    const total = orders.reduce((n, o) => n + o.copies, 0) + copies;
+    await alertTeam({
+        subject: `${extraCopiesLabel(copies)} : ${book}`,
+        text: `${who} a commandé ${extraCopiesLabel(copies)} (${unitPrice} € pièce) depuis l'espace famille, pour « ${book} ».\nTéléphone : ${by?.phone ?? 'non renseigné'}\nE-mail : ${session.customer_details?.email ?? 'non renseigné'}\nÀ envoyer à : ${shipping ?? 'adresse non fournie'}\nTotal à imprimer en plus du livre de l'auteur : ${total}.`,
+        sms: `${extraCopiesLabel(copies)} commandés pour ${book}.`,
+        replyTo: session.customer_details?.email ?? undefined,
+    });
 }
