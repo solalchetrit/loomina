@@ -25,13 +25,13 @@ export default async function AdminMails({ searchParams }: { searchParams: Promi
   }
 
   return (
-    <div className="relative left-1/2 w-[calc(100vw-24px)] max-w-[1600px] -translate-x-1/2">
+    <div className="w-full">
       {liste ? (
         <MailApp key={`${folder}:${q}`} user={mailboxUser()} folders={FOLDERS} folder={folder} q={q} liste={liste} ouvrir={Number(sp.m) || null} ecrire={ecrire} />
       ) : (
         <div className="card p-10 text-center">
-          <p className="text-[18px] font-bold">Boîte mail indisponible</p>
-          <p className="mt-2 text-[15px] text-[var(--ink-3)]">{erreur}</p>
+          <p className="text-[18px] font-semibold">Boîte mail indisponible</p>
+          <p className="mt-2 text-[14px] text-[var(--ink-3)]">{erreur}</p>
         </div>
       )}
     </div>

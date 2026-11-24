@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AIcon, { type AdminIconName } from "./icons";
 
 type Item = { href: string; label: string; icon: AdminIconName };
@@ -42,95 +43,167 @@ const ALIASES: Record<string, string[]> = {
 };
 
 const ALL = GROUPS.flatMap((g) => g.items);
+const OPEN_EVENT = "loomina-admin-menu";
+const THEME_COOKIE = "loomina_admin_theme";
 
 function useActive() {
   const pathname = usePathname();
   return (href: string) => (href === "/admin" ? pathname === "/admin" : [href, ...(ALIASES[href] ?? [])].some((h) => pathname.startsWith(h)));
 }
 
-function NavLink({ item, active, compact = false }: { item: Item; active: boolean; compact?: boolean }) {
+/** Le logo du site : blanc sur le sombre, bleu sur le clair. Les vrais fichiers, jamais redessinés. */
+function Logo() {
   return (
-    <Link
-      href={item.href}
-      aria-current={active ? "page" : undefined}
-      className={`press flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-[14px] font-bold transition-colors duration-150 ${compact ? "h-10 px-3 text-[14.5px]" : "h-11 px-3.5 text-[15px]"} ${
-        active ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:bg-[var(--canvas)] hover:text-[var(--ink)]"
-      }`}
-    >
-      <AIcon name={item.icon} size={18} className={active ? "text-[var(--amber)]" : "text-[var(--ink-3)]"} />
-      {item.label}
+    <Link href="/admin" className="flex items-center gap-2.5" aria-label="Loomina, admin">
+      <span className="relative block h-[22px] w-[77px]">
+        <Image src="/logo-loomina-blanc.png" alt="" fill sizes="77px" priority className="adm-logo-dark object-contain object-left" />
+        <Image src="/header-logo-bleu.png" alt="" fill sizes="77px" priority className="adm-logo-light object-contain object-left" />
+      </span>
+      <span className="rounded-full border border-[var(--rule-strong)] px-2 py-px text-[11px] font-medium text-[var(--ink-3)]">Admin</span>
     </Link>
   );
 }
 
-/** Ordinateur : une colonne à gauche, fixe, groupée. */
-export function AdminSidebar() {
-  const active = useActive();
+/** Clair ou sombre : le choix est écrit sur la page et dans un cookie d'un an. */
+function ThemeButton() {
+  const toggle = () => {
+    const root = document.getElementById("adm-root");
+    if (!root) return;
+    const next = root.dataset.theme === "light" ? "dark" : "light";
+    root.dataset.theme = next;
+    document.cookie = `${THEME_COOKIE}=${next}; path=/admin; max-age=31536000; samesite=lax`;
+  };
   return (
-    <nav aria-label="Rubriques de l’admin" className="sticky top-[6.25rem] hidden max-h-[calc(100vh-7.5rem)] w-[224px] shrink-0 overflow-y-auto lg:block">
-      <div className="grid gap-5 rounded-[22px] border border-[var(--line)] bg-white p-3 shadow-[var(--shadow-bar)]">
-        {GROUPS.map((g) => (
-          <div key={g.title}>
-            <p className="px-3.5 pb-1.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--ink-3)]">{g.title}</p>
-            <ul className="grid gap-0.5">
-              {g.items.map((i) => (
-                <li key={i.href}>
-                  <NavLink item={i} active={active(i.href)} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </nav>
+    <button type="button" onClick={toggle} className="adm-navlink">
+      <AIcon name="spark" size={16} />
+      Clair ou sombre
+    </button>
   );
 }
 
 /**
- * Téléphone et tablette : la rubrique en cours, et un bouton qui déplie
- * toutes les rubriques, groupées comme sur ordinateur (au lieu d'une rangée
- * de huit onglets qui débordait de l'écran).
+ * La colonne de gauche : logo, recherche d'un client (⌘K), rubriques, puis
+ * l'état du serveur vocal et les sorties. Sur téléphone, elle glisse depuis
+ * la gauche au bouton « Rubriques » de la barre du haut.
  */
-export default function AdminNav() {
+export function AdminSidebar({ health }: { health?: React.ReactNode }) {
   const active = useActive();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const current = ALL.find((i) => active(i.href)) ?? ALL[0];
-  // Une page ouverte referme le menu.
+  const search = useRef<HTMLInputElement>(null);
+
+  // Une page ouverte referme la colonne.
   useEffect(() => {
     const id = window.setTimeout(() => setOpen(false), 0);
     return () => window.clearTimeout(id);
   }, [pathname]);
+
+  useEffect(() => {
+    const onMenu = () => setOpen((o) => !o);
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setOpen(true);
+        search.current?.focus();
+      }
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener(OPEN_EVENT, onMenu);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener(OPEN_EVENT, onMenu);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
   return (
-    <nav aria-label="Rubriques de l’admin" className="lg:hidden">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls="admin-menu"
-        onClick={() => setOpen((o) => !o)}
-        className="press flex h-11 w-full items-center gap-2.5 rounded-[14px] px-3 text-[15px] font-bold text-[var(--ink)] hover:bg-[var(--canvas)]"
-      >
-        <AIcon name={current.icon} size={18} className="text-[var(--amber-ink)]" />
-        <span className="flex-1 text-left">{current.label}</span>
-        <span className="text-[14px] font-semibold text-[var(--ink-3)]">{open ? "Fermer" : "Rubriques"}</span>
-        <AIcon name="chevron" size={16} className={`text-[var(--ink-3)] transition-transform duration-200 ${open ? "-rotate-90" : "rotate-90"}`} />
-      </button>
-      {open && (
-        <div id="admin-menu" className="grid gap-4 px-1 pb-2 pt-3 sm:grid-cols-3">
+    <>
+      {open && <button type="button" aria-label="Fermer les rubriques" className="fixed inset-0 z-[1050] cursor-default lg:hidden" onClick={() => setOpen(false)} />}
+      <aside className="adm-side" data-open={open}>
+        <div className="px-2 pt-1">
+          <Logo />
+        </div>
+        <form action="/admin/clients" method="get" role="search" className="relative">
+          <AIcon name="search" size={15} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--ink-3)]" />
+          <input
+            ref={search}
+            name="q"
+            type="search"
+            autoComplete="off"
+            placeholder="Chercher un client"
+            aria-label="Chercher un client par son nom ou son numéro"
+            className="h-[34px] w-full rounded-[7px] border border-[var(--line)] bg-[var(--surface)] pl-8 pr-10 text-[13px] placeholder:text-[var(--ink-3)]"
+          />
+          <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-[5px] border border-[var(--rule-strong)] px-1.5 font-sans text-[11px] font-medium text-[var(--ink-3)]">⌘K</kbd>
+        </form>
+        <nav aria-label="Rubriques de l’admin" className="grid gap-3.5">
           {GROUPS.map((g) => (
             <div key={g.title}>
-              <p className="px-3 pb-1 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--ink-3)]">{g.title}</p>
-              <ul className="grid gap-0.5">
+              <p className="px-2.5 pb-1 text-[11.5px] font-medium text-[var(--ink-3)]">{g.title}</p>
+              <ul className="grid gap-px">
                 {g.items.map((i) => (
                   <li key={i.href}>
-                    <NavLink item={i} active={active(i.href)} compact />
+                    <Link href={i.href} aria-current={active(i.href) ? "page" : undefined} className="adm-navlink">
+                      <AIcon name={i.icon} size={16} />
+                      {i.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
+        </nav>
+        <div className="mt-auto grid gap-px border-t border-[var(--line)] pt-3">
+          {health}
+          <ThemeButton />
+          <a href="https://www.loomina.eu" target="_blank" rel="noreferrer" className="adm-navlink">
+            <AIcon name="external" size={16} />
+            Voir le site
+          </a>
+          <form action="/api/admin/logout" method="post">
+            <button className="adm-navlink">
+              <AIcon name="logout" size={16} />
+              Se déconnecter
+            </button>
+          </form>
         </div>
-      )}
-    </nav>
+      </aside>
+    </>
+  );
+}
+
+/** La barre du haut : où l'on est, et la date du jour à Paris. */
+export function AdminTopBar() {
+  const active = useActive();
+  const pathname = usePathname();
+  const current = ALL.find((i) => active(i.href)) ?? ALL[0];
+  const deeper = pathname !== current.href && pathname.startsWith("/admin/clients/");
+  const [now, setNow] = useState("");
+  useEffect(() => {
+    const id = window.setTimeout(() => setNow(new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", weekday: "long", day: "numeric", month: "long" }).format(new Date())), 0);
+    return () => window.clearTimeout(id);
+  }, []);
+  return (
+    <div className="adm-top">
+      <span className="lg:hidden">
+        <button type="button" aria-label="Ouvrir les rubriques" className="adm-ghost" onClick={() => window.dispatchEvent(new Event(OPEN_EVENT))}>
+          <AIcon name="layers" size={15} />
+          Rubriques
+        </button>
+      </span>
+      <p className="flex min-w-0 items-center gap-2 text-[13px] text-[var(--ink-3)]">
+        {deeper ? (
+          <>
+            <Link href={current.href} className="hover:text-[var(--ink)]">{current.label}</Link>
+            <span aria-hidden="true">/</span>
+            <span className="truncate font-medium text-[var(--ink)]">Fiche</span>
+          </>
+        ) : (
+          <span className="truncate font-medium text-[var(--ink)]">{current.label}</span>
+        )}
+      </p>
+      <span className="flex-1" />
+      {now && <span className="hidden sm:block"><span className="adm-ghost first-letter:uppercase">{now}</span></span>}
+    </div>
   );
 }

@@ -14,7 +14,7 @@ function Line({ b }: { b: BookLine }) {
       <div className="flex items-center gap-3">
         <Avatar name={b.client} size={40} />
         <div className="min-w-0">
-          <Link href={`/admin/clients/${b.profileId}/livre`} className="text-[17px] font-bold hover:underline">{b.client}</Link>
+          <Link href={`/admin/clients/${b.profileId}/livre`} className="text-[15px] font-semibold hover:underline">{b.client}</Link>
           <span className="mt-1 flex flex-wrap gap-1.5">
             <Badge tone={st.tone}>{st.label}</Badge>
             {b.isGift && <Badge>Offert</Badge>}
@@ -45,7 +45,7 @@ export default async function AdminBooks({ searchParams }: { searchParams: Promi
         Chaque livre terminé, et ce qu’il attend de vous. À chaque étape, le client (et la personne qui l’a offert) reçoit un SMS et un e-mail.
       </PageHeader>
       {(fait || erreur) && (
-        <p role="status" className={`rounded-[16px] px-4 py-3 text-[15px] font-semibold ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[#fbeae6] text-[#a8402f]"}`}>{fait ?? erreur}</p>
+        <p role="status" className={`rounded-[10px] px-4 py-3 text-[14px] font-semibold ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[var(--danger-soft)] text-[var(--danger)]"}`}>{fait ?? erreur}</p>
       )}
 
       <Panel icon="pen" title={`À faire (${todo.length})`}>

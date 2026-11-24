@@ -550,3 +550,80 @@ export async function listOrders(): Promise<Array<{ sessionId: string; client: s
         };
     });
 }
+
+// ------------------------------------------------------------------
+// Les appels de la semaine (page Aujourd'hui)
+// ------------------------------------------------------------------
+
+export interface AgendaSlot {
+    /** Jour à Paris, « AAAA-MM-JJ ». */
+    day: string;
+    /** « HH:MM », heure de Paris. */
+    time: string;
+    client: string;
+    profileId: string;
+    /** fait : un appel a eu lieu ce jour-là ; manqué : l'heure est passée sans appel ; à venir sinon. */
+    state: 'done' | 'missed' | 'planned';
+    /** Durée de l'appel du jour, en minutes, s'il a eu lieu. */
+    minutes: number | null;
+    /** Le prochain rendez-vous de la liste. */
+    next: boolean;
+    /** L'auteur n'a encore jamais eu de vrai appel. */
+    first: boolean;
+}
+
+const parisDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' });
+const parisClock = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', hour12: false });
+
+/**
+ * Les rendez-vous réglés par les auteurs pour la semaine en cours (lundi à
+ * dimanche, heure de Paris), avec ce que chaque appel a donné. Hors tests
+ * et hors livres terminés.
+ */
+export async function getAgenda(now = Date.now()): Promise<AgendaSlot[]> {
+    const supabase = db();
+    const today = parisDay.format(new Date(now));
+    const clock = parisClock.format(new Date(now));
+    // Le lundi de la semaine, en jours pleins (midi UTC : aucun risque de changer de jour).
+    const noon = new Date(`${today}T12:00:00Z`);
+    const monday = noon.getTime() - ((noon.getUTCDay() + 6) % 7) * DAY;
+    const days = Array.from({ length: 7 }, (_, i) => new Date(monday + i * DAY).toISOString().slice(0, 10));
+
+    const [profiles, projects, interviews] = await Promise.all([
+        supabase.from('profiles').select('id, first_name, last_name').limit(1000),
+        supabase.from('projects').select('id, user_id, status, project_metadata').limit(1000),
+        supabase.from('interviews').select('project_id, created_at, duration_seconds, processing_status').limit(10000),
+    ]);
+    const P = must(profiles, 'profils') as Row[];
+    const I = (must(interviews, 'entretiens') as Row[]).filter((i) => i.processing_status !== 'too_short');
+
+    const slots: AgendaSlot[] = [];
+    for (const j of must(projects, 'projets') as Row[]) {
+        const meta = (j.project_metadata ?? {}) as Row;
+        if (j.status === 'completed' || isTestMeta(meta)) continue;
+        const schedule = normalizeSchedule(meta.call_schedule);
+        if (!schedule.active) continue;
+        const p = P.find((x) => x.id === j.user_id);
+        const mine = I.filter((i) => i.project_id === j.id);
+        const first = mine.length === 0;
+        days.forEach((day, i) => {
+            if (!schedule.days.includes(i + 1)) return;
+            const call = mine.find((c) => parisDay.format(new Date(String(c.created_at))) === day);
+            const passed = day < today || (day === today && schedule.time < clock);
+            slots.push({
+                day,
+                time: schedule.time,
+                client: p ? `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim() || 'Sans nom' : 'Client inconnu',
+                profileId: String(j.user_id),
+                state: call ? 'done' : passed ? 'missed' : 'planned',
+                minutes: call ? Math.round((Number(call.duration_seconds) || 0) / 60) : null,
+                next: false,
+                first,
+            });
+        });
+    }
+    slots.sort((a, b) => `${a.day} ${a.time}`.localeCompare(`${b.day} ${b.time}`));
+    const next = slots.find((s) => s.state === 'planned');
+    if (next) next.next = true;
+    return slots;
+}

@@ -28,11 +28,11 @@ function Funnel({ a }: { a: Audience }) {
     <ol className="grid gap-2.5">
       {steps.map((s, i) => (
         <li key={s.label} className="grid items-center gap-x-4 gap-y-1 sm:grid-cols-[190px_1fr_120px]">
-          <p className="flex items-center gap-2 text-[15.5px] font-bold">
+          <p className="flex items-center gap-2 text-[15.5px] font-semibold">
             {s.label} <Delta now={s.value} before={s.before} />
           </p>
-          <div className="h-9 overflow-hidden rounded-[12px] bg-[var(--surface-2)]">
-            <div className="flex h-full items-center rounded-[12px] bg-[var(--amber)] px-3 text-[15px] font-extrabold text-[var(--ink)]" style={{ width: `${Math.max(s.value ? (100 * s.value) / max : 0, s.value ? 7 : 0)}%` }}>
+          <div className="h-9 overflow-hidden rounded-[8px] bg-[var(--surface-2)]">
+            <div className="flex h-full items-center rounded-[8px] bg-[var(--amber)] px-3 text-[14px] font-semibold text-[var(--ink)]" style={{ width: `${Math.max(s.value ? (100 * s.value) / max : 0, s.value ? 7 : 0)}%` }}>
               {s.value ? fmtNumber(s.value) : ""}
             </div>
           </div>
@@ -84,7 +84,7 @@ export default async function AdminAudience({ searchParams }: { searchParams: Pr
             <Stat icon="phone" tone="green" label="Clics sur la démo" value={fmtNumber(a.events.demo)} delta={<Delta now={a.events.demo} before={a.previous.demo} />} hint={`temps moyen : ${secs(a.engagement)} par visite`} />
           </div>
 
-          <Panel icon="chart" title="Visites par jour" action={<a href={`https://analytics.google.com/analytics/web/#/p${process.env.GA_PROPERTY_ID?.trim() || "516095374"}/reports/intelligenthome`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Ouvrir Google Analytics <AIcon name="external" size={14} /></a>}>
+          <Panel icon="chart" title="Visites par jour" action={<a href={`https://analytics.google.com/analytics/web/#/p${process.env.GA_PROPERTY_ID?.trim() || "516095374"}/reports/intelligenthome`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Ouvrir Google Analytics <AIcon name="external" size={14} /></a>}>
             <AreaChart label="Visites par jour" data={a.daily.map((d) => ({ x: day(d.date), y: d.sessions }))} />
           </Panel>
 
@@ -114,19 +114,19 @@ export default async function AdminAudience({ searchParams }: { searchParams: Pr
       {/* ───────────── Search Console ───────────── */}
       {audienceConfigured() && (
         <>
-          <h2 className="mt-4 flex items-center gap-3 text-[22px] font-extrabold tracking-[-0.02em]">
+          <h2 className="mt-4 flex items-center gap-3 text-[22px] font-semibold tracking-[-0.02em]">
             <span className="chip-icon !h-9 !w-9"><AIcon name="search" size={18} /></span>
             Google Search : ce que les gens cherchent
           </h2>
           {sErr || !s ? (
             <Panel>
-              <p className="text-[16px] font-bold">La Search Console n’est pas encore ouverte à l’admin.</p>
+              <p className="text-[14.5px] font-semibold">La Search Console n’est pas encore ouverte à l’admin.</p>
               <ol className="mt-3 grid list-decimal gap-1.5 pl-5 text-[15.5px] text-[var(--ink-2)]">
                 <li>
                   Dans la <a className="link" href="https://search.google.com/search-console/users" target="_blank" rel="noreferrer">Search Console</a>, propriété loomina.eu : Paramètres, Utilisateurs et autorisations, Ajouter un utilisateur.
                 </li>
                 <li>
-                  Coller l’adresse du compte technique {robot ? <code className="rounded bg-[var(--surface-2)] px-1.5 py-0.5 text-[14px]">{robot}</code> : "(celle de la clé GA_SERVICE_ACCOUNT_KEY)"}, droit « Restreint ».
+                  Coller l’adresse du compte technique {robot ? <code className="rounded bg-[var(--surface-2)] px-1.5 py-0.5 text-[13.5px]">{robot}</code> : "(celle de la clé GA_SERVICE_ACCOUNT_KEY)"}, droit « Restreint ».
                 </li>
                 <li>
                   Dans Google Cloud, activer l’API{" "}
@@ -143,7 +143,7 @@ export default async function AdminAudience({ searchParams }: { searchParams: Pr
                 <Stat icon="check" label="Taux de clic" value={pct(s.ctr)} hint="clics ÷ apparitions" />
                 <Stat icon="star" label="Position moyenne" value={s.position ? s.position.toLocaleString("fr-FR", { maximumFractionDigits: 1 }) : "—"} hint="1 = premier résultat" />
               </div>
-              <Panel icon="chart" title="Apparitions dans Google par jour" action={<a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Ouvrir la Search Console <AIcon name="external" size={14} /></a>}>
+              <Panel icon="chart" title="Apparitions dans Google par jour" action={<a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Ouvrir la Search Console <AIcon name="external" size={14} /></a>}>
                 <AreaChart label="Apparitions par jour" data={s.daily.map((d) => ({ x: day(d.date), y: d.impressions }))} />
               </Panel>
               <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
@@ -152,9 +152,9 @@ export default async function AdminAudience({ searchParams }: { searchParams: Pr
                     <Empty>Pas encore assez de recherches pour que Google les montre.</Empty>
                   ) : (
                     <div className="-mx-1 overflow-x-auto">
-                      <table className="w-full min-w-[420px] text-left text-[15px]">
+                      <table className="w-full min-w-[420px] text-left text-[14px]">
                         <thead>
-                          <tr className="text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--ink-3)]">
+                          <tr className="text-[12px] font-medium text-[var(--ink-3)]">
                             <th className="px-1 pb-2">Recherche</th>
                             <th className="px-1 pb-2 text-right">Clics</th>
                             <th className="px-1 pb-2 text-right">Vues</th>

@@ -118,7 +118,7 @@ function link(a: { x: number; y: number; w: number; h: number }, b: { x: number;
 }
 
 const STATUS = {
-  todo: { label: "À faire", dot: "#d4513b" },
+  todo: { label: "À faire", dot: "var(--danger)" },
   partial: { label: "À surveiller", dot: "#ee9b2d" },
 } as const;
 
@@ -438,17 +438,17 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
         setSelected(null);
       }}
       aria-pressed={filter === key}
-      className={`press whitespace-nowrap rounded-full px-4 py-2 text-[15px] font-bold ${filter === key ? "bg-[var(--ink)] text-white" : `bg-white text-[var(--ink)] shadow-[0_0_0_1px_var(--line)] hover:shadow-[0_0_0_1px_var(--rule-strong)] ${extra}`}`}
+      className={`press whitespace-nowrap rounded-full px-4 py-2 text-[14px] font-semibold ${filter === key ? "bg-[var(--btn)] text-[var(--on-btn)]" : `bg-[var(--surface)] text-[var(--ink)] shadow-[0_0_0_1px_var(--line)] hover:shadow-[0_0_0_1px_var(--rule-strong)] ${extra}`}`}
     >
       {label}
     </button>
   );
 
   const nodeClass = (n: MapNode) => {
-    if (n.status === "todo") return "border-dashed border-[#d4513b] bg-[#fff6f4] text-[var(--ink)]";
+    if (n.status === "todo") return "border-dashed border-[var(--danger)] bg-[var(--danger-soft)] text-[var(--ink)]";
     if (n.kind === "end") return "border-transparent bg-[var(--success-soft)] text-[var(--success)]";
-    if (n.kind === "q") return "border-[var(--rule-strong)] bg-white text-[var(--ink)]";
-    return "border-[var(--line)] bg-white text-[var(--ink)]";
+    if (n.kind === "q") return "border-[var(--rule-strong)] bg-[var(--surface)] text-[var(--ink)]";
+    return "border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]";
   };
 
   const detail = sel ?? null;
@@ -482,13 +482,13 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
           {chip(
             "todo",
             <span className="inline-flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#d4513b]" aria-hidden /> Ce qui manque ({counts.todo + counts.partial})
+              <span className="h-2 w-2 rounded-full bg-[var(--danger)]" aria-hidden /> Ce qui manque ({counts.todo + counts.partial})
             </span>
           )}
         </div>
         <div className="inline-flex rounded-full bg-[var(--surface-2)] p-1">
           {(["schema", "liste"] as const).map((m) => (
-            <button key={m} type="button" onClick={() => setMode(m)} aria-pressed={mode === m} className={`rounded-full px-4 py-1.5 text-[15px] font-bold ${mode === m ? "bg-white text-[var(--ink)] shadow-[var(--shadow-bar)]" : "text-[var(--ink-3)]"}`}>
+            <button key={m} type="button" onClick={() => setMode(m)} aria-pressed={mode === m} className={`rounded-full px-4 py-1.5 text-[14px] font-semibold ${mode === m ? "bg-[var(--surface)] text-[var(--ink)] shadow-[var(--shadow-bar)]" : "text-[var(--ink-3)]"}`}>
               {m === "schema" ? "Schéma" : "Liste"}
             </button>
           ))}
@@ -498,7 +498,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
       {mode === "schema" ? (
         <div
           ref={frame}
-          className="relative left-1/2 mt-5 h-[78vh] min-h-[480px] w-[calc(100vw-24px)] max-w-[2200px] -translate-x-1/2 lg:left-0 lg:w-full lg:translate-x-0 touch-none select-none overflow-hidden rounded-[24px] border border-[var(--line)] bg-white"
+          className="relative left-1/2 mt-5 h-[78vh] min-h-[480px] w-[calc(100vw-24px)] max-w-[2200px] -translate-x-1/2 lg:left-0 lg:w-full lg:translate-x-0 touch-none select-none overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--surface)]"
           style={{ backgroundImage: "radial-gradient(var(--rule-strong) 1px, transparent 1px)", backgroundSize: `${22 * view.z}px ${22 * view.z}px`, backgroundPosition: `${view.x}px ${view.y}px`, cursor: dragging ? "grabbing" : "grab" }}
           onPointerDown={(e) => {
             if ((e.target as HTMLElement).closest("[data-ui]")) return;
@@ -530,18 +530,18 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
         >
           <div className="absolute left-0 top-0 origin-top-left" style={{ width: L.width, height: L.height, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})`, transition: anim ? "transform .28s cubic-bezier(.2,.7,.2,1)" : "none" }}>
             {L.boxes.map((b) => (
-              <div key={b.group.key} className="absolute rounded-[22px] border border-[var(--line)] bg-white/70 transition-opacity" style={{ left: b.x, top: b.y - 10, width: b.w, height: b.h + 10, opacity: filter !== "all" && filter !== "todo" && filter !== b.group.key ? 0.3 : 1 }} />
+              <div key={b.group.key} className="absolute rounded-[12px] border border-[var(--line)] bg-[var(--surface)] transition-opacity" style={{ left: b.x, top: b.y - 10, width: b.w, height: b.h + 10, opacity: filter !== "all" && filter !== "todo" && filter !== b.group.key ? 0.3 : 1 }} />
             ))}
 
             <svg width={L.width} height={L.height} className="pointer-events-none absolute left-0 top-0" fill="none">
               {rootEdges.map((d, i) => (
-                <path key={i} d={d} stroke="#c9c7bf" strokeWidth={1.5} />
+                <path key={i} d={d} stroke="var(--rule-strong)" strokeWidth={1.5} />
               ))}
               {cross.map((e) => (
-                <path key={e.key} d={e.d} stroke={e.hot ? "#ee9b2d" : "#e2c9a0"} strokeWidth={e.hot ? 2.5 : 1.5} strokeDasharray="5 5" opacity={selected && !e.hot ? 0.35 : 0.9} />
+                <path key={e.key} d={e.d} stroke={e.hot ? "#ee9b2d" : "var(--amber-line)"} strokeWidth={e.hot ? 2.5 : 1.5} strokeDasharray="5 5" opacity={selected && !e.hot ? 0.35 : 0.9} />
               ))}
               {edges.map((e) => (
-                <path key={e.key} d={e.d} stroke={e.hot ? "#161616" : "#bdbbb2"} strokeWidth={e.hot ? 2.5 : 1.5} opacity={e.faint ? 0.25 : 1} />
+                <path key={e.key} d={e.d} stroke={e.hot ? "var(--ink)" : "var(--rule-strong)"} strokeWidth={e.hot ? 2.5 : 1.5} opacity={e.faint ? 0.25 : 1} />
               ))}
             </svg>
 
@@ -549,7 +549,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
               <div
                 key={r.root.id}
                 data-node={r.root.id}
-                className={`absolute flex items-center justify-center rounded-[14px] border px-3 text-center text-[13.5px] font-bold leading-tight ${r.root.row === 0 ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-[var(--rule-strong)] bg-white"} ${selected === r.root.id ? "ring-4 ring-[var(--amber-soft)]" : ""}`}
+                className={`absolute flex items-center justify-center rounded-[8px] border px-3 text-center text-[13px] font-semibold leading-tight ${r.root.row === 0 ? "border-[var(--ink)] bg-[var(--btn)] text-[var(--on-btn)]" : "border-[var(--rule-strong)] bg-[var(--surface)]"} ${selected === r.root.id ? "ring-4 ring-[var(--amber-soft)]" : ""}`}
                 style={{ left: r.x, top: r.y, width: RW, height: NH }}
               >
                 {r.root.kind === "q" ? "◦ " : ""}
@@ -560,7 +560,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
             {L.boxes.map((b) => (
               <div
                 key={`h-${b.group.key}`}
-                className="absolute flex items-center justify-center rounded-[12px] bg-[var(--amber)] px-3 text-center text-[14px] font-extrabold leading-tight text-[var(--ink)] transition-opacity"
+                className="absolute flex items-center justify-center rounded-[8px] bg-[var(--amber)] px-3 text-center text-[13.5px] font-semibold leading-tight text-[var(--ink)] transition-opacity"
                 style={{ left: b.x + PAD, top: b.y, width: b.w - PAD * 2, height: HEAD, opacity: filter !== "all" && filter !== "todo" && filter !== b.group.key ? 0.3 : 1 }}
               >
                 {b.group.label}
@@ -574,10 +574,10 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
                 <div
                   key={p.node.id}
                   data-node={p.node.id}
-                  className={`absolute flex items-center justify-center rounded-[12px] border px-2.5 text-center text-[12.5px] font-semibold leading-[1.25] transition-[opacity,box-shadow] ${nodeClass(p.node)} ${selected === p.node.id ? "shadow-[0_0_0_4px_var(--amber-soft)] !border-[var(--ink)]" : linked.has(p.node.id) ? "!border-[var(--ink)]" : ""}`}
+                  className={`absolute flex items-center justify-center rounded-[8px] border px-2.5 text-center text-[12.5px] font-semibold leading-[1.25] transition-[opacity,box-shadow] ${nodeClass(p.node)} ${selected === p.node.id ? "shadow-[0_0_0_4px_var(--amber-soft)] !border-[var(--ink)]" : linked.has(p.node.id) ? "!border-[var(--ink)]" : ""}`}
                   style={{ left: p.x, top: p.y, width: NW, height: NH, opacity: off ? 0.25 : 1 }}
                 >
-                  {st && <span className="absolute -left-1 -top-1 h-3 w-3 rounded-[4px] border-2 border-white" style={{ background: st.dot }} aria-label={st.label} />}
+                  {st && <span className="absolute -left-1 -top-1 h-3 w-3 rounded-[4px] border-2 border-[var(--surface)]" style={{ background: st.dot }} aria-label={st.label} />}
                   <span>
                     {p.node.kind === "q" ? "◦ " : ""}
                     {p.node.label}
@@ -594,9 +594,9 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
                 <span className="pill pill-amber">{detailGroup?.label ?? "Point de départ"}</span>
                 <button type="button" onClick={() => setSelected(null)} aria-label="Fermer" className="-mr-1 -mt-1 flex h-8 w-8 items-center justify-center rounded-full text-[20px] leading-none text-[var(--ink-3)] hover:bg-[var(--surface-2)]">×</button>
               </div>
-              <p className="mt-3 text-[19px] font-extrabold leading-tight tracking-[-0.02em]">{detail?.node.label ?? selRoot?.root.label}</p>
+              <p className="mt-3 text-[19px] font-semibold leading-tight tracking-[-0.02em]">{detail?.node.label ?? selRoot?.root.label}</p>
               {detail?.node.status && (
-                <p className="mt-2 inline-flex items-center gap-2 text-[14px] font-bold" style={{ color: STATUS[detail.node.status].dot }}>
+                <p className="mt-2 inline-flex items-center gap-2 text-[13.5px] font-semibold" style={{ color: STATUS[detail.node.status].dot }}>
                   <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: STATUS[detail.node.status].dot }} /> {STATUS[detail.node.status].label}
                 </p>
               )}
@@ -609,7 +609,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
                     const other = L.placed.get(l.from === detail.node.id ? l.to : l.from);
                     const og = groups.find((g) => g.key === other?.group);
                     return (
-                      <button key={l.from + l.to} type="button" onClick={() => go(other?.node.id ?? null)} className="mt-3 block w-full rounded-[12px] bg-[var(--amber-soft)] px-3 py-2 text-left text-[14px] font-semibold text-[var(--amber-deep)]">
+                      <button key={l.from + l.to} type="button" onClick={() => go(other?.node.id ?? null)} className="mt-3 block w-full rounded-[8px] bg-[var(--amber-soft)] px-3 py-2 text-left text-[13.5px] font-semibold text-[var(--amber-deep)]">
                         {l.from === detail.node.id ? "→" : "←"} {og?.label} · {other?.node.label} <span className="font-normal">({l.label})</span>
                       </button>
                     );
@@ -618,7 +618,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
           )}
 
           {/* Mini-carte */}
-          <div data-ui className="absolute bottom-3 left-3 hidden rounded-[14px] border border-[var(--line)] bg-white p-2 shadow-[var(--shadow-bar)] sm:block">
+          <div data-ui className="absolute bottom-3 left-3 hidden rounded-[8px] border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[var(--shadow-bar)] sm:block">
             <div className="relative" style={{ width: 150, height: L.height * (150 / L.width) }}>
               {L.boxes.map((b) => (
                 <span key={b.group.key} className="absolute rounded-[3px] bg-[var(--amber-soft)]" style={{ left: b.x * (150 / L.width), top: b.y * (150 / L.width), width: b.w * (150 / L.width), height: b.h * (150 / L.width) }} />
@@ -632,23 +632,23 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
           {/* Légende et zoom */}
           <div data-ui className="absolute bottom-3 right-3 flex cursor-auto items-end gap-2">
             {legend && (
-              <div className="card mb-12 w-[250px] p-4 text-[13.5px] shadow-[var(--shadow-float)] sm:mb-0">
+              <div className="card mb-12 w-[250px] p-4 text-[13px] shadow-[var(--shadow-float)] sm:mb-0">
                 <ul className="grid gap-2">
                   <li className="flex items-center gap-2"><span className="h-5 w-8 rounded-[6px] bg-[var(--amber)]" /> Un domaine</li>
-                  <li className="flex items-center gap-2"><span className="h-5 w-8 rounded-[6px] border border-[var(--line)] bg-white" /> Une étape</li>
-                  <li className="flex items-center gap-2"><span className="flex h-5 w-8 items-center justify-center rounded-[6px] border border-[var(--rule-strong)] bg-white text-[11px]">◦</span> Une question, un aiguillage</li>
+                  <li className="flex items-center gap-2"><span className="h-5 w-8 rounded-[6px] border border-[var(--line)] bg-[var(--surface)]" /> Une étape</li>
+                  <li className="flex items-center gap-2"><span className="flex h-5 w-8 items-center justify-center rounded-[6px] border border-[var(--rule-strong)] bg-[var(--surface)] text-[11px]">◦</span> Une question, un aiguillage</li>
                   <li className="flex items-center gap-2"><span className="h-5 w-8 rounded-[6px] bg-[var(--success-soft)]" /> Un résultat enregistré ou envoyé</li>
-                  <li className="flex items-center gap-2"><span className="h-5 w-8 rounded-[6px] border border-dashed border-[#d4513b] bg-[#fff6f4]" /> À faire : pas dans le code</li>
+                  <li className="flex items-center gap-2"><span className="h-5 w-8 rounded-[6px] border border-dashed border-[var(--danger)] bg-[var(--danger-soft)]" /> À faire : pas dans le code</li>
                   <li className="flex items-center gap-2"><span className="ml-2.5 mr-2.5 h-3 w-3 rounded-[4px] bg-[#ee9b2d]" /> À surveiller : incomplet</li>
-                  <li className="flex items-center gap-2"><svg width="32" height="8"><path d="M0 4 H32" stroke="#e2c9a0" strokeWidth="2" strokeDasharray="5 5" /></svg> Lien d’un domaine à l’autre</li>
+                  <li className="flex items-center gap-2"><svg width="32" height="8"><path d="M0 4 H32" stroke="var(--amber-line)" strokeWidth="2" strokeDasharray="5 5" /></svg> Lien d’un domaine à l’autre</li>
                 </ul>
               </div>
             )}
-            <div className="flex items-center gap-1 rounded-full border border-[var(--line)] bg-white p-1 shadow-[var(--shadow-bar)]">
-              <button type="button" onClick={() => setLegend((v) => !v)} aria-pressed={legend} className="rounded-full px-3 py-1.5 text-[14px] font-bold hover:bg-[var(--surface-2)]">Légende</button>
-              <button type="button" onClick={() => zoom(0.85)} aria-label="Dézoomer" className="h-9 w-9 rounded-full text-[18px] font-bold hover:bg-[var(--surface-2)]">−</button>
-              <span className="w-12 text-center text-[14px] font-bold tabular-nums">{Math.round(view.z * 100)} %</span>
-              <button type="button" onClick={() => zoom(1.18)} aria-label="Zoomer" className="h-9 w-9 rounded-full text-[18px] font-bold hover:bg-[var(--surface-2)]">+</button>
+            <div className="flex items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--surface)] p-1 shadow-[var(--shadow-bar)]">
+              <button type="button" onClick={() => setLegend((v) => !v)} aria-pressed={legend} className="rounded-full px-3 py-1.5 text-[13.5px] font-semibold hover:bg-[var(--surface-2)]">Légende</button>
+              <button type="button" onClick={() => zoom(0.85)} aria-label="Dézoomer" className="h-9 w-9 rounded-full text-[18px] font-semibold hover:bg-[var(--surface-2)]">−</button>
+              <span className="w-12 text-center text-[13.5px] font-semibold tabular-nums">{Math.round(view.z * 100)} %</span>
+              <button type="button" onClick={() => zoom(1.18)} aria-label="Zoomer" className="h-9 w-9 rounded-full text-[18px] font-semibold hover:bg-[var(--surface-2)]">+</button>
               <button type="button" onClick={fitWidth} aria-label="Voir toute la carte" className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[var(--surface-2)]"><AIcon name="expand" size={16} /></button>
             </div>
           </div>
@@ -666,13 +666,13 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
                   <p className="t-small mt-1">{g.about}</p>
                   <ul className="mt-4 grid gap-2">
                     {nodes.map((n) => (
-                      <li key={n.id} className={`rounded-[14px] border px-4 py-3 ${n.status === "todo" ? "border-dashed border-[#d4513b] bg-[#fff6f4]" : "border-[var(--line)] bg-white"}`}>
-                        <p className="flex flex-wrap items-center gap-2 text-[16px] font-bold">
+                      <li key={n.id} className={`rounded-[8px] border px-4 py-3 ${n.status === "todo" ? "border-dashed border-[var(--danger)] bg-[var(--danger-soft)]" : "border-[var(--line)] bg-[var(--surface)]"}`}>
+                        <p className="flex flex-wrap items-center gap-2 text-[14.5px] font-semibold">
                           {n.kind === "q" ? "◦ " : ""}
                           {n.label}
-                          {n.status && <span className="pill" style={{ background: n.status === "todo" ? "#fbe6e2" : "var(--amber-soft)", color: n.status === "todo" ? "#9a3524" : "var(--amber-deep)" }}>{STATUS[n.status].label}</span>}
+                          {n.status && <span className="pill" style={{ background: n.status === "todo" ? "var(--danger-soft)" : "var(--amber-soft)", color: n.status === "todo" ? "var(--danger)" : "var(--amber-deep)" }}>{STATUS[n.status].label}</span>}
                         </p>
-                        {n.d && <p className="mt-1 text-[15px] leading-relaxed text-[var(--ink-2)]">{n.d}</p>}
+                        {n.d && <p className="mt-1 text-[14px] leading-relaxed text-[var(--ink-2)]">{n.d}</p>}
                       </li>
                     ))}
                   </ul>

@@ -46,8 +46,8 @@ export default async function AdminDemos() {
             {demos.map((d) => {
               const s = STATUS[String(d.status)] ?? { label: String(d.status), tone: "muted" as Tone };
               return (
-                <li key={String(d.id)} className="rounded-[18px] border border-[var(--line)] bg-[#fcfbf8] p-4 sm:p-5">
-                  <div className="flex flex-wrap items-center gap-2 text-[15px]">
+                <li key={String(d.id)} className="rounded-[10px] border border-[var(--line)] bg-[var(--adm-bg)] p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center gap-2 text-[14px]">
                     <b>{fmtDate(d.created_at)}</b>
                     <span className="text-[var(--ink-3)]">
                       · {d.first_name ? String(d.first_name) : "prénom inconnu"} · {fmtDuration(d.duration_seconds)} · <span className="tabular-nums">{String(d.phone ?? "numéro masqué")}</span>
@@ -57,12 +57,12 @@ export default async function AdminDemos() {
                     {d.email ? <Badge tone="ok">E-mail : {String(d.email)}{Number(d.email_count) > 1 ? ` (×${String(d.email_count)})` : ""}</Badge> : null}
                     {d.promo_code ? <Badge>Code {String(d.promo_code)}</Badge> : null}
                   </div>
-                  <p className="mt-2 text-[14.5px] text-[var(--ink-2)]">
+                  <p className="mt-2 text-[13.5px] text-[var(--ink-2)]">
                     {d.title ? <><b>« {String(d.title)} »</b> · </> : null}
                     Le narrateur a dit {fmtNumber(narratorWords(d.transcript))} mots, le récit en compte {fmtNumber(words(d.content))}.
                     {d.status === "written" && d.token ? <> · <Link href={`/recit/${String(d.token)}`} className="font-semibold underline" target="_blank">Voir la page du récit</Link></> : null}
                   </p>
-                  {d.error ? <p className="mt-2 text-[14px] text-[var(--danger)]">Erreur : {String(d.error)}</p> : null}
+                  {d.error ? <p className="mt-2 text-[13.5px] text-[var(--danger)]">Erreur : {String(d.error)}</p> : null}
                   {d.recording_sid ? <audio controls preload="none" src={`/api/admin/recordings/${String(d.id)}?demo=1`} className="mt-3 w-full" /> : null}
                   <div className="mt-3 grid gap-2">
                     {d.content ? <Fold summary="Récit envoyé">{String(d.content)}</Fold> : null}
