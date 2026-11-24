@@ -6,7 +6,7 @@ import { fmtDate, fmtNumber } from "@/lib/admin/format";
 import type { Tone } from "@/lib/admin/format";
 import { PHASE_LABELS, toPhase } from "@/lib/loomina/phases";
 import { STAGE_ADMIN } from "@/lib/loomina/fulfillment";
-import { Badge, Panel, NightFigure, Empty, PageHeader, Avatar, Progress, Segmented } from "@/components/admin/ui";
+import { Badge, Panel, NightFigure, Empty, PageHeader, Progress, Segmented } from "@/components/admin/ui";
 
 export const metadata = { title: "Clients" };
 
@@ -52,7 +52,6 @@ function Row({ c, children, relance = false }: { c: CrmClient; children?: React.
   return (
     <li className="flex flex-wrap items-center gap-2">
       <Link href={`/admin/clients/${c.id}`} className="-mx-3 flex min-w-0 flex-1 flex-wrap items-center gap-3 rounded-[10px] px-3 py-3 hover:bg-[var(--canvas)]">
-        <Avatar name={c.name} />
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-2">
             <span className="font-medium">{c.name}</span>
@@ -184,7 +183,6 @@ export default async function AdminClients({ searchParams }: { searchParams: Pro
                     <tr key={c.id} className="group align-middle [&>td]:border-t [&>td]:border-[var(--line)] [&>td]:px-4 [&>td]:py-2.5 hover:[&>td]:bg-[var(--canvas)]">
                       <td>
                         <Link href={`/admin/clients/${c.id}`} className="flex items-center gap-3">
-                          <Avatar name={c.name} size={30} />
                           <span className="min-w-0">
                             <span className="block whitespace-nowrap font-medium group-hover:underline">{c.name}</span>
                             <span className="block text-[13px] tabular-nums text-[var(--ink-3)]">{c.phone ?? "pas de numéro"}</span>

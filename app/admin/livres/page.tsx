@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
 import { listBooks, type BookLine } from "@/lib/admin/data";
 import { STAGE_ADMIN } from "@/lib/loomina/fulfillment";
-import { Badge, Panel, Empty, PageHeader, Avatar } from "@/components/admin/ui";
+import { Badge, Panel, Empty, PageHeader } from "@/components/admin/ui";
 import BookSteps, { PromiseNote } from "@/components/admin/BookSteps";
 
 export const metadata = { title: "Livres" };
@@ -12,7 +12,6 @@ function Line({ b }: { b: BookLine }) {
   return (
     <li className="grid gap-4 py-5 first:pt-1 last:pb-1 lg:grid-cols-[minmax(220px,0.8fr)_1.6fr] lg:items-start">
       <div className="flex items-center gap-3">
-        <Avatar name={b.client} size={40} />
         <div className="min-w-0">
           <Link href={`/admin/clients/${b.profileId}/livre`} className="text-[15px] font-semibold hover:underline">{b.client}</Link>
           <span className="mt-1 flex flex-wrap gap-1.5">
