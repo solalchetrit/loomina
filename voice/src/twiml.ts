@@ -21,6 +21,8 @@ export function conversationRelayTwiml(params: {
     callSid: string;
     /** Voix propre à cet appel (la démo), sinon celle de la configuration. */
     voice?: string;
+    /** Noms propres de l'auteur (plan.ts, authorHints). */
+    hints?: string[];
 }): string {
     const attrs: Record<string, string> = {
         url: wsUrl(),
@@ -43,8 +45,8 @@ export function conversationRelayTwiml(params: {
         // (« hum », « oui ») grâce à la sensibilité basse.
         interruptible: 'speech',
         interruptSensitivity: 'low',
-        // Les noms propres de la marque, pour la transcription.
-        hints: 'Loomina,Loumina',
+        // Les noms propres de la marque et de l'auteur (lieux, proches), pour la transcription.
+        hints: ['Loomina', 'Loumina', ...(params.hints ?? [])].join(','),
         dtmfDetection: 'false',
         // Morceaux de phrase en direct : Loomina sait que le narrateur a
         // repris la parole et retient sa réponse (session.ts).

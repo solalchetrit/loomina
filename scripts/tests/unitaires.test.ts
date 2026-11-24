@@ -786,3 +786,20 @@ test('écoute : Loomina qui parle pendant une pause du narrateur est comptée co
     assert.equal(t.cuts[0].pause, 0.8);
     assert.equal(t.loominaWait.median, 0.7);
 });
+
+test('voix : les tournures interdites sont retirées avant la voix (24/11/2026)', async () => {
+    const { tidyReply } = await import('../../voice/src/speech.ts');
+    assert.equal(tidyReply('Tu te souviens d’un moment précis où il t’a fait rire, ou d’une blague qu’il aimait faire ?'), 'Parle-moi d’un moment précis où il t’a fait rire.');
+    assert.equal(tidyReply('Merci. Tu te souviens du costume, ou d’un moment sur scène ce jour-là ?'), 'Merci. Parle-moi du costume.');
+    assert.equal(tidyReply('Tu disais que tu dormais souvent chez tes parents. Avec qui ?'), 'Tu dormais souvent chez tes parents. Avec qui ?');
+    assert.equal(tidyReply('Tu te souviens comment elle s’appelait ?'), 'Comment elle s’appelait ?');
+    assert.equal(tidyReply('Il y avait quelque chose qui t’impressionnait ou qui te plaisait dans cette maison ?'), 'Il y avait quelque chose qui t’impressionnait ?');
+    assert.equal(tidyReply('C’était toi ou ta sœur ?'), 'C’était toi ou ta sœur ?');
+    assert.equal(tidyReply('Ah, Sidi Ferruch. C’était où exactement ?'), 'Ah, Sidi Ferruch. C’était où exactement ?');
+});
+
+test('voix : les noms propres de l’auteur vont à la transcription', async () => {
+    const { authorHints } = await import('../../voice/src/plan.ts');
+    const hints = authorHints({ identity: { full_name: 'Patricia', places: ['Alger', 'la Casbah', 'Bab El Oued'] }, family: [{ name: 'Charlie' }, { name: 'Charlie' }] });
+    assert.deepEqual(hints, ['Patricia', 'Alger', 'Casbah', 'Bab El Oued', 'Charlie']);
+});

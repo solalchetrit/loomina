@@ -111,7 +111,7 @@ async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse):
                 console.info(`[voice] ${callSid} jamais connecté, session retirée`);
             }
         }, 60_000);
-        reply(res, 200, conversationRelayTwiml({ welcomeGreeting: forVoice(plan.firstMessage), callSid, voice: plan.demo ? demoVoice(config.voice.ttsVoice) : undefined }), 'text/xml');
+        reply(res, 200, conversationRelayTwiml({ welcomeGreeting: forVoice(plan.firstMessage), callSid, voice: plan.demo ? demoVoice(config.voice.ttsVoice) : undefined, hints: plan.hints }), 'text/xml');
     } catch (err) {
         console.error('[voice] préparation impossible :', err instanceof Error ? err.message : err);
         reply(

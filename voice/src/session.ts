@@ -11,7 +11,7 @@
 import type { WebSocket } from 'ws';
 import OpenAI from 'openai';
 import { config } from './config.ts';
-import { forVoice } from './speech.ts';
+import { forVoice, tidyReply } from './speech.ts';
 import type { CallPlan } from './plan.ts';
 import { buildEndOfCallReport, deliverReport } from './report.ts';
 import type { TurnRecord } from './report.ts';
@@ -363,7 +363,8 @@ export class CallSession {
         let asked = false;
         const say = (text: string) => {
             if (asked || !text) return;
-            let out = text;
+            // Tournures interdites retirées (speech.ts), sans appel au modèle.
+            let out = tidyReply(text);
             const q = out.indexOf('?');
             if (config.limits.oneQuestion && q >= 0) {
                 // Garder les guillemets ou l'espace qui ferment la question.
@@ -390,11 +391,15 @@ export class CallSession {
             // Démo (20/11/2026) : des phrases entières seulement. Coupée à
             // chaque virgule, chaque morceau repartait avec une intonation
             // neuve et la voix sonnait « robot ».
-            const demo = this.plan.demo;
+            //
+            // Phrases entières aussi pour les appels (24/11/2026) : tidyReply
+            // doit voir la phrase complète (« …, ou … ? »). Pas de retard :
+            // pendant l'attente avant de parler (holdFor), la réponse
+            // entière est déjà arrivée.
             let cut = -1;
-            const re = demo ? /[.!?…](?=\s)/g : /[.!?;:,…»)](?=\s)/g;
+            const re = /[.!?…](?=\s)/g;
             for (let m = re.exec(voiceBuf); m; m = re.exec(voiceBuf)) cut = m.index + 1;
-            if (cut < 0 && voiceBuf.length > (demo ? 220 : 90)) cut = voiceBuf.lastIndexOf(' ');
+            if (cut < 0 && voiceBuf.length > 220) cut = voiceBuf.lastIndexOf(' ');
             if (cut <= 0) return;
             say(voiceBuf.slice(0, cut));
             voiceBuf = voiceBuf.slice(cut);
