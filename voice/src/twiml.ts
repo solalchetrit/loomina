@@ -34,6 +34,11 @@ export function conversationRelayTwiml(params: {
         transcriptionProvider: 'Deepgram',
         speechModel: config.voice.sttModel,
         deepgramSmartFormat: 'true',
+        // Pas de filtre à gros mots (Solal, 24/11/2026) : la transcription
+        // remplaçait des mots par « ** **** », et le passage drôle de la
+        // grand-mère de Patricia sur la coiffure s'est perdu. Un livre de
+        // souvenirs garde les mots tels qu'ils ont été dits.
+        profanityFilter: 'false',
         // Le narrateur peut couper Loomina ; on évite les faux départs
         // (« hum », « oui ») grâce à la sensibilité basse.
         interruptible: 'speech',
