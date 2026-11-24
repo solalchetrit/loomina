@@ -4,8 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
-import CopiesStepper from "@/components/order/CopiesStepper";
-import { EXTRA_COPY, extraCopiesLabel } from "@/config/offer";
+import BookCopies from "./BookCopies";
 import Companion from "./Companion";
 import FamilyOnboarding, { type FamilySetup } from "./FamilyOnboarding";
 import type { ProjectOverview } from "./types";
@@ -169,60 +168,6 @@ function Suggest({ book, onAdded, onUnauthorized }: { book: FamilyBook; onAdded:
             ))}
           </ul>
         </div>
-      )}
-    </section>
-  );
-}
-
-/** Des exemplaires en plus du livre, pour soi ou un proche (Solal, 24/11/2026). Paiement sur Stripe. */
-function Copies({ book, name, onUnauthorized }: { book: FamilyBook; name: string; onUnauthorized: () => void }) {
-  const [copies, setCopies] = useState(1);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const order = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/famille/exemplaires", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId: book.id, copies }),
-      });
-      if (res.status === 401) return onUnauthorized();
-      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error || "Le paiement n’a pas pu démarrer. Réessayez dans un instant.");
-      window.location.href = data.url;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Le paiement n’a pas pu démarrer.");
-      setBusy(false);
-    }
-  };
-
-  return (
-    <section className="card p-6 md:p-8" aria-labelledby={`exemplaires-${book.id}`}>
-      <h3 id={`exemplaires-${book.id}`} className="t-heading">
-        Des exemplaires en plus
-      </h3>
-      <p className="t-body mt-1">
-        Le même livre que celui de {name}, pour vous ou pour un proche. {EXTRA_COPY.price} € l’exemplaire, livré chez vous en France.
-      </p>
-      <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-4">
-        <CopiesStepper value={copies} onChange={setCopies} min={1} label="Nombre d’exemplaires" />
-        <p className="text-[16px]">
-          Total : <b className="tabular-nums">{copies * EXTRA_COPY.price} €</b>
-        </p>
-        <Button type="button" onClick={order} loading={busy}>
-          Commander
-        </Button>
-      </div>
-      {error && (
-        <p role="alert" className="mt-4 text-[15px] font-semibold text-[var(--danger)]">
-          {error}
-        </p>
-      )}
-      {(book.extraCopies ?? 0) > 0 && (
-        <p className="mt-4 text-[15px] text-[var(--ink-3)]">Déjà commandés pour ce livre : {extraCopiesLabel(book.extraCopies ?? 0)}.</p>
       )}
     </section>
   );
@@ -397,7 +342,7 @@ function Book({ book, giverFirstName, onChange, onReload, onUnauthorized }: { bo
         )}
       </section>
 
-      <Copies book={book} name={name} onUnauthorized={onUnauthorized} />
+      <BookCopies extraCopies={book.extraCopies ?? 0} narrator={book.narratorFirstName} endpoint="/api/famille/exemplaires" projectId={book.id} onUnauthorized={onUnauthorized} />
     </div>
   );
 }
@@ -412,16 +357,6 @@ function Book({ book, giverFirstName, onChange, onReload, onUnauthorized }: { bo
 export default function FamilySpace({ onLogout, onUnauthorized, onNotFound }: { onLogout: () => void; onUnauthorized: () => void; onNotFound: () => void }) {
   const [data, setData] = useState<FamilyOverview | null>(null);
   const [failed, setFailed] = useState(false);
-  // Retour de Stripe après des exemplaires payés (app/api/famille/exemplaires).
-  const [copiesThanks, setCopiesThanks] = useState(false);
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    if (url.searchParams.get("exemplaires") !== "merci") return;
-    url.searchParams.delete("exemplaires");
-    window.history.replaceState(null, "", url.pathname + url.search + url.hash);
-    const id = window.setTimeout(() => setCopiesThanks(true), 0);
-    return () => window.clearTimeout(id);
-  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -496,11 +431,6 @@ export default function FamilySpace({ onLogout, onUnauthorized, onNotFound }: { 
         )}
 
         <div className="mt-4 flex flex-col gap-10">
-          {copiesThanks && (
-            <p role="status" className="rounded-[14px] bg-[var(--amber-soft)] px-4 py-3 text-[16px] font-semibold text-[var(--amber-deep)]">
-              Merci, vos exemplaires sont commandés. Vous recevrez la confirmation par e-mail.
-            </p>
-          )}
           {failed && (
             <p role="alert" className="rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[16px] font-medium text-[var(--danger)]">
               Nous n’arrivons pas à charger votre espace pour le moment.{" "}

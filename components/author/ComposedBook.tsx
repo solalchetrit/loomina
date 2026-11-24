@@ -86,7 +86,7 @@ const formatDate = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", { 
  * tout ce qui a été raconté, range les souvenirs dans l'ordre de la vie et
  * ne garde qu'une fois ce qui a été dit plusieurs fois.
  */
-export default function ComposedBook({ onUnauthorized, top, aside }: { onUnauthorized: () => void; top?: ReactNode; aside?: ReactNode }) {
+export default function ComposedBook({ onUnauthorized, top, aside, after }: { onUnauthorized: () => void; top?: ReactNode; aside?: ReactNode; /** Sous la carte du livre, dans la colonne de gauche. */ after?: ReactNode }) {
   const [data, setData] = useState<Payload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -165,7 +165,7 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
 
   if (!data && !error) {
     return (
-      <ReaderLayout side={<>{top}{aside}</>}>
+      <ReaderLayout side={<>{top}{aside}{after}</>}>
         <p className="flex items-center gap-3 text-[15px] text-[var(--ink-2)]" role="status">
           <span className="spinner" aria-hidden="true" />
           Nous ouvrons votre livre…
@@ -264,6 +264,7 @@ export default function ComposedBook({ onUnauthorized, top, aside }: { onUnautho
             </More>
             {edition && <Toc label="Sommaire" parts={toc} />}
           </div>
+          {after}
         </>
       }
     >

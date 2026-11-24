@@ -230,7 +230,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
                     .map((o) =>
                       o.source === "commande"
                         ? `${o.copies} à la commande, avec le livre`
-                        : `${o.copies} par ${o.by?.first_name ?? "un proche"} le ${fmtDate(o.at)}, à envoyer à ${o.shipping ?? "adresse inconnue"}`
+                        : `${o.copies} par ${o.by?.first_name ?? (o.source === "auteur" ? "l’auteur" : "un proche")} (espace ${o.source}) le ${fmtDate(o.at)}, ${o.shipping ? `à envoyer à ${o.shipping}` : "avec le livre"}`
                     )
                     .join(" ; ")
                 : "aucun"}

@@ -1,5 +1,6 @@
 import type Stripe from 'stripe';
 import { EXTRA_COPY, OFFER } from '@/config/offer';
+import { stripe } from '@/lib/stripe';
 
 /**
  * Les exemplaires en plus du livre de l'auteur (Solal, 24/11/2026).
@@ -12,12 +13,13 @@ export interface ExtraCopiesOrder {
     copies: number;
     /** Prix unitaire payé, en euros (le prix peut changer ensuite). */
     unit_price: number;
-    source: 'commande' | 'famille';
+    /** Où ils ont été commandés : avec le livre, depuis l'espace auteur ou l'espace famille. */
+    source: 'commande' | 'auteur' | 'famille';
     stripe_session_id: string;
     at: string;
-    /** Espace famille : qui a commandé. */
+    /** Espaces auteur et famille : qui a commandé. */
     by?: { first_name: string | null; phone: string } | null;
-    /** Espace famille : l'adresse où envoyer ces exemplaires (sinon, avec le livre de l'auteur). */
+    /** L'adresse où envoyer ces exemplaires, si elle a été demandée (sinon, avec le livre de l'auteur). */
     shipping?: string | null;
 }
 
@@ -45,4 +47,42 @@ export function extraCopiesOrders(meta: unknown): ExtraCopiesOrder[] {
 /** Le nombre total d'exemplaires en plus à imprimer pour ce livre. */
 export function totalExtraCopies(meta: unknown): number {
     return extraCopiesOrders(meta).reduce((sum, o) => sum + o.copies, 0);
+}
+
+/**
+ * La page de paiement Stripe d'exemplaires en plus, depuis l'espace auteur ou
+ * l'espace famille. Le webhook les note sur le livre une fois payés
+ * (app/api/webhook/stripe, metadata.kind = extra_copies).
+ * `askAddress` : Stripe demande où les envoyer (un proche, ou un livre déjà parti).
+ */
+export async function createExtraCopiesCheckout(params: {
+    origin: string;
+    projectId: string;
+    copies: number;
+    source: 'auteur' | 'famille';
+    byPhone: string;
+    byFirstName: string | null;
+    askAddress: boolean;
+}): Promise<string | null> {
+    const session = await stripe().checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        line_items: [extraCopiesLineItem(params.copies)],
+        ...(params.askAddress ? { shipping_address_collection: { allowed_countries: ['FR'] } } : {}),
+        allow_promotion_codes: true,
+        success_url: `${params.origin}/dashboard?exemplaires=merci`,
+        cancel_url: `${params.origin}/dashboard`,
+        expires_at: Math.floor(Date.now() / 1000) + 2 * 60 * 60,
+        // Pas de metadata.email : ce n'est pas une commande de livre, aucune relance de panier.
+        metadata: {
+            kind: 'extra_copies',
+            source: params.source,
+            projectId: params.projectId,
+            copies: String(params.copies),
+            unitPrice: String(EXTRA_COPY.price),
+            byPhone: params.byPhone,
+            byFirstName: params.byFirstName ?? '',
+        },
+    });
+    return session.url;
 }

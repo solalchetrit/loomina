@@ -9,6 +9,7 @@ import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
 import { familyAudience, readGiver, sharesWithGiver } from '@/lib/loomina/giver';
 import { readFulfillment } from '@/lib/loomina/fulfillment';
+import { totalExtraCopies } from '@/lib/loomina/extra-copies';
 import { readShipping } from '@/lib/loomina/shipping';
 import { readPhaseState } from '@/lib/loomina/phase-plan';
 import { buildWeave } from '@/lib/loomina/weave';
@@ -83,6 +84,8 @@ export async function GET(request: NextRequest) {
             prefs,
             welcome,
             shipping: readShipping(pmeta),
+            // Exemplaires en plus déjà commandés (lib/loomina/extra-copies.ts).
+            extraCopies: totalExtraCopies(pmeta),
             delivery: (() => {
                 const f = readFulfillment(project.status, pmeta);
                 return { stage: f.stage, tracking: f.tracking, shippedAt: f.shippedAt };

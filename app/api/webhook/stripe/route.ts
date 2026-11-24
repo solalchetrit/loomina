@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
     const meta = session.metadata ?? {};
 
-    // Exemplaires en plus commandés depuis l'espace famille : rien à créer,
-    // on les ajoute au livre (app/api/famille/exemplaires).
+    // Exemplaires en plus commandés depuis l'espace auteur ou famille : rien à créer,
+    // on les ajoute au livre (lib/loomina/extra-copies.ts).
     if (meta.kind === 'extra_copies') {
         try {
             await recordFamilyCopies(session);
@@ -323,7 +323,7 @@ async function handleAbandonedCart(session: Stripe.Checkout.Session): Promise<vo
 }
 
 /**
- * Des exemplaires en plus payés depuis l'espace famille : notés sur le livre
+ * Des exemplaires en plus payés depuis l'espace auteur ou famille : notés sur le livre
  * (project_metadata.extra_copies), une seule fois par paiement, et l'équipe est prévenue.
  * Lève en cas d'échec : Stripe rejouera.
  */
@@ -351,19 +351,20 @@ async function recordFamilyCopies(session: Stripe.Checkout.Session): Promise<voi
     const ship = session.collected_information?.shipping_details ?? null;
     const a = ship?.address;
     const shipping = ship && a ? [ship.name, a.line1, a.line2, `${a.postal_code ?? ''} ${a.city ?? ''}`.trim(), a.country].filter(Boolean).join(', ') : null;
-    const order: ExtraCopiesOrder = { copies, unit_price: unitPrice, source: 'famille', stripe_session_id: session.id, at: new Date().toISOString(), by, shipping };
+    const source: ExtraCopiesOrder['source'] = meta.source === 'auteur' ? 'auteur' : 'famille';
+    const order: ExtraCopiesOrder = { copies, unit_price: unitPrice, source, stripe_session_id: session.id, at: new Date().toISOString(), by, shipping };
     const { error: upErr } = await supabase
         .from('projects')
         .update({ project_metadata: { ...current, extra_copies: [...orders, order] } })
         .eq('id', project.id);
     if (upErr) throw new Error(`mise à jour projet : ${upErr.message}`);
 
-    const who = by?.first_name || 'Un proche';
+    const who = by?.first_name || (source === 'auteur' ? 'L’auteur' : 'Un proche');
     const book = project.title || 'un livre';
     const total = orders.reduce((n, o) => n + o.copies, 0) + copies;
     await alertTeam({
         subject: `${extraCopiesLabel(copies)} : ${book}`,
-        text: `${who} a commandé ${extraCopiesLabel(copies)} (${unitPrice} € pièce) depuis l'espace famille, pour « ${book} ».\nTéléphone : ${by?.phone ?? 'non renseigné'}\nE-mail : ${session.customer_details?.email ?? 'non renseigné'}\nÀ envoyer à : ${shipping ?? 'adresse non fournie'}\nTotal à imprimer en plus du livre de l'auteur : ${total}.`,
+        text: `${who} a commandé ${extraCopiesLabel(copies)} (${unitPrice} € pièce) depuis l'espace ${source}, pour « ${book} ».\nTéléphone : ${by?.phone ?? 'non renseigné'}\nE-mail : ${session.customer_details?.email ?? 'non renseigné'}\nÀ envoyer à : ${shipping ?? 'avec le livre de l’auteur'}\nTotal à imprimer en plus du livre de l'auteur : ${total}.`,
         sms: `${extraCopiesLabel(copies)} commandés pour ${book}.`,
         replyTo: session.customer_details?.email ?? undefined,
     });
