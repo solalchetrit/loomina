@@ -36,7 +36,9 @@ function words(text: string): number {
  */
 // 1,2 s (demande de Solal, 19/11/2026, après la démo de sa mère) : un peu
 // plus de temps pour réfléchir avant que Loomina reprenne. Était 0,8 s.
-const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 1200);
+// 2 s (Solal, 24/11/2026, premier appel de Patricia : Loomina coupée sans
+// cesse, « laisse-lui le temps de finir ses phrases, elle a des hésitations »).
+const REPLY_DELAY_MS = Number(process.env.VOICE_REPLY_DELAY_MS ?? 2000);
 /**
  * Le modèle est interrogé tout de suite : l'attente ci-dessus et le temps
  * de réflexion du modèle (environ 1 s) se chevauchent au lieu de
@@ -64,8 +66,19 @@ export function looksUnfinished(text: string): boolean {
 }
 
 /** Attente plus longue quand la phrase n'est pas finie ou très courte. */
-const UNFINISHED_DELAY_MS = Number(process.env.VOICE_UNFINISHED_DELAY_MS ?? 2600);
-const SHORT_DELAY_MS = Number(process.env.VOICE_SHORT_DELAY_MS ?? 1900);
+// 24/11/2026 (appel de Patricia) : 2,6 → 3,4 s et 1,9 → 2,8 s.
+const UNFINISHED_DELAY_MS = Number(process.env.VOICE_UNFINISHED_DELAY_MS ?? 3400);
+const SHORT_DELAY_MS = Number(process.env.VOICE_SHORT_DELAY_MS ?? 2800);
+
+/**
+ * Patience qui grandit pendant l'appel : chaque fois que le narrateur
+ * coupe Loomina (il n'avait pas fini), Loomina attend 0,4 s de plus avant
+ * ses réponses suivantes, jusqu'à 1,2 s de plus. Certains narrateurs
+ * marquent de longues pauses au milieu de leurs phrases ; Loomina s'y
+ * cale au lieu de les couper tout l'appel (Solal, 24/11/2026).
+ */
+export const PATIENCE_STEP_MS = 400;
+export const PATIENCE_MAX_MS = 1200;
 
 // Appel test de Solal (20/11/2026, 24 coupures en 17 min) : Loomina
 // reprenait la parole dès une petite pause au milieu d'une idée (« En fait,
@@ -119,6 +132,8 @@ export class CallSession {
     private promptTokens = 0;
     private completionTokens = 0;
     private interruptions = 0;
+    /** Attente ajoutée après chaque coupure (voir PATIENCE_STEP_MS). */
+    private patienceMs = 0;
 
     private generation: AbortController | null = null;
     private silenceTimer: NodeJS.Timeout | null = null;
@@ -239,7 +254,8 @@ export class CallSession {
         }
         this.cancelPendingReply();
         this.heardAt = Date.now();
-        void this.generate(this.heardAt + holdFor(clean));
+        const hold = holdFor(clean);
+        void this.generate(this.heardAt + (hold ? hold + this.patienceMs : 0));
     }
 
     private cancelPendingReply(): void {
@@ -249,6 +265,7 @@ export class CallSession {
 
     onInterrupt(utteranceUntilInterrupt: string): void {
         this.interruptions += 1;
+        this.patienceMs = Math.min(PATIENCE_MAX_MS, this.patienceMs + PATIENCE_STEP_MS);
         const heard = utteranceUntilInterrupt.trim();
         // Démo de Fabrice (20/11/2026) : la personne a continué à raconter,
         // la réponse de Loomina n'a jamais été dite, mais elle restait en
