@@ -347,10 +347,11 @@ async function recordFamilyCopies(session: Stripe.Checkout.Session): Promise<voi
     if (orders.some((o) => o.stripe_session_id === session.id)) return; // rejeu de Stripe
     const unitPrice = Number.parseInt(meta.unitPrice ?? '', 10) || EXTRA_COPY.price;
     const by = meta.byPhone ? { first_name: meta.byFirstName?.trim() || null, phone: formatToE164(meta.byPhone) } : null;
-    // L'adresse où envoyer ces exemplaires, demandée par Stripe.
+    // L'adresse où envoyer ces exemplaires : demandée par le site (metadata.shipping),
+    // ou par Stripe pour une ancienne page de paiement externe.
     const ship = session.collected_information?.shipping_details ?? null;
     const a = ship?.address;
-    const shipping = ship && a ? [ship.name, a.line1, a.line2, `${a.postal_code ?? ''} ${a.city ?? ''}`.trim(), a.country].filter(Boolean).join(', ') : null;
+    const shipping = meta.shipping?.trim() || (ship && a ? [ship.name, a.line1, a.line2, `${a.postal_code ?? ''} ${a.city ?? ''}`.trim(), a.country].filter(Boolean).join(', ') : null);
     const source: ExtraCopiesOrder['source'] = meta.source === 'auteur' ? 'auteur' : 'famille';
     const order: ExtraCopiesOrder = { copies, unit_price: unitPrice, source, stripe_session_id: session.id, at: new Date().toISOString(), by, shipping };
     const { error: upErr } = await supabase
