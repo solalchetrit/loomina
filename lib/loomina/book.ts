@@ -37,6 +37,7 @@
  */
 
 import { promptText, refreshPrompts } from './prompt-store';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import OpenAI from 'openai';
 import type { LoominaContext } from './context';
 import { renderContext } from './context';
@@ -112,6 +113,25 @@ export interface BookEdition {
     pieces?: BookPieces | null;
 }
 
+/**
+ * Les jetons dépensés par une composition du livre (coût précis par appel,
+ * demande de Solal du 24/11/2026). advanceEdition ouvre un compteur, chaque
+ * requête au modèle y ajoute les siens.
+ */
+export type UsageMap = Record<string, { input: number; cached: number; output: number }>;
+export const bookUsage = new AsyncLocalStorage<UsageMap>();
+export function addUsage(map: UsageMap, model: string, u: { prompt_tokens?: number; completion_tokens?: number; prompt_tokens_details?: { cached_tokens?: number } | null }): void {
+    const m = (map[model] ??= { input: 0, cached: 0, output: 0 });
+    m.input += u.prompt_tokens ?? 0;
+    m.cached += u.prompt_tokens_details?.cached_tokens ?? 0;
+    m.output += u.completion_tokens ?? 0;
+}
+export function mergeUsage(a: UsageMap | null | undefined, b: UsageMap): UsageMap {
+    const out: UsageMap = JSON.parse(JSON.stringify(a ?? {}));
+    for (const [model, u] of Object.entries(b)) addUsage(out, model, { prompt_tokens: u.input, completion_tokens: u.output, prompt_tokens_details: { cached_tokens: u.cached } });
+    return out;
+}
+
 let client: OpenAI | null = null;
 const openai = () => (client ??= new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 2, timeout: 280_000 }));
 
@@ -135,6 +155,8 @@ async function json(
         },
         limit ? { timeout: limit.timeoutMs, maxRetries: 0 } : undefined
     );
+    const spent = bookUsage.getStore();
+    if (spent && completion.usage) addUsage(spent, BOOK_MODEL, completion.usage);
     const raw = completion.choices[0]?.message?.content;
     if (!raw) throw new Error('Livre : réponse vide du modèle');
     return JSON.parse(raw) as Record<string, unknown>;

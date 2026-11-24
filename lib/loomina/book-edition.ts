@@ -11,7 +11,8 @@
 import { db } from './db';
 import type { Profile, Project } from './db';
 import { normalizeContext } from './context';
-import { planBook, writeBookChapter, carryCorrection, polishBook, writePieces, chapterSignature, RECIPE } from './book';
+import { planBook, writeBookChapter, carryCorrection, polishBook, writePieces, chapterSignature, RECIPE, bookUsage, mergeUsage } from './book';
+import type { UsageMap } from './book';
 import type { PlannedChapter, BookChapter, Source, BookPieces } from './book';
 import { readWishes } from './phase-plan';
 import { countWords } from './writer';
@@ -29,6 +30,8 @@ export interface Edition {
     source_words: number;
     /** Ce qui entoure les chapitres (voir EditionExtras). Absent tant que la migration 20261119 n'est pas appliquée. */
     extras?: EditionExtras | null;
+    /** Jetons OpenAI dépensés par la composition (migration 20261124). */
+    usage?: UsageMap | null;
     error: string | null;
     claimed_at: string | null;
     created_at: string;
@@ -136,7 +139,14 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
     const edition = (claimed?.[0] as Edition | undefined) ?? null;
     if (!edition) return null;
 
-    const save = async (patch: Partial<Edition>): Promise<Edition> => {
+    // Les jetons de cette étape, ajoutés à ceux de l'édition à chaque écriture.
+    const spent: UsageMap = {};
+    bookUsage.enterWith(spent);
+    let usageBase = edition.usage ?? null;
+    const save = async (input: Partial<Edition>): Promise<Edition> => {
+        let patch = input;
+        const withUsage = Object.keys(spent).length > 0;
+        if (withUsage) patch = { ...patch, usage: mergeUsage(usageBase, spent) };
         const write = (p: Partial<Edition>) =>
             supabase
                 .from('book_editions')
@@ -152,7 +162,17 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
             void _dropped;
             ({ data, error } = await write(rest));
         }
+        // Base sans la colonne `usage` (migration 20261124 pas encore appliquée).
+        if (error && 'usage' in patch && /usage/.test(error.message)) {
+            const { usage: _u, ...rest } = patch;
+            void _u;
+            ({ data, error } = await write(rest));
+        }
         if (error) throw new Error(`Écriture book_editions impossible : ${error.message}`);
+        if (withUsage && patch.usage) {
+            usageBase = patch.usage;
+            for (const k of Object.keys(spent)) delete spent[k];
+        }
         return data as Edition;
     };
 

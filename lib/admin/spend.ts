@@ -263,7 +263,7 @@ export async function callLines(range: Range): Promise<CallLine[]> {
             client: who?.name ?? 'Client inconnu',
             profileId: who?.profileId ?? null,
             seconds: Number(r.duration_seconds) || 0,
-            cost: costs.get(String(r.id)) ?? { line: 0, voice: 0, conversation: 0, writing: 0, total: 0, totalTtc: 0, estimated: true },
+            cost: costs.get(String(r.id)) ?? { items: [], line: 0, voice: 0, conversation: 0, writing: 0, total: 0, totalTtc: 0, estimated: true },
             test: who?.test ?? false,
         };
     });
