@@ -113,7 +113,11 @@ export async function POST(request: NextRequest) {
         // écrasaient le premier destinataire, qui perdait son accès.
         const resolved = await resolveNarratorAccount({ email, phone, firstName, lastName });
         const userId = resolved.userId;
-        const accountEmail = resolved.email;
+        // Le compte d'authentification peut porter un alias « +numéro » (deux
+        // narrateurs avec le même e-mail d'acheteur). La fiche, elle, garde
+        // l'adresse tapée par le client : c'est là que partent ses e-mails
+        // (Solal, 24/11/2026 : la fiche de Patricia affichait l'alias).
+        const accountEmail = email || resolved.email;
 
         // ── Le profil ────────────────────────────────────────────────────────
         // Identité : écrasée par la commande (le client vient de la saisir).

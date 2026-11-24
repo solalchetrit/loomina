@@ -747,3 +747,42 @@ test('démo sans commande : rappel deux jours avant la fin du code, une seule fo
     assert.match(e.html, /desinscription/);
     assert.doesNotMatch(e.text, /€/);
 });
+
+// ── Écoute des appels (lib/admin/ecoute.ts, 24/11/2026) ─────────────────────
+import { encodeWav, parseWav, speechSegments, measureTiming, pickLoominaChannel } from '../../lib/admin/ecoute';
+
+test('écoute : Loomina qui parle pendant une pause du narrateur est comptée comme coupée', () => {
+    const rate = 8000;
+    const dur = 12;
+    const track = (spans: Array<[number, number]>) => {
+        const a = new Int16Array(rate * dur);
+        for (let i = 0; i < a.length; i++) a[i] = ((i * 7919) % 31) - 15; // bruit de fond faible
+        for (const [s, e] of spans) for (let i = s * rate; i < e * rate; i++) a[i] = Math.round(Math.sin(i / 3) * 8000);
+        return a;
+    };
+    const bot = track([[0, 3], [6.8, 8.5], [10.2, 11.5]]);
+    const user = track([[3.5, 6], [7.2, 9.5]]);
+    // WAV deux pistes : narrateur à gauche, Loomina à droite.
+    const head = encodeWav(bot, rate).subarray(0, 44);
+    const wav = new Uint8Array(44 + bot.length * 4);
+    wav.set(head);
+    const v = new DataView(wav.buffer);
+    v.setUint32(4, 36 + bot.length * 4, true);
+    v.setUint16(22, 2, true);
+    v.setUint32(28, rate * 4, true);
+    v.setUint16(32, 4, true);
+    v.setUint32(40, bot.length * 4, true);
+    for (let i = 0; i < bot.length; i++) {
+        v.setInt16(44 + i * 4, user[i], true);
+        v.setInt16(46 + i * 4, bot[i], true);
+    }
+    const pcm = parseWav(wav);
+    const segs = pcm.channels.map((c) => speechSegments(c, rate));
+    const b = pickLoominaChannel(segs, 300, 200);
+    assert.equal(b, 1);
+    const t = measureTiming(segs[0], segs[1], dur);
+    assert.equal(t.cuts.length, 1);
+    assert.equal(t.cuts[0].at, 6.8);
+    assert.equal(t.cuts[0].pause, 0.8);
+    assert.equal(t.loominaWait.median, 0.7);
+});

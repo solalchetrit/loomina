@@ -14,6 +14,7 @@
  * 30 jours (purgeOldDemoStories, appelée à chaque nouvelle démo).
  */
 
+import { forgetRecording } from '@/lib/admin/recording';
 import crypto from 'node:crypto';
 import OpenAI from 'openai';
 import { db, findProfileByPhone } from './db';
@@ -82,7 +83,10 @@ export async function purgeOldDemoStories(): Promise<void> {
     const limit = new Date(Date.now() - DEMO_STORY_DAYS * 86_400_000).toISOString();
     // D'abord le son chez Twilio : la ligne effacée, on ne saurait plus le retrouver.
     const { data: old } = await db().from('demo_stories').select('recording_sid').lt('created_at', limit).not('recording_sid', 'is', null);
-    for (const row of old ?? []) await deleteTwilioRecording(row.recording_sid as string);
+    for (const row of old ?? []) {
+        await deleteTwilioRecording(row.recording_sid as string);
+        await forgetRecording(row.recording_sid as string);
+    }
     const { error } = await db().from('demo_stories').delete().lt('created_at', limit);
     if (error) console.warn('[demo] purge des anciens récits :', error.message);
 }

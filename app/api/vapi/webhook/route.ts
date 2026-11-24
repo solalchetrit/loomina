@@ -34,6 +34,10 @@ import { recordDemoCall, processDemoStory, purgeOldDemoStories } from '@/lib/loo
 import { extractCallData } from '@/lib/loomina/pipeline';
 import type { VapiMessage } from '@/lib/loomina/pipeline';
 import { recordEvent, processEvent } from '@/lib/loomina/events';
+import { warmRecording } from '@/lib/admin/recording';
+import { kickReview } from '@/lib/admin/ecoute';
+import { internalSecret } from '@/lib/loomina/book-edition';
+import { SITE } from '@/config/site';
 import { checkSharedSecret } from '@/lib/loomina/secret';
 
 export const runtime = 'nodejs';
@@ -242,6 +246,12 @@ async function handleEndOfCall(
         try {
             const outcome = await processEvent(eventId);
             console.info(`[vapi] Événement ${eventId} traité :`, JSON.stringify(outcome));
+            // L'enregistrement est copié chez nous (écoute immédiate dans
+            // l'admin), puis l'appel est réécouté et comparé au transcript
+            // (lib/admin/ecoute.ts, demande de Solal du 24/11/2026).
+            const rec = (metadata as { recordingSid?: unknown }).recordingSid;
+            await warmRecording(typeof rec === 'string' ? rec : null);
+            if (outcome?.interviewId && typeof rec === 'string') await kickReview(outcome.interviewId, SITE.url, internalSecret());
         } catch (err) {
             // Déjà consigné dans call_events par processEvent.
             // Le cron de rattrapage reprendra la main.
