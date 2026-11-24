@@ -27,6 +27,7 @@ export default function Payment({
   promo,
   onPromo,
   onBack,
+  backLabel,
 }: {
   clientSecret: string;
   publishableKey: string;
@@ -40,6 +41,8 @@ export default function Payment({
   promo: string | null;
   onPromo: (code: string | null) => void;
   onBack: () => void;
+  /** Le lien de retour sous le bouton (par défaut « Modifier les coordonnées »). */
+  backLabel?: string;
 }) {
   const stripePromise = useMemo(() => loadStripe(publishableKey), [publishableKey]);
   return (
@@ -72,7 +75,7 @@ export default function Payment({
         },
       }}
     >
-      <PaymentForm label={label} installments={installments} method={method} onSwitch={onSwitch} promo={promo} onPromo={onPromo} onBack={onBack} />
+      <PaymentForm label={label} installments={installments} method={method} onSwitch={onSwitch} promo={promo} onPromo={onPromo} onBack={onBack} backLabel={backLabel} />
     </CheckoutElementsProvider>
   );
 }
@@ -85,6 +88,7 @@ function PaymentForm({
   promo,
   onPromo,
   onBack,
+  backLabel = "Modifier les coordonnées",
 }: {
   label: string;
   installments: boolean;
@@ -93,6 +97,7 @@ function PaymentForm({
   promo: string | null;
   onPromo: (code: string | null) => void;
   onBack: () => void;
+  backLabel?: string;
 }) {
   const state = useCheckout();
   const [switching, setSwitching] = useState<"card" | "klarna" | null>(null);
@@ -125,7 +130,7 @@ function PaymentForm({
     return (
       <div role="alert" className="rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[15px] font-medium text-[var(--danger)]">
         Le paiement n’a pas pu se charger. Rechargez la page, ou écrivez-nous à contact@loomina.eu.
-        <button type="button" onClick={onBack} className="link ml-2">Revenir aux coordonnées</button>
+        <button type="button" onClick={onBack} className="link ml-2">Revenir en arrière</button>
       </div>
     );
   }
@@ -312,7 +317,7 @@ function PaymentForm({
       </p>
       <p className="mt-4 text-center">
         <button type="button" onClick={onBack} className="text-[14px] text-[var(--ink-3)] underline underline-offset-2 hover:text-[var(--ink)]">
-          ← Modifier les coordonnées
+          ← {backLabel}
         </button>
       </p>
     </div>

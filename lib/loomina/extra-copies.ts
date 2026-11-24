@@ -50,10 +50,13 @@ export function totalExtraCopies(meta: unknown): number {
 }
 
 /**
- * La page de paiement Stripe d'exemplaires en plus, depuis l'espace auteur ou
- * l'espace famille. Le webhook les note sur le livre une fois payés
+ * Le paiement d'exemplaires en plus, depuis l'espace auteur ou l'espace
+ * famille. Comme la commande (app/api/checkout) : paiement intégré au site
+ * (Stripe ui_mode « custom », dessiné par components/order/Payment.tsx),
+ * sans page Stripe (Solal, 24/11/2026). Sans clé publiable, page Stripe externe.
+ * L'adresse, quand il en faut une, est demandée par le site lui-même.
+ * Le webhook note les exemplaires sur le livre une fois payés
  * (app/api/webhook/stripe, metadata.kind = extra_copies).
- * `askAddress` : Stripe demande où les envoyer (un proche, ou un livre déjà parti).
  */
 export async function createExtraCopiesCheckout(params: {
     origin: string;
@@ -62,16 +65,20 @@ export async function createExtraCopiesCheckout(params: {
     source: 'auteur' | 'famille';
     byPhone: string;
     byFirstName: string | null;
-    askAddress: boolean;
-}): Promise<string | null> {
+    email: string;
+    /** Où envoyer ces exemplaires ; absent : avec le livre de l'auteur. */
+    shipping: string | null;
+}): Promise<{ clientSecret: string; publishableKey: string } | { url: string }> {
+    const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY?.trim() || '';
+    const embedded = publishableKey.startsWith('pk_');
+    const back = `${params.origin}/dashboard?exemplaires=merci`;
     const session = await stripe().checkout.sessions.create({
+        ...(embedded ? { ui_mode: 'custom' as const, return_url: back } : { success_url: back, cancel_url: `${params.origin}/dashboard` }),
         mode: 'payment',
         payment_method_types: ['card'],
         line_items: [extraCopiesLineItem(params.copies)],
-        ...(params.askAddress ? { shipping_address_collection: { allowed_countries: ['FR'] } } : {}),
         allow_promotion_codes: true,
-        success_url: `${params.origin}/dashboard?exemplaires=merci`,
-        cancel_url: `${params.origin}/dashboard`,
+        customer_email: params.email,
         expires_at: Math.floor(Date.now() / 1000) + 2 * 60 * 60,
         // Pas de metadata.email : ce n'est pas une commande de livre, aucune relance de panier.
         metadata: {
@@ -82,7 +89,15 @@ export async function createExtraCopiesCheckout(params: {
             unitPrice: String(EXTRA_COPY.price),
             byPhone: params.byPhone,
             byFirstName: params.byFirstName ?? '',
+            shipping: (params.shipping ?? '').slice(0, 490),
         },
     });
-    return session.url;
+    if (embedded && session.client_secret) return { clientSecret: session.client_secret, publishableKey };
+    return { url: session.url ?? '' };
+}
+
+/** Une adresse e-mail plausible, ou null. */
+export function cleanEmail(raw: unknown): string | null {
+    const v = typeof raw === 'string' ? raw.trim().slice(0, 200) : '';
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? v : null;
 }

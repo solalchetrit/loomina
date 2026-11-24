@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
+import CopiesCheckout from "./CopiesCheckout";
 import CopiesStepper from "@/components/order/CopiesStepper";
 import { EXTRA_COPY, extraCopiesLabel } from "@/config/offer";
 
@@ -9,7 +10,7 @@ import { EXTRA_COPY, extraCopiesLabel } from "@/config/offer";
  * Les livres prévus pour cette histoire (Solal, 24/11/2026), dans l'espace
  * auteur (onglet « Le livre ») et dans l'espace famille : le livre de
  * l'auteur plus les exemplaires en plus déjà commandés, et de quoi en ajouter.
- * Le paiement se fait sur une page Stripe ; au retour (?exemplaires=merci), un merci.
+ * Le paiement se fait dans le site (CopiesCheckout) ; au retour (?exemplaires=merci), un merci.
  */
 export default function BookCopies({
   extraCopies,
@@ -29,8 +30,8 @@ export default function BookCopies({
   compact?: boolean;
 }) {
   const [copies, setCopies] = useState(1);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // La fenêtre de paiement, dans le site (components/author/CopiesCheckout.tsx).
+  const [open, setOpen] = useState(false);
   const [thanks, setThanks] = useState(false);
 
   // Retour de Stripe après paiement.
@@ -46,25 +47,6 @@ export default function BookCopies({
   const family = narrator !== undefined;
   const total = 1 + extraCopies;
   const own = family ? `Le livre de ${narrator || "votre proche"}` : "Votre livre";
-
-  const order = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, copies }),
-      });
-      if (res.status === 401) return onUnauthorized();
-      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error || "Le paiement n’a pas pu démarrer. Réessayez dans un instant.");
-      window.location.href = data.url;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Le paiement n’a pas pu démarrer.");
-      setBusy(false);
-    }
-  };
 
   return (
     <section className={`card ${compact ? "p-5" : "p-6 md:p-8"}`} aria-labelledby={`livres-prevus-${projectId ?? "auteur"}`}>
@@ -102,16 +84,14 @@ export default function BookCopies({
               Total : <b className="tabular-nums">{copies * EXTRA_COPY.price} €</b>
             </p>
           </div>
-          <Button type="button" onClick={order} loading={busy} className={`mt-4 ${compact ? "!min-h-11 w-full !text-[15px]" : ""}`}>
+          <Button type="button" onClick={() => setOpen(true)} className={`mt-4 ${compact ? "!min-h-11 w-full !text-[15px]" : ""}`}>
             Commander
           </Button>
-          {error && (
-            <p role="alert" className="mt-3 text-[14.5px] font-semibold text-[var(--danger)]">
-              {error}
-            </p>
-          )}
         </div>
       </div>
+      {open && (
+        <CopiesCheckout endpoint={endpoint} projectId={projectId} copies={copies} family={family} onClose={() => setOpen(false)} onUnauthorized={onUnauthorized} />
+      )}
     </section>
   );
 }
