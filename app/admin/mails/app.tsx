@@ -66,10 +66,10 @@ function I({ n, s = 16, className = "", fill = false }: { n: keyof typeof P; s?:
   );
 }
 
-const btnGhost = "press inline-flex items-center justify-center gap-1.5 rounded-[10px] text-[14px] font-semibold text-[var(--ink-2)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)] disabled:opacity-40";
-const btnOutline = "press inline-flex items-center justify-center gap-1.5 rounded-[10px] bg-white px-3 text-[14px] font-bold text-[var(--ink)] shadow-[0_0_0_1px_var(--line)] hover:shadow-[0_0_0_1px_var(--rule-strong)] disabled:opacity-40";
-const btnPrimary = "press inline-flex items-center justify-center gap-1.5 rounded-[10px] bg-[var(--ink)] px-3.5 text-[14px] font-bold text-white disabled:opacity-40";
-const input = "w-full rounded-[10px] border border-[var(--line)] bg-white px-3 text-[15px] outline-none focus:border-[var(--ink)]";
+const btnGhost = "press inline-flex items-center justify-center gap-1.5 rounded-[7px] text-[13.5px] font-semibold text-[var(--ink-2)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)] disabled:opacity-40";
+const btnOutline = "press inline-flex items-center justify-center gap-1.5 rounded-[7px] bg-[var(--surface)] px-3 text-[13.5px] font-semibold text-[var(--ink)] shadow-[0_0_0_1px_var(--line)] hover:shadow-[0_0_0_1px_var(--rule-strong)] disabled:opacity-40";
+const btnPrimary = "press inline-flex items-center justify-center gap-1.5 rounded-[7px] bg-[var(--btn)] px-3.5 text-[13.5px] font-semibold text-[var(--on-btn)] disabled:opacity-40";
+const input = "w-full rounded-[7px] border border-[var(--line)] bg-[var(--surface)] px-3 text-[14px] outline-none focus:border-[var(--ink)]";
 
 type Compose = {
   mode: "nouveau" | "repondre" | "tous" | "transferer";
@@ -303,26 +303,26 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
   const destinataire = (m: MailRow) => (folder === "sent" ? m.to[0] : m.from);
 
   return (
-    <div className="flex h-[calc(100dvh-11.5rem)] min-h-[480px] flex-col overflow-hidden rounded-[22px] border border-[var(--line)] bg-white shadow-[var(--shadow-bar)] lg:h-[calc(100dvh-8rem)]">
+    <div className="flex h-[calc(100dvh-7rem)] min-h-[480px] flex-col overflow-hidden rounded-[12px] border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow-bar)] lg:h-[calc(100dvh-7rem)]">
       {/* Barre : dossiers, recherche, actualiser, nouveau */}
       <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[var(--line)] px-3 py-2.5">
-        <span className="hidden pl-1 pr-2 text-[15px] font-extrabold tracking-[-0.01em] sm:inline">{user}</span>
+        <span className="hidden pl-1 pr-2 text-[14px] font-semibold tracking-[-0.01em] sm:inline">{user}</span>
         <nav className="order-3 -mx-1 flex min-w-0 basis-full items-center gap-0.5 overflow-x-auto whitespace-nowrap px-1 sm:order-1 sm:basis-auto">
           {folders.map((d) => (
             <button
               key={d.key}
               onClick={() => nav({ folder: d.key })}
               aria-current={d.key === folder ? "page" : undefined}
-              className={cx("press rounded-[10px] px-3 py-1.5 text-[14px] transition-colors", d.key === folder ? "bg-[var(--amber-soft)] font-bold text-[var(--amber-deep)]" : "font-semibold text-[var(--ink-2)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]")}
+              className={cx("press rounded-[7px] px-3 py-1.5 text-[13.5px] transition-colors", d.key === folder ? "bg-[var(--amber-soft)] font-semibold text-[var(--amber-deep)]" : "font-semibold text-[var(--ink-2)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]")}
             >
               {d.label}
-              {d.key === "inbox" && folder === "inbox" && liste.unseen > 0 ? <span className="ml-1.5 rounded-full bg-[var(--amber)] px-1.5 text-[11px] font-bold text-[var(--ink)]">{liste.unseen}</span> : null}
+              {d.key === "inbox" && folder === "inbox" && liste.unseen > 0 ? <span className="ml-1.5 rounded-full bg-[var(--amber)] px-1.5 text-[11px] font-semibold text-[var(--ink)]">{liste.unseen}</span> : null}
             </button>
           ))}
         </nav>
         <form className="relative order-4 min-w-0 basis-full sm:order-2 sm:ml-auto sm:w-56 sm:basis-auto xl:w-72" onSubmit={rechercher}>
           <I n="search" className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--ink-3)]" />
-          <input id="recherche-mail" className={cx(input, "h-9 pl-8 text-[14px]")} placeholder="Rechercher un mail…" title="Expéditeur, destinataire, objet" value={recherche} onChange={(e) => setRecherche(e.target.value)} />
+          <input id="recherche-mail" className={cx(input, "h-9 pl-8 text-[13.5px]")} placeholder="Rechercher un mail…" title="Expéditeur, destinataire, objet" value={recherche} onChange={(e) => setRecherche(e.target.value)} />
           {recherche && (
             <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--ink-3)] hover:text-[var(--ink)]" onClick={() => { setRecherche(""); nav({ q: "" }); }} aria-label="Effacer la recherche">
               <I n="x" />
@@ -354,7 +354,7 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
               <span className="ml-auto flex items-center gap-0.5">
                 <button className={cx(btnGhost, "h-7 px-2 text-[13px]")} disabled={pending || !coches.size} onClick={() => grouper("lu")} title="Marquer lu"><I n="open" s={14} />Lu</button>
                 <button className={cx(btnGhost, "h-7 px-2 text-[13px]")} disabled={pending || !coches.size} onClick={() => grouper("nonlu")} title="Marquer non lu"><I n="mail" s={14} />Non lu</button>
-                {folder !== "trash" && <button className={cx(btnGhost, "h-7 px-2 text-[13px] hover:text-[#a8402f]")} disabled={pending || !coches.size} onClick={() => grouper("corbeille")} title="Mettre à la corbeille"><I n="trash" s={14} /></button>}
+                {folder !== "trash" && <button className={cx(btnGhost, "h-7 px-2 text-[13px] hover:text-[var(--danger)]")} disabled={pending || !coches.size} onClick={() => grouper("corbeille")} title="Mettre à la corbeille"><I n="trash" s={14} /></button>}
                 <button className={cx(btnGhost, "size-7")} onClick={() => setCoches(null)} aria-label="Annuler la sélection"><I n="x" s={14} /></button>
               </span>
             </div>
@@ -362,7 +362,7 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
             <div className="flex items-center gap-1 border-b border-[var(--line)] px-3 py-2 text-[13px]">
               <button className={cx(btnGhost, "-ml-1 size-7")} onClick={() => setCoches(new Set())} title="Sélectionner plusieurs messages" aria-label="Sélectionner"><I n="select" /></button>
               {([["tous", "Tous"], ["nonlus", "Non lus"], ["suivis", "Suivis"]] as const).map(([k, l]) => (
-                <button key={k} onClick={() => setFiltre(k)} className={cx("press whitespace-nowrap rounded-full px-2.5 py-1 font-semibold", filtre === k ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:bg-[var(--surface-2)]")}>{l}</button>
+                <button key={k} onClick={() => setFiltre(k)} className={cx("press whitespace-nowrap rounded-full px-2.5 py-1 font-semibold", filtre === k ? "bg-[var(--btn)] text-[var(--on-btn)]" : "text-[var(--ink-2)] hover:bg-[var(--surface-2)]")}>{l}</button>
               ))}
               <span className="ml-auto whitespace-nowrap tabular-nums text-[var(--ink-3)]">{total} message(s)</span>
               <button className={cx(btnGhost, "hidden size-7 md:inline-flex")} onClick={() => setAide((x) => !x)} title="Raccourcis clavier (?)" aria-label="Raccourcis clavier">?</button>
@@ -371,7 +371,7 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
           {aide && (
             <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 border-b border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-[12.5px] text-[var(--ink-2)]">
               {[["j / k", "suivant / précédent"], ["r", "répondre"], ["a", "répondre à tous"], ["f", "transférer"], ["e", "corbeille"], ["u", "lu / non lu"], ["s", "suivre"], ["c", "nouveau message"], ["/", "rechercher"], ["Échap", "fermer"]].map(([k, l]) => (
-                <span key={k}><kbd className="rounded border border-[var(--line)] bg-white px-1 font-mono text-[11px]">{k}</kbd> {l}</span>
+                <span key={k}><kbd className="rounded border border-[var(--line)] bg-[var(--surface)] px-1 font-mono text-[11px]">{k}</kbd> {l}</span>
               ))}
             </div>
           )}
@@ -391,19 +391,19 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
                     className={cx("flex w-full gap-3 px-3 py-2.5 text-left transition-colors", coche || (actif && !coches) ? "bg-[var(--amber-soft)]/70" : "hover:bg-[var(--canvas)]")}
                   >
                     {coches ? (
-                      <span className={cx("mt-0.5 grid size-9 shrink-0 place-items-center rounded-full border-2", coche ? "border-[var(--ink)] bg-[var(--ink)] text-white" : "border-[var(--line)] bg-white")}>{coche && <I n="check" />}</span>
+                      <span className={cx("mt-0.5 grid size-9 shrink-0 place-items-center rounded-full border-2", coche ? "border-[var(--ink)] bg-[var(--btn)] text-[var(--on-btn)]" : "border-[var(--line)] bg-[var(--surface)]")}>{coche && <I n="check" />}</span>
                     ) : (
-                      <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full text-[12px] font-bold text-white" style={{ background: teinte(a?.address || "?") }}>{initiales(a)}</span>
+                      <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full text-[12px] font-semibold text-white" style={{ background: teinte(a?.address || "?") }}>{initiales(a)}</span>
                     )}
                     <span className="min-w-0 flex-1">
                       <span className="flex items-baseline gap-2">
-                        <span className={cx("min-w-0 flex-1 truncate text-[14.5px]", !m.seen ? "font-bold text-[var(--ink)]" : "text-[var(--ink-2)]")}>
+                        <span className={cx("min-w-0 flex-1 truncate text-[13.5px]", !m.seen ? "font-semibold text-[var(--ink)]" : "text-[var(--ink-2)]")}>
                           {folder === "sent" && <span className="font-normal text-[var(--ink-3)]">À : </span>}
                           {nom(a)}
                         </span>
-                        <span className={cx("shrink-0 text-[12.5px] tabular-nums", !m.seen ? "font-bold text-[var(--amber-ink)]" : "text-[var(--ink-3)]")}>{quand(m.date)}</span>
+                        <span className={cx("shrink-0 text-[12.5px] tabular-nums", !m.seen ? "font-semibold text-[var(--amber-ink)]" : "text-[var(--ink-3)]")}>{quand(m.date)}</span>
                       </span>
-                      <span className={cx("mt-0.5 flex items-center gap-1.5 text-[14px]", !m.seen ? "font-semibold text-[var(--ink)]" : "text-[var(--ink-2)]")}>
+                      <span className={cx("mt-0.5 flex items-center gap-1.5 text-[13.5px]", !m.seen ? "font-semibold text-[var(--ink)]" : "text-[var(--ink-2)]")}>
                         <span className="min-w-0 flex-1 truncate">{m.subject}</span>
                         {m.answered && <I n="reply" s={13} className="text-[var(--ink-3)]" />}
                         {m.attach && <I n="clip" s={13} className="text-[var(--ink-3)]" />}
@@ -415,7 +415,7 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
                 </li>
               );
             })}
-            {!visibles.length && <li className="px-4 py-12 text-center text-[14px] text-[var(--ink-3)]">{rows.length ? "Aucun message pour ce filtre." : q ? "Aucun message ne correspond à la recherche." : "Ce dossier est vide."}</li>}
+            {!visibles.length && <li className="px-4 py-12 text-center text-[13.5px] text-[var(--ink-3)]">{rows.length ? "Aucun message pour ce filtre." : q ? "Aucun message ne correspond à la recherche." : "Ce dossier est vide."}</li>}
             {!q && offset < liste.total && filtre === "tous" && (
               <li className="p-3">
                 <button className={cx(btnOutline, "h-9 w-full")} onClick={charger} disabled={pending}>Messages plus anciens</button>
@@ -444,10 +444,10 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
             <div className="space-y-4 p-6">
               <div className="h-6 w-2/3 animate-pulse rounded bg-[var(--surface-2)]" />
               <div className="h-4 w-1/3 animate-pulse rounded bg-[var(--surface-2)]" />
-              <div className="h-64 animate-pulse rounded-[14px] bg-[var(--surface-2)]" />
+              <div className="h-64 animate-pulse rounded-[8px] bg-[var(--surface-2)]" />
             </div>
           ) : erreur ? (
-            <div className="p-8 text-center text-[14px] font-semibold text-[#a8402f]">{erreur}</div>
+            <div className="p-8 text-center text-[13.5px] font-semibold text-[var(--danger)]">{erreur}</div>
           ) : mail ? (
             <article className="min-w-0 p-5 lg:p-6">
               <div className="mb-4 flex flex-wrap items-center gap-1">
@@ -465,26 +465,26 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
                       </>
                     ) : null;
                   })()}
-                  {folder !== "trash" && <button className={cx(btnGhost, "size-8 hover:text-[#a8402f]")} title="Mettre à la corbeille" disabled={pending} onClick={() => jeter(mail.uid)}><I n="trash" /></button>}
+                  {folder !== "trash" && <button className={cx(btnGhost, "size-8 hover:text-[var(--danger)]")} title="Mettre à la corbeille" disabled={pending} onClick={() => jeter(mail.uid)}><I n="trash" /></button>}
                 </span>
               </div>
-              <h2 className="text-balance text-[22px] font-extrabold leading-snug tracking-[-0.02em] [overflow-wrap:anywhere]">{mail.subject}</h2>
+              <h2 className="text-balance text-[22px] font-semibold leading-snug tracking-[-0.02em] [overflow-wrap:anywhere]">{mail.subject}</h2>
               <div className="mt-3 flex items-start gap-3">
-                <span className="grid size-10 shrink-0 place-items-center rounded-full text-[13px] font-bold text-white" style={{ background: teinte(mail.from[0]?.address || "?") }}>{initiales(mail.from[0])}</span>
-                <div className="min-w-0 flex-1 text-[14px]">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full text-[13px] font-semibold text-white" style={{ background: teinte(mail.from[0]?.address || "?") }}>{initiales(mail.from[0])}</span>
+                <div className="min-w-0 flex-1 text-[13.5px]">
                   <div className="flex flex-wrap items-baseline gap-x-2">
-                    <span className="font-bold">{nom(mail.from[0])}</span>
+                    <span className="font-semibold">{nom(mail.from[0])}</span>
                     <span className="truncate text-[var(--ink-3)]">{mail.from[0]?.address}</span>
                   </div>
                   <Destinataires to={mail.to} cc={mail.cc} />
                   <time className="mt-0.5 block text-[12.5px] text-[var(--ink-3)]" dateTime={mail.date}>{complet.format(new Date(mail.date))}</time>
                 </div>
               </div>
-              <div className="mt-5">{mail.html ? <Corps html={mail.html} /> : <pre className="whitespace-pre-wrap font-sans text-[15px] leading-relaxed text-[var(--ink)]">{mail.text}</pre>}</div>
+              <div className="mt-5">{mail.html ? <Corps html={mail.html} /> : <pre className="whitespace-pre-wrap font-sans text-[14px] leading-relaxed text-[var(--ink)]">{mail.text}</pre>}</div>
               {mail.attachments.length > 0 && (
                 <div className="mt-5 flex flex-wrap gap-2">
                   {mail.attachments.map((a) => (
-                    <a key={a.i} href={`/api/admin/mails/piece?${new URLSearchParams({ folder, uid: String(mail.uid), i: String(a.i) })}`} target="_blank" rel="noreferrer" className="flex max-w-72 items-center gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-[14px] hover:bg-[var(--surface-2)]">
+                    <a key={a.i} href={`/api/admin/mails/piece?${new URLSearchParams({ folder, uid: String(mail.uid), i: String(a.i) })}`} target="_blank" rel="noreferrer" className="flex max-w-72 items-center gap-2 rounded-[7px] border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-[13.5px] hover:bg-[var(--surface-2)]">
                       <I n="clip" className="text-[var(--ink-3)]" />
                       <span className="min-w-0 flex-1 truncate">{a.filename}</span>
                       <span className="shrink-0 text-[12px] text-[var(--ink-3)]">{octets(a.size)}</span>
@@ -496,9 +496,9 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
           ) : (
             <div className="grid h-full place-items-center p-8 text-center">
               <div>
-                <div className="mx-auto mb-3 grid size-12 place-items-center rounded-[16px] bg-[var(--amber-soft)] text-[var(--amber-ink)]"><I n="inbox" s={20} /></div>
-                <p className="font-bold">{user}</p>
-                <p className="mt-1 text-[14px] text-[var(--ink-3)]">Sélectionnez un message pour le lire.</p>
+                <div className="mx-auto mb-3 grid size-12 place-items-center rounded-[10px] bg-[var(--amber-soft)] text-[var(--amber-ink)]"><I n="inbox" s={20} /></div>
+                <p className="font-semibold">{user}</p>
+                <p className="mt-1 text-[13.5px] text-[var(--ink-3)]">Sélectionnez un message pour le lire.</p>
               </div>
             </div>
           )}
@@ -506,7 +506,7 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
       </div>
 
       {toast.msg && (
-        <div role="status" className={cx("fixed bottom-5 left-1/2 z-[1100] -translate-x-1/2 rounded-[14px] px-4 py-2.5 text-[14.5px] font-semibold shadow-[var(--shadow-float)]", toast.msg.ok ? "bg-[var(--ink)] text-white" : "bg-[#a8402f] text-white")}>{toast.msg.text}</div>
+        <div role="status" className={cx("fixed bottom-5 left-1/2 z-[1100] -translate-x-1/2 rounded-[8px] px-4 py-2.5 text-[13.5px] font-semibold shadow-[var(--shadow-float)]", toast.msg.ok ? "bg-[var(--btn)] text-[var(--on-btn)]" : "bg-[var(--danger)] text-[var(--on-btn)]")}>{toast.msg.text}</div>
       )}
     </div>
   );
@@ -588,12 +588,12 @@ img{max-width:100%;height:auto}table{max-width:100%!important}pre{white-space:pr
   return (
     <div>
       {distantes && !images && (
-        <div className="mb-2 flex flex-wrap items-center gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-[13px] text-[var(--ink-2)]">
+        <div className="mb-2 flex flex-wrap items-center gap-2 rounded-[7px] border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-[13px] text-[var(--ink-2)]">
           Images distantes masquées (elles peuvent signaler l’ouverture à l’expéditeur).
           <button className="ml-auto font-semibold text-[var(--amber-ink)] hover:underline" onClick={() => setImages(true)}>Afficher les images</button>
         </div>
       )}
-      <div className="overflow-hidden rounded-[14px] border border-[var(--line)] bg-white">
+      <div className="overflow-hidden rounded-[8px] border border-[var(--line)] bg-[var(--surface)]">
         {/* Même origine pour mesurer la hauteur, mais aucun script autorisé : allow-scripts n'est pas donné. */}
         <iframe ref={ref} title="Contenu du message" srcDoc={doc} sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" className="block w-full" style={{ height: h }} />
       </div>
@@ -653,7 +653,7 @@ function Composer({ user, folder, compose, setCompose, onSent, onError }: {
   return (
     <div className="flex h-full flex-col p-5 lg:p-6">
       <div className="mb-4 flex items-center gap-2">
-        <h2 className="text-[20px] font-extrabold tracking-[-0.02em]">{titre}</h2>
+        <h2 className="text-[20px] font-semibold tracking-[-0.02em]">{titre}</h2>
         <span className="text-[13px] text-[var(--ink-3)]">depuis {user}</span>
         <button className={cx(btnGhost, "ml-auto size-8")} onClick={() => setCompose(null)} aria-label="Fermer"><I n="x" /></button>
       </div>
@@ -684,13 +684,13 @@ function Composer({ user, folder, compose, setCompose, onSent, onError }: {
       {compose.quote && (
         <details className="mt-2 text-[13px] text-[var(--ink-3)]">
           <summary className="cursor-pointer">Message d’origine (ajouté sous votre réponse)</summary>
-          <pre className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap rounded-[10px] bg-[var(--canvas)] p-3 font-sans">{compose.quote}</pre>
+          <pre className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap rounded-[7px] bg-[var(--canvas)] p-3 font-sans">{compose.quote}</pre>
         </details>
       )}
       {compose.files.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {compose.files.map((f, i) => (
-            <span key={f.filename + i} className="flex items-center gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--canvas)] px-2.5 py-1.5 text-[13px]">
+            <span key={f.filename + i} className="flex items-center gap-2 rounded-[7px] border border-[var(--line)] bg-[var(--canvas)] px-2.5 py-1.5 text-[13px]">
               <I n="clip" s={14} />
               <span className="max-w-48 truncate">{f.filename}</span>
               <span className="text-[var(--ink-3)]">{octets(f.size)}</span>
@@ -700,16 +700,16 @@ function Composer({ user, folder, compose, setCompose, onSent, onError }: {
         </div>
       )}
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <button className={cx(btnPrimary, "h-10 px-4")} onClick={envoi} disabled={pending}>
+        <button className={cx(btnPrimary, "h-9 px-4")} onClick={envoi} disabled={pending}>
           <I n="send" />
           {pending ? "Envoi…" : "Envoyer"}
         </button>
-        <label className={cx(btnOutline, "h-10 cursor-pointer")}>
+        <label className={cx(btnOutline, "h-9 cursor-pointer")}>
           <I n="clip" />
           Joindre
           <input type="file" multiple className="sr-only" onChange={(e) => { void joindre(e.target.files); e.target.value = ""; }} />
         </label>
-        <button className={cx(btnGhost, "h-10 px-3")} onClick={() => setCompose(null)}>Annuler</button>
+        <button className={cx(btnGhost, "h-9 px-3")} onClick={() => setCompose(null)}>Annuler</button>
       </div>
     </div>
   );

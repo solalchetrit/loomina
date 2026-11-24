@@ -1,0 +1,462 @@
+/* ================================================================
+   ADMIN — habillage du 24/11/2026 (Solal : « classe, épuré, new gen »).
+   Tout est rangé sous .adm : le site et l'espace auteur ne changent pas.
+   Sombre par défaut, bleu nuit de Loomina pour les surfaces ; l'ambre de
+   l'étoile ne sert qu'aux données et au bouton principal. Bords d'un
+   pixel, petits arrondis, pas d'ombre. Le clair reste au choix (.adm[data-theme="light"]).
+   ================================================================ */
+
+.adm {
+  color-scheme: dark;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Les jetons du site, retournés */
+  --canvas: #151a26;        /* survol, bande discrète dans un panneau */
+  --surface: #0f131c;       /* panneaux */
+  --surface-2: #1a2030;
+  --mist: var(--canvas);
+  --line: #1e2533;
+  --line-soft: #1a202d;
+  --rule-strong: #2a3244;
+  --ink: #eceff5;
+  --title: #eceff5;
+  --ink-soft: #c9cfdb;
+  --ink-2: #a2aabb;
+  --ink-3: #6f778a;
+  --night: #0f131c;
+  --night-deep: #080b11;
+  --amber: #f1a843;
+  --amber-ink: #f1a843;
+  --amber-display: #f1a843;
+  --amber-deep: #f1a843;
+  --amber-soft: rgba(241, 168, 67, 0.13);
+  --amber-wash: rgba(241, 168, 67, 0.1);
+  --amber-line: rgba(241, 168, 67, 0.32);
+  --success: #62c88e;
+  --success-soft: rgba(98, 200, 142, 0.13);
+  --danger: #f2775f;
+  --radius-card: 10px;
+  --radius-btn: 8px;
+  --shadow-bar: none;
+  --shadow-float: 0 18px 44px -18px rgba(0, 0, 0, 0.6);
+
+  /* Les jetons propres à l'admin */
+  --adm-bg: #0a0d14;
+  --adm-side: #080b11;
+  --danger-soft: rgba(242, 119, 95, 0.13);
+  --btn: #f1a843;           /* bouton principal */
+  --on-btn: #231503;
+  --sel: #1a2030;           /* onglet ou filtre choisi */
+  --adm-glow: rgba(241, 168, 67, 0.15);
+  --adm-grid: rgba(255, 255, 255, 0.035);
+
+  min-height: 100vh;
+  background: var(--adm-bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.adm[data-theme="light"] {
+  color-scheme: light;
+  --canvas: #f1f3f7;
+  --surface: #ffffff;
+  --surface-2: #e9ecf2;
+  --line: #e3e6ec;
+  --line-soft: #eceef3;
+  --rule-strong: #d3d8e1;
+  --ink: #131927;
+  --title: #131927;
+  --ink-soft: #283044;
+  --ink-2: #4b5262;
+  --ink-3: #747c8c;
+  --night: #131927;
+  --night-deep: #0d1220;
+  --amber-ink: #95580a;
+  --amber-display: #c27610;
+  --amber-deep: #6f4005;
+  --amber-soft: rgba(241, 168, 67, 0.2);
+  --amber-wash: rgba(241, 168, 67, 0.13);
+  --amber-line: rgba(194, 118, 16, 0.3);
+  --success: #23774a;
+  --success-soft: rgba(35, 119, 74, 0.1);
+  --danger: #b8402b;
+  --shadow-float: 0 18px 44px -22px rgba(20, 24, 34, 0.3);
+  --adm-bg: #f5f6f9;
+  --adm-side: #eef0f4;
+  --danger-soft: rgba(184, 64, 43, 0.09);
+  --sel: #ffffff;
+  --adm-glow: rgba(241, 168, 67, 0.2);
+  --adm-grid: rgba(19, 25, 39, 0.045);
+}
+
+.adm ::selection {
+  background: var(--amber-soft);
+}
+
+.adm :focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* ---------- La coquille : colonne pleine hauteur, barre fine, contenu ---------- */
+
+.adm-app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+@media (min-width: 1024px) {
+  .adm-app {
+    grid-template-columns: 236px minmax(0, 1fr);
+  }
+}
+
+.adm-side {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1100;
+  display: flex;
+  width: 264px;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  background: var(--adm-side);
+  padding: 16px 12px;
+  transform: translateX(-100%);
+  transition: transform 200ms var(--ease-out);
+}
+
+.adm-side[data-open="true"] {
+  transform: none;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5);
+}
+
+@media (min-width: 1024px) {
+  .adm-side {
+    position: sticky;
+    top: 0;
+    width: auto;
+    height: 100vh;
+    transform: none;
+    box-shadow: none !important;
+  }
+}
+
+.adm-navlink {
+  display: flex;
+  height: 32px;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  border-radius: 7px;
+  padding: 0 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-align: left;
+  white-space: nowrap;
+  transition: background-color 120ms, color 120ms;
+}
+
+.adm-navlink:hover {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.adm-navlink[aria-current="page"] {
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.adm-navlink[aria-current="page"] svg {
+  color: var(--amber-ink);
+}
+
+.adm-main {
+  position: relative;
+  min-width: 0;
+}
+
+/* Le halo ambre et le quadrillage, en haut de page seulement : on les sent sans les voir. */
+.adm-main::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 340px;
+  pointer-events: none;
+  background:
+    radial-gradient(620px 300px at 88% -12%, var(--adm-glow), transparent 62%),
+    linear-gradient(var(--adm-grid) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, var(--adm-grid) 1px, transparent 1px) 0 0 / 44px 44px;
+  -webkit-mask-image: linear-gradient(#000, transparent);
+  mask-image: linear-gradient(#000, transparent);
+}
+
+.adm-top {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  height: 52px;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--adm-bg) 82%, transparent);
+  padding: 0 16px;
+  backdrop-filter: blur(14px);
+}
+
+.adm-page {
+  position: relative;
+  margin: 0 auto;
+  max-width: 1244px;
+  padding: 28px 16px 80px;
+}
+
+@media (min-width: 900px) {
+  .adm-top,
+  .adm-page {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.adm-ghost {
+  display: inline-flex;
+  height: 30px;
+  align-items: center;
+  gap: 7px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  padding: 0 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.adm-ghost:hover {
+  border-color: var(--rule-strong);
+  color: var(--ink);
+}
+
+/* ---------- Les boutons ---------- */
+
+.adm-btn {
+  display: inline-flex;
+  height: 34px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 7px;
+  background: var(--btn);
+  padding: 0 13px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-btn);
+  white-space: nowrap;
+}
+
+.adm-btn:hover {
+  filter: brightness(1.06);
+}
+
+.adm-btn:disabled {
+  opacity: 0.4;
+}
+
+.adm-btn-sec {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--rule-strong);
+}
+
+.adm-btn-sec:hover {
+  filter: none;
+  background: var(--canvas);
+}
+
+/* ---------- Les briques du site, reprises au format de l'admin ---------- */
+
+.adm .card {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.adm .card-float {
+  box-shadow: var(--shadow-float);
+}
+
+.adm .t-heading {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.adm .t-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.adm .t-small {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.adm .t-body {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.adm .t-eyebrow {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+.adm .pill {
+  height: 22px;
+  gap: 6px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.adm .pill-neutral {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--rule-strong);
+}
+
+.adm .chip-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+}
+
+.adm .field {
+  min-height: 38px;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.adm textarea.field {
+  min-height: 120px;
+  padding: 10px 12px;
+}
+
+.adm .field:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+.adm .field-label {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.adm .book-text {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.adm input,
+.adm select,
+.adm textarea {
+  color: var(--ink);
+}
+
+.adm audio {
+  color-scheme: inherit;
+}
+
+.adm table th {
+  font-weight: 500;
+}
+
+/* Les chiffres d'une page : du texte sur une bande réglée, pas des tuiles. */
+.adm-figs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+@media (min-width: 820px) {
+  .adm-figs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.adm-fig {
+  display: block;
+  margin: -1px 0 0 -1px;
+  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+  padding: 16px 18px;
+}
+
+a.adm-fig:hover {
+  background: var(--canvas);
+}
+
+/* ---------- La page de connexion ---------- */
+
+.adm-login-art {
+  position: relative;
+  overflow: hidden;
+  background: #0d1220;
+  color: #fff;
+}
+
+.adm-login-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(760px 480px at 88% -8%, rgba(241, 168, 67, 0.34), transparent 60%),
+    radial-gradient(680px 480px at -12% 112%, rgba(60, 86, 160, 0.55), transparent 60%);
+}
+
+.adm-login-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px) 0 0 / 48px 48px;
+}
+
+.adm-login-art > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adm-side {
+    transition: none;
+  }
+}
+
+/* Le logo du site : le blanc sur le sombre, le bleu sur le clair. */
+.adm .adm-logo-light,
+.adm[data-theme="light"] .adm-logo-dark {
+  display: none;
+}
+
+.adm[data-theme="light"] .adm-logo-light {
+  display: block;
+}

@@ -36,25 +36,25 @@ const TIMERS = [
 function Diagram() {
   const box = (x: number, y: number, w: number, h: number, title: string, sub: string, tone: string) => (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx={16} fill={tone} stroke="#d6d4cc" />
-      <text x={x + w / 2} y={y + h / 2 - 4} textAnchor="middle" fontSize={17} fontWeight={800} fill="#161616">{title}</text>
-      <text x={x + w / 2} y={y + h / 2 + 18} textAnchor="middle" fontSize={13} fill="#4a4a45">{sub}</text>
+      <rect x={x} y={y} width={w} height={h} rx={10} fill={`color-mix(in srgb, ${tone} 14%, var(--surface))`} stroke={`color-mix(in srgb, ${tone} 45%, var(--line))`} />
+      <text x={x + w / 2} y={y + h / 2 - 4} textAnchor="middle" fontSize={16} fontWeight={600} fill="var(--ink)">{title}</text>
+      <text x={x + w / 2} y={y + h / 2 + 18} textAnchor="middle" fontSize={13} fill="var(--ink-2)">{sub}</text>
     </g>
   );
   const label = (x: number, y: number, t: string) => (
     <g>
-      <rect x={x - t.length * 3.6 - 8} y={y - 13} width={t.length * 7.2 + 16} height={22} rx={11} fill="#ffffff" stroke="#e7e6e1" />
-      <text x={x} y={y + 2} textAnchor="middle" fontSize={12.5} fill="#2b2b28">{t}</text>
+      <rect x={x - t.length * 3.6 - 8} y={y - 13} width={t.length * 7.2 + 16} height={22} rx={11} fill="var(--surface)" stroke="var(--line)" />
+      <text x={x} y={y + 2} textAnchor="middle" fontSize={12.5} fill="var(--ink-2)">{t}</text>
     </g>
   );
   return (
     <svg viewBox="0 0 1000 640" role="img" aria-label="Schéma des services de Loomina" className="h-auto w-full min-w-[600px]">
       <defs>
         <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0 0 L10 5 L0 10 z" fill="#66665f" />
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)" />
         </marker>
       </defs>
-      <g stroke="#66665f" strokeWidth={1.6} fill="none" markerEnd="url(#arr)">
+      <g stroke="var(--ink-3)" strokeWidth={1.6} fill="none" markerEnd="url(#arr)">
         <path d="M160 92 V178" markerStart="url(#arr)" />
         <path d="M160 272 V358" markerStart="url(#arr)" />
         <path d="M840 92 V178" markerStart="url(#arr)" />
@@ -66,14 +66,14 @@ function Diagram() {
         <path d="M160 452 C 160 560, 250 575, 368 575" markerStart="url(#arr)" />
         <path d="M972 225 H990 V575 H632" markerStart="url(#arr)" />
       </g>
-      {box(30, 20, 260, 72, "Le narrateur", "son téléphone", "#e6eefb")}
-      {box(710, 20, 260, 72, "Le client sur le site", "navigateur", "#e6eefb")}
-      {box(30, 180, 260, 92, "Twilio", "numéro · oreille · voix · SMS", "#fde8ea")}
-      {box(710, 180, 260, 92, "Site (Vercel)", "pages · API · traitement", "#f2f1ec")}
-      {box(30, 360, 260, 92, "Serveur vocal", "Render · appels en direct", "#fcebd2")}
-      {box(370, 360, 260, 92, "OpenAI", "toutes les IA", "#e3f3f1")}
-      {box(710, 360, 260, 92, "Stripe", "paiement", "#ece9fe")}
-      {box(370, 530, 260, 92, "Supabase", "base de données · photos", "#e3f0e5")}
+      {box(30, 20, 260, 72, "Le narrateur", "son téléphone", "#5b8def")}
+      {box(710, 20, 260, 72, "Le client sur le site", "navigateur", "#5b8def")}
+      {box(30, 180, 260, 92, "Twilio", "numéro · oreille · voix · SMS", "#f2775f")}
+      {box(710, 180, 260, 92, "Site (Vercel)", "pages · API · traitement", "#8b93a5")}
+      {box(30, 360, 260, 92, "Serveur vocal", "Render · appels en direct", "#f1a843")}
+      {box(370, 360, 260, 92, "OpenAI", "toutes les IA", "#3fb8a9")}
+      {box(710, 360, 260, 92, "Stripe", "paiement", "#8b7cf0")}
+      {box(370, 530, 260, 92, "Supabase", "base de données · photos", "#62c88e")}
       {label(160, 136, "la voix")}
       {label(160, 316, "le texte, en direct")}
       {label(840, 136, "pages, espace auteur")}
@@ -102,9 +102,9 @@ export default async function AdminStructure() {
         <div className="overflow-x-auto"><Diagram /></div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((s) => (
-            <div key={s.name} className="rounded-[16px] border border-[var(--line)] bg-[#fcfbf8] p-4">
-              <p className="font-bold">{s.name}</p>
-              <p className="mt-1 text-[15px] text-[var(--ink-2)]">{s.what}</p>
+            <div key={s.name} className="rounded-[10px] border border-[var(--line)] bg-[var(--adm-bg)] p-4">
+              <p className="font-semibold">{s.name}</p>
+              <p className="mt-1 text-[14px] text-[var(--ink-2)]">{s.what}</p>
               <p className="mt-1 font-mono text-[12px] text-[var(--ink-3)]">{s.where}</p>
             </div>
           ))}
@@ -113,14 +113,14 @@ export default async function AdminStructure() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel icon="database" title="Ce que contient la base">
-          <ul className="grid gap-2 text-[15px]">
+          <ul className="grid gap-2 text-[14px]">
             {TABLES.map(([t, d]) => (
               <li key={t}><span className="font-mono text-[13px] font-semibold">{t}</span> <span className="text-[var(--ink-2)]">· {d}</span></li>
             ))}
           </ul>
         </Panel>
         <Panel icon="clock" title="Ce qui tourne tout seul">
-          <ul className="grid gap-2 text-[15px]">
+          <ul className="grid gap-2 text-[14px]">
             {TIMERS.map(([when, who, what]) => (
               <li key={when}><b>{when}</b> <span className="text-[var(--ink-3)]">({who})</span> · <span className="text-[var(--ink-2)]">{what}</span></li>
             ))}

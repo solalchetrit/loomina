@@ -5,7 +5,7 @@ import { fmtEur } from "@/lib/admin/costs";
 import { fmtDate, fmtDuration } from "@/lib/admin/format";
 import { COSTS } from "@/config/costs";
 import { OFFER } from "@/config/offer";
-import { Badge, Panel, Stat, Empty, PageHeader, Segmented, BarList, NightPanel, NightFigure, Fold } from "@/components/admin/ui";
+import { Badge, Panel, Stat, Empty, PageHeader, Segmented, BarList, NightFigure, Fold } from "@/components/admin/ui";
 import { listOrders, getCrm } from "@/lib/admin/data";
 import { realRevenue } from "@/lib/admin/revenue";
 
@@ -21,7 +21,7 @@ const DEMO_STATUS: Record<string, string> = {
 };
 
 function Th({ children, right = false }: { children: React.ReactNode; right?: boolean }) {
-  return <th className={`px-2 pb-2.5 text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--ink-3)] ${right ? "text-right" : ""}`}>{children}</th>;
+  return <th className={`px-2 pb-2.5 text-[12px] font-medium text-[var(--ink-3)] ${right ? "text-right" : ""}`}>{children}</th>;
 }
 
 const money = (n: number) => fmtEur(n);
@@ -81,14 +81,14 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
         {s.range.label.charAt(0).toUpperCase() + s.range.label.slice(1)} : ce que les clients ont payé (lu dans Stripe, remboursements déduits), ce que Loomina a dépensé (factures Twilio{oa ? ", OpenAI" : ""} et Stripe, abonnements, hors taxes), et la différence.
       </PageHeader>
 
-      <NightPanel title={`Bilan de ${s.range.label}`}>
-        <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section aria-label={`Bilan de ${s.range.label}`}>
+        <div className="adm-figs">
           <NightFigure label="Encaissé" value={net == null ? "—" : money(net)} hint={revenue ? `${revenue.orders} commande(s)${revenue.refunded > 0 ? `, ${money(revenue.refunded)} remboursé(s)` : ""}` : "Stripe ne répond pas"} />
           <NightFigure label="Dépensé" value={money(s.total)} hint={s.projected != null ? `vers ${money(s.projected)} en fin de mois` : `${money(s.total * (1 + COSTS.vat))} TTC`} />
           <NightFigure label="Marge" value={margin == null ? "—" : money(margin)} hint={net == null ? "Stripe ne répond pas" : net ? `${Math.round((100 * (margin ?? 0)) / net)} % de l’encaissé, hors impression et envoi` : "pas encore de commande sur la période"} />
           <NightFigure label="Une commande" value={perOrder == null ? "—" : money(perOrder)} hint={revenue && revenue.discounts > 0 ? `après ${money(revenue.discounts)} de codes promo` : `prix affiché ${OFFER.price} €`} />
         </div>
-      </NightPanel>
+      </section>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.4fr_1fr]">
         <Panel icon="card" title={`Commandes de ${s.range.label} (${periodOrders.length})`}>
@@ -98,7 +98,7 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
             <Empty>Aucune commande payée sur la période{testOrders ? ` (vos ${testOrders} commande(s) de test ne comptent pas)` : ""}.</Empty>
           ) : (
             <div className="-mx-2 overflow-x-auto">
-              <table className="w-full min-w-[520px] border-separate border-spacing-0 text-left text-[15px]">
+              <table className="w-full min-w-[520px] border-separate border-spacing-0 text-left text-[14px]">
                 <thead><tr><Th>Client</Th><Th>Date</Th><Th right>Payé</Th><Th right>Remboursé</Th></tr></thead>
                 <tbody>
                   {periodOrders.map((o) => {
@@ -107,7 +107,7 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
                       <tr key={o.sessionId} className="[&>td]:border-t [&>td]:border-[var(--line-soft)] [&>td]:px-2 [&>td]:py-2.5">
                         <td className="font-semibold"><Link className="hover:underline" href={`/admin/clients/${o.profileId}`}>{o.client}</Link>{o.isGift ? <span className="t-small"> · offert</span> : null}</td>
                         <td className="whitespace-nowrap tabular-nums text-[var(--ink-2)]">{fmtDate(o.at)}</td>
-                        <td className="text-right font-bold tabular-nums">{line ? money(line.paid) : "—"}{line && line.discount > 0 ? <span className="t-small block !text-[12px] font-normal">−{money(line.discount)} de code promo</span> : null}</td>
+                        <td className="text-right font-semibold tabular-nums">{line ? money(line.paid) : "—"}{line && line.discount > 0 ? <span className="t-small block !text-[12px] font-normal">−{money(line.discount)} de code promo</span> : null}</td>
                         <td className="text-right tabular-nums">{line && line.refunded > 0 ? money(line.refunded) : "—"}</td>
                       </tr>
                     );
@@ -123,7 +123,7 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
         </Panel>
       </div>
 
-      <h2 className="mt-3 text-[22px] font-extrabold tracking-[-0.02em]">Le détail des dépenses</h2>
+      <h2 className="mt-3 text-[22px] font-semibold tracking-[-0.02em]">Le détail des dépenses</h2>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
           {s.projected != null ? (
             <Stat icon="clock" label="Projection fin de mois" value={money(s.projected)} hint={`au rythme de ${s.range.elapsedDays} jour(s)`} />
@@ -137,7 +137,7 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
       {s.errors.length > 0 && (
         <ul className="grid gap-2">
           {s.errors.map((e) => (
-            <li key={e} className="rounded-[14px] bg-[#fbeae6] px-4 py-2.5 text-[15px] font-semibold text-[var(--danger)]">{e}</li>
+            <li key={e} className="rounded-[8px] bg-[var(--danger-soft)] px-4 py-2.5 text-[14px] font-semibold text-[var(--danger)]">{e}</li>
           ))}
         </ul>
       )}
@@ -154,11 +154,11 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
           <div className="grid gap-3">
             <Fold summary={<span className="flex items-center gap-2">Twilio {tw ? <Badge tone="ok">réel</Badge> : <Badge tone="wait">estimé</Badge>}</span>} meta={tw ? money(tw.total) : "—"}>
               {tw ? (
-                <div className="grid gap-1 font-sans text-[15px]">
+                <div className="grid gap-1 font-sans text-[14px]">
                   {tw.lines.map((l) => (
                     <p key={l.label} className="flex justify-between gap-3"><span>{l.label} <span className="text-[var(--ink-3)]">· {l.usage}</span></span><b className="tabular-nums">{money(l.amount)}</b></p>
                   ))}
-                  {tw.balance != null && <p className="mt-2 text-[14px] text-[var(--ink-3)]">Crédit restant chez Twilio : <b className="text-[var(--ink)]">{money(tw.balance)}</b></p>}
+                  {tw.balance != null && <p className="mt-2 text-[13.5px] text-[var(--ink-3)]">Crédit restant chez Twilio : <b className="text-[var(--ink)]">{money(tw.balance)}</b></p>}
                 </div>
               ) : (
                 "Twilio ne répond pas : la ligne et la voix sont estimées à partir des appels."
@@ -166,31 +166,31 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
             </Fold>
             <Fold summary={<span className="flex items-center gap-2">OpenAI {oa ? <Badge tone="ok">réel</Badge> : <Badge tone="wait">estimé</Badge>}</span>} meta={money(oa?.total ?? s.sums.callsAi + s.sums.demosAi + s.sums.compositions)}>
               {oa ? (
-                <div className="grid gap-1 font-sans text-[15px]">
+                <div className="grid gap-1 font-sans text-[14px]">
                   {oa.lines.map((l) => (
                     <p key={l.label} className="flex justify-between gap-3"><span>{l.label}</span><b className="tabular-nums">{money(l.amount)}</b></p>
                   ))}
-                  {openAiOther != null && openAiOther > 0.01 && <p className="mt-2 text-[14px] text-[var(--ink-3)]">Dont {money(openAiOther)} hors appels et démos : compositions du livre, photos, tests.</p>}
+                  {openAiOther != null && openAiOther > 0.01 && <p className="mt-2 text-[13.5px] text-[var(--ink-3)]">Dont {money(openAiOther)} hors appels et démos : compositions du livre, photos, tests.</p>}
                 </div>
               ) : (
-                <span className="font-sans text-[15px]">
+                <span className="font-sans text-[14px]">
                   Calculé à partir des jetons de chaque appel et démo, plus {money(COSTS.compositionFallbackPerEdition * COSTS.usdToEur)} par composition du livre (estimation).{" "}
                   {!openAiBillConfigured() && "Pour lire la vraie facture : créer une clé d’administration en lecture sur platform.openai.com (Settings, Admin keys) et la poser sur Vercel sous OPENAI_ADMIN_KEY."}
                 </span>
               )}
             </Fold>
             <Fold summary="Stripe (frais de paiement)" meta={s.stripe == null ? "—" : money(s.stripe)}>
-              <span className="font-sans text-[15px]">Les frais prélevés par Stripe sur les paiements et remboursements de la période, lus en direct.</span>
+              <span className="font-sans text-[14px]">Les frais prélevés par Stripe sur les paiements et remboursements de la période, lus en direct.</span>
             </Fold>
             <Fold summary="Abonnements fixes" meta={money(s.subs.total)}>
-              <div className="grid gap-1 font-sans text-[15px]">
+              <div className="grid gap-1 font-sans text-[14px]">
                 {s.subs.lines.map((l) => (
                   <p key={l.name} className="flex justify-between gap-3">
                     <span>{l.name}{l.note ? <span className="text-[var(--ink-3)]"> · {l.note}</span> : null}</span>
                     <b className="tabular-nums">{l.amount == null ? "à renseigner" : money(l.amount)}</b>
                   </p>
                 ))}
-                <p className="mt-2 text-[14px] text-[var(--ink-3)]">Liste et montants dans config/costs.ts.</p>
+                <p className="mt-2 text-[13.5px] text-[var(--ink-3)]">Liste et montants dans config/costs.ts.</p>
               </div>
             </Fold>
           </div>
@@ -204,15 +204,15 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
           <>
             <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
               {([["Ligne", s.sums.calls.line], ["Voix et écoute", s.sums.calls.voice], ["IA de la conversation", s.sums.calls.conversation], ["Analyse et écriture", s.sums.calls.writing], ["Total", s.sums.calls.total]] as const).map(([l, v]) => (
-                <div key={l} className="rounded-[16px] bg-[var(--canvas)] px-4 py-3">
+                <div key={l} className="rounded-[10px] bg-[var(--canvas)] px-4 py-3">
                   <p className="text-[13px] font-semibold text-[var(--ink-3)]">{l}</p>
-                  <p className="mt-0.5 text-[20px] font-extrabold tabular-nums tracking-[-0.02em]">{money(v)}</p>
+                  <p className="mt-0.5 text-[20px] font-semibold tabular-nums tracking-[-0.02em]">{money(v)}</p>
                 </div>
               ))}
             </div>
             <div className="-mx-2 max-h-[560px] overflow-auto">
-              <table className="w-full min-w-[820px] border-separate border-spacing-0 text-left text-[15px]">
-                <thead className="sticky top-0 bg-white">
+              <table className="w-full min-w-[820px] border-separate border-spacing-0 text-left text-[14px]">
+                <thead className="sticky top-0 bg-[var(--surface)]">
                   <tr>
                     <Th>Client</Th><Th>Date</Th><Th right>Durée</Th><Th right>Ligne</Th><Th right>Voix</Th><Th right>IA conv.</Th><Th right>Écriture</Th><Th right>Total</Th>
                   </tr>
@@ -227,7 +227,7 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
                       <td className="text-right tabular-nums">{cents(c.cost.voice)}</td>
                       <td className="text-right tabular-nums">{cents(c.cost.conversation)}</td>
                       <td className="text-right tabular-nums">{cents(c.cost.writing)}</td>
-                      <td className="text-right font-bold tabular-nums">{money(c.cost.total)}{c.cost.estimated ? <span className="t-small block !text-[12px] font-normal">estimé</span> : null}</td>
+                      <td className="text-right font-semibold tabular-nums">{money(c.cost.total)}{c.cost.estimated ? <span className="t-small block !text-[12px] font-normal">estimé</span> : null}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -243,8 +243,8 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
             <Empty>Aucune démo sur la période.</Empty>
           ) : (
             <div className="-mx-2 max-h-[480px] overflow-auto">
-              <table className="w-full min-w-[560px] border-separate border-spacing-0 text-left text-[15px]">
-                <thead className="sticky top-0 bg-white">
+              <table className="w-full min-w-[560px] border-separate border-spacing-0 text-left text-[14px]">
+                <thead className="sticky top-0 bg-[var(--surface)]">
                   <tr><Th>Démo</Th><Th right>Durée</Th><Th right>Téléphone</Th><Th right>IA</Th><Th right>Total</Th></tr>
                 </thead>
                 <tbody>
@@ -254,7 +254,7 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
                       <td className="text-right tabular-nums">{fmtDuration(d.seconds)}</td>
                       <td className="text-right tabular-nums">{cents(d.line + d.voice)}</td>
                       <td className="text-right tabular-nums">{cents(d.conversation + d.writing)}</td>
-                      <td className="text-right font-bold tabular-nums">{money(d.total)}{d.estimated ? <span className="t-small block !text-[12px] font-normal">estimé</span> : null}</td>
+                      <td className="text-right font-semibold tabular-nums">{money(d.total)}{d.estimated ? <span className="t-small block !text-[12px] font-normal">estimé</span> : null}</td>
                     </tr>
                   ))}
                 </tbody>

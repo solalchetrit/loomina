@@ -32,7 +32,7 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
   return (
     <div className="grid grid-cols-1 gap-5">
       <div>
-        <Link href={`/admin/clients/${id}`} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-3)] hover:text-[var(--ink)]">
+        <Link href={`/admin/clients/${id}`} className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--ink-3)] hover:text-[var(--ink)]">
           <AIcon name="chevron" size={14} className="rotate-180" /> {name}
         </Link>
         <p className="t-eyebrow mt-4">Relire le livre</p>
@@ -45,18 +45,18 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
           {book ? `${book.chapters.length} chapitres, ${fmtNumber(words)} mots, composé le ${fmtDate(book.updated_at)} à partir de ${book.source_count} récit(s) d’appel.` : "Le livre n’est pas encore composé (il faut au moins deux récits)."}
         </p>
         {(fait || erreur) && (
-          <p role="status" className={`mt-5 rounded-[16px] px-4 py-3 text-[15px] font-semibold ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[#fbeae6] text-[#a8402f]"}`}>{fait ?? erreur}</p>
+          <p role="status" className={`mt-5 rounded-[10px] px-4 py-3 text-[14px] font-semibold ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[var(--danger-soft)] text-[var(--danger)]"}`}>{fait ?? erreur}</p>
         )}
       </div>
 
       <Panel icon="spark" title="L’avis de l’IA">
-        <p className="text-[15px] text-[var(--ink-2)]">
+        <p className="text-[14px] text-[var(--ink-2)]">
           Une IA lit le livre en entier et signale les incohérences, les répétitions, les passages obscurs et les points délicats. Elle ne change rien au livre : c’est un avis, pour vous seul.
         </p>
-        {review?.status === "running" && <p className="mt-3 rounded-[14px] bg-[var(--amber-soft)] px-4 py-3 text-[15px] font-semibold text-[var(--amber-deep)]">Avis en cours depuis le {fmtDate(review.started_at)}. Rechargez la page dans une minute.</p>}
-        {review?.status === "failed" && <p className="mt-3 rounded-[14px] bg-[#fbeae6] px-4 py-3 text-[15px] text-[#a8402f]">L’avis a échoué : {review.error}</p>}
+        {review?.status === "running" && <p className="mt-3 rounded-[8px] bg-[var(--amber-soft)] px-4 py-3 text-[14px] font-semibold text-[var(--amber-deep)]">Avis en cours depuis le {fmtDate(review.started_at)}. Rechargez la page dans une minute.</p>}
+        {review?.status === "failed" && <p className="mt-3 rounded-[8px] bg-[var(--danger-soft)] px-4 py-3 text-[14px] text-[var(--danger)]">L’avis a échoué : {review.error}</p>}
         {review?.status === "done" && review.text && (
-          <div className="mt-4 rounded-[18px] bg-[var(--canvas)] p-5">
+          <div className="mt-4 rounded-[10px] bg-[var(--canvas)] p-5">
             <p className="text-[13px] font-semibold text-[var(--ink-3)]">
               Avis du {fmtDate(review.at)}{stale ? " — sur une version plus ancienne du livre : redemandez un avis." : ""}
             </p>
@@ -64,7 +64,7 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
               {review.text.split("\n").map((line, i) => {
                 const t = line.trim();
                 if (!t) return null;
-                if (REVIEW_HEADS.includes(t.replace(/[:：]$/, "").toUpperCase())) return <p key={i} className="mt-4 text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--amber-ink)] first:mt-0">{t}</p>;
+                if (REVIEW_HEADS.includes(t.replace(/[:：]$/, "").toUpperCase())) return <p key={i} className="mt-4 text-[12px] font-medium text-[var(--amber-ink)] first:mt-0">{t}</p>;
                 return <p key={i} className={t.startsWith("-") ? "pl-4 -indent-4 text-[var(--ink-2)]" : "text-[var(--ink)]"}>{t}</p>;
               })}
             </div>
@@ -72,7 +72,7 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
         )}
         <div className="mt-4 flex flex-wrap gap-2">
           <form action={`/api/admin/clients/${id}/review`} method="post">
-            <button disabled={!book || review?.status === "running"} className="press inline-flex h-11 items-center rounded-[14px] bg-[var(--ink)] px-4 text-[15px] font-bold text-white disabled:opacity-40">
+            <button disabled={!book || review?.status === "running"} className="press inline-flex h-9 items-center rounded-[8px] bg-[var(--btn)] px-4 text-[14px] font-semibold text-[var(--on-btn)] disabled:opacity-40">
               {review?.status === "done" ? "Redemander un avis" : "Demander l’avis de l’IA"}
             </button>
           </form>
@@ -86,7 +86,7 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
       )}
 
       <Panel icon="book" title="Le livre à imprimer">
-        <p className="text-[15px] text-[var(--ink-2)]">
+        <p className="text-[14px] text-[var(--ink-2)]">
           Les fichiers à envoyer à l’imprimeur : l’intérieur (A5, 3 mm de fonds perdus, polices embarquées, nombre de pages multiple de 4) et la couverture à plat (4e de couverture, dos, 1re), toile lin. Fabriqués à la demande depuis la dernière version du livre, photos comprises.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -96,11 +96,11 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
             { part: "lecture", label: "Version à lire (celle de l’auteur)", dark: false },
           ].map((b) =>
             book ? (
-              <a key={b.part} href={`/api/admin/clients/${id}/livre-pdf?part=${b.part}`} className={`press inline-flex h-11 items-center rounded-[14px] px-4 text-[15px] font-bold ${b.dark ? "bg-[var(--ink)] text-white" : "bg-white text-[var(--ink)] shadow-[0_0_0_1px_var(--line)]"}`}>
+              <a key={b.part} href={`/api/admin/clients/${id}/livre-pdf?part=${b.part}`} className={`press inline-flex h-9 items-center rounded-[8px] px-4 text-[14px] font-semibold ${b.dark ? "bg-[var(--btn)] text-[var(--on-btn)]" : "bg-[var(--surface)] text-[var(--ink)] shadow-[0_0_0_1px_var(--line)]"}`}>
                 {b.label}
               </a>
             ) : (
-              <span key={b.part} aria-disabled="true" className="inline-flex h-11 items-center rounded-[14px] bg-white px-4 text-[15px] font-bold text-[var(--ink)] opacity-40 shadow-[0_0_0_1px_var(--line)]">{b.label}</span>
+              <span key={b.part} aria-disabled="true" className="inline-flex h-9 items-center rounded-[8px] bg-[var(--surface)] px-4 text-[14px] font-semibold text-[var(--ink)] opacity-40 shadow-[0_0_0_1px_var(--line)]">{b.label}</span>
             )
           )}
         </div>
@@ -114,10 +114,10 @@ export default async function AdminBook({ params, searchParams }: { params: Prom
             const newPart = !!ch.part && ch.part !== (n > 0 ? book.chapters[n - 1].part : "");
             return (
               <section key={ch.number} id={`chapitre-${ch.number}`} className="mb-12 last:mb-0">
-                {newPart && <p className="mb-6 border-b border-[var(--line)] pb-2 text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--amber-ink)]">{ch.part}</p>}
+                {newPart && <p className="mb-6 border-b border-[var(--line)] pb-2 text-[12px] font-medium text-[var(--amber-ink)]">{ch.part}</p>}
                 <p className="text-[13px] font-semibold text-[var(--ink-3)]">Chapitre {ch.number} · {fmtNumber(ch.word_count)} mots · récits {ch.sources.join(", ")}</p>
-                <h2 className="mt-1 text-[26px] font-extrabold leading-tight tracking-[-0.02em]">{ch.title}</h2>
-                <div className="mt-4 grid gap-4 text-[17px] leading-[1.75] text-[var(--ink)]" style={{ textAlign: "justify" }}>
+                <h2 className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.02em]">{ch.title}</h2>
+                <div className="mt-4 grid gap-4 text-[15px] leading-[1.75] text-[var(--ink)]" style={{ textAlign: "justify" }}>
                   {ch.content.split(/\n{2,}/).map((p, i) => <p key={i}>{p.replace(/^#+\s*/, "")}</p>)}
                 </div>
               </section>

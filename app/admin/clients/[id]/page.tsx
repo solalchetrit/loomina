@@ -9,7 +9,7 @@ import { describeSchedule } from "@/lib/loomina/schedule";
 import { readTopics } from "@/lib/loomina/phase-plan";
 import { buildAssistant } from "@/lib/loomina/assistant";
 import { getSystemPrompt } from "@/lib/loomina/db";
-import { Badge, Panel, Field, Fold, Empty, Avatar, Progress, Stat } from "@/components/admin/ui";
+import { Badge, Panel, Field, Fold, Empty, Avatar, Progress, NightFigure } from "@/components/admin/ui";
 import AIcon from "@/components/admin/icons";
 import { callCosts, sumCosts, fmtEur, type CallCost } from "@/lib/admin/costs";
 import BookSteps from "@/components/admin/BookSteps";
@@ -66,71 +66,69 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
   const spent = sumCosts(costs.values());
 
   return (
-    <div className="grid grid-cols-1 gap-5">
-      <div>
-        <Link href="/admin/clients" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-3)] hover:text-[var(--ink)]">
-          <AIcon name="chevron" size={14} className="rotate-180" /> Clients
-        </Link>
-        <div className="mt-4 flex flex-wrap items-center gap-4">
-          <Avatar name={name} size={64} />
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-[30px] font-extrabold leading-tight tracking-[-0.025em] sm:text-[34px]">{name}</h1>
-              {st && <Badge tone={st.tone}>{st.label}</Badge>}
-              {order.isGift && <Badge tone="wait">Livre offert</Badge>}
-              {order.refundedAt && <Badge tone="bad">Remboursé</Badge>}
-              {order.test && <Badge>Client de test</Badge>}
-            </div>
-            <p className="mt-1 text-[15px] tabular-nums text-[var(--ink-2)]">
-              {profile.phone_number ?? "pas de numéro"}
-              {profile.email ? <> · <Link className="underline" href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`}>{profile.email}</Link></> : " · pas d’e-mail"}
-              {" · "}{profile.politeness_preference === "tu" ? "tutoiement" : "vouvoiement"}
-            </p>
-            <p className="mt-0.5 text-[15px] text-[var(--ink-3)]">
-              {describeSchedule(settings.schedule) ? `Rendez-vous : ${describeSchedule(settings.schedule)}` : "Pas de rendez-vous : appelle quand il veut"} · client depuis le {fmtDate(profile.created_at, false)}
-            </p>
+    <div className="grid grid-cols-1 gap-[22px]">
+      <header className="flex flex-wrap items-center gap-x-4 gap-y-3">
+        <Avatar name={name} size={48} />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-[24px] font-semibold leading-tight tracking-[-0.025em]">{name}</h1>
+            {st && <Badge tone={st.tone}>{st.label}</Badge>}
+            {order.isGift && <Badge tone="wait">Livre offert</Badge>}
+            {order.refundedAt && <Badge tone="bad">Remboursé</Badge>}
+            {order.test && <Badge>Client de test</Badge>}
           </div>
-        </div>
-        {(fait || erreur) && (
-          <p role="status" className={`mt-5 rounded-[16px] px-4 py-3 text-[15px] font-semibold ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[#fbeae6] text-[#a8402f]"}`}>
-            {fait ?? erreur}
+          <p className="mt-1 flex flex-wrap gap-x-3.5 gap-y-0.5 text-[13.5px] text-[var(--ink-2)]">
+            <span className="tabular-nums">{profile.phone_number ?? "pas de numéro"}</span>
+            {profile.email ? <Link className="underline decoration-[var(--rule-strong)] underline-offset-4 hover:text-[var(--ink)]" href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`}>{profile.email}</Link> : <span>pas d’e-mail</span>}
+            <span>{profile.politeness_preference === "tu" ? "tutoiement" : "vouvoiement"}</span>
+            <span>{describeSchedule(settings.schedule) ? `rendez-vous ${describeSchedule(settings.schedule)}` : "pas de rendez-vous, appelle quand il veut"}</span>
+            <span className="text-[var(--ink-3)]">client depuis le {fmtDate(profile.created_at, false)}</span>
           </p>
-        )}
-        <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <div className="rounded-[18px] border border-black/[0.06] bg-white p-4">
-            <p className="text-[13px] font-semibold text-[var(--ink-3)]">Phase</p>
-            <p className="mt-1 text-[18px] font-extrabold tracking-[-0.01em]">{phase ? `${phase}. ${PHASE_LABELS[phase]}` : "—"}</p>
-            <div className="mt-2"><Progress value={project?.phase_progress ?? 0} /></div>
-          </div>
-          <Stat icon="phone" tone="amber" label="Appels" value={c.interviews.length} hint={fmtDuration(totalSeconds)} />
-          <Stat icon="book" label="Récits" value={c.chapters.length} hint={`${fmtNumber(words)} mots`} />
-          <Stat icon="layers" label="Livre composé" value={edition ? (EDITION_STATUS[edition.status] ?? EDITION_STATUS.failed).label : "—"} hint={edition ? `${edition.chapters.length} chapitre(s)` : "dès 2 récits"} />
         </div>
-      </div>
+        {profile.email && <Link href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`} className="adm-btn adm-btn-sec"><AIcon name="message" size={15} /> Lui écrire</Link>}
+      </header>
 
-      <nav aria-label="Rubriques de la fiche" className="flex flex-wrap gap-2">
+      {(fait || erreur) && (
+        <p role="status" className={`rounded-[8px] px-4 py-2.5 text-[13.5px] font-medium ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[var(--danger-soft)] text-[var(--danger)]"}`}>
+          {fait ?? erreur}
+        </p>
+      )}
+
+      <section aria-label="Où en est son livre" className="adm-figs">
+        <div className="adm-fig">
+          <span className="block text-[12.5px] text-[var(--ink-3)]">Phase</span>
+          <span className="mt-1.5 block truncate text-[20px] font-semibold leading-[26px] tracking-[-0.02em]">{phase ? `${phase}. ${PHASE_LABELS[phase]}` : "—"}</span>
+          <span className="mt-2.5 block"><Progress value={project?.phase_progress ?? 0} /></span>
+        </div>
+        <NightFigure label="Appels" value={c.interviews.length} hint={fmtDuration(totalSeconds)} />
+        <NightFigure label="Récits" value={c.chapters.length} hint={`${fmtNumber(words)} mots`} />
+        <NightFigure label="Livre composé" value={edition ? (EDITION_STATUS[edition.status] ?? EDITION_STATUS.failed).label : "—"} hint={edition ? `${edition.chapters.length} chapitre(s)` : "dès 2 récits"} />
+      </section>
+
+      <nav aria-label="Rubriques de la fiche" className="-mb-2 flex gap-6 overflow-x-auto border-b border-[var(--line)]">
         {TABS.map((t) => (
           <Link
             key={t.id}
             href={`/admin/clients/${id}?onglet=${t.id}`}
             aria-current={tab === t.id ? "page" : undefined}
-            className={`inline-flex h-10 items-center rounded-full px-4 text-[15px] font-bold ${tab === t.id ? "bg-[var(--ink)] text-white" : "bg-white text-[var(--ink-2)] shadow-[0_0_0_1px_var(--line)] hover:text-[var(--ink)]"}`}
+            className={`-mb-px whitespace-nowrap border-b-2 pb-2.5 pt-1 text-[13.5px] font-medium ${tab === t.id ? "border-[var(--amber)] text-[var(--ink)]" : "border-transparent text-[var(--ink-3)] hover:text-[var(--ink)]"}`}
           >
-            {t.label}{t.id === "appels" ? ` (${c.interviews.length})` : t.id === "livre" ? ` (${c.chapters.length})` : ""}
+            {t.label}
+            {t.id === "appels" ? <span className="ml-1.5 tabular-nums text-[var(--ink-3)]">{c.interviews.length}</span> : t.id === "livre" ? <span className="ml-1.5 tabular-nums text-[var(--ink-3)]">{c.chapters.length}</span> : null}
           </Link>
         ))}
       </nav>
 
       {tab === "appels" && (
         <>
-      <Panel icon="phone" title={`Appels (${c.interviews.length})`}>
+      <Panel title={`Appels (${c.interviews.length})`}>
         {c.interviews.length > 0 && (
-          <div className="mb-4 rounded-[18px] bg-[var(--canvas)] p-4">
-            <p className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-3)]">Ce que ces appels ont coûté</p>
-            <p className="mt-1 text-[24px] font-extrabold tracking-[-0.02em] tabular-nums">
-              {fmtEur(spent.totalTtc)} TTC <span className="text-[15px] font-semibold text-[var(--ink-3)]">({fmtEur(spent.total)} HT{spent.estimated ? ", en partie estimé" : ""})</span>
+          <div className="mb-4 rounded-[8px] border border-[var(--line)] p-3.5">
+            <p className="text-[12.5px] text-[var(--ink-3)]">Ce que ces appels ont coûté</p>
+            <p className="mt-1 text-[20px] font-semibold tracking-[-0.02em] tabular-nums">
+              {fmtEur(spent.totalTtc)} TTC <span className="text-[14px] font-semibold text-[var(--ink-3)]">({fmtEur(spent.total)} HT{spent.estimated ? ", en partie estimé" : ""})</span>
             </p>
-            <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">
+            <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">
               Soit {fmtEur(spent.totalTtc / c.interviews.length)} TTC par appel en moyenne, tout compris (ligne, voix, IA, SMS, livre, écoute). Le détail est sous chaque appel.
             </p>
           </div>
@@ -160,7 +158,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
       {tab === "livre" && (
         <>
       {project && order.fulfillment.completed && !order.refundedAt && (
-        <Panel icon="book" title="Le livre, de la relecture à l’envoi" action={<Link href={`/admin/clients/${id}/livre`} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Relire et fichiers d’impression <AIcon name="arrow" size={14} /></Link>}>
+        <Panel icon="book" title="Le livre, de la relecture à l’envoi" action={<Link href={`/admin/clients/${id}/livre`} className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Relire et fichiers d’impression <AIcon name="arrow" size={14} /></Link>}>
           <BookSteps profileId={id} f={order.fulfillment} hasAddress={!!order.shipping} retour="fiche" completedAt={typeof project.project_metadata?.completed_at === "string" ? (project.project_metadata.completed_at as string) : null} />
         </Panel>
       )}
@@ -179,17 +177,17 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
         )}
       </Panel>
 
-      <Panel icon="layers" title="Livre composé" action={c.editions.ready ? <Link href={`/admin/clients/${id}/livre`} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Relire le livre et demander l’avis de l’IA <AIcon name="arrow" size={14} /></Link> : undefined}>
+      <Panel icon="layers" title="Livre composé" action={c.editions.ready ? <Link href={`/admin/clients/${id}/livre`} className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--ink-2)] hover:text-[var(--ink)]">Relire le livre et demander l’avis de l’IA <AIcon name="arrow" size={14} /></Link> : undefined}>
         {!edition ? (
           <Empty>Pas encore composé (il faut au moins deux récits).</Empty>
         ) : (
           <div className="grid gap-3">
-            <div className="flex flex-wrap items-center gap-2 text-[15px]">
+            <div className="flex flex-wrap items-center gap-2 text-[14px]">
               <Badge tone={(EDITION_STATUS[edition.status] ?? EDITION_STATUS.failed).tone}>{(EDITION_STATUS[edition.status] ?? EDITION_STATUS.failed).label}</Badge>
               <span className="text-[var(--ink-3)]">mis à jour le {fmtDate(edition.updated_at)} · {edition.source_count} récit(s) source · {edition.chapters.length}/{edition.plan.length} chapitre(s)</span>
             </div>
-            {edition.error && <p className="text-[15px] text-[var(--danger)]">{edition.error}</p>}
-            {c.editions.ready && c.editions.ready !== edition && <p className="text-[15px] text-[var(--ink-3)]">Dernière version prête : {fmtDate(c.editions.ready.updated_at)}.</p>}
+            {edition.error && <p className="text-[14px] text-[var(--danger)]">{edition.error}</p>}
+            {c.editions.ready && c.editions.ready !== edition && <p className="text-[14px] text-[var(--ink-3)]">Dernière version prête : {fmtDate(c.editions.ready.updated_at)}.</p>}
             {(c.editions.ready ?? edition).chapters.map((ch, n) => (
               <Fold key={n} summary={`${n + 1}. ${ch.title}`}>{ch.content}</Fold>
             ))}
@@ -261,42 +259,42 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
       {project && (
         <Panel icon="pen" title="Agir">
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="rounded-[18px] bg-[var(--canvas)] p-4">
-              <p className="text-[16px] font-bold">Relancer ce client</p>
-              <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">
+            <div className="rounded-[10px] bg-[var(--canvas)] p-4">
+              <p className="text-[14.5px] font-semibold">Relancer ce client</p>
+              <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">
                 Envoie un SMS et un e-mail qui rappellent le numéro à appeler. Pour un livre offert sans aucun appel, la relance va à celui qui l’a offert. Elle part aussi toute seule après 14 jours sans appel.
                 {order.relances.length > 0 && ` Dernière relance : ${fmtDate(order.relances[order.relances.length - 1].at)} (${order.relances.length} en tout).`}
               </p>
               <form action={`/api/admin/clients/${id}/relance`} method="post" className="mt-3">
-                <button disabled={!!order.refundedAt} className="press inline-flex h-11 items-center rounded-[14px] bg-[var(--ink)] px-4 text-[15px] font-bold text-white disabled:opacity-40">Envoyer la relance</button>
+                <button disabled={!!order.refundedAt} className="press inline-flex h-9 items-center rounded-[8px] bg-[var(--btn)] px-4 text-[14px] font-semibold text-[var(--on-btn)] disabled:opacity-40">Envoyer la relance</button>
               </form>
             </div>
-            <div className="rounded-[18px] bg-[var(--canvas)] p-4">
-              <p className="text-[16px] font-bold">Rembourser ce client</p>
+            <div className="rounded-[10px] bg-[var(--canvas)] p-4">
+              <p className="text-[14.5px] font-semibold">Rembourser ce client</p>
               {order.refundedAt ? (
-                <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">Remboursé le {fmtDate(order.refundedAt)}{order.refundAmount != null ? ` (${order.refundAmount} €)` : ""}. Le livre est fermé.</p>
+                <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">Remboursé le {fmtDate(order.refundedAt)}{order.refundAmount != null ? ` (${order.refundAmount} €)` : ""}. Le livre est fermé.</p>
               ) : !order.stripeSessionId ? (
-                <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">Pas de paiement Stripe lié à ce livre : rien à rembourser.</p>
+                <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">Pas de paiement Stripe lié à ce livre : rien à rembourser.</p>
               ) : (
                 <>
-                  <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">Rembourse toute la commande dans Stripe, ferme le livre et arrête les rendez-vous. Le client reçoit un e-mail. On ne peut pas revenir en arrière.</p>
+                  <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">Rembourse toute la commande dans Stripe, ferme le livre et arrête les rendez-vous. Le client reçoit un e-mail. On ne peut pas revenir en arrière.</p>
                   <form action={`/api/admin/clients/${id}/refund`} method="post" className="mt-3 flex flex-wrap items-center gap-2">
-                    <input name="confirmation" required autoComplete="off" placeholder="Écrire REMBOURSER" aria-label="Écrire REMBOURSER pour confirmer" className="h-11 w-[200px] rounded-[14px] border border-[var(--line)] bg-white px-3 text-[15px]" />
-                    <button className="press inline-flex h-11 items-center rounded-[14px] bg-[#a8402f] px-4 text-[15px] font-bold text-white">Rembourser ce client</button>
+                    <input name="confirmation" required autoComplete="off" placeholder="Écrire REMBOURSER" aria-label="Écrire REMBOURSER pour confirmer" className="h-9 w-[200px] rounded-[8px] border border-[var(--line)] bg-[var(--surface)] px-3 text-[14px]" />
+                    <button className="press inline-flex h-9 items-center rounded-[8px] bg-[var(--danger)] px-4 text-[14px] font-semibold text-white">Rembourser ce client</button>
                   </form>
                 </>
               )}
             </div>
-            <div className="rounded-[18px] bg-[var(--canvas)] p-4">
-              <p className="text-[16px] font-bold">{order.test ? "Client de test" : "Classer en test"}</p>
-              <p className="mt-1 text-[14.5px] text-[var(--ink-2)]">
+            <div className="rounded-[10px] bg-[var(--canvas)] p-4">
+              <p className="text-[14.5px] font-semibold">{order.test ? "Client de test" : "Classer en test"}</p>
+              <p className="mt-1 text-[13.5px] text-[var(--ink-2)]">
                 {order.test
                   ? "Ce client ne compte dans aucun chiffre de l’admin (clients, commandes, argent, parcours). Il reste visible, rangé avec les tests."
                   : "Pour vos essais et ceux de vos proches : le client reste visible, mais sort de tous les chiffres. Une commande payée 0 € est classée en test toute seule."}
               </p>
               <form action={`/api/admin/clients/${id}/test`} method="post" className="mt-3">
                 {order.test && <input type="hidden" name="annuler" value="1" />}
-                <button className="press inline-flex h-11 items-center rounded-[14px] bg-white px-4 text-[15px] font-bold text-[var(--ink)] shadow-[0_0_0_1px_var(--line)]">
+                <button className="press inline-flex h-9 items-center rounded-[8px] bg-[var(--surface)] px-4 text-[14px] font-semibold text-[var(--ink)] shadow-[0_0_0_1px_var(--line)]">
                   {order.test ? "C’est un vrai client" : "C’est un client de test"}
                 </button>
               </form>
@@ -315,24 +313,24 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="grid gap-3">
               <div>
-                <p className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-3)]">Où reprendre au prochain appel</p>
-                <p className="mt-1 text-[16px]">{project.next_question_strategy ?? "Faire connaissance (premier appel)."}</p>
+                <p className="text-[12px] font-medium text-[var(--ink-3)]">Où reprendre au prochain appel</p>
+                <p className="mt-1 text-[14.5px]">{project.next_question_strategy ?? "Faire connaissance (premier appel)."}</p>
               </div>
               <div>
-                <p className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-3)]">Sujets suggérés en attente</p>
-                {ctx.suggested_topics?.length ? <ul className="mt-1 list-disc pl-5 text-[15px]">{ctx.suggested_topics.map((t) => <li key={t}>{t}</li>)}</ul> : <p className="mt-1 text-[15px] text-[var(--ink-3)]">Aucun</p>}
+                <p className="text-[12px] font-medium text-[var(--ink-3)]">Sujets suggérés en attente</p>
+                {ctx.suggested_topics?.length ? <ul className="mt-1 list-disc pl-5 text-[14px]">{ctx.suggested_topics.map((t) => <li key={t}>{t}</li>)}</ul> : <p className="mt-1 text-[14px] text-[var(--ink-3)]">Aucun</p>}
               </div>
               <div>
-                <p className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-3)]">Sujets propres à cette personne</p>
+                <p className="text-[12px] font-medium text-[var(--ink-3)]">Sujets propres à cette personne</p>
                 {topics.length ? (
-                  <ul className="mt-1 grid gap-1 text-[15px]">
+                  <ul className="mt-1 grid gap-1 text-[14px]">
                     {topics.map((t) => <li key={t.id}><Badge tone={t.status === "open" ? "wait" : t.status === "done" ? "ok" : "muted"}>{t.status === "open" ? "à raconter" : t.status === "done" ? "raconté" : "pas souhaité"}</Badge> phase {t.phase} · {t.label}</li>)}
                   </ul>
-                ) : <p className="mt-1 text-[15px] text-[var(--ink-3)]">Aucun</p>}
+                ) : <p className="mt-1 text-[14px] text-[var(--ink-3)]">Aucun</p>}
               </div>
               <div>
-                <p className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-3)]">Corrections de l’auteur</p>
-                {ctx.author_corrections?.length ? <ul className="mt-1 list-disc pl-5 text-[15px]">{ctx.author_corrections.map((t) => <li key={t}>{t}</li>)}</ul> : <p className="mt-1 text-[15px] text-[var(--ink-3)]">Aucune</p>}
+                <p className="text-[12px] font-medium text-[var(--ink-3)]">Corrections de l’auteur</p>
+                {ctx.author_corrections?.length ? <ul className="mt-1 list-disc pl-5 text-[14px]">{ctx.author_corrections.map((t) => <li key={t}>{t}</li>)}</ul> : <p className="mt-1 text-[14px] text-[var(--ink-3)]">Aucune</p>}
               </div>
             </div>
             <div className="grid content-start gap-3">
@@ -359,8 +357,8 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
           <Empty>Aucun rapport d’appel reçu.</Empty>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-[14px]">
-              <thead className="text-[12px] uppercase tracking-[0.05em] text-[var(--ink-3)]">
+            <table className="w-full min-w-[640px] text-left text-[13.5px]">
+              <thead className="text-[12px] font-medium text-[var(--ink-3)]">
                 <tr><th className="py-2 pr-3">Reçu</th><th className="pr-3">État</th><th className="pr-3">Essais</th><th className="pr-3">Traité</th><th>Message</th><th /></tr>
               </thead>
               <tbody>
@@ -376,7 +374,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
                       <td className="pl-3">
                         {e.status === "failed" && (
                           <form action={`/api/admin/events/${String(e.id)}/retry?client=${id}`} method="post">
-                            <button className="press whitespace-nowrap rounded-[10px] bg-[var(--ink)] px-3 py-1.5 text-[13px] font-bold text-white">Relancer</button>
+                            <button className="press whitespace-nowrap rounded-[7px] bg-[var(--btn)] px-3 py-1.5 text-[13px] font-semibold text-[var(--on-btn)]">Relancer</button>
                           </form>
                         )}
                       </td>
