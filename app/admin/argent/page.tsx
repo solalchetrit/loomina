@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
-import { getSpend, openAiBillConfigured, type Period } from "@/lib/admin/spend";
+import { openAiBillConfigured, type Period } from "@/lib/admin/spend";
+import { getSpendKept, realRevenueKept } from "@/lib/admin/cached";
 import { fmtEur } from "@/lib/admin/costs";
 import { fmtDate, fmtDuration } from "@/lib/admin/format";
 import { COSTS } from "@/config/costs";
 import { OFFER } from "@/config/offer";
 import { Badge, Panel, Stat, Empty, PageHeader, Segmented, BarList, NightFigure, Fold } from "@/components/admin/ui";
 import { listOrders, getCrm } from "@/lib/admin/data";
-import { realRevenue } from "@/lib/admin/revenue";
 
 export const metadata = { title: "Argent" };
 
@@ -33,11 +33,11 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
   await requireAdmin();
   const { periode } = await searchParams;
   const period: Period = periode === "precedent" ? "precedent" : "mois";
-  const [s, orders, crm] = await Promise.all([getSpend(period), listOrders(), getCrm()]);
+  const [s, orders, crm] = await Promise.all([getSpendKept(period), listOrders(), getCrm()]);
   // Ce qui rentre : lu dans Stripe, vrais clients seulement (les tests et les commandes à 0 € n'y sont pas).
   const realOrders = orders.filter((o) => !o.test);
   const testOrders = orders.length - realOrders.length;
-  const revenue = await realRevenue(realOrders.map((o) => o.sessionId), s.range);
+  const revenue = await realRevenueKept(realOrders.map((o) => o.sessionId), s.range);
   const periodOrders = realOrders.filter((o) => revenue?.sessions.has(o.sessionId));
   const net = revenue?.net ?? null;
   const margin = net == null ? null : net - s.total;

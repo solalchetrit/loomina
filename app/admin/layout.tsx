@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { Geist } from "next/font/google";
 import { AdminSidebar, AdminTopBar } from "@/components/admin/AdminNav";
 import { isAdmin } from "@/lib/admin/auth";
-import { voiceHealth } from "@/lib/admin/data";
+import { voiceHealthKept } from "@/lib/admin/cached";
 import "./admin.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
@@ -21,7 +21,7 @@ const THEME_COOKIE = "loomina_admin_theme";
 
 /** L'état du serveur vocal, en bas de la colonne. Chargé à part : il ne retarde pas la page. */
 async function VoiceStatus() {
-  const v = await voiceHealth();
+  const v = await voiceHealthKept();
   return (
     <p className="flex items-center gap-2 px-2.5 py-1.5 text-[12.5px] text-[var(--ink-2)]" title={v.detail}>
       <span className="size-[7px] shrink-0 rounded-full" style={{ background: v.ok ? "var(--success)" : "var(--danger)", boxShadow: `0 0 0 3px ${v.ok ? "var(--success-soft)" : "var(--danger-soft)"}` }} />

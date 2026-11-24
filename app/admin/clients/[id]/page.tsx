@@ -11,7 +11,8 @@ import { buildAssistant } from "@/lib/loomina/assistant";
 import { getSystemPrompt } from "@/lib/loomina/db";
 import { Badge, Panel, Field, Fold, Empty, Avatar, Progress, NightFigure } from "@/components/admin/ui";
 import AIcon from "@/components/admin/icons";
-import { callCosts, sumCosts, fmtEur, type CallCost } from "@/lib/admin/costs";
+import { sumCosts, fmtEur, type CallCost } from "@/lib/admin/costs";
+import { callCostsKept } from "@/lib/admin/cached";
 import BookSteps from "@/components/admin/BookSteps";
 import CallCard from "@/components/admin/CallCard";
 import { readReviews, type ReviewRow } from "@/lib/admin/ecoute";
@@ -50,7 +51,7 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
 
   // Ce que Loomina recevra au prochain appel de ce client, construit comme le fait le serveur vocal.
   let nextCall: { firstMessage: string; system: string } | null = null;
-  if (project && phase) {
+  if (tab === "coulisses" && project && phase) {
     const prompt = await getSystemPrompt(phase).catch(() => null);
     const payload = buildAssistant({ profile, project, prompt, phase, serverUrl: "https://www.loomina.eu/api/vapi/webhook" });
     nextCall = { firstMessage: payload.assistant.firstMessage, system: payload.assistant.model.messages[0].content };
@@ -59,10 +60,14 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
   const edition = c.editions.running ?? c.editions.ready ?? c.editions.failed;
 
   // Ce que chaque appel a coûté : ligne (prix réel Twilio), voix, IA de la conversation, analyse et écriture.
-  const [costs, reviews] = await Promise.all([
-    callCosts(c.interviews, { phone: profile.phone_number ?? null, projectId: project?.id ?? null }).catch(() => new Map<string, CallCost>()),
-    readReviews(c.interviews.map((i) => String(i.id))).catch(() => new Map<string, ReviewRow>()),
-  ]);
+  // Seul l'onglet Appels s'en sert : les autres onglets s'ouvrent sans attendre Twilio.
+  // La clé du cache suit les appels, leurs écoutes et les compositions du livre : un changement recalcule aussitôt.
+  const onCalls = tab === "appels";
+  const reviews = onCalls ? await readReviews(c.interviews.map((i) => String(i.id))).catch(() => new Map<string, ReviewRow>()) : new Map<string, ReviewRow>();
+  const stamp = [c.interviews.length, reviews.size, edition ? `${String(edition.id)}:${String(edition.status)}` : ""].join("|");
+  const costs = onCalls
+    ? await callCostsKept(c.interviews, { phone: profile.phone_number ?? null, projectId: project?.id ?? null }, stamp).catch(() => new Map<string, CallCost>())
+    : new Map<string, CallCost>();
   const spent = sumCosts(costs.values());
 
   return (

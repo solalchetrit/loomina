@@ -1,11 +1,12 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
-import { getOverview, getAgenda, configWarnings, voiceHealth, listOrders, type AgendaSlot } from "@/lib/admin/data";
+import { getOverview, getAgenda, configWarnings, listOrders, type AgendaSlot } from "@/lib/admin/data";
 import { fmtDate, fmtDuration, fmtNumber, INTERVIEW_STATUS, EVENT_STATUS } from "@/lib/admin/format";
 import { Badge, Panel, Empty, PageHeader, Avatar, NightFigure, Delta, Fold } from "@/components/admin/ui";
-import { getAudience, audienceConfigured, type Audience } from "@/lib/admin/audience";
-import { getSpend, monthRange } from "@/lib/admin/spend";
-import { realRevenue } from "@/lib/admin/revenue";
+import { audienceConfigured, type Audience } from "@/lib/admin/audience";
+import { monthRange } from "@/lib/admin/spend";
+import { getAudienceKept, getSpendKept, realRevenueKept, voiceHealthKept } from "@/lib/admin/cached";
 import { fmtEur } from "@/lib/admin/costs";
 import { STAGE_ADMIN } from "@/lib/loomina/fulfillment";
 import { PromiseNote } from "@/components/admin/BookSteps";
@@ -57,6 +58,22 @@ function Agenda({ slots }: { slots: AgendaSlot[] }) {
   );
 }
 
+const monthName = () => new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", month: "long" }).format(new Date());
+
+/** La marge du mois : Stripe et les factures des fournisseurs. Chargée à part, pour ne pas retenir la page. */
+async function MarginFigure() {
+  const [spend, orders] = await Promise.all([getSpendKept("mois").catch(() => null), listOrders().catch(() => [])]);
+  const revenue = await realRevenueKept(orders.filter((x) => !x.test).map((x) => x.sessionId), monthRange("mois")).catch(() => null);
+  const margin = revenue && spend ? revenue.net - spend.total : null;
+  return <NightFigure href="/admin/argent" label={`Marge de ${monthName()}`} value={margin == null ? "—" : fmtEur(margin)} hint={revenue && spend ? `${fmtEur(revenue.net)} encaissés, ${fmtEur(spend.total)} dépensés` : "Stripe ou les coûts ne répondent pas"} />;
+}
+
+/** Les visiteurs de la semaine, lus dans Google Analytics. Chargés à part eux aussi. */
+async function VisitorsFigure() {
+  const audience = audienceConfigured() ? await getAudienceKept(7).catch((): Audience | null => null) : null;
+  return <NightFigure href="/admin/audience?jours=7" label="Visiteurs du site, 7 jours" value={audience ? fmtNumber(audience.users) : "—"} hint={audience ? <span className="inline-flex flex-wrap items-center gap-x-2"><Delta now={audience.users} before={audience.previous.users} /> {fmtNumber(audience.events.demo)} clic(s) sur la démo</span> : "Google Analytics non branché"} />;
+}
+
 /**
  * La page d'accueil de l'admin : ce qu'il faut faire aujourd'hui, puis la
  * semaine en quatre chiffres et les derniers appels (audit du 20/11/2026).
@@ -64,16 +81,8 @@ function Agenda({ slots }: { slots: AgendaSlot[] }) {
 export default async function AdminHome({ searchParams }: { searchParams: Promise<{ fait?: string; erreur?: string }> }) {
   await requireAdmin();
   const { fait, erreur } = await searchParams;
-  const [o, agenda, voice, audience, spend, orders] = await Promise.all([
-    getOverview(),
-    getAgenda().catch((): AgendaSlot[] => []),
-    voiceHealth(),
-    audienceConfigured() ? getAudience(7).catch((): Audience | null => null) : Promise.resolve(null),
-    getSpend("mois").catch(() => null),
-    listOrders().catch(() => []),
-  ]);
-  const revenue = await realRevenue(orders.filter((x) => !x.test).map((x) => x.sessionId), monthRange("mois")).catch(() => null);
-  const margin = revenue && spend ? revenue.net - spend.total : null;
+  // La base seulement : la page s'affiche tout de suite. La marge et les visiteurs (Stripe, Twilio, OpenAI, Google) arrivent à part, plus bas.
+  const [o, agenda, voice] = await Promise.all([getOverview(), getAgenda().catch((): AgendaSlot[] => []), voiceHealthKept()]);
   const warnings = configWarnings();
 
   const todo = (voice.ok ? 0 : 1) + warnings.length + o.problems.length + o.stuckEditions.length + o.newOrders.length + o.booksToAct.length + o.contacts.length;
@@ -81,7 +90,6 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
   const done = agenda.filter((a) => a.state === "done").length;
   const missed = agenda.filter((a) => a.state === "missed").length;
   const coming = agenda.length - done - missed;
-  const month = new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", month: "long" }).format(new Date());
 
   return (
     <div className="grid grid-cols-1 gap-[22px]">
@@ -174,8 +182,12 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
       <section aria-label="Les chiffres de la semaine" className="adm-figs">
         <NightFigure href="/admin/argent" label="Commandes, 7 jours" value={o.ordersWeek} hint={`${o.clients} client${o.clients > 1 ? "s" : ""} en tout`} />
         <NightFigure href="/admin/clients" label="Appels clients, 7 jours" value={o.callsWeek} hint={`${o.minutesWeek} min au total`} />
-        <NightFigure href="/admin/argent" label={`Marge de ${month}`} value={margin == null ? "—" : fmtEur(margin)} hint={revenue && spend ? `${fmtEur(revenue.net)} encaissés, ${fmtEur(spend.total)} dépensés` : "Stripe ou les coûts ne répondent pas"} />
-        <NightFigure href="/admin/audience?jours=7" label="Visiteurs du site, 7 jours" value={audience ? fmtNumber(audience.users) : "—"} hint={audience ? <span className="inline-flex flex-wrap items-center gap-x-2"><Delta now={audience.users} before={audience.previous.users} /> {fmtNumber(audience.events.demo)} clic(s) sur la démo</span> : "Google Analytics non branché"} />
+        <Suspense fallback={<NightFigure href="/admin/argent" label={`Marge de ${monthName()}`} value="…" hint="Lecture de Stripe et des factures" />}>
+          <MarginFigure />
+        </Suspense>
+        <Suspense fallback={<NightFigure href="/admin/audience?jours=7" label="Visiteurs du site, 7 jours" value="…" hint="Lecture de Google Analytics" />}>
+          <VisitorsFigure />
+        </Suspense>
       </section>
 
       <Panel flush title="Derniers appels" action={<Link href="/admin/clients" className="text-[12.5px] text-[var(--ink-3)] hover:text-[var(--ink)]">Tous les clients</Link>}>
