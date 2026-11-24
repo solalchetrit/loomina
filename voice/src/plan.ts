@@ -29,6 +29,29 @@ export interface CallPlan {
     targetMinutes: number | null;
     demo: boolean;
     label: string;
+    /** Noms propres de cet auteur (lieux, proches), pour la transcription. */
+    hints?: string[];
+}
+
+/**
+ * Les noms propres déjà connus de l'auteur, donnés à la transcription
+ * (24/11/2026 : « Sidi Ferruch » perdu, « Babel-Wed » pour Bab El Oued au
+ * premier appel de Patricia). Au plus 40, sans doublon.
+ */
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export function authorHints(context: any): string[] {
+    const out = new Set<string>();
+    const add = (v: unknown) => {
+        if (typeof v !== 'string') return;
+        const t = v.replace(/^(?:(?:la|le|les)\s+|l['’]\s*)/i, '').replace(/[,"<>&]/g, ' ').replace(/\s+/g, ' ').trim();
+        if (t.length >= 3 && t.length <= 40) out.add(t);
+    };
+    const identity = context?.identity ?? {};
+    add(identity.full_name);
+    for (const p of identity.places ?? []) add(p);
+    for (const s of identity.spellings ?? []) add(typeof s === 'string' ? s : s?.correct ?? s?.name);
+    for (const f of context?.family ?? []) add(f?.name);
+    return [...out].slice(0, 40);
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -81,5 +104,6 @@ export async function planForCaller(customerNumber: string | null): Promise<Call
     return {
         ...fromVapiShape(payload, hardLimitSeconds(targetMinutes, config.limits.maxCallSeconds), false, `phase-${phase}`),
         targetMinutes,
+        hints: authorHints(project.context),
     };
 }
