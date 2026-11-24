@@ -702,11 +702,11 @@ test('laisser finir : attendre plus longtemps une phrase pas finie', async () =>
     const sessionModule = '../../voice/src/session.ts';
     const { holdFor } = (await import(sessionModule)) as { holdFor: (t: string) => number };
     assert.equal(holdFor('Ça va, et toi ?'), 0);
-    assert.equal(holdFor('Donc, j\'étais plutôt dans ma'), 2600);
-    assert.equal(holdFor('Qui est'), 2600);
-    assert.equal(holdFor('Je vais te dire, il y avait mon oncle et'), 2600);
-    assert.equal(holdFor('On regardait des vidéos.'), 1900);
-    assert.equal(holdFor('Il y avait mon oncle, ma mère, ma grand-mère, Sam et moi.'), 1200);
+    assert.equal(holdFor('Donc, j\'étais plutôt dans ma'), 3400);
+    assert.equal(holdFor('Qui est'), 3400);
+    assert.equal(holdFor('Je vais te dire, il y avait mon oncle et'), 3400);
+    assert.equal(holdFor('On regardait des vidéos.'), 2800);
+    assert.equal(holdFor('Il y avait mon oncle, ma mère, ma grand-mère, Sam et moi.'), 2000);
 });
 
 test('ton d’écriture : « Naturel » devient le défaut, chaque ton est expliqué', async () => {
