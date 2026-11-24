@@ -15,13 +15,15 @@ function Sign({ plus }: { plus?: boolean }) {
 /**
  * Moins, le nombre, plus : le nombre d'exemplaires en plus (config/offer.ts).
  * Une seule pilule, comme un sélecteur de quantité de boutique (Solal, 24/11/2026 : « tu peux faire mieux »).
+ * Sur téléphone : pas de zoom au double appui (touch-manipulation), pas de fond resté gris
+ * après un appui (survol seulement avec une souris), pas de texte sélectionné en cliquant vite.
  */
 export default function CopiesStepper({ value, onChange, min = 0, label }: { value: number; onChange: (n: number) => void; min?: number; label: string }) {
   const btn =
-    "press flex h-10 w-10 items-center justify-center rounded-full text-[var(--ink)] transition-colors hover:bg-[var(--canvas)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] disabled:cursor-not-allowed disabled:text-[var(--rule-strong)] disabled:hover:bg-transparent";
+    "press flex h-10 w-10 touch-manipulation items-center justify-center rounded-full text-[var(--ink)] transition-colors active:bg-[var(--surface-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] disabled:cursor-not-allowed disabled:text-[var(--rule-strong)] disabled:active:bg-transparent [@media(hover:hover)]:hover:bg-[var(--canvas)] [@media(hover:hover)]:disabled:hover:bg-transparent";
   return (
     <div
-      className="inline-flex h-12 items-center rounded-full border border-[var(--rule-strong)] bg-white p-1 shadow-[0_1px_2px_rgba(23,29,43,0.06)]"
+      className="inline-flex h-12 select-none items-center rounded-full border border-[var(--rule-strong)] bg-white p-1 shadow-[0_1px_2px_rgba(23,29,43,0.06)]"
       role="group"
       aria-label={label}
     >
