@@ -15,7 +15,8 @@ export const maxDuration = 120;
  * le MP3 mono (les deux voix mêlées) est copié une fois dans notre seau privé,
  * puis on renvoie vers un lien signé d'une heure. La lecture démarre tout de
  * suite et l'on peut avancer où l'on veut. Les identifiants Twilio ne sont
- * jamais exposés.
+ * jamais exposés. Le navigateur garde le renvoi une demi-heure (le lien signé
+ * vit une heure) : réécouter ou avancer dans le son ne repasse plus par ici.
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     if (!(await isAdmin())) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
@@ -26,5 +27,5 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!recordingSid) return NextResponse.json({ error: 'pas d’enregistrement' }, { status: 404 });
     const url = await recordingUrl(recordingSid);
     if (!url) return NextResponse.json({ error: 'enregistrement introuvable chez Twilio' }, { status: 404 });
-    return NextResponse.redirect(url, { status: 302, headers: { 'Cache-Control': 'private, no-store' } });
+    return NextResponse.redirect(url, { status: 302, headers: { 'Cache-Control': 'private, max-age=1800' } });
 }

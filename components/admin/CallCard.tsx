@@ -37,7 +37,7 @@ export default function CallCard({ profileId, interview, cost, review, chapterNu
 
       {cost?.recordingEventId && (
         <div className="px-5 pt-4 sm:px-6">
-          <audio controls preload="metadata" src={`/api/admin/recordings/${cost.recordingEventId}`} className="w-full" />
+          <audio controls preload="none" src={`/api/admin/recordings/${cost.recordingEventId}`} className="w-full" />
         </div>
       )}
 

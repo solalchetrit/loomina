@@ -172,7 +172,7 @@ export function AdminSidebar({ health }: { health?: React.ReactNode }) {
   );
 }
 
-/** La barre du haut : où l'on est, et la date du jour à Paris. */
+/** La barre du haut : où l'on est, la date du jour à Paris, et le bouton qui relit les chiffres des fournisseurs. */
 export function AdminTopBar() {
   const active = useActive();
   const pathname = usePathname();
@@ -204,6 +204,13 @@ export function AdminTopBar() {
       </p>
       <span className="flex-1" />
       {now && <span className="hidden sm:block"><span className="adm-ghost first-letter:uppercase">{now}</span></span>}
+      <form action="/api/admin/rafraichir" method="post">
+        <input type="hidden" name="retour" value={pathname} />
+        <button className="adm-ghost" title="Relire tout de suite Stripe, Twilio, OpenAI et Google (sinon gardés quelques minutes)">
+          <AIcon name="refresh" size={14} />
+          Actualiser
+        </button>
+      </form>
     </div>
   );
 }

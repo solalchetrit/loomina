@@ -18,7 +18,8 @@ const forArtifact = process.env.ARTIFACT === "1";
 const nextConfig: NextConfig = {
   // Photos optimisées gardées un mois dans le navigateur et chez Vercel : elles ne changent
   // que si on remplace le fichier (dans ce cas, le renommer pour forcer la mise à jour).
-  images: { minimumCacheTTL: 2678400 },
+  // AVIF d'abord (environ 20 % plus léger que WebP), WebP pour les navigateurs qui ne le lisent pas.
+  images: { minimumCacheTTL: 2678400, formats: ["image/avif", "image/webp"] },
   ...(forArtifact ? { distDir: ".next-artifact", images: { unoptimized: true }, turbopack: { resolveAlias: { "@/lib/loomina/artifact-hook": "./lib/loomina/artifact-api.ts" } } } : {}),
   // Le PDF du livre lit ses polices et le logo sur le disque : on les joint à ces fonctions.
   outputFileTracingIncludes: {

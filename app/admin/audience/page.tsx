@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/admin/auth";
-import { getAudience, getSearch, audienceConfigured, serviceAccountEmail, type Audience, type SearchStats } from "@/lib/admin/audience";
+import { getAudienceKept, getSearchKept } from "@/lib/admin/cached";
+import { audienceConfigured, serviceAccountEmail, type Audience, type SearchStats } from "@/lib/admin/audience";
 import { fmtNumber } from "@/lib/admin/format";
 import { Panel, Stat, Empty, PageHeader, Delta, AreaChart, BarList, Segmented } from "@/components/admin/ui";
 import AIcon from "@/components/admin/icons";
@@ -53,7 +54,7 @@ export default async function AdminAudience({ searchParams }: { searchParams: Pr
   let s: SearchStats | null = null;
   let sErr: string | null = null;
   if (audienceConfigured()) {
-    const [ra, rs] = await Promise.allSettled([getAudience(days), getSearch(days)]);
+    const [ra, rs] = await Promise.allSettled([getAudienceKept(days), getSearchKept(days)]);
     if (ra.status === "fulfilled") a = ra.value;
     else aErr = ra.reason instanceof Error ? ra.reason.message : String(ra.reason);
     if (rs.status === "fulfilled") s = rs.value;
