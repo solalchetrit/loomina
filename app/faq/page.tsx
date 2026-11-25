@@ -3,7 +3,7 @@ import { Section, PageHeader } from "@/components/ui/Section";
 import Accordion from "@/components/ui/Accordion";
 import Closing from "@/components/Closing";
 import { SITE } from "@/config/site";
-import { OFFER, GUARANTEE } from "@/config/offer";
+import { OFFER, GUARANTEE, SHOW_PRICE, LAUNCH } from "@/config/offer";
 
 /**
  * Chaque réponse ne promet que ce que le service fait aujourd'hui
@@ -69,7 +69,7 @@ const FAQ_CATEGORIES = [
     questions: [
       {
         q: "Quel est le prix exact ?",
-        a: `${OFFER.price} € tout compris : les appels, l’écriture, la relecture, la mise en page, l’impression et la livraison en France métropolitaine. Il n’y a rien à payer en plus.`,
+        a: `${SHOW_PRICE ? `${OFFER.price} €` : `Le prix sera annoncé à l’ouverture des commandes, le ${LAUNCH.label}. Il est`} tout compris : les appels, l’écriture, la relecture, la mise en page, l’impression et la livraison en France métropolitaine. Il n’y a rien à payer en plus.`,
       },
       {
         q: "Comment se passe le paiement ?",

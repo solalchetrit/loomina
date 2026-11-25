@@ -1,5 +1,5 @@
 import { SITE } from "@/config/site";
-import { OFFER } from "@/config/offer";
+import { OFFER, SHOW_PRICE } from "@/config/offer";
 
 /**
  * La fiche produit envoyée à Google : seulement sur l'accueil et sur « Le livre et le prix »,
@@ -7,6 +7,8 @@ import { OFFER } from "@/config/offer";
  * y compris les mentions légales et le blog.)
  */
 export default function ProductJsonLd() {
+  // Avant le lancement, aucun prix n'est affiché : pas de fiche produit avec un prix pour Google.
+  if (!SHOW_PRICE) return null;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",

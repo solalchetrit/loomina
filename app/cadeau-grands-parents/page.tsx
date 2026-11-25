@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
 import GuidePage from "@/components/guide/GuidePage";
 import { SITE } from "@/config/site";
-import { OFFER } from "@/config/offer";
+import { OFFER, SHOW_PRICE } from "@/config/offer";
 
 export const metadata: Metadata = {
   ...pageMeta({
     title: "Cadeau grands-parents : le livre de leur vie",
-    description: `Une idée de cadeau pour grand-mère ou grand-père qui a déjà tout : il ou elle raconte sa vie au téléphone, Loomina en fait un livre imprimé. ${OFFER.price} € tout compris.`,
+    description: `Une idée de cadeau pour grand-mère ou grand-père qui a déjà tout : il ou elle raconte sa vie au téléphone, Loomina en fait un livre imprimé${SHOW_PRICE ? `. ${OFFER.price} € tout compris.` : ", tout compris."}`,
     path: "/cadeau-grands-parents",
   }),
 };
@@ -73,7 +73,7 @@ export default function Page() {
             <p>
               Un livre imprimé ({OFFER.format}) avec les photos de famille placées dans le texte, livré chez vous en France
               métropolitaine, et une version numérique ({OFFER.digital}) à partager avec les cousins, les oncles, les
-              arrière-petits-enfants. {OFFER.price} € tout compris.
+              arrière-petits-enfants.{SHOW_PRICE && ` ${OFFER.price} € tout compris.`}
             </p>
           ),
         },
