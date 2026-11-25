@@ -31,7 +31,7 @@ export function bienvenueEmail(v: BienvenueVars): RenderedEmail {
             ...ps('Vous préférez que Loomina vous appelle ? Choisissez vos jours et votre heure dans votre espace.'),
             progression(1, 'Votre livre en cinq étapes. Vous êtes ici :'),
             ...ps(REFUND),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
 }
@@ -62,7 +62,7 @@ export function bienvenueCadeauEmail(v: BienvenueCadeauVars): RenderedEmail {
             ...ps('De votre côté, suivez l’aventure dans votre espace famille. Vous pouvez même y souffler des souvenirs à raconter. Connectez-vous avec votre numéro de téléphone.'),
             bouton('Ouvrir mon espace famille', DASHBOARD),
             ...ps(REFUND),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
 }

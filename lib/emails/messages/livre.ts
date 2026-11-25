@@ -32,7 +32,7 @@ export function livreTermineEmail(v: LivreTermineVars): RenderedEmail {
             ),
             progression(5, t('Ton récit est complet', 'Votre récit est complet')),
             frise(SUIVI_LIVRE, 1, t('Et maintenant, ton livre imprimé', 'Et maintenant, votre livre imprimé')),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
 }
@@ -86,7 +86,7 @@ export function etapeLivreEmail(v: EtapeLivreVars): RenderedEmail {
                     `Ensuite, direction l’imprimerie ! ${t('Nous te prévenons', 'Nous vous prévenons')} à chaque étape.`
                 ),
                 suivi(1),
-                signature('Mémo et l’équipe Loomina'),
+                signature(),
             ],
         });
     }
@@ -103,7 +103,7 @@ export function etapeLivreEmail(v: EtapeLivreVars): RenderedEmail {
                 ),
                 suivi(2),
                 bouton(v.family ? 'Ouvrir mon espace famille' : 'Ouvrir mon espace', DASHBOARD),
-                signature('Mémo et l’équipe Loomina'),
+                signature(),
             ],
         });
     }
@@ -117,7 +117,7 @@ export function etapeLivreEmail(v: EtapeLivreVars): RenderedEmail {
             ...ps(hello, `${Book} vient de partir. ${where}`),
             ...(v.tracking ? [encadre([`Numéro de suivi : ${v.tracking.number}`]), bouton('Suivre le colis', v.tracking.url)] : []),
             suivi(3),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
 }

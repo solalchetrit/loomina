@@ -28,7 +28,7 @@ export function correctionEmail(v: CorrectionVars): RenderedEmail {
                 t('Tu peux le relire dans ton espace.', 'Vous pouvez le relire dans votre espace.')
             ),
             bouton('Relire mon récit', DASHBOARD),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
 }
@@ -60,7 +60,7 @@ export function relanceEmail(v: RelanceVars): RenderedEmail {
             bouton(t('Ouvrir mon espace', 'Ouvrir mon espace'), DASHBOARD),
             progression(v.age, t('Où en est ton livre', 'Où en est votre livre')),
             ...ps(t('Si quelque chose te gêne, réponds simplement à cet e-mail.', 'Si quelque chose vous gêne, répondez simplement à cet e-mail.')),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
 }
@@ -86,7 +86,7 @@ export function relanceOffreurEmail(v: RelanceOffreurVars): RenderedEmail {
                 'Un petit coup de pouce ? Vous pouvez lui transférer cet e-mail, ou être à ses côtés pour le tout premier appel.',
                 'Si quelque chose bloque, répondez simplement à cet e-mail : on vous aide volontiers.'
             ),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
 }

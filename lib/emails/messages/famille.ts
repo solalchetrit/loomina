@@ -33,7 +33,7 @@ export function familleEmail(v: FamilleVars): RenderedEmail {
                 progression(v.age, `Le livre de ${n}`),
                 follow,
                 ...ps(login),
-                signature('Mémo et l’équipe Loomina'),
+                signature(),
             ],
         });
     }
@@ -47,7 +47,7 @@ export function familleEmail(v: FamilleVars): RenderedEmail {
                 ...ps('Bonjour,', `${n} vient de dire au téléphone que son livre est terminé. Notre équipe le relit maintenant en entier et le met en page.`, 'On vous prévient à chaque étape : relu, à l’impression, en route.'),
                 progression(5, `Le livre de ${n}`),
                 follow,
-                signature('Mémo et l’équipe Loomina'),
+                signature(),
             ],
         });
     }
@@ -61,7 +61,7 @@ export function familleEmail(v: FamilleVars): RenderedEmail {
             progression(v.age, `Le livre de ${n}`),
             follow,
             ...ps(login),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
 }

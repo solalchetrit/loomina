@@ -43,7 +43,7 @@ export function demoRecitEmail(v: DemoRecitVars): RenderedEmail & { orderUrl: st
             ...(v.promo ? [encadre([`Votre cadeau : -${pct} % sur votre livre.`, `Déjà appliqué sur le bouton ci-dessous, jusqu’au ${frenchDay(v.promo.expires)}.`])] : []),
             bouton('Écrire mon livre', orderUrl),
             ...ps('À très vite !'),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
         ],
     });
     return { ...mail, orderUrl };
@@ -80,7 +80,7 @@ export function demoRappelEmail(v: DemoRappelVars): RenderedEmail & { orderUrl: 
             ),
             bouton('Écrire mon livre', orderUrl),
             ...ps(v.storyUrl ? `Envie de relire votre récit ? Il est toujours ici : ${v.storyUrl}` : null, `Une question ? Appelez le ${SITE.phoneDisplay} ou répondez à cet e-mail.`),
-            signature('Mémo et l’équipe Loomina'),
+            signature(),
             ...petit(v.optOut),
         ],
     });
