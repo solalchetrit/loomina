@@ -145,7 +145,7 @@ export function etapeSuivanteEmail(v: EtapeSuivanteVars): RenderedEmail {
             blocks: [
                 memo({ age: v.age, pose: 'c', bulle: `${n} m’a fait grandir !` }),
                 titre(g.sujet),
-                ...ps(hello, `Bonne nouvelle : le livre de ${n} passe à l’étape suivante, et Mémo a grandi.`, `${last ? 'Dernière étape' : 'Prochaine étape'} : ${g.famille}.`, `Une idée de souvenir sur ce sujet ? Soufflez-la dans votre espace famille : Loomina en parlera avec ${n} au prochain appel.`),
+                ...ps(hello, `Bonne nouvelle : le livre de ${n} passe à l’étape suivante, et Mémo a grandi.`, `${last ? 'Dernière étape' : 'Prochaine étape'}, ${g.famille}.`, `Une idée de souvenir sur ce sujet ? Soufflez-la dans votre espace famille : Loomina en parlera avec ${n} au prochain appel.`),
                 progression(v.age, `Le livre de ${n}`),
                 bouton('Ouvrir mon espace famille', DASHBOARD),
                 signature(),
@@ -162,7 +162,7 @@ export function etapeSuivanteEmail(v: EtapeSuivanteVars): RenderedEmail {
             ...ps(
                 hello,
                 `${t(g.fait[0], g.fait[1])}, bravo ! ${t('Ton livre', 'Votre livre')} passe à l’étape suivante, et Mémo a grandi.`,
-                `${last ? 'Dernière étape' : 'Prochaine étape'} : ${t(g.suite[0], g.suite[1])}. ${t('Au prochain appel, Loomina t’emmène là-bas.', 'Au prochain appel, Loomina vous emmène là-bas.')}`
+                `${last ? 'Dernière étape' : 'Prochaine étape'}, ${t(g.suite[0], g.suite[1])}. ${t('Au prochain appel, Loomina t’emmène là-bas.', 'Au prochain appel, Loomina vous emmène là-bas.')}`
             ),
             progression(v.age, t('Où en est ton livre', 'Où en est votre livre')),
             appeler(),
