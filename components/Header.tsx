@@ -65,7 +65,7 @@ export default function Header() {
               aria-current={isActive("/dashboard") ? "page" : undefined}
               className="whitespace-nowrap rounded-xl px-3 py-2 text-[15px] font-bold text-[var(--ink)] hover:bg-[var(--surface-2)]"
             >
-              Espace auteur
+              Se connecter
             </Link>
             <a
               href={`tel:${SITE.phone}`}
@@ -109,7 +109,7 @@ export default function Header() {
         <div id="menu-mobile" className="fixed inset-0 z-[910] flex flex-col bg-[var(--canvas)] px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-24 xl:hidden">
           <nav className="flex flex-1 flex-col" aria-label="Navigation mobile">
             <ul className="card divide-y divide-[var(--line-soft)] px-5">
-              {[...NAV_LINKS, { href: "/dashboard", label: "Espace auteur" }].map((item) => (
+              {[...NAV_LINKS, { href: "/dashboard", label: "Se connecter" }].map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
