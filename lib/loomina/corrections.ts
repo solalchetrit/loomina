@@ -14,6 +14,8 @@
  */
 
 import { db } from './db';
+import { correctionEmail } from '../emails/messages/ecriture';
+import { memoAge } from '../emails/memo';
 import type { Profile, Project } from './db';
 import { normalizeContext } from './context';
 import { applyCorrection, countWords } from './writer';
@@ -60,18 +62,18 @@ export async function queueCorrection(projectId: string, chapter: number, text: 
     await writePending(projectId, (list) => [...list, entry].slice(-MAX_PENDING));
 }
 
-function doneTexts(profile: Pick<Profile, 'first_name' | 'politeness_preference'>, title: string): { subject: string; email: string; sms: string } {
+function doneTexts(profile: Pick<Profile, 'first_name' | 'politeness_preference'>, title: string, phase: number | null): { subject: string; email: string; html: string; sms: string } {
     const tu = profile.politeness_preference === 'tu';
-    const hello = profile.first_name ? `Bonjour ${profile.first_name},` : 'Bonjour,';
     const host = SITE.url.replace(/^https?:\/\/(www\.)?/, '');
+    // L'e-mail : lib/emails/messages/ecriture.ts.
+    const mail = correctionEmail({ firstName: profile.first_name, tu, title, age: memoAge(phase) });
     return {
-        subject: tu ? 'Ta modification a été apportée' : 'Votre modification a été apportée',
-        email: tu
-            ? `${hello}\n\nTa remarque sur le récit « ${title} » a bien été prise en compte : le texte est corrigé, et la suite du livre en tiendra compte.\n\nTu peux le relire dans ton espace : ${host}/dashboard\n\nLoomina`
-            : `${hello}\n\nVotre remarque sur le récit « ${title} » a bien été prise en compte : le texte est corrigé, et la suite du livre en tiendra compte.\n\nVous pouvez le relire dans votre espace : ${host}/dashboard\n\nLoomina`,
+        subject: mail.subject,
+        email: mail.text,
+        html: mail.html,
         sms: tu
-            ? `Loomina : ta remarque sur « ${title} » a été prise en compte, le récit est corrigé. À relire sur ${host}/dashboard`
-            : `Loomina : votre remarque sur « ${title} » a été prise en compte, le récit est corrigé. À relire sur ${host}/dashboard`,
+            ? `Loomina : ta remarque sur « ${title} » a été prise en compte, le récit est corrigé ! À relire sur ${host}/dashboard`
+            : `Loomina : votre remarque sur « ${title} » a été prise en compte, le récit est corrigé ! À relire sur ${host}/dashboard`,
     };
 }
 
@@ -111,9 +113,9 @@ async function applyOne(project: Project, profile: Profile, c: PendingCorrection
 
     // Prévenir l'auteur : e-mail si l'adresse du compte est la sienne (pas celle
     // de la personne qui a offert le livre), SMS sinon ou si l'e-mail ne part pas.
-    const texts = doneTexts(profile, (chapter.title as string | null) ?? `Récit ${c.chapter}`);
+    const texts = doneTexts(profile, (chapter.title as string | null) ?? `Récit ${c.chapter}`, project.phase);
     const ownEmail = project.project_metadata?.is_gift === true ? null : profile.email;
-    const mailed = ownEmail ? await sendEmail({ to: ownEmail, subject: texts.subject, text: texts.email, replyTo: teamContacts().email }) : false;
+    const mailed = ownEmail ? await sendEmail({ to: ownEmail, subject: texts.subject, text: texts.email, html: texts.html, replyTo: teamContacts().email }) : false;
     if (!mailed && profile.phone_number) await sendSms(profile.phone_number, texts.sms);
 }
 

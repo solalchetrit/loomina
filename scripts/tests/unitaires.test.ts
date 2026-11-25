@@ -407,7 +407,7 @@ test('bienvenue : pour soi, le SMS part au narrateur et donne le numéro à appe
     const w = welcomeTexts({ buyerEmail: 'a@b.fr', narratorFirstName: 'Jeanne', narratorPhone: '+33611111111', isGift: false, giver: null });
     assert.equal(w.smsTo, '+33611111111');
     assert.match(w.sms, /01 59 16 93 57/);
-    assert.match(w.email, /Bonjour Jeanne,/);
+    assert.match(w.email, /Bienvenue, Jeanne !/);
 });
 
 test('bienvenue : livre offert, le SMS part à celui qui offre, jamais au narrateur', () => {

@@ -20,7 +20,8 @@ import OpenAI from 'openai';
 import { db, findProfileByPhone } from './db';
 import { isOptedOut, optOutLine, optOutHeaders } from './optout';
 import { sendSms } from './sms';
-import { brandEmailHtml, sendEmail } from './notify';
+import { sendEmail } from './notify';
+import { demoRecitEmail, demoRappelEmail, frenchDay } from '../emails/messages/demo';
 import { promptText, refreshPrompts } from './prompt-store';
 import { WRITER_SYSTEM, WRITER_MODEL, WRITER_REASONING_EFFORT, WRITER_MAX_TOKENS, countWords } from './writer';
 import { tokenUsage } from './usage';
@@ -278,43 +279,11 @@ async function promoExpiry(storyId: string, code: string): Promise<Date | null> 
     }
 }
 
-/** « 1er décembre », « 3 décembre », avec des espaces insécables. */
-export function frenchDay(d: Date): string {
-    return d
-        .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' })
-        .replace(/^1 /, '1er ')
-        .replace(/ /g, '\u00a0');
-}
+export { frenchDay };
 
-function esc(s: string): string {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-/** Le texte et la mise en page de l'e-mail du récit. */
+/** Le texte et la mise en page de l'e-mail du récit (lib/emails/messages/demo.ts). */
 export function demoEmail(params: { firstName: string | null; title: string; promo: { code: string; expires: Date } | null }) {
-    const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
-    const orderUrl = `https://${HOST}/order${params.promo ? `?code=${params.promo.code}` : ''}`;
-    // « 1er décembre », pas « 1 décembre ».
-    const until = params.promo ? frenchDay(params.promo.expires) : '';
-    const intro = [
-        hello,
-        `Voici votre récit, « ${params.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page comme il le serait dans votre livre.`,
-        `Ce n’était qu’un moment de votre vie. Imaginez-les tous réunis, appel après appel, dans un livre à garder et à transmettre.`,
-    ];
-    // Demande de Solal : un simple bouton, la réduction en pourcentage, jamais le prix réduit.
-    const promoLine = params.promo ? `Votre réduction de ${DEMO_PROMO.percentOff}\u00a0% est déjà appliquée sur ce lien, jusqu’au ${until}.` : null;
-    const button = 'Écrire mon livre';
-    const outro = ['Pour nous poser une question, répondez simplement à cet e\u2011mail.', 'À très bientôt,\nLoomina'];
-
-    const text = [...intro, ...(promoLine ? [promoLine] : []), `${button} : ${orderUrl}`, ...outro].join('\n\n');
-    const p = (t: string) => `<p style="margin:0 0 16px">${esc(t).replace(/\n/g, '<br>')}</p>`;
-    const html = brandEmailHtml(
-        intro.map(p).join('') +
-        (promoLine ? p(promoLine) : '') +
-        `<p style="margin:8px 0 28px"><a href="${esc(orderUrl)}" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#161616;color:#ffffff;font-weight:800;text-decoration:none">${esc(button)}</a></p>` +
-        outro.map(p).join('')
-    );
-    return { text, html, orderUrl };
+    return demoRecitEmail(params);
 }
 
 /** Envoie le récit en PDF à l'adresse donnée sur la page du lien. */
@@ -322,10 +291,10 @@ export async function emailDemoStory(story: DemoStory, email: string): Promise<'
     if (story.email_count >= MAX_EMAILS) return 'limit';
     const pdf = await buildRecitPdf({ title: story.title ?? 'Un souvenir', author: story.first_name, content: story.content ?? '', date: new Date(story.created_at), seed: story.token });
     const promo = await demoPromoCode(story);
-    const { text, html } = demoEmail({ firstName: story.first_name, title: story.title ?? 'Un souvenir', promo });
+    const { text, html, subject } = demoEmail({ firstName: story.first_name, title: story.title ?? 'Un souvenir', promo });
     const ok = await sendEmail({
         to: email,
-        subject: `Votre récit : ${story.title}`,
+        subject,
         text,
         html,
         attachments: [{ filename: `${fileName(story.title ?? 'recit')}.pdf`, content: Buffer.from(pdf), contentType: 'application/pdf' }],
@@ -462,32 +431,9 @@ export function demoReminderDue(row: { email: string | null; promo_code: string 
     return left <= DEMO_REMINDER_BEFORE_H * 3600_000 && left > 3 * 3600_000;
 }
 
-/** L'e-mail du rappel : la date de fin, le bouton avec la réduction appliquée, le lien du récit s'il vit encore. */
+/** L'e-mail du rappel : la date de fin, le bouton avec la réduction appliquée, le lien du récit s'il vit encore (lib/emails/messages/demo.ts). */
 export function demoReminderEmail(params: { firstName: string | null; title: string; code: string; expires: Date; storyUrl: string | null; optOut: string | null }) {
-    const hello = params.firstName ? `Bonjour ${params.firstName},` : 'Bonjour,';
-    const until = frenchDay(params.expires);
-    const orderUrl = `https://${HOST}/order?code=${params.code}`;
-    const subject = `Votre réduction de ${DEMO_PROMO.percentOff} % se termine le ${until}`;
-    const intro = [
-        hello,
-        `Il y a quelques jours, vous avez raconté à Loomina « ${params.title} ». Votre réduction de ${DEMO_PROMO.percentOff} % pour écrire votre livre se termine le ${until}.`,
-        `Elle est déjà appliquée sur ce lien :`,
-    ];
-    const button = 'Écrire mon livre';
-    const outro = [
-        ...(params.storyUrl ? [`Votre récit est toujours à lire ici : ${params.storyUrl}`] : []),
-        'Pour nous poser une question, répondez simplement à cet e‑mail.',
-        'À très bientôt,\nLoomina',
-    ];
-    const text = [...intro, `${button} : ${orderUrl}`, ...outro, ...(params.optOut ? [params.optOut] : [])].join('\n\n');
-    const p = (t: string) => `<p style="margin:0 0 16px">${esc(t).replace(/\n/g, '<br>')}</p>`;
-    const html = brandEmailHtml(
-        intro.map(p).join('') +
-            `<p style="margin:8px 0 28px"><a href="${esc(orderUrl)}" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#161616;color:#ffffff;font-weight:800;text-decoration:none">${esc(button)}</a></p>` +
-            outro.map(p).join('') +
-            (params.optOut ? `<p style="margin:24px 0 0;font-size:13px;color:#6b6b6b">${esc(params.optOut)}</p>` : '')
-    );
-    return { subject, text, html, orderUrl };
+    return demoRappelEmail(params);
 }
 
 function parisHour(now: number): number {
