@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
 import { CATALOGUE, ETAPES, SANS_EMAIL } from "@/lib/emails/catalogue";
+import { SITE_URL } from "@/lib/emails/mise-en-page";
 import { Badge, Panel, PageHeader } from "@/components/admin/ui";
 
 export const metadata = { title: "E-mails types" };
@@ -15,6 +16,8 @@ export default async function AdminEmailTypes({ searchParams }: { searchParams: 
   const { e } = await searchParams;
   const current = CATALOGUE.find((c) => c.id === e) ?? CATALOGUE[0];
   const mail = current.exemple();
+  // Les images (Mémo, logo) sont lues sur ce site-ci : l’aperçu marche aussi avant la mise en ligne.
+  const html = mail.html.split(`${SITE_URL}/`).join("/");
 
   return (
     <div className="grid grid-cols-1 gap-5">
@@ -61,7 +64,7 @@ export default async function AdminEmailTypes({ searchParams }: { searchParams: 
             </dl>
           </Panel>
           <Panel title="Aperçu" flush>
-            <iframe title={mail.subject} srcDoc={mail.html} className="block h-[1100px] w-full rounded-b-[inherit] border-0 bg-[#f2f5f8]" />
+            <iframe title={mail.subject} srcDoc={html} className="block h-[1100px] w-full rounded-b-[inherit] border-0 bg-[#f2f5f8]" />
           </Panel>
           <Panel title="Quand rien ne part">
             <ul className="grid gap-2 p-4 text-[14px]">

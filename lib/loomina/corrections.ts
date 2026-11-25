@@ -115,7 +115,7 @@ async function applyOne(project: Project, profile: Profile, c: PendingCorrection
     // de la personne qui a offert le livre), SMS sinon ou si l'e-mail ne part pas.
     const texts = doneTexts(profile, (chapter.title as string | null) ?? `Récit ${c.chapter}`, project.phase);
     const ownEmail = project.project_metadata?.is_gift === true ? null : profile.email;
-    const mailed = ownEmail ? await sendEmail({ to: ownEmail, subject: texts.subject, text: texts.email, html: texts.html, replyTo: teamContacts().email }) : false;
+    const mailed = ownEmail ? await sendEmail({ to: ownEmail, subject: texts.subject, text: texts.email, html: texts.html, replyTo: teamContacts().email, loginPhone: profile.phone_number }) : false;
     if (!mailed && profile.phone_number) await sendSms(profile.phone_number, texts.sms);
 }
 

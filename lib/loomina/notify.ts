@@ -17,6 +17,7 @@
  */
 
 import { sendSms } from './sms';
+import { magicLink } from './magic-link';
 import { SITE } from '../../config/site';
 import { familyAudience } from './giver';
 // Les e-mails clients : un modèle par e-mail, rangés dans lib/emails (25/11/2026).
@@ -98,6 +99,14 @@ export function mailConfigured(): boolean {
     return smtpConfig() !== null;
 }
 
+/** Les liens « loomina.eu/dashboard » d'un e-mail, en lien de connexion directe pour ce numéro. */
+export function personalizeLinks(phone: string | null | undefined, body: string): string {
+    if (!phone) return body;
+    const link = magicLink(phone);
+    if (link.endsWith('/dashboard')) return body;
+    return body.replace(new RegExp(`(?:https?://)?(?:www\\.)?${HOST.replace(/[.]/g, '\\.')}/dashboard(?![\\w/])`, 'g'), `https://${link}`);
+}
+
 /** Un e-mail simple : le texte, tel quel, dans une mise en page sobre. */
 export async function sendEmail(params: {
     to: string;
@@ -109,6 +118,12 @@ export async function sendEmail(params: {
     html?: string;
     /** En-têtes en plus (List-Unsubscribe des relances). */
     headers?: Record<string, string>;
+    /**
+     * Le numéro du destinataire, s'il a un espace : chaque bouton vers
+     * loomina.eu/dashboard devient un lien de connexion directe pour ce numéro,
+     * comme dans les SMS (lib/loomina/magic-link.ts).
+     */
+    loginPhone?: string | null;
 }): Promise<boolean> {
     const smtp = smtpConfig();
     if (!smtp) {
@@ -116,7 +131,9 @@ export async function sendEmail(params: {
         return false;
     }
     const from = process.env.LOOMINA_MAIL_FROM?.trim() || `Loomina <${smtp.user}>`;
-    const html = params.html ?? brandEmailHtml(paragraphsHtml(params.text));
+    const direct = (s: string) => personalizeLinks(params.loginPhone, s);
+    const html = direct(params.html ?? brandEmailHtml(paragraphsHtml(params.text)));
+    params = { ...params, text: direct(params.text) };
     try {
         // Chargé à la demande : le serveur vocal n'envoie pas d'e-mail et n'a pas ce paquet.
         const { createTransport } = await import('nodemailer');
@@ -221,7 +238,7 @@ export async function notifyNewOrder(order: Order): Promise<void> {
         ? `Livre offert à ${order.narratorFirstName || '(prénom manquant)'}${order.giver?.first_name ? ` par ${order.giver.first_name}` : ''}`
         : `Livre pour ${order.narratorFirstName || '(prénom manquant)'}`;
     await Promise.allSettled([
-        sendEmail({ to: order.buyerEmail, subject: w.subject, text: w.email, html: w.html, replyTo: teamContacts().email }),
+        sendEmail({ to: order.buyerEmail, subject: w.subject, text: w.email, html: w.html, replyTo: teamContacts().email, loginPhone: order.isGift ? order.giver?.phone : order.narratorPhone }),
         w.smsTo ? sendSms(w.smsTo, w.sms) : Promise.resolve(false),
         alertTeam({
             subject: `Nouvelle commande : ${who}`,
@@ -278,7 +295,7 @@ export async function notifyAuthorBookComplete(
         const email = authorOwnEmail(author, projectMetadata);
         await Promise.allSettled([
             author.phone_number ? sendSms(author.phone_number, t.sms) : Promise.resolve(false),
-            email ? sendEmail({ to: email, subject: t.subject, text: t.email, html: t.html }) : Promise.resolve(false),
+            email ? sendEmail({ to: email, subject: t.subject, text: t.email, html: t.html, loginPhone: author.phone_number }) : Promise.resolve(false),
         ]);
     } catch (e) {
         console.error('[notify] livre terminé, auteur non prévenu', e);
@@ -326,10 +343,14 @@ export async function notifyFamily(params: {
         if (!phones.length && !email) return;
         const news = familyNewsText(params.kind, params.narratorFirstName ?? '', params.storyTitle);
         const follow = `Suivez l'avancement sur ${HOST}/dashboard`;
-        const mail = familleEmail({ kind: params.kind, narrator: params.narratorFirstName, storyTitle: params.storyTitle, age: memoAge(params.phase, params.kind === 'book_complete') });
+        // Les nouvelles sont des e-mails « en plus » : la désinscription les arrête (25/11/2026).
+        const { optOutLine, optOutHeaders, isOptedOut } = await import('./optout');
+        const mailTo = email && !(await isOptedOut(email)) ? email : null;
+        const mail = familleEmail({ kind: params.kind, narrator: params.narratorFirstName, storyTitle: params.storyTitle, age: memoAge(params.phase, params.kind === 'book_complete'), optOut: mailTo ? optOutLine(mailTo) : null });
+        const giverPhone = familyAudience(meta).find((p) => p.giver)?.phone ?? null;
         await Promise.allSettled([
             ...phones.map((phone) => sendSms(phone, `Loomina : ${news.text} ${follow}`)),
-            email ? sendEmail({ to: email, subject: mail.subject, text: mail.text, html: mail.html }) : Promise.resolve(false),
+            mailTo ? sendEmail({ to: mailTo, subject: mail.subject, text: mail.text, html: mail.html, headers: optOutHeaders(mailTo), loginPhone: giverPhone }) : Promise.resolve(false),
         ]);
     } catch (err) {
         console.warn('[famille] nouvelles non envoyées :', err instanceof Error ? err.message : String(err));
@@ -449,7 +470,7 @@ export async function notifyBookStage(params: {
         const meta = params.projectMetadata ?? {};
         const authorEmail = authorOwnEmail(params.author, meta);
         if (params.author.phone_number) jobs.push(sendSms(params.author.phone_number, t.sms));
-        if (authorEmail) jobs.push(sendEmail({ to: authorEmail, subject: t.subject, text: t.email, html: t.html, replyTo: team }));
+        if (authorEmail) jobs.push(sendEmail({ to: authorEmail, subject: t.subject, text: t.email, html: t.html, replyTo: team, loginPhone: params.author.phone_number }));
 
         if (meta.family_news !== false) {
             // Celui qui a offert le livre, et les autres proches ajoutés (lib/loomina/giver.ts).
@@ -458,7 +479,7 @@ export async function notifyBookStage(params: {
                 const f = bookStageTexts(params.step, { first_name: person.firstName, family: true, narratorFirstName: params.author.first_name }, params.tracking);
                 jobs.push(sendSms(person.phone, f.sms));
                 const email = person.giver && meta.is_gift === true && typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
-                if (email && email !== authorEmail) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, html: f.html, replyTo: team }));
+                if (email && email !== authorEmail) jobs.push(sendEmail({ to: email, subject: f.subject, text: f.email, html: f.html, replyTo: team, loginPhone: person.phone }));
             }
         }
         await Promise.allSettled(jobs);
@@ -477,7 +498,7 @@ export async function notifyBookStage(params: {
  * nouvelles). Pas de SMS : le SMS « récit prêt » part déjà après l'appel. Ne lève jamais.
  */
 export async function notifyPhaseUp(params: {
-    author: { first_name: string | null; politeness_preference?: string | null; email?: string | null };
+    author: { first_name: string | null; politeness_preference?: string | null; email?: string | null; phone_number?: string | null };
     projectMetadata: Record<string, unknown> | null;
     /** La nouvelle étape (2, 3 ou 4). */
     phase: number;
@@ -488,16 +509,18 @@ export async function notifyPhaseUp(params: {
         const meta = params.projectMetadata ?? {};
         const team = teamContacts().email;
         const jobs: Promise<unknown>[] = [];
+        // E-mail « en plus » : la désinscription l'arrête (25/11/2026).
+        const { optOutLine, optOutHeaders, isOptedOut } = await import('./optout');
         const authorEmail = authorOwnEmail(params.author, meta);
-        if (authorEmail) {
-            const m = etapeSuivanteEmail({ firstName: params.author.first_name, tu: params.author.politeness_preference === 'tu', age });
-            jobs.push(sendEmail({ to: authorEmail, subject: m.subject, text: m.text, html: m.html, replyTo: team }));
+        if (authorEmail && !(await isOptedOut(authorEmail))) {
+            const m = etapeSuivanteEmail({ firstName: params.author.first_name, tu: params.author.politeness_preference === 'tu', age, optOut: optOutLine(authorEmail) });
+            jobs.push(sendEmail({ to: authorEmail, subject: m.subject, text: m.text, html: m.html, replyTo: team, headers: optOutHeaders(authorEmail), loginPhone: params.author.phone_number }));
         }
         const giverEmail = meta.is_gift === true && meta.family_news !== false && typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
-        if (giverEmail && giverEmail !== authorEmail) {
+        if (giverEmail && giverEmail !== authorEmail && !(await isOptedOut(giverEmail))) {
             const giver = familyAudience(meta).find((p) => p.giver);
-            const m = etapeSuivanteEmail({ firstName: giver?.firstName ?? null, tu: false, age, family: { narrator: params.author.first_name } });
-            jobs.push(sendEmail({ to: giverEmail, subject: m.subject, text: m.text, html: m.html, replyTo: team }));
+            const m = etapeSuivanteEmail({ firstName: giver?.firstName ?? null, tu: false, age, family: { narrator: params.author.first_name }, optOut: optOutLine(giverEmail) });
+            jobs.push(sendEmail({ to: giverEmail, subject: m.subject, text: m.text, html: m.html, replyTo: team, headers: optOutHeaders(giverEmail), loginPhone: giver?.phone }));
         }
         await Promise.allSettled(jobs);
     } catch (err) {

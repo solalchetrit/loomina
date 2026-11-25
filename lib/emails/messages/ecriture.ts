@@ -107,6 +107,8 @@ export interface EtapeSuivanteVars {
     age: 2 | 3 | 4;
     /** Pour un proche : le prénom de la personne qui raconte (on parle alors d'elle). */
     family?: { narrator: string | null };
+    /** La ligne de désinscription (lib/loomina/optout.ts), tout en bas. */
+    optOut?: string | null;
 }
 
 const GRANDIT: Record<2 | 3 | 4, { sujet: string; bulle: [string, string]; fait: [string, string]; suite: [string, string]; famille: string }> = {
@@ -140,7 +142,7 @@ export function etapeSuivanteEmail(v: EtapeSuivanteVars): RenderedEmail {
     if (v.family) {
         const n = v.family.narrator?.trim() || 'Votre proche';
         return renderEmail({
-            subject: `Le livre de ${n} avance : ${g.sujet.charAt(0).toLowerCase()}${g.sujet.slice(1)}`,
+            subject: `Le livre de ${n} avance : ${g.sujet}`,
             preheader: `${n} passe à l’étape suivante de son livre.`,
             blocks: [
                 memo({ age: v.age, pose: 'c', bulle: `${n} m’a fait grandir !` }),
@@ -150,6 +152,7 @@ export function etapeSuivanteEmail(v: EtapeSuivanteVars): RenderedEmail {
                 bouton('Ouvrir mon espace famille', DASHBOARD),
                 signature(),
             ],
+            optOut: v.optOut,
         });
     }
     const t = (a: string, b: string) => (v.tu ? a : b);
@@ -169,5 +172,6 @@ export function etapeSuivanteEmail(v: EtapeSuivanteVars): RenderedEmail {
             bouton('Ouvrir mon espace', DASHBOARD),
             signature(),
         ],
+        optOut: v.optOut,
     });
 }

@@ -16,6 +16,8 @@ export interface FamilleVars {
     storyTitle?: string;
     /** L'âge de Mémo, c'est-à-dire l'étape du livre (lib/emails/memo.ts). */
     age: MemoAge;
+    /** La ligne de désinscription (lib/loomina/optout.ts), tout en bas. */
+    optOut?: string | null;
 }
 
 export function familleEmail(v: FamilleVars): RenderedEmail {
@@ -35,6 +37,7 @@ export function familleEmail(v: FamilleVars): RenderedEmail {
                 ...ps(login),
                 signature(),
             ],
+            optOut: v.optOut,
         });
     }
     if (v.kind === 'book_complete') {
@@ -49,6 +52,7 @@ export function familleEmail(v: FamilleVars): RenderedEmail {
                 follow,
                 signature(),
             ],
+            optOut: v.optOut,
         });
     }
     return renderEmail({
@@ -63,5 +67,6 @@ export function familleEmail(v: FamilleVars): RenderedEmail {
             ...ps(login),
             signature(),
         ],
+        optOut: v.optOut,
     });
 }

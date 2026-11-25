@@ -157,7 +157,7 @@ export async function relanceClient(profileId: string, opts: { auto?: string } =
 
     const [sms, mail] = await Promise.all([
         phone ? sendSms(phone, texts.sms) : Promise.resolve(false),
-        email ? sendEmail({ to: email, subject: texts.subject, text: texts.email, html: texts.html, replyTo: teamContacts().email }) : Promise.resolve(false),
+        email ? sendEmail({ to: email, subject: texts.subject, text: texts.email, html: texts.html, replyTo: teamContacts().email, loginPhone: phone }) : Promise.resolve(false),
     ]);
     if (!sms && !mail) return { ok: false, message: 'Ni le SMS ni l’e-mail ne sont partis (numéro manquant, ou envoi refusé).' };
 

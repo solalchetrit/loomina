@@ -79,13 +79,13 @@ export function bouton(label: string, url: string): Block {
  * Le bouton « Appeler Loomina » : pour les auteurs qui écrivent leur livre
  * (demande de Solal, 25/11/2026). Sur un téléphone, il lance l'appel.
  */
-export function appeler(label = 'Appeler Loomina'): Block {
+export function appeler(label = 'Appeler'): Block {
     return {
         html:
             `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px"><tr><td style="border-radius:999px;background:${C.amber}">` +
-            `<a href="tel:${SITE.phone}" style="display:inline-block;padding:15px 30px;border-radius:999px;font-family:${FONT};font-size:16px;font-weight:700;color:${C.night};text-decoration:none">${esc(label)} · ${esc(SITE.phoneDisplay)}</a>` +
+            `<a href="tel:${SITE.phone}" style="display:inline-block;padding:15px 30px;border-radius:999px;font-family:${FONT};font-size:16px;font-weight:700;color:${C.night};text-decoration:none">${esc(label)}</a>` +
             '</td></tr></table>',
-        text: `${label} : ${SITE.phoneDisplay}`,
+        text: `Appeler Loomina : ${SITE.phoneDisplay}`,
     };
 }
 

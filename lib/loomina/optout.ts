@@ -54,6 +54,14 @@ export async function recordOptOut(token: string): Promise<boolean> {
     return !error;
 }
 
+/** Annule une désinscription (« Annuler ma désinscription »). Renvoie false si l'écriture a échoué. */
+export async function removeOptOut(token: string): Promise<boolean> {
+    if (!isOptOutToken(token)) return false;
+    const { error } = await db().from('email_optouts').delete().eq('email_hash', token);
+    if (error) console.warn('[désinscription] annulation impossible :', error.message);
+    return !error;
+}
+
 /** Cette adresse a-t-elle demandé à ne plus recevoir de rappels ? En cas de doute (base injoignable), oui. */
 export async function isOptedOut(email: string): Promise<boolean> {
     const t = optOutToken(email);
@@ -69,5 +77,5 @@ export async function isOptedOut(email: string): Promise<boolean> {
 /** La ligne à ajouter en bas d'un e-mail de relance. */
 export function optOutLine(email: string): string | null {
     const url = optOutUrl(email);
-    return url ? `Vous ne souhaitez plus recevoir ces rappels ? ${url}` : null;
+    return url ? `Vous ne souhaitez plus recevoir ces e-mails ? ${url}` : null;
 }

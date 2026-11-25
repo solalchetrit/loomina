@@ -15,6 +15,7 @@ export const GROUPS: Array<{ title: string; items: Item[] }> = [
     items: [
       { href: "/admin", label: "Aujourd’hui", icon: "home" },
       { href: "/admin/clients", label: "Clients", icon: "users" },
+      { href: "/admin/contacts", label: "Contacts", icon: "user" },
       { href: "/admin/livres", label: "Livres", icon: "book" },
       { href: "/admin/demos", label: "Démos", icon: "phone" },
     ],
