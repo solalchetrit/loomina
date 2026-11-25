@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { OFFER, LAUNCH, isOrderOpen, normalizeExtraCopies } from "@/config/offer";
 import { extraCopiesLineItem } from "@/lib/loomina/extra-copies";
 import { stripe } from "@/lib/stripe";
+import { allow, clientIp, TOO_MANY } from "@/lib/loomina/rate-limit";
 import { normalizeCallMinutes } from "@/lib/loomina/call-length";
 import { isTestAuthorPhone } from "@/lib/loomina/test-author";
 import { isTestFamilyPhone } from "@/lib/loomina/test-family";
@@ -11,6 +12,10 @@ export async function POST(request: NextRequest) {
     // Vitrine jusqu'au lancement : aucune nouvelle commande avant LAUNCH.opensAt.
     if (!isOrderOpen()) {
         return NextResponse.json({ error: `Les commandes ouvrent le ${LAUNCH.label}.` }, { status: 403 });
+    }
+    // Au plus 20 paniers Stripe par heure et par adresse (25/11/2026).
+    if (!(await allow(`checkout:ip:${clientIp(request.headers)}`, 3600, 20))) {
+        return NextResponse.json({ error: TOO_MANY }, { status: 429 });
     }
     try {
         const body = await request.json();
