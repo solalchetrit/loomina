@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { OFFER, normalizeExtraCopies } from "@/config/offer";
+import { OFFER, LAUNCH, isOrderOpen, normalizeExtraCopies } from "@/config/offer";
 import { extraCopiesLineItem } from "@/lib/loomina/extra-copies";
 import { stripe } from "@/lib/stripe";
 import { normalizeCallMinutes } from "@/lib/loomina/call-length";
@@ -8,6 +8,10 @@ import { isTestFamilyPhone } from "@/lib/loomina/test-family";
 import { encodeFamilyForStripe } from "@/lib/loomina/giver";
 
 export async function POST(request: NextRequest) {
+    // Vitrine jusqu'au lancement : aucune nouvelle commande avant LAUNCH.opensAt.
+    if (!isOrderOpen()) {
+        return NextResponse.json({ error: `Les commandes ouvrent le ${LAUNCH.label}.` }, { status: 403 });
+    }
     try {
         const body = await request.json();
         const { firstName, lastName, phone, email, isGift, callMinutes, giverFirstName, giverPhone } = body;

@@ -90,3 +90,18 @@ export const THEMES: { title: string; desc: string }[] = [
   { title: "La transmission", desc: "Ce que l’on souhaite laisser aux siens." },
   { title: "Les projets", desc: "Ce qu’il reste à accomplir." },
 ];
+
+/**
+ * Ouverture des commandes (Solal, 25/11/2026 : le site reste une vitrine
+ * jusqu'au lancement du 1er décembre). Avant cette date, la page de commande
+ * annonce l'ouverture et l'API de paiement refuse toute nouvelle commande.
+ * Le jour venu, tout s'ouvre tout seul, sans redéploiement.
+ */
+export const LAUNCH = {
+  opensAt: "2026-12-01T00:00:00+01:00",
+  label: "mardi 1er décembre",
+};
+
+export function isOrderOpen(now: number = Date.now()): boolean {
+  return now >= new Date(LAUNCH.opensAt).getTime();
+}
