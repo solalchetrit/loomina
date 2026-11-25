@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
+import { shrinkPhoto as shrink } from "@/lib/shrink-photo";
 
 interface Photo {
   id: string;
   caption: string | null;
   question: string;
   chapter?: string | null;
+  from?: string | null;
   url: string | null;
 }
 
@@ -24,33 +26,6 @@ async function chapterTitles(): Promise<string[]> {
     return (stories as { story_title: string | null }[]).map((s) => s.story_title).filter((t): t is string => !!t);
   } catch {
     return [];
-  }
-}
-
-/**
- * Réduit la photo dans le navigateur avant l'envoi : 1 600 px de côté au
- * plus, en JPEG. Une photo de téléphone (souvent 4 à 10 Mo, parfois HEIC)
- * dépasserait sinon la limite d'envoi du serveur.
- */
-async function shrink(file: File): Promise<Blob> {
-  const url = URL.createObjectURL(file);
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const i = new Image();
-      i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error("Cette image ne peut pas être lue."));
-      i.src = url;
-    });
-    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(img.naturalWidth * scale);
-    canvas.height = Math.round(img.naturalHeight * scale);
-    canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return await new Promise<Blob>((resolve, reject) =>
-      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Conversion impossible."))), "image/jpeg", 0.85)
-    );
-  } finally {
-    URL.revokeObjectURL(url);
   }
 }
 
@@ -120,7 +95,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
           <li key={p.id}>
             {p.url ? (
               // eslint-disable-next-line @next/next/no-img-element -- lien signé temporaire, hors optimisation Next
-              <img src={p.url} alt={p.caption ?? "Photo envoyée"} title={p.caption ?? p.question} className="h-12 w-12 rounded-[12px] object-cover" />
+              <img src={p.url} alt={p.caption ?? "Photo envoyée"} title={[p.caption ?? p.question, p.from ? `Envoyée par ${p.from}` : null].filter(Boolean).join(" · ")} className="h-12 w-12 rounded-[12px] object-cover" />
             ) : (
               <div className="h-12 w-12 rounded-[12px] bg-[var(--surface-2)]" title={p.caption ?? p.question} />
             )}
@@ -196,6 +171,85 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
         </p>
       </form>
       )}
+
+      <InviteLink onUnauthorized={onUnauthorized} />
     </section>
+  );
+}
+
+/**
+ * Le lien pour les proches (lib/loomina/photo-invite.ts) : l'auteur le copie
+ * et l'envoie, ses proches ajoutent leurs photos sans compte.
+ */
+function InviteLink({ onUnauthorized }: { onUnauthorized: () => void }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [state, setState] = useState<"idle" | "copied" | "error">("idle");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/user/photos/lien")
+      .then((r) => (r.status === 401 ? (onUnauthorized(), null) : r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && typeof d?.url === "string") setUrl(d.url);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [onUnauthorized]);
+
+  if (!url) return null;
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setState("copied");
+    } catch {
+      // Presse-papiers refusé : le lien reste lisible et sélectionnable juste en dessous.
+      setState("error");
+    }
+  };
+
+  const share = async () => {
+    try {
+      await navigator.share({ title: "Ajoutez une photo à mon livre", text: "Ajoutez une photo à mon livre Loomina :", url });
+    } catch {
+      /* partage annulé */
+    }
+  };
+
+  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+
+  return (
+    <div className="mt-4 border-t border-[var(--rule)] pt-3">
+      <p className="text-[14px] font-bold text-[var(--ink-2)]">Vos proches aussi</p>
+      <p className="mt-0.5 text-[14px] leading-snug text-[var(--ink-3)]">Envoyez-leur votre lien : ils ajoutent leurs photos, sans compte.</p>
+      <div className="mt-2 flex gap-2">
+        <button
+          type="button"
+          onClick={copy}
+          className="press min-h-10 flex-1 rounded-full border border-[var(--rule-strong)] bg-white px-4 text-[14px] font-bold text-[var(--ink)] hover:border-[var(--ink-3)]"
+        >
+          {state === "copied" ? "Lien copié" : "Copier le lien"}
+        </button>
+        {canShare && (
+          <button
+            type="button"
+            onClick={share}
+            className="press min-h-10 rounded-full border border-[var(--rule-strong)] bg-white px-4 text-[14px] font-bold text-[var(--ink)] hover:border-[var(--ink-3)]"
+          >
+            Envoyer
+          </button>
+        )}
+      </div>
+      <p className="mt-2 break-all text-[13px] text-[var(--ink-3)]">
+        <span className="select-all font-semibold text-[var(--ink-2)]">{url.replace(/^https?:\/\//, "")}</span>
+      </p>
+      {state === "error" && (
+        <p className="mt-1 text-[13px] text-[var(--ink-2)]" role="status">
+          Copie impossible : sélectionnez l’adresse ci-dessus.
+        </p>
+      )}
+    </div>
   );
 }
