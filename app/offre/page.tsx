@@ -52,8 +52,8 @@ export default function OffrePage() {
                     <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
                   </p>
                 ) : (
-                  <p className="text-[34px] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--amber)] md:text-[46px]">
-                    Le {LAUNCH.label.replace(/^\S+ /, "")}
+                  <p className="whitespace-nowrap text-[34px] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--amber)] md:text-[46px]">
+                    {LAUNCH.label.replace(/^\S+ /, "")}
                   </p>
                 )}
                 <p className="max-w-[13rem] text-[14px] leading-snug text-[#cfcfc8]">

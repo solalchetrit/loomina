@@ -31,8 +31,8 @@ export default function OfferCard({
               </span>
             </p>
           ) : (
-            <p className="mt-3 text-[44px] font-extrabold leading-none tracking-[-0.045em] md:text-[56px]">
-              Le {LAUNCH.label.replace(/^\S+ /, "")}
+            <p className="mt-3 whitespace-nowrap text-[44px] font-extrabold leading-none tracking-[-0.045em] md:text-[56px]">
+              {LAUNCH.label.replace(/^\S+ /, "")}
             </p>
           )}
           <p className="t-body mt-4">
