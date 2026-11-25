@@ -5,7 +5,7 @@
  *   en une phrase et raccroche.
  * - Sans récit (appel coupé, trop court), on accepte jusqu'à 3 appels par
  *   numéro sur 24 heures.
- * - Au plus 30 démos par heure pour tout le monde, et 5 par jour en numéro
+ * - Au plus 100 démos par heure pour tout le monde, et 20 par jour en numéro
  *   masqué : un robot qui appelle en boucle ne vide pas le budget.
  *
  * DEMO_UNLIMITED_PHONES (Render, numéros séparés par des virgules) ouvre la
@@ -19,8 +19,8 @@ import { db } from './db';
 import { allow } from './rate-limit';
 
 export const DEMO_TRIES_PER_DAY = 3;
-export const DEMO_PER_HOUR_ALL = 30;
-export const DEMO_HIDDEN_PER_DAY = 5;
+export const DEMO_PER_HOUR_ALL = 100;
+export const DEMO_HIDDEN_PER_DAY = 20;
 
 export type DemoGate = 'ok' | 'already_done' | 'too_many_tries' | 'busy';
 
