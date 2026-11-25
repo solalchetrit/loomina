@@ -94,9 +94,7 @@ export default async function AdminStructure() {
   return (
     <div className="grid grid-cols-1 gap-5">
       <TechTabs value="structure" />
-      <PageHeader eyebrow="Structure" title="Comment Loomina fonctionne">
-        Les services qui font tourner Loomina, ce qui passe de l’un à l’autre, ce que contient la base et ce qui tourne tout seul.
-      </PageHeader>
+      <PageHeader eyebrow="Structure" title="Comment Loomina fonctionne" />
 
       <Panel icon="globe" title="Qui parle à qui">
         <div className="overflow-x-auto"><Diagram /></div>

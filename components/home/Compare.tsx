@@ -52,10 +52,7 @@ function Value({ cell, strong = false }: { cell: Cell; strong?: boolean }) {
 export default function Compare() {
   return (
     <Section id="comparer">
-      <SectionHead
-        title="Écrire seul, un biographe, ou Loomina ?"
-        text="Trois façons d’obtenir le livre d’une vie. Ligne par ligne, voici ce qui change pour vous."
-      />
+      <SectionHead title="Écrire seul, un biographe, ou Loomina ?" />
       <ul className="head-gap space-y-3 md:hidden">
         {ROWS.map((r) => (
           <li key={r.label} className="rounded-[20px] border border-[var(--line)] bg-white p-5">

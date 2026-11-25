@@ -20,9 +20,8 @@ export default function Progress({ project }: { project: ProjectOverview }) {
           <h2 id="progression" className="t-heading">
             Où en est votre livre
           </h2>
-          <p className="t-body mt-1">
-            {project.completed ? "Votre récit est complet : place à la relecture et à l’impression." : `Étape en cours : ${STAGES[project.phase - 1].title.toLowerCase()}.`}
-          </p>
+          {/* L'étape en cours est déjà surlignée juste en dessous : on ne la répète pas ici. */}
+          {project.completed && <p className="t-body mt-1">Votre récit est complet : place à la relecture et à l’impression.</p>}
         </div>
         <dl className="flex gap-6">
           {[
