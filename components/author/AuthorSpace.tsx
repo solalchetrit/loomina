@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ComposedBook from "./ComposedBook";
@@ -16,7 +16,9 @@ import Settings from "./Settings";
 import FamilyAccess from "./FamilyAccess";
 import Photos from "./Photos";
 import Onboarding from "./Onboarding";
-import CallOncePicker, { type CallOnceValue } from "./CallOncePicker";
+import NextCallBooking from "./NextCallBooking";
+import type { CallOnceValue } from "./CallOncePicker";
+import { describeSchedule } from "@/lib/loomina/schedule";
 import Shipping from "./Shipping";
 import { formatDate, type Overview } from "./types";
 
@@ -33,13 +35,14 @@ type Tab = "apercu" | "livre" | "vie" | "appels" | "reglages";
 
 /** Le prochain appel : le numéro, et le sujet que Loomina a prévu d'aborder. */
 /**
- * « Votre prochain appel » : le sujet prévu, le numéro, et depuis le 25/11/2026
- * (demande de Solal) le choix du jour et de l'heure du prochain appel, là où
- * l'auteur le cherche, plus un lien vers Réglages pour les rendez-vous de la semaine.
+ * « Votre prochain appel » : le sujet prévu, la réservation du prochain appel
+ * (jour et heure, demande de Solal 25/11/2026), le numéro, et un lien vers
+ * Réglages pour les rendez-vous de la semaine.
  */
 function NextCall({
   topic,
   schedule,
+  weekly,
   callOnce,
   canBook,
   onBooked,
@@ -48,38 +51,16 @@ function NextCall({
 }: {
   topic: string | null;
   schedule?: string | null;
+  /** « chaque mardi à 15 h », ou null. */
+  weekly: string | null;
   callOnce: CallOnceValue;
   canBook: boolean;
   onBooked: () => void;
   onSettings: () => void;
   onUnauthorized: () => void;
 }) {
-  const [once, setOnce] = useState<CallOnceValue>(callOnce);
-  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error" | "past">("idle");
-  const seq = useRef(0);
-  const book = async (v: CallOnceValue) => {
-    setOnce(v);
-    const n = ++seq.current;
-    setStatus("saving");
-    try {
-      const res = await fetch("/api/user/preferences", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ callOnce: v }),
-      });
-      if (res.status === 401) return onUnauthorized();
-      if (n !== seq.current) return;
-      if (res.status === 400) return setStatus("past");
-      if (!res.ok) throw new Error();
-      setStatus("saved");
-      onBooked();
-    } catch {
-      if (n === seq.current) setStatus("error");
-    }
-  };
-
   return (
-    <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white md:p-7" aria-labelledby="prochain-appel">
+    <section className="flex min-w-0 flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white md:p-7" aria-labelledby="prochain-appel">
       <h2 id="prochain-appel" className="text-[17px] font-bold tracking-normal text-[var(--amber)]">
         Votre prochain appel
       </h2>
@@ -91,34 +72,29 @@ function NextCall({
       ) : (
         <p className="mt-3 text-[clamp(1.4rem,2.1vw,1.7rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
       )}
-      {canBook && (
-        <div className="mt-5">
-          <label htmlFor="prochain-appel-jour" className="field-label !text-white">
-            Loomina vous appelle
-          </label>
-          <CallOncePicker idPrefix="prochain-appel" value={once} onChange={(v) => void book(v)} dark />
-          <p role="status" className="mt-1.5 text-[14px] font-semibold">
-            {status === "saved" && <span className="text-[var(--amber)]">{once ? "C’est noté. Vous recevrez un SMS une demi-heure avant." : "Appel retiré."}</span>}
-            {status === "past" && <span className="text-[#f3b2a5]">Cette heure est déjà passée. Choisissez-en une autre.</span>}
-            {status === "error" && <span className="text-[#f3b2a5]">L’appel n’a pas été enregistré. Réessayez.</span>}
-          </p>
-        </div>
-      )}
+      {canBook && <NextCallBooking value={callOnce} onSaved={onBooked} onUnauthorized={onUnauthorized} />}
       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
         <a
           href={`tel:${SITE.phone}`}
-          className="press inline-flex min-h-12 shrink-0 items-center rounded-full bg-[var(--amber)] px-6 text-[21px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
+          className="press inline-flex min-h-12 shrink-0 items-center rounded-full border border-white/25 px-6 text-[20px] font-extrabold tracking-[-0.02em] text-white hover:border-[var(--amber)] hover:text-[var(--amber)]"
         >
           {SITE.phoneDisplay}
         </a>
         <p className="min-w-[12rem] flex-1 text-[15px] leading-snug text-[#cfcfc8]">
-          {schedule ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.` : "Depuis le numéro de votre commande, quand vous voulez."}
+          {canBook
+            ? "Ou appelez Loomina quand vous voulez."
+            : schedule
+              ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.`
+              : "Depuis le numéro de votre commande, quand vous voulez."}
         </p>
       </div>
       {canBook && (
-        <button type="button" onClick={onSettings} className="mt-3 self-start text-[15px] font-semibold text-white underline decoration-[var(--amber)] underline-offset-4 hover:text-[var(--amber)]">
-          Des rendez-vous chaque semaine ? Réglages
-        </button>
+        <p className="mt-3 text-[15px] text-[#cfcfc8]">
+          {weekly ? `Rendez-vous ${weekly}. ` : "Un appel chaque semaine ? "}
+          <button type="button" onClick={onSettings} className="font-semibold text-white underline decoration-[var(--amber)] underline-offset-4 hover:text-[var(--amber)]">
+            {weekly ? "Modifier" : "Réglages"}
+          </button>
+        </p>
       )}
     </section>
   );
@@ -280,6 +256,7 @@ export default function AuthorSpace({
                 <NextCall
                   topic={project?.nextTopic ?? null}
                   schedule={project?.scheduleText}
+                  weekly={describeSchedule(data.prefs.callSchedule)}
                   callOnce={data.prefs.callOnce ?? null}
                   canBook={Boolean(project && !project.completed)}
                   onBooked={load}
