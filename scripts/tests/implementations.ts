@@ -133,6 +133,34 @@ async function main() {
         assert.match(reminderText('Jeanne', false, '15:00'), /Je vous appelle tout à l'heure, à 15 h/);
         assert.match(reminderText('Léo', true, '09:30'), /Je t'appelle tout à l'heure, à 9 h 30/);
     });
+    await check('A', 'Appel à date unique : créneau, SMS 30 min avant, date passée refusée, texte', async () => {
+        const { dueOnceSlot, dueOnceReminder } = await import('../../lib/loomina/reminder');
+        const { upcomingCallOnce, describeCallOnce, describeCalls, parseCallOnce, callOnceDays } = await import('../../lib/loomina/schedule');
+        const once = { date: '2026-11-30', time: '10:00' }; // lundi
+        assert.equal(dueOnceSlot(once, new Date('2026-11-30T09:00:00Z')), '2026-11-30 10:00'); // 10 h à Paris
+        assert.equal(dueOnceSlot(once, new Date('2026-11-30T09:09:00Z')), '2026-11-30 10:00');
+        assert.equal(dueOnceSlot(once, new Date('2026-11-30T09:10:00Z')), null);
+        assert.equal(dueOnceSlot(once, new Date('2026-11-30T08:59:00Z')), null);
+        assert.equal(dueOnceSlot(once, new Date('2026-12-07T09:00:00Z')), null); // pas la semaine suivante
+        assert.equal(dueOnceReminder(once, new Date('2026-11-30T08:30:00Z')), '2026-11-30 10:00'); // 9 h 30
+        assert.equal(dueOnceReminder(once, new Date('2026-11-30T08:45:00Z')), null);
+        // Un appel à 9 h : le SMS part à 8 h 30 le jour même.
+        assert.equal(dueOnceReminder({ date: '2026-12-01', time: '09:00' }, new Date('2026-12-01T07:30:00Z')), '2026-12-01 09:00');
+        assert.equal(parseCallOnce({ date: '2026-02-30', time: '10:00' }), null);
+        assert.deepEqual(parseCallOnce({ date: '2026-12-01', time: '23:00' }), { date: '2026-12-01', time: '20:00' });
+        const now = new Date('2026-11-25T10:00:00Z'); // mercredi 11 h à Paris
+        assert.equal(upcomingCallOnce({ date: '2026-11-25', time: '10:30' }, now), null);
+        assert.deepEqual(upcomingCallOnce({ date: '2026-11-25', time: '14:00' }, now), { date: '2026-11-25', time: '14:00' });
+        assert.equal(upcomingCallOnce({ date: '2027-03-01', time: '10:00' }, now), null);
+        assert.equal(describeCallOnce(once, now), 'le lundi 30 novembre à 10 h');
+        assert.equal(describeCallOnce({ date: '2026-12-01', time: '09:30' }, now), 'le mardi 1er décembre à 9 h 30');
+        assert.equal(describeCallOnce({ date: '2026-11-26', time: '15:00' }, now), 'demain à 15 h');
+        assert.equal(describeCalls({ active: true, days: [2], time: '15:00' }, once, now), 'le lundi 30 novembre à 10 h, puis chaque mardi à 15 h');
+        assert.equal(describeCalls({ active: false, days: [], time: '15:00' }, null, now), null);
+        const days = callOnceDays(now);
+        assert.equal(days.length, 14);
+        assert.deepEqual(days.slice(0, 3).map((d) => d.label), ['Aujourd’hui', 'Demain', 'Vendredi 27 novembre']);
+    });
     await check('A', 'Coûts : la grille donne un prix cohérent pour un appel type', async () => {
         const { tokensCostUsd } = await import('../../lib/admin/costs');
         // 20 000 jetons lus et 3 000 écrits par gpt-5.5 : 0,10 + 0,09 = 0,19 $.

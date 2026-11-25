@@ -70,6 +70,8 @@ export async function refundClient(profileId: string): Promise<RefundResult> {
                 refund_id: refund.id,
                 refund_amount: amount,
                 call_schedule: { ...schedule, active: false },
+                // L'appel à date unique est annulé aussi.
+                call_once: undefined,
             },
         })
         .eq('id', project.id);

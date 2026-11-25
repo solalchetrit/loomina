@@ -3,7 +3,7 @@ import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
 import { DEMO_DATA, demoSavePrefs } from '@/lib/loomina/demo';
 import { testAuthorReply } from '@/lib/loomina/test-author';
-import { normalizeSchedule } from '@/lib/loomina/schedule';
+import { normalizeSchedule, upcomingCallOnce } from '@/lib/loomina/schedule';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
 
 export const runtime = 'nodejs';
@@ -83,6 +83,17 @@ export async function PATCH(request: NextRequest) {
         }
         if (body.callSchedule !== undefined) {
             meta.call_schedule = normalizeSchedule(body.callSchedule);
+            metaChanged = true;
+        }
+        // Appel à date unique : null l'annule. Une date passée ou mal formée est refusée,
+        // pour que l'auteur le voie au lieu d'attendre un appel qui ne viendra pas.
+        if (body.callOnce !== undefined) {
+            if (body.callOnce === null) delete meta.call_once;
+            else {
+                const once = upcomingCallOnce(body.callOnce);
+                if (!once) return NextResponse.json({ error: 'past' }, { status: 400 });
+                meta.call_once = once;
+            }
             metaChanged = true;
         }
         if (body.callMinutes !== undefined) {

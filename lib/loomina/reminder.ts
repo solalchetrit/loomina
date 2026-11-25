@@ -4,30 +4,12 @@
  * (voice/src/scheduler.ts s'en sert chaque minute).
  */
 
-import { normalizeSchedule } from './schedule';
+import { normalizeSchedule, parseCallOnce, parisNow } from './schedule';
 
 /** Fenêtre pendant laquelle un envoi prévu part encore (serveur redémarré…). */
 const WINDOW_MINUTES = 10;
 
-/** Jour (1 = lundi … 7 = dimanche) et minute de la journée, heure de Paris. */
-export function parisNow(date = new Date()): { day: number; minutes: number; ymd: string } {
-    const parts = Object.fromEntries(
-        new Intl.DateTimeFormat('en-GB', {
-            timeZone: 'Europe/Paris',
-            weekday: 'short',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-        })
-            .formatToParts(date)
-            .map((p) => [p.type, p.value])
-    );
-    const day = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(parts.weekday) + 1;
-    return { day, minutes: Number(parts.hour) * 60 + Number(parts.minute), ymd: `${parts.year}-${parts.month}-${parts.day}` };
-}
+export { parisNow };
 
 /** Le SMS de rappel part entre 30 et 20 minutes avant l'heure prévue. */
 const REMINDER_MINUTES = 30;
@@ -42,6 +24,31 @@ export function dueReminder(schedule: unknown, now = new Date()): string | null 
     const start = h * 60 + m;
     if (p.minutes < start - REMINDER_MINUTES || p.minutes >= start - REMINDER_MINUTES + WINDOW_MINUTES) return null;
     return `${p.ymd} ${s.time}`;
+}
+
+/** Minute « AAAA-MM-JJ HH:MM » de Paris en minutes depuis 1970 (pour comparer des créneaux sur deux jours). */
+function slotMinutes(ymd: string, minutes: number): number {
+    return Math.round(new Date(`${ymd}T00:00:00Z`).getTime() / 60_000) + minutes;
+}
+
+/** L'appel unique (`project_metadata.call_once`) : le créneau dû maintenant, ou null. */
+export function dueOnceSlot(once: unknown, now = new Date()): string | null {
+    const c = parseCallOnce(once);
+    if (!c) return null;
+    const p = parisNow(now);
+    const [h, m] = c.time.split(':').map(Number);
+    const diff = slotMinutes(p.ymd, p.minutes) - slotMinutes(c.date, h * 60 + m);
+    return diff >= 0 && diff < WINDOW_MINUTES ? `${c.date} ${c.time}` : null;
+}
+
+/** L'appel unique : le créneau dont le SMS de rappel est dû maintenant (30 min avant), ou null. */
+export function dueOnceReminder(once: unknown, now = new Date()): string | null {
+    const c = parseCallOnce(once);
+    if (!c) return null;
+    const p = parisNow(now);
+    const [h, m] = c.time.split(':').map(Number);
+    const diff = slotMinutes(p.ymd, p.minutes) - (slotMinutes(c.date, h * 60 + m) - REMINDER_MINUTES);
+    return diff >= 0 && diff < WINDOW_MINUTES ? `${c.date} ${c.time}` : null;
 }
 
 export function reminderText(firstName: string | null, tu: boolean, time: string): string {

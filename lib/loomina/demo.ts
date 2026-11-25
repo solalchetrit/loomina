@@ -109,6 +109,7 @@ const state = {
         sensitiveTopics: ['La maladie de Pierre'],
         smsChapter: true,
         callSchedule: { active: true, days: [2], time: '15:00' } as { active: boolean; days: number[]; time: string },
+        callOnce: null as { date: string; time: string } | null,
         callMinutes: 30,
         giverFirstName: null as string | null,
         shareWithGiver: false,
