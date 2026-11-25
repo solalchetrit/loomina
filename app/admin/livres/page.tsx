@@ -41,7 +41,7 @@ export default async function AdminBooks({ searchParams }: { searchParams: Promi
   return (
     <div className="grid grid-cols-1 gap-5">
       <PageHeader eyebrow="Livres" title="De la relecture à la boîte aux lettres">
-        Chaque livre terminé, et ce qu’il attend de vous. À chaque étape, le client (et la personne qui l’a offert) reçoit un SMS et un e-mail.
+        À chaque étape, le client (et la personne qui l’a offert) reçoit un SMS et un e-mail.
       </PageHeader>
       {(fait || erreur) && (
         <p role="status" className={`rounded-[10px] px-4 py-3 text-[14px] font-semibold ${fait ? "bg-[var(--success-soft)] text-[var(--success)]" : "bg-[var(--danger-soft)] text-[var(--danger)]"}`}>{fait ?? erreur}</p>
