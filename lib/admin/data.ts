@@ -11,7 +11,7 @@ import type { Profile, Project } from '@/lib/loomina/db';
 import { readEditions } from '@/lib/loomina/book-edition';
 import type { Edition } from '@/lib/loomina/book-edition';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
-import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
+import { normalizeSchedule, describeCalls, parseCallOnce } from '@/lib/loomina/schedule';
 import { readFamilyMembers, readGiver } from '@/lib/loomina/giver';
 import type { Giver } from '@/lib/loomina/giver';
 import { isTestMeta } from '@/lib/loomina/test-flag';
@@ -471,7 +471,7 @@ export async function getCrm(now = Date.now()): Promise<Crm> {
             daysSinceOrder,
             daysSinceLastCall,
             daysToFirstCall: firstCallAt ? Math.max(0, Math.floor((new Date(firstCallAt).getTime() - new Date(orderedAt).getTime()) / DAY)) : null,
-            schedule: describeSchedule(normalizeSchedule(meta.call_schedule)),
+            schedule: describeCalls(normalizeSchedule(meta.call_schedule), meta.call_once),
             stage,
             health,
             failedEvents: project ? E.filter((e) => e.project_id === project.id).length : 0,
@@ -606,24 +606,31 @@ export async function getAgenda(now = Date.now()): Promise<AgendaSlot[]> {
         const meta = (j.project_metadata ?? {}) as Row;
         if (j.status === 'completed' || isTestMeta(meta)) continue;
         const schedule = normalizeSchedule(meta.call_schedule);
-        if (!schedule.active) continue;
+        // L'appel à date unique (project_metadata.call_once), s'il tombe cette semaine.
+        const once = parseCallOnce(meta.call_once);
+        const onceDay = once && days.includes(once.date) ? once : null;
+        if (!schedule.active && !onceDay) continue;
         const p = P.find((x) => x.id === j.user_id);
         const mine = I.filter((i) => i.project_id === j.id);
         const first = mine.length === 0;
         days.forEach((day, i) => {
-            if (!schedule.days.includes(i + 1)) return;
-            const call = mine.find((c) => parisDay.format(new Date(String(c.created_at))) === day);
-            const passed = day < today || (day === today && schedule.time < clock);
-            slots.push({
-                day,
-                time: schedule.time,
-                client: p ? `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim() || 'Sans nom' : 'Client inconnu',
-                profileId: String(j.user_id),
-                state: call ? 'done' : passed ? 'missed' : 'planned',
-                minutes: call ? Math.round((Number(call.duration_seconds) || 0) / 60) : null,
-                next: false,
-                first,
-            });
+            const weekly = schedule.active && schedule.days.includes(i + 1);
+            const single = onceDay?.date === day && !(weekly && onceDay.time === schedule.time);
+            const times = [...(weekly ? [schedule.time] : []), ...(single ? [onceDay.time] : [])];
+            for (const time of times) {
+                const call = mine.find((c) => parisDay.format(new Date(String(c.created_at))) === day);
+                const passed = day < today || (day === today && time < clock);
+                slots.push({
+                    day,
+                    time,
+                    client: p ? `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim() || 'Sans nom' : 'Client inconnu',
+                    profileId: String(j.user_id),
+                    state: call ? 'done' : passed ? 'missed' : 'planned',
+                    minutes: call ? Math.round((Number(call.duration_seconds) || 0) / 60) : null,
+                    next: false,
+                    first,
+                });
+            }
         });
     }
     slots.sort((a, b) => `${a.day} ${a.time}`.localeCompare(`${b.day} ${b.time}`));

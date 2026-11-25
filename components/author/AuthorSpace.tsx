@@ -16,6 +16,9 @@ import Settings from "./Settings";
 import FamilyAccess from "./FamilyAccess";
 import Photos from "./Photos";
 import Onboarding from "./Onboarding";
+import NextCallBooking from "./NextCallBooking";
+import type { CallOnceValue } from "./CallOncePicker";
+import { describeSchedule } from "@/lib/loomina/schedule";
 import Shipping from "./Shipping";
 import { formatDate, type Overview } from "./types";
 
@@ -31,9 +34,33 @@ const TABS: readonly { id: string; label: string; short: string; icon: IconName 
 type Tab = "apercu" | "livre" | "vie" | "appels" | "reglages";
 
 /** Le prochain appel : le numéro, et le sujet que Loomina a prévu d'aborder. */
-function NextCall({ topic, schedule }: { topic: string | null; schedule?: string | null }) {
+/**
+ * « Votre prochain appel » : le sujet prévu, la réservation du prochain appel
+ * (jour et heure, demande de Solal 25/11/2026), le numéro, et un lien vers
+ * Réglages pour les rendez-vous de la semaine.
+ */
+function NextCall({
+  topic,
+  schedule,
+  weekly,
+  callOnce,
+  canBook,
+  onBooked,
+  onSettings,
+  onUnauthorized,
+}: {
+  topic: string | null;
+  schedule?: string | null;
+  /** « chaque mardi à 15 h », ou null. */
+  weekly: string | null;
+  callOnce: CallOnceValue;
+  canBook: boolean;
+  onBooked: () => void;
+  onSettings: () => void;
+  onUnauthorized: () => void;
+}) {
   return (
-    <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white md:p-7" aria-labelledby="prochain-appel">
+    <section className="flex min-w-0 flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white md:p-7" aria-labelledby="prochain-appel">
       <h2 id="prochain-appel" className="text-[17px] font-bold tracking-normal text-[var(--amber)]">
         Votre prochain appel
       </h2>
@@ -45,17 +72,30 @@ function NextCall({ topic, schedule }: { topic: string | null; schedule?: string
       ) : (
         <p className="mt-3 text-[clamp(1.4rem,2.1vw,1.7rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
       )}
+      {canBook && <NextCallBooking value={callOnce} onSaved={onBooked} onUnauthorized={onUnauthorized} />}
       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
         <a
           href={`tel:${SITE.phone}`}
-          className="press inline-flex min-h-12 shrink-0 items-center rounded-full bg-[var(--amber)] px-6 text-[21px] font-extrabold tracking-[-0.02em] text-[var(--ink)] hover:brightness-105"
+          className="press inline-flex min-h-12 shrink-0 items-center rounded-full border border-white/25 px-6 text-[20px] font-extrabold tracking-[-0.02em] text-white hover:border-[var(--amber)] hover:text-[var(--amber)]"
         >
           {SITE.phoneDisplay}
         </a>
         <p className="min-w-[12rem] flex-1 text-[15px] leading-snug text-[#cfcfc8]">
-          {schedule ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.` : "Depuis le numéro de votre commande, quand vous voulez."}
+          {canBook
+            ? "Ou appelez Loomina quand vous voulez."
+            : schedule
+              ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.`
+              : "Depuis le numéro de votre commande, quand vous voulez."}
         </p>
       </div>
+      {canBook && (
+        <p className="mt-3 text-[15px] text-[#cfcfc8]">
+          {weekly ? `Rendez-vous ${weekly}. ` : "Un appel chaque semaine ? "}
+          <button type="button" onClick={onSettings} className="font-semibold text-white underline decoration-[var(--amber)] underline-offset-4 hover:text-[var(--amber)]">
+            {weekly ? "Modifier" : "Réglages"}
+          </button>
+        </p>
+      )}
     </section>
   );
 }
@@ -213,7 +253,16 @@ export default function AuthorSpace({
               {project?.completed && <Shipping saved={data.shipping ?? null} delivery={data.delivery} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
               {project && (project.weave ? <Companion project={project} demo={data.demo} skipIntro={Boolean(data.welcome)} /> : <Progress project={project} />)}
               <div className="grid gap-3 lg:grid-cols-[1fr_1.2fr]">
-                <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />
+                <NextCall
+                  topic={project?.nextTopic ?? null}
+                  schedule={project?.scheduleText}
+                  weekly={describeSchedule(data.prefs.callSchedule)}
+                  callOnce={data.prefs.callOnce ?? null}
+                  canBook={Boolean(project && !project.completed)}
+                  onBooked={load}
+                  onSettings={() => setTab("reglages")}
+                  onUnauthorized={onUnauthorized}
+                />
                 {project ? (
                   <SuggestTopic
                     questions={project.openQuestions}

@@ -9,6 +9,7 @@ import { CALL_MINUTES_OPTIONS } from "@/lib/loomina/call-length";
 import type { Overview } from "./types";
 import s from "./Onboarding.module.css";
 import { DAYS, DAY_LABELS, CALL_HOURS } from "./Settings";
+import CallOncePicker, { type CallOnceValue } from "./CallOncePicker";
 
 /**
  * L'accueil du premier passage dans l'espace auteur, en trois écrans, une idée par écran :
@@ -44,6 +45,7 @@ export default function Onboarding({
   const [minutes, setMinutes] = useState(prefs.callMinutes);
   const [days, setDays] = useState<number[]>(prefs.callSchedule?.days ?? []);
   const [time, setTime] = useState(prefs.callSchedule?.time ?? "15:00");
+  const [once, setOnce] = useState<CallOnceValue>(prefs.callOnce ?? null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
 
@@ -71,7 +73,11 @@ export default function Onboarding({
       const all = draft.trim() && !topics.includes(draft.trim()) ? [...topics, draft.trim()] : topics;
       // « Plus tard » garde quand même un rendez-vous choisi (jours cochés) : c'est un geste
       // explicite, contrairement au tu/vous ou à la durée, qui ont une valeur par défaut.
-      const schedule = days.length ? { callSchedule: { active: true, days, time } } : {};
+      const schedule = {
+        ...(days.length ? { callSchedule: { active: true, days, time } } : {}),
+        // Le premier appel à une date précise, choisi ici, compte aussi avec « Plus tard ».
+        ...(once ? { callOnce: once } : {}),
+      };
       const body = skip
         ? { welcomeDone: true, ...schedule }
         : {
@@ -181,9 +187,14 @@ export default function Onboarding({
                       ))}
                     </select>
                   </div>
-                ) : (
-                  <p className="t-small mt-1.5">Sans jour choisi, c’est vous qui appelez, quand vous voulez.</p>
-                )}
+                ) : null}
+              </fieldset>
+              <fieldset>
+                <legend className="field-label">
+                  Ou une seule fois, à une date précise <span className="font-normal text-[var(--ink-3)]">(facultatif)</span>
+                </legend>
+                <CallOncePicker idPrefix="accueil-une-fois" value={once} onChange={setOnce} />
+                {days.length === 0 && !once && <p className="t-small mt-1.5">Sans jour choisi, c’est vous qui appelez, quand vous voulez.</p>}
               </fieldset>
               <fieldset>
                 <legend className="field-label">Durée d’un appel</legend>

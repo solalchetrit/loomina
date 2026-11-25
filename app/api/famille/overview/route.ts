@@ -7,7 +7,7 @@ import { testFamilyReply } from '@/lib/loomina/test-family';
 import { familyMemberOf, familyWelcomeDone, findGiftProjects, giverPendingTopics, sharesWithGiver } from '@/lib/loomina/giver';
 import { normalizeContext } from '@/lib/loomina/context';
 import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
-import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
+import { normalizeSchedule, describeCalls, parseCallOnce } from '@/lib/loomina/schedule';
 import { readPhaseState } from '@/lib/loomina/phase-plan';
 import { buildWeave } from '@/lib/loomina/weave';
 import { familySetupOpen } from '@/lib/loomina/family-setup';
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
                         words,
                         photos: Array.isArray(meta.photos) ? meta.photos.length : 0,
                         hasTitle: Boolean(project.title?.trim()),
-                        hasSchedule: schedule.active,
+                        hasSchedule: schedule.active || parseCallOnce(meta.call_once) !== null,
                     }),
                     words: shared ? words : null,
                     // L'accueil de l'espace famille, montré une fois à chaque proche (familyWelcomeDone).
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
                         const f = readFulfillment(project.status, project.project_metadata);
                         return { stage: f.stage, tracking: f.tracking };
                     })(),
-                    scheduleText: describeSchedule(schedule),
+                    scheduleText: describeCalls(schedule, meta.call_once),
                     shared,
                     calls: (interviews.data ?? []).map((i) => ({
                         title: titleOf.get(i.id as string) ?? null,

@@ -12,6 +12,13 @@
  *    narrateur que Loomina va l'appeler (demande de Solal, 17/11/2026).
  *    Désactivable : `project_metadata.sms_reminder === false`.
  *
+ * 1 ter. APPEL À DATE UNIQUE — l'auteur peut aussi choisir un seul jour et
+ *    une heure (`project_metadata.call_once`, demande de Solal, 25/11/2026),
+ *    surtout pour son premier appel. Il passe par le même chemin que les
+ *    rendez-vous : même SMS une demi-heure avant, même créneau noté avant
+ *    l'appel (`last_scheduled_slot`), donc jamais deux appels si l'appel
+ *    unique tombe à la même heure qu'un rendez-vous de la semaine.
+ *
  * 2. RATTRAPAGE — toutes les 5 minutes, demande au site de retraiter les
  *    appels dont le traitement (Directeur, Écrivain) a échoué. Sur Vercel
  *    Hobby, le cron du site ne passe qu'une fois par jour, à 3 h.
@@ -21,7 +28,7 @@ import twilio from 'twilio';
 import { db } from '../../lib/loomina/db';
 import { normalizeSchedule } from '../../lib/loomina/schedule';
 import { sendSms } from '../../lib/loomina/sms';
-import { parisNow, dueReminder, reminderText } from '../../lib/loomina/reminder';
+import { parisNow, dueReminder, dueOnceSlot, dueOnceReminder, reminderText } from '../../lib/loomina/reminder';
 
 export { parisNow };
 import { config } from './config.ts';
@@ -41,19 +48,42 @@ export function dueSlot(schedule: unknown, now = new Date()): string | null {
     return `${p.ymd} ${s.time}`;
 }
 
-async function sendReminders(): Promise<void> {
-    const { data, error } = await db()
-        .from('projects')
-        .select('id, user_id, status, project_metadata')
-        .eq('project_metadata->call_schedule->>active', 'true')
-        .neq('status', 'completed')
-        .limit(500);
-    if (error) throw new Error(`lecture des rendez-vous (rappels) : ${error.message}`);
+type ProjectRow = { id: string; user_id: string; status: string | null; project_metadata: unknown };
 
-    for (const project of data ?? []) {
+/** Les livres qui ont un rendez-vous de la semaine ou un appel à date unique. */
+async function projectsWithCalls(what: string): Promise<ProjectRow[]> {
+    const [weekly, once] = await Promise.all([
+        db()
+            .from('projects')
+            .select('id, user_id, status, project_metadata')
+            .eq('project_metadata->call_schedule->>active', 'true')
+            .neq('status', 'completed')
+            .limit(500),
+        db()
+            .from('projects')
+            .select('id, user_id, status, project_metadata')
+            .not('project_metadata->call_once', 'is', null)
+            .neq('status', 'completed')
+            .limit(500),
+    ]);
+    if (weekly.error) throw new Error(`lecture des rendez-vous (${what}) : ${weekly.error.message}`);
+    // Un souci sur les appels uniques ne doit jamais bloquer les rendez-vous de la semaine.
+    if (once.error) console.error(`[rendez-vous] lecture des appels uniques (${what}) :`, once.error.message);
+    const byId = new Map<string, ProjectRow>();
+    for (const p of [...(weekly.data ?? []), ...(once.data ?? [])] as ProjectRow[]) byId.set(p.id, p);
+    return [...byId.values()];
+}
+
+/** Le créneau dû maintenant : rendez-vous de la semaine d'abord, sinon appel unique. */
+function dueCallSlot(meta: Record<string, unknown>, now = new Date()): string | null {
+    return dueSlot(meta.call_schedule, now) ?? dueOnceSlot(meta.call_once, now);
+}
+
+async function sendReminders(): Promise<void> {
+    for (const project of await projectsWithCalls('rappels')) {
         const meta = (project.project_metadata ?? {}) as Record<string, unknown>;
         if (meta.sms_reminder === false) continue;
-        const slot = dueReminder(meta.call_schedule);
+        const slot = dueReminder(meta.call_schedule) ?? dueOnceReminder(meta.call_once);
         if (!slot || meta.last_reminder_slot === slot) continue;
 
         const { data: profile } = await db().from('profiles').select('phone_number, first_name, politeness_preference').eq('id', project.user_id).single();
@@ -69,23 +99,15 @@ async function sendReminders(): Promise<void> {
             .select('id');
         if (claimErr || !claimed?.length) continue;
 
-        const sent = await sendSms(phone, reminderText((profile?.first_name as string | null) ?? null, profile?.politeness_preference === 'tu', normalizeSchedule(meta.call_schedule).time));
+        const sent = await sendSms(phone, reminderText((profile?.first_name as string | null) ?? null, profile?.politeness_preference === 'tu', slot.slice(11)));
         if (sent) console.info(`[rappel] SMS envoyé pour le créneau ${slot}`);
     }
 }
 
 async function placeScheduledCalls(isBusy: (phone: string) => boolean): Promise<void> {
-    const { data, error } = await db()
-        .from('projects')
-        .select('id, user_id, status, project_metadata')
-        .eq('project_metadata->call_schedule->>active', 'true')
-        .neq('status', 'completed')
-        .limit(500);
-    if (error) throw new Error(`lecture des rendez-vous : ${error.message}`);
-
-    for (const project of data ?? []) {
+    for (const project of await projectsWithCalls('appels')) {
         const meta = (project.project_metadata ?? {}) as Record<string, unknown>;
-        const slot = dueSlot(meta.call_schedule);
+        const slot = dueCallSlot(meta);
         if (!slot || meta.last_scheduled_slot === slot) continue;
 
         const { data: profile } = await db().from('profiles').select('phone_number').eq('id', project.user_id).single();

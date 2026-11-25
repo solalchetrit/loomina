@@ -20,8 +20,8 @@ import { formatToE164 } from '@/lib/phone';
 import { readSession } from './session';
 import { DEMO_DATA } from './demo';
 import { PHASE_LABELS } from './phases';
-import { normalizeSchedule, describeSchedule } from './schedule';
-import type { CallSchedule } from './schedule';
+import { normalizeSchedule, describeCalls, upcomingCallOnce } from './schedule';
+import type { CallSchedule, CallOnce } from './schedule';
 import { normalizeCallMinutes } from './call-length';
 import { readPhaseState } from './phase-plan';
 import { buildWeave } from './weave';
@@ -56,6 +56,7 @@ type Prefs = {
     sensitiveTopics: string[];
     smsChapter: boolean;
     callSchedule: CallSchedule;
+    callOnce: CallOnce | null;
     callMinutes: number;
     giverFirstName: string | null;
     shareWithGiver: boolean;
@@ -79,6 +80,7 @@ function freshEssai(): Essai {
             sensitiveTopics: [],
             smsChapter: true,
             callSchedule: normalizeSchedule(undefined),
+            callOnce: null,
             callMinutes: normalizeCallMinutes(undefined),
             giverFirstName: null,
             shareWithGiver: false,
@@ -125,6 +127,7 @@ function applyPrefs(essai: Essai, body: Record<string, unknown>): Essai {
     if (typeof body.smsChapter === 'boolean') p.smsChapter = body.smsChapter;
     if (typeof body.shareWithGiver === 'boolean') p.shareWithGiver = body.shareWithGiver;
     if (body.callSchedule !== undefined) p.callSchedule = normalizeSchedule(body.callSchedule);
+    if (body.callOnce !== undefined) p.callOnce = upcomingCallOnce(body.callOnce);
     if (body.callMinutes !== undefined) p.callMinutes = normalizeCallMinutes(body.callMinutes);
     return { ...essai, prefs: p };
 }
@@ -163,7 +166,7 @@ function overview(essai: Essai) {
             progress: 0,
             completed: false,
             nextTopic: null,
-            scheduleText: describeSchedule(prefs.callSchedule),
+            scheduleText: describeCalls(prefs.callSchedule, prefs.callOnce),
             chapters: 0,
             words: 0,
             weave: buildWeave({
@@ -174,7 +177,7 @@ function overview(essai: Essai) {
                 words: 0,
                 photos: 0,
                 hasTitle: Boolean(prefs.title),
-                hasSchedule: prefs.callSchedule.active,
+                hasSchedule: prefs.callSchedule.active || prefs.callOnce !== null,
             }),
             timeline: [],
             family: essai.family,

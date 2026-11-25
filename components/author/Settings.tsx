@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import type { Prefs } from "./types";
+import CallOncePicker from "./CallOncePicker";
+import { describeCallOnce } from "@/lib/loomina/schedule";
 import { CALL_MINUTES_OPTIONS } from "@/lib/loomina/call-length";
 import { WRITING_STYLES, normalizeStyle } from "@/lib/loomina/styles";
 
@@ -57,6 +59,30 @@ export default function Settings({
     void saveSchedule(callSchedule);
   };
 
+  // L'appel à date unique s'enregistre de la même façon, dès qu'on le touche.
+  const [onceStatus, setOnceStatus] = useState<"idle" | "saving" | "saved" | "error" | "past">("idle");
+  const onceSeq = useRef(0);
+  const updateOnce = async (callOnce: Prefs["callOnce"]) => {
+    setForm((f) => ({ ...f, callOnce }));
+    const seq = ++onceSeq.current;
+    setOnceStatus("saving");
+    try {
+      const res = await fetch("/api/user/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callOnce }),
+      });
+      if (res.status === 401) return onUnauthorized();
+      if (seq !== onceSeq.current) return;
+      if (res.status === 400) return setOnceStatus("past");
+      if (!res.ok) throw new Error();
+      onSaved({ ...prefs, callOnce });
+      setOnceStatus("saved");
+    } catch {
+      if (seq === onceSeq.current) setOnceStatus("error");
+    }
+  };
+
   const update = (patch: Partial<Prefs>) => {
     setForm((f) => ({ ...f, ...patch }));
     setStatus("idle");
@@ -75,7 +101,7 @@ export default function Settings({
       const res = await fetch("/api/user/preferences", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, title: form.title ?? "", firstNamePhonetic: form.firstNamePhonetic ?? "", writingStyle: form.writingStyle ?? "" }),
+        body: JSON.stringify({ ...form, callOnce: undefined, title: form.title ?? "", firstNamePhonetic: form.firstNamePhonetic ?? "", writingStyle: form.writingStyle ?? "" }),
       });
       if (res.status === 401) return onUnauthorized();
       if (!res.ok) throw new Error();
@@ -250,10 +276,23 @@ export default function Settings({
               ))}
             </select>
             </div>
-            {form.callSchedule.days.length === 0 && <p className="t-small mt-1.5">Sans jour choisi, c’est vous qui appelez, quand vous voulez.</p>}
+            {form.callSchedule.days.length === 0 && !form.callOnce && <p className="t-small mt-1.5">Sans jour choisi, c’est vous qui appelez, quand vous voulez.</p>}
             <p role="status" className="mt-1.5 text-[14px] font-semibold">
               {scheduleStatus === "saved" && <span className="text-[var(--success)]">{form.callSchedule.days.length ? "Rendez-vous enregistré." : "Rendez-vous retiré."}</span>}
               {scheduleStatus === "error" && <span className="text-[var(--danger)]">Le rendez-vous n’a pas été enregistré. Réessayez.</span>}
+            </p>
+          </fieldset>
+          <fieldset className="min-w-0">
+            <legend className="field-label">Ou une seule fois, à une date précise</legend>
+            <CallOncePicker idPrefix="reglages-une-fois" value={form.callOnce} onChange={(v) => void updateOnce(v)} />
+            <p role="status" className="mt-1.5 text-[14px] font-semibold">
+              {onceStatus === "saved" && (
+                <span className="text-[var(--success)]">
+                  {form.callOnce ? `Loomina vous appellera ${describeCallOnce(form.callOnce) ?? ""}.` : "Appel retiré."}
+                </span>
+              )}
+              {onceStatus === "past" && <span className="text-[var(--danger)]">Cette heure est déjà passée. Choisissez-en une autre.</span>}
+              {onceStatus === "error" && <span className="text-[var(--danger)]">L’appel n’a pas été enregistré. Réessayez.</span>}
             </p>
           </fieldset>
           <fieldset className="min-w-0">

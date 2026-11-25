@@ -11,6 +11,8 @@ export interface Prefs {
   smsChapter: boolean;
   /** Rendez-vous d'appel réguliers (1 = lundi … 7 = dimanche, heure de Paris). */
   callSchedule: { active: boolean; days: number[]; time: string };
+  /** Appel à date unique encore à venir (« AAAA-MM-JJ », « HH:MM », heure de Paris), ou null. */
+  callOnce: { date: string; time: string } | null;
   /** Durée d'appel souhaitée, en minutes (15, 20, 30 ou 45). */
   callMinutes: number;
   /** Livre offert : prénom de la personne qui l'a offert ("" si inconnu), null si le livre n'est pas un cadeau suivi. */

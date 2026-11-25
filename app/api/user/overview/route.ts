@@ -6,7 +6,7 @@ import { toPhase, PHASE_LABELS } from '@/lib/loomina/phases';
 import { DEMO_DATA, demoOverview } from '@/lib/loomina/demo';
 import { testAuthorReply } from '@/lib/loomina/test-author';
 import { normalizeCallMinutes } from '@/lib/loomina/call-length';
-import { normalizeSchedule, describeSchedule } from '@/lib/loomina/schedule';
+import { normalizeSchedule, describeCalls, upcomingCallOnce, parseCallOnce } from '@/lib/loomina/schedule';
 import { familyAudience, readGiver, sharesWithGiver } from '@/lib/loomina/giver';
 import { readFulfillment } from '@/lib/loomina/fulfillment';
 import { totalExtraCopies } from '@/lib/loomina/extra-copies';
@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
             sensitiveTopics: splitTopics(profile.sensitive_topics),
             smsChapter: (project?.project_metadata as Record<string, unknown> | null)?.sms_chapter !== false,
             callSchedule: normalizeSchedule((project?.project_metadata as Record<string, unknown> | null)?.call_schedule),
+            callOnce: upcomingCallOnce((project?.project_metadata as Record<string, unknown> | null)?.call_once),
             callMinutes: normalizeCallMinutes((project?.project_metadata as Record<string, unknown> | null)?.call_minutes),
             // Livre offert : qui l'a offert, et si l'auteur lui laisse lire ses récits.
             giverFirstName: readGiver(project?.project_metadata)?.firstName ?? (readGiver(project?.project_metadata) ? '' : null),
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
                 progress: Math.max(0, Math.min(100, project.phase_progress ?? 0)),
                 completed,
                 nextTopic: project.next_question_strategy,
-                scheduleText: describeSchedule(prefs.callSchedule),
+                scheduleText: describeCalls(prefs.callSchedule, prefs.callOnce),
                 chapters: chapters.data.length,
                 words,
                 // La toile du livre : un rang par sujet raconté (lib/loomina/weave.ts).
@@ -108,7 +109,7 @@ export async function GET(request: NextRequest) {
                     words,
                     photos: Array.isArray(pmeta.photos) ? pmeta.photos.length : 0,
                     hasTitle: Boolean(project.title?.trim()),
-                    hasSchedule: prefs.callSchedule.active,
+                    hasSchedule: prefs.callSchedule.active || parseCallOnce(pmeta.call_once) !== null,
                 }),
                 timeline: context.timeline,
                 family: context.family.map(({ name, relation, deceased }) => ({ name, relation, deceased })),
