@@ -33,7 +33,7 @@ import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
 import type { TokenUsage } from './usage';
-import { notifyFamily, alertTeam, notifyAuthorBookComplete } from './notify';
+import { notifyFamily, alertTeam, notifyAuthorBookComplete, notifyPhaseUp } from './notify';
 import { autoCompose } from './book-edition';
 
 /**
@@ -434,6 +434,11 @@ export async function processEndOfCall(params: {
         // Le titre ne part que si le narrateur partage ses récits avec l'offreur.
         storyTitle: project.project_metadata?.share_with_giver === true ? writer.chapter_title : undefined,
     });
+
+    // Le livre passe à l'étape suivante : Mémo grandit, on le dit par e-mail (25/11/2026).
+    if (brief.nextPhase && brief.nextPhase > phase && project.status !== 'completed') {
+        await notifyPhaseUp({ author: params.profile, projectMetadata: project.project_metadata, phase: brief.nextPhase });
+    }
 
     // Le livre se recompose avec ce nouveau récit, sans attendre ici.
     await autoCompose(project.id);

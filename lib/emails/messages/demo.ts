@@ -4,7 +4,7 @@
  */
 import { SITE } from '../../../config/site';
 import { DEMO_PROMO } from '../../../config/offer';
-import { HOST, bouton, encadre, memo, petit, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
+import { HOST, bouton, encadre, memo, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
 
 /** « 1er décembre », « 3 décembre », avec des espaces insécables. */
 export function frenchDay(d: Date): string {
@@ -37,8 +37,8 @@ export function demoRecitEmail(v: DemoRecitVars): RenderedEmail & { orderUrl: st
             titre('Votre souvenir est devenu un récit'),
             ...ps(
                 hello,
-                `Voici « ${v.title} », écrit par Loomina à partir de notre conversation au téléphone. Il est en pièce jointe, mis en page exactement comme il le serait dans votre livre.`,
-                'Ce n’était qu’un souvenir. Imaginez votre vie entière, appel après appel, dans un livre à garder et à offrir à ceux que vous aimez.'
+                `Voici « ${v.title} », écrit par Loomina à partir de notre conversation au téléphone. Votre récit est en pièce jointe, mis en page exactement comme il le serait dans votre livre.`,
+                'Ce n’était qu’un seul souvenir. Imaginez votre vie entière, appel après appel, dans un livre à garder et à offrir à ceux que vous aimez.'
             ),
             ...(v.promo ? [encadre([`Votre cadeau : -${pct} % sur votre livre.`, `Déjà appliqué sur le bouton ci-dessous, jusqu’au ${frenchDay(v.promo.expires)}.`])] : []),
             bouton('Écrire mon livre', orderUrl),
@@ -81,8 +81,8 @@ export function demoRappelEmail(v: DemoRappelVars): RenderedEmail & { orderUrl: 
             bouton('Écrire mon livre', orderUrl),
             ...ps(v.storyUrl ? `Envie de relire votre récit ? Il est toujours ici : ${v.storyUrl}` : null, `Une question ? Appelez le ${SITE.phoneDisplay} ou répondez à cet e-mail.`),
             signature(),
-            ...petit(v.optOut),
         ],
+        optOut: v.optOut,
     });
     return { ...mail, orderUrl };
 }

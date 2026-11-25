@@ -3,7 +3,7 @@
  * Envoyé par lib/loomina/notify.ts (notifyNewOrder).
  */
 import { SITE } from '../../../config/site';
-import { DASHBOARD, bouton, etapes, memo, progression, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
+import { DASHBOARD, appeler, bouton, etapes, memo, progression, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
 
 const REFUND = 'Et si le premier appel ne convient pas, on vous rembourse en entier, sur simple demande, dans les 7 jours.';
 
@@ -27,6 +27,7 @@ export function bienvenueEmail(v: BienvenueVars): RenderedEmail {
                 'Racontez. Loomina pose les questions et vous écoute. Il n’y a rien à préparer.',
                 'Après chaque appel, le récit de ce que vous avez raconté vous attend dans votre espace.',
             ]),
+            appeler(),
             bouton('Ouvrir mon espace', DASHBOARD),
             ...ps('Vous préférez que Loomina vous appelle ? Choisissez vos jours et votre heure dans votre espace.'),
             progression(1, 'Votre livre en cinq étapes. Vous êtes ici :'),

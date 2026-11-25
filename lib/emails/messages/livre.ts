@@ -4,7 +4,7 @@
  * (notifyAuthorBookComplete, notifyBookStage).
  */
 import { SITE } from '../../../config/site';
-import { DASHBOARD, SUIVI_LIVRE, bouton, encadre, frise, memo, progression, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
+import { DASHBOARD, SUIVI_LIVRE, appeler, bouton, encadre, frise, memo, progression, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
 
 /** Délai annoncé pour la première version complète du livre. */
 export const FIRST_VERSION_DELAY = 'une semaine';
@@ -28,8 +28,9 @@ export function livreTermineEmail(v: LivreTermineVars): RenderedEmail {
                     `Notre équipe le relit maintenant en entier et le met en page. D’ici ${FIRST_VERSION_DELAY}, tu recevras sa première version complète par e-mail, et tu pourras aussi la lire dans ton espace.`,
                     `Notre équipe le relit maintenant en entier et le met en page. D’ici ${FIRST_VERSION_DELAY}, vous recevrez sa première version complète par e-mail, et vous pourrez aussi la lire dans votre espace.`
                 ),
-                t(`Un souvenir te revient entre-temps ? Appelle le ${SITE.phoneDisplay}, il rejoindra le livre.`, `Un souvenir vous revient entre-temps ? Appelez le ${SITE.phoneDisplay}, il rejoindra le livre.`)
+                t('Un souvenir te revient entre-temps ? Appelle Loomina, il rejoindra le livre.', 'Un souvenir vous revient entre-temps ? Appelez Loomina, il rejoindra le livre.')
             ),
+            appeler(),
             progression(5, t('Ton récit est complet', 'Votre récit est complet')),
             frise(SUIVI_LIVRE, 1, t('Et maintenant, ton livre imprimé', 'Et maintenant, votre livre imprimé')),
             signature(),
@@ -85,6 +86,7 @@ export function etapeLivreEmail(v: EtapeLivreVars): RenderedEmail {
                           ),
                     `Ensuite, direction l’imprimerie ! ${t('Nous te prévenons', 'Nous vous prévenons')} à chaque étape.`
                 ),
+                ...(v.family ? [] : [appeler()]),
                 suivi(1),
                 signature(),
             ],

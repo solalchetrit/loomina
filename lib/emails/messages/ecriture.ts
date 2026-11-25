@@ -4,7 +4,7 @@
  * le livre (lib/admin/actions.ts).
  */
 import { SITE } from '../../../config/site';
-import { DASHBOARD, bouton, memo, progression, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
+import { DASHBOARD, appeler, bouton, memo, progression, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
 import type { MemoAge } from '../memo';
 
 export interface CorrectionVars {
@@ -28,6 +28,8 @@ export function correctionEmail(v: CorrectionVars): RenderedEmail {
                 t('Tu peux le relire dans ton espace.', 'Vous pouvez le relire dans votre espace.')
             ),
             bouton('Relire mon récit', DASHBOARD),
+            ...ps(t('Un autre souvenir te revient ? Raconte-le à Loomina.', 'Un autre souvenir vous revient ? Racontez-le à Loomina.')),
+            appeler(),
             signature(),
         ],
     });
@@ -57,7 +59,8 @@ export function relanceEmail(v: RelanceVars): RenderedEmail {
                 ),
                 t('Tu préfères que Loomina t’appelle ? Choisis tes jours et ton heure dans ton espace.', 'Vous préférez que Loomina vous appelle ? Choisissez vos jours et votre heure dans votre espace.')
             ),
-            bouton(t('Ouvrir mon espace', 'Ouvrir mon espace'), DASHBOARD),
+            appeler(),
+            bouton('Ouvrir mon espace', DASHBOARD),
             progression(v.age, t('Où en est ton livre', 'Où en est votre livre')),
             ...ps(t('Si quelque chose te gêne, réponds simplement à cet e-mail.', 'Si quelque chose vous gêne, répondez simplement à cet e-mail.')),
             signature(),
@@ -86,6 +89,84 @@ export function relanceOffreurEmail(v: RelanceOffreurVars): RenderedEmail {
                 'Un petit coup de pouce ? Vous pouvez lui transférer cet e-mail, ou être à ses côtés pour le tout premier appel.',
                 'Si quelque chose bloque, répondez simplement à cet e-mail : on vous aide volontiers.'
             ),
+            signature(),
+        ],
+    });
+}
+
+/**
+ * Le livre passe à l'étape suivante : Mémo grandit (demande de Solal,
+ * 25/11/2026). Part après l'appel qui fait changer de phase, à l'auteur, ou à
+ * celui qui a offert le livre si l'adresse du compte est la sienne.
+ */
+export interface EtapeSuivanteVars {
+    /** Prénom du destinataire. */
+    firstName: string | null;
+    tu: boolean;
+    /** Le nouvel âge de Mémo : 2, 3 ou 4. */
+    age: 2 | 3 | 4;
+    /** Pour un proche : le prénom de la personne qui raconte (on parle alors d'elle). */
+    family?: { narrator: string | null };
+}
+
+const GRANDIT: Record<2 | 3 | 4, { sujet: string; bulle: [string, string]; fait: [string, string]; suite: [string, string]; famille: string }> = {
+    2: {
+        sujet: 'Mémo fait ses premiers pas !',
+        bulle: ['Regarde, je marche ! Raconte-moi tes racines.', 'Regardez, je marche ! Racontez-moi vos racines.'],
+        fait: ['Tu as fait connaissance avec Loomina', 'Vous avez fait connaissance avec Loomina'],
+        suite: ['tes racines : ta famille, tes parents, ton enfance, l’école', 'vos racines : votre famille, vos parents, votre enfance, l’école'],
+        famille: 'ses racines : sa famille, ses parents, son enfance, l’école',
+    },
+    3: {
+        sujet: 'Mémo prend la plume !',
+        bulle: ['J’ai pris ma plume. Raconte-moi ta vie d’adulte !', 'J’ai pris ma plume. Racontez-moi votre vie d’adulte !'],
+        fait: ['Tes racines sont racontées', 'Vos racines sont racontées'],
+        suite: ['ta vie d’adulte : ce qui a rempli tes journées, les personnes que tu as aimées, tes passions', 'votre vie d’adulte : ce qui a rempli vos journées, les personnes que vous avez aimées, vos passions'],
+        famille: 'sa vie d’adulte : ce qui a rempli ses journées, les personnes aimées, ses passions',
+    },
+    4: {
+        sujet: 'Mémo met ses lunettes !',
+        bulle: ['J’ai mis mes lunettes. Plus qu’une étape avant ton livre !', 'J’ai mis mes lunettes. Plus qu’une étape avant votre livre !'],
+        fait: ['Ta vie est racontée', 'Votre vie est racontée'],
+        suite: ['ce que tu veux transmettre : tes valeurs, tes messages à ceux que tu aimes', 'ce que vous voulez transmettre : vos valeurs, vos messages à ceux que vous aimez'],
+        famille: 'ce qu’il ou elle veut transmettre : ses valeurs, ses messages à ceux qu’il ou elle aime',
+    },
+};
+
+export function etapeSuivanteEmail(v: EtapeSuivanteVars): RenderedEmail {
+    const g = GRANDIT[v.age];
+    const hello = v.firstName ? `Bonjour ${v.firstName} !` : 'Bonjour !';
+    const last = v.age === 4;
+    if (v.family) {
+        const n = v.family.narrator?.trim() || 'Votre proche';
+        return renderEmail({
+            subject: `Le livre de ${n} avance : ${g.sujet.charAt(0).toLowerCase()}${g.sujet.slice(1)}`,
+            preheader: `${n} passe à l’étape suivante de son livre.`,
+            blocks: [
+                memo({ age: v.age, pose: 'c', bulle: `${n} m’a fait grandir !` }),
+                titre(g.sujet),
+                ...ps(hello, `Bonne nouvelle : le livre de ${n} passe à l’étape suivante, et Mémo a grandi.`, `${last ? 'Dernière étape' : 'Prochaine étape'} : ${g.famille}.`, `Une idée de souvenir sur ce sujet ? Soufflez-la dans votre espace famille : Loomina en parlera avec ${n} au prochain appel.`),
+                progression(v.age, `Le livre de ${n}`),
+                bouton('Ouvrir mon espace famille', DASHBOARD),
+                signature(),
+            ],
+        });
+    }
+    const t = (a: string, b: string) => (v.tu ? a : b);
+    return renderEmail({
+        subject: g.sujet,
+        preheader: t('Ton livre passe à l’étape suivante.', 'Votre livre passe à l’étape suivante.'),
+        blocks: [
+            memo({ age: v.age, pose: 'c', bulle: t(g.bulle[0], g.bulle[1]) }),
+            titre(g.sujet),
+            ...ps(
+                hello,
+                `${t(g.fait[0], g.fait[1])}, bravo ! ${t('Ton livre', 'Votre livre')} passe à l’étape suivante, et Mémo a grandi.`,
+                `${last ? 'Dernière étape' : 'Prochaine étape'} : ${t(g.suite[0], g.suite[1])}. ${t('Au prochain appel, Loomina t’emmène là-bas.', 'Au prochain appel, Loomina vous emmène là-bas.')}`
+            ),
+            progression(v.age, t('Où en est ton livre', 'Où en est votre livre')),
+            appeler(),
+            bouton('Ouvrir mon espace', DASHBOARD),
             signature(),
         ],
     });

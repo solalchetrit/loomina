@@ -25,6 +25,7 @@ import { familleEmail } from '../emails/messages/famille';
 import { panierEmail } from '../emails/messages/panier';
 import { livreTermineEmail, etapeLivreEmail, FIRST_VERSION_DELAY } from '../emails/messages/livre';
 import { memoAge } from '../emails/memo';
+import { etapeSuivanteEmail } from '../emails/messages/ecriture';
 
 export { FIRST_VERSION_DELAY };
 
@@ -463,5 +464,43 @@ export async function notifyBookStage(params: {
         await Promise.allSettled(jobs);
     } catch (err) {
         console.error('[notify] étape du livre non annoncée :', err instanceof Error ? err.message : String(err));
+    }
+}
+
+// ------------------------------------------------------------
+// Le livre passe à l'étape suivante : Mémo grandit (demande de Solal, 25/11/2026)
+// ------------------------------------------------------------
+
+/**
+ * Prévient par e-mail que le livre change d'étape : l'auteur si l'adresse du
+ * compte est la sienne, et celui qui a offert le livre (sauf s'il a coupé les
+ * nouvelles). Pas de SMS : le SMS « récit prêt » part déjà après l'appel. Ne lève jamais.
+ */
+export async function notifyPhaseUp(params: {
+    author: { first_name: string | null; politeness_preference?: string | null; email?: string | null };
+    projectMetadata: Record<string, unknown> | null;
+    /** La nouvelle étape (2, 3 ou 4). */
+    phase: number;
+}): Promise<void> {
+    try {
+        if (params.phase !== 2 && params.phase !== 3 && params.phase !== 4) return;
+        const age = params.phase as 2 | 3 | 4;
+        const meta = params.projectMetadata ?? {};
+        const team = teamContacts().email;
+        const jobs: Promise<unknown>[] = [];
+        const authorEmail = authorOwnEmail(params.author, meta);
+        if (authorEmail) {
+            const m = etapeSuivanteEmail({ firstName: params.author.first_name, tu: params.author.politeness_preference === 'tu', age });
+            jobs.push(sendEmail({ to: authorEmail, subject: m.subject, text: m.text, html: m.html, replyTo: team }));
+        }
+        const giverEmail = meta.is_gift === true && meta.family_news !== false && typeof meta.buyer_email === 'string' ? meta.buyer_email : null;
+        if (giverEmail && giverEmail !== authorEmail) {
+            const giver = familyAudience(meta).find((p) => p.giver);
+            const m = etapeSuivanteEmail({ firstName: giver?.firstName ?? null, tu: false, age, family: { narrator: params.author.first_name } });
+            jobs.push(sendEmail({ to: giverEmail, subject: m.subject, text: m.text, html: m.html, replyTo: team }));
+        }
+        await Promise.allSettled(jobs);
+    } catch (err) {
+        console.error('[notify] nouvelle étape non annoncée :', err instanceof Error ? err.message : String(err));
     }
 }

@@ -806,3 +806,22 @@ test('voix : les noms propres de l’auteur vont à la transcription', async () 
     const hints = authorHints({ identity: { full_name: 'Patricia', places: ['Alger', 'la Casbah', 'Bab El Oued'] }, family: [{ name: 'Charlie' }, { name: 'Charlie' }] });
     assert.deepEqual(hints, ['Patricia', 'Alger', 'Casbah', 'Bab El Oued', 'Charlie']);
 });
+
+test('e-mails : Mémo grandit à chaque étape, bouton Appeler Loomina, désinscription en bas', async () => {
+    const { etapeSuivanteEmail } = await import('../../lib/emails/messages/ecriture');
+    const { panierEmail } = await import('../../lib/emails/messages/panier');
+    const { remboursementEmail } = await import('../../lib/emails/messages/remboursement');
+    const vous = etapeSuivanteEmail({ firstName: 'Jeanne', tu: false, age: 3 });
+    assert.match(vous.subject, /plume/);
+    assert.match(vous.html, /memo-3-c\.png/);
+    assert.match(vous.html, /tel:\+33159169357/);
+    const tu = etapeSuivanteEmail({ firstName: 'Léo', tu: true, age: 2 });
+    assert.doesNotMatch(tu.text, /\bvous\b|\bvotre\b/i);
+    const fam = etapeSuivanteEmail({ firstName: 'Marc', tu: false, age: 4, family: { narrator: 'Jeanne' } });
+    assert.match(fam.subject, /Le livre de Jeanne/);
+    assert.doesNotMatch(fam.html, /tel:/);
+    const cart = panierEmail({ firstName: 'Marc', isGift: false, narratorFirstName: null, recoveryUrl: null, optOut: 'Vous ne souhaitez plus recevoir ces rappels ? https://x/desinscription' }, 1);
+    assert.ok(cart.html.indexOf('desinscription') > cart.html.indexOf('on lit tout'));
+    assert.match(remboursementEmail({ firstName: null, amount: 224.5 }).text, /224,50 €/);
+    assert.doesNotMatch(vous.text + fam.text, /Mémo et l’équipe/);
+});

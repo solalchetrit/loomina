@@ -75,6 +75,20 @@ export function bouton(label: string, url: string): Block {
     };
 }
 
+/**
+ * Le bouton « Appeler Loomina » : pour les auteurs qui écrivent leur livre
+ * (demande de Solal, 25/11/2026). Sur un téléphone, il lance l'appel.
+ */
+export function appeler(label = 'Appeler Loomina'): Block {
+    return {
+        html:
+            `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px"><tr><td style="border-radius:999px;background:${C.amber}">` +
+            `<a href="tel:${SITE.phone}" style="display:inline-block;padding:15px 30px;border-radius:999px;font-family:${FONT};font-size:16px;font-weight:700;color:${C.night};text-decoration:none">${esc(label)} · ${esc(SITE.phoneDisplay)}</a>` +
+            '</td></tr></table>',
+        text: `${label} : ${SITE.phoneDisplay}`,
+    };
+}
+
 /** Un encadré ambre clair : un code, un numéro de suivi, une info à retrouver vite. */
 export function encadre(lignes: string[]): Block {
     return {
@@ -106,12 +120,6 @@ export function etapes(items: string[]): Block {
 /** La signature. */
 export function signature(nom = 'L’équipe Loomina'): Block {
     return { html: `<p style="margin:8px 0 0;font-weight:700;color:${C.title}">${esc(nom)}</p>`, text: nom };
-}
-
-/** Une petite ligne grise en bas (désinscription). */
-export function petit(t: string | null | undefined): Block[] {
-    if (!t) return [];
-    return [{ html: `<p style="margin:24px 0 0;font-size:13px;line-height:1.5;color:${C.soft}">${esc(t)}</p>`, text: t }];
 }
 
 /**
@@ -182,7 +190,9 @@ export interface RenderedEmail {
 }
 
 /** Assemble un e-mail complet à partir de ses blocs. */
-export function renderEmail(e: { subject: string; preheader: string; blocks: Block[] }): RenderedEmail {
+export function renderEmail(e: { subject: string; preheader: string; blocks: Block[]; /** La ligne de désinscription, tout en bas sous le pied de page. */ optOut?: string | null }): RenderedEmail {
+    // Le lien de désinscription devient cliquable dans la version HTML.
+    const optOutHtml = e.optOut ? esc(e.optOut).replace(/(https?:\/\/\S+)/, `<a href="$1" style="color:${C.soft};text-decoration:underline">$1</a>`) : '';
     const inner = e.blocks.map((b) => b.html).join('');
     const html =
         '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light">' +
@@ -202,7 +212,8 @@ export function renderEmail(e: { subject: string; preheader: string; blocks: Blo
         `<tr><td align="center" style="padding:24px 10px 0;font-family:${FONT};font-size:13px;line-height:1.7;color:${C.soft}">` +
         `Une question, une idée, un souvenir ? Répondez à cet e-mail, on lit tout.<br>` +
         `Loomina · ${SITE.phoneDisplay} · <a href="${SITE_URL}" style="color:${C.soft};text-decoration:underline">${HOST}</a>` +
+        (optOutHtml ? `<br><br>${optOutHtml}` : '') +
         '</td></tr></table></td></tr></table></body></html>';
-    const text = e.blocks.map((b) => b.text).join('\n\n') + `\n\n—\nLoomina · ${SITE.phoneDisplay} · ${HOST}`;
+    const text = e.blocks.map((b) => b.text).join('\n\n') + `\n\n—\nUne question, une idée, un souvenir ? Répondez à cet e-mail, on lit tout.\nLoomina · ${SITE.phoneDisplay} · ${HOST}` + (e.optOut ? `\n\n${e.optOut}` : '');
     return { subject: e.subject, preheader: e.preheader, text, html };
 }

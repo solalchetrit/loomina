@@ -10,7 +10,7 @@ import { demoRecitEmail, demoRappelEmail } from './messages/demo';
 import { panierEmail } from './messages/panier';
 import { bienvenueEmail, bienvenueCadeauEmail } from './messages/commande';
 import { familleEmail } from './messages/famille';
-import { correctionEmail, relanceEmail, relanceOffreurEmail } from './messages/ecriture';
+import { correctionEmail, etapeSuivanteEmail, relanceEmail, relanceOffreurEmail } from './messages/ecriture';
 import { livreTermineEmail, etapeLivreEmail } from './messages/livre';
 import { remboursementEmail } from './messages/remboursement';
 import type { RenderedEmail } from './mise-en-page';
@@ -88,6 +88,22 @@ export const CATALOGUE: CatalogueEntry[] = [
         variables: ['prénom', 'tu ou vous', 'titre du récit', 'étape du livre (âge de Mémo)'], code: 'lib/loomina/corrections.ts',
         exemple: () => correctionEmail({ firstName: 'Jeanne', tu: false, title: 'L’arrivée à Paris', age: 2 }),
     },
+    ...([2, 3, 4] as const).flatMap((age) => [
+        {
+            id: `etape-${age}`, etape: ETAPES[4], nom: `Mémo grandit : étape ${age} sur 4`,
+            quand: 'Après l’appel qui fait passer le livre à l’étape suivante', aQui: 'L’auteur',
+            variables: ['prénom', 'tu ou vous', 'nouvelle étape (âge de Mémo)'], code: 'lib/loomina/notify.ts (notifyPhaseUp)',
+            exemple: () => etapeSuivanteEmail({ firstName: 'Jeanne', tu: false, age }),
+        },
+        ...(age === 2
+            ? [{
+                  id: 'etape-famille', etape: ETAPES[4], nom: 'Mémo grandit (famille)',
+                  quand: 'Au même moment (livre offert)', aQui: 'Celui qui offre',
+                  variables: ['prénom du proche', 'prénom de l’auteur', 'nouvelle étape (âge de Mémo)'], code: 'lib/loomina/notify.ts (notifyPhaseUp)',
+                  exemple: () => etapeSuivanteEmail({ firstName: 'Marc', tu: false, age, family: { narrator: 'Jeanne' } }),
+              }]
+            : []),
+    ]),
     {
         id: 'relance', etape: ETAPES[4], nom: 'Relance : 14 jours sans appel',
         quand: 'Automatique après 14 jours sans appel (10 h à 19 h), ou bouton de l’admin', aQui: 'L’auteur',
@@ -142,6 +158,5 @@ export const CATALOGUE: CatalogueEntry[] = [
 export const SANS_EMAIL: { etape: string; texte: string }[] = [
     { etape: ETAPES[2], texte: 'Livre offert : la personne qui va raconter ne reçoit pas de bienvenue (ni e-mail, ni SMS).' },
     { etape: ETAPES[3], texte: 'Avant un appel programmé : seulement un SMS 30 minutes avant. Après chaque appel : seulement le SMS « votre récit est prêt » à l’auteur.' },
-    { etape: ETAPES[4], texte: 'Passage à une nouvelle étape du livre (Mémo grandit) : rien n’est envoyé.' },
     { etape: ETAPES[5], texte: 'Livre reçu : pas de merci ni de demande d’avis.' },
 ];

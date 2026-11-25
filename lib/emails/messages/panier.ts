@@ -3,7 +3,7 @@
  * jours après, cinq jours après). Envoyés par lib/loomina/abandoned-cart.ts.
  */
 import { SITE } from '../../../config/site';
-import { SITE_URL, bouton, etapes, memo, petit, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
+import { SITE_URL, bouton, etapes, memo, ps, renderEmail, signature, titre, type RenderedEmail } from '../mise-en-page';
 
 export type CartStep = 1 | 2 | 3;
 
@@ -43,8 +43,8 @@ export function panierEmail(v: PanierVars, step: CartStep = 1): RenderedEmail {
                 ...ps(demo),
                 bouton('Reprendre ma commande', link),
                 signature(),
-                ...petit(v.optOut),
             ],
+            optOut: v.optOut,
         });
     }
     if (step === 3) {
@@ -58,8 +58,8 @@ export function panierEmail(v: PanierVars, step: CartStep = 1): RenderedEmail {
                 bouton('Reprendre ma commande', link),
                 ...ps('Si ce n’est pas le bon moment, aucun souci. Et si quelque chose vous fait hésiter, dites-le-nous en répondant à cet e-mail : on lit tout, et on répond.'),
                 signature(),
-                ...petit(v.optOut),
             ],
+            optOut: v.optOut,
         });
     }
     return renderEmail({
@@ -72,7 +72,7 @@ export function panierEmail(v: PanierVars, step: CartStep = 1): RenderedEmail {
             bouton('Reprendre ma commande', link),
             ...ps(refund, demo),
             signature(),
-            ...petit(v.optOut),
         ],
+        optOut: v.optOut,
     });
 }
