@@ -56,11 +56,12 @@ export function bienvenueCadeauEmail(v: BienvenueCadeauVars): RenderedEmail {
             titre(g ? `Merci ${g}, quel beau cadeau !` : 'Quel beau cadeau !'),
             ...ps(g ? `Bonjour ${g},` : 'Bonjour,', `Merci pour votre commande : vous venez d’offrir à ${n} le livre de sa vie. On va prendre grand soin de ses souvenirs.`, 'Voici comment ça se passe :'),
             etapes([
+                `Vous choisissez le jour où ${n} découvre son cadeau : maintenant, ou le jour J (Noël, un anniversaire…). Ce jour-là, ${n} reçoit un SMS de bienvenue avec le numéro à appeler.`,
                 `${n} appelle le ${SITE.phoneDisplay} depuis son propre téléphone, quand il ou elle le souhaite. Loomina le ou la reconnaît.`,
                 'Loomina mène la conversation. Il n’y a rien à préparer.',
                 `Après chaque appel, un nouveau récit rejoint le livre de ${n}.`,
             ]),
-            ...ps('De votre côté, suivez l’aventure dans votre espace famille. Vous pouvez même y souffler des souvenirs à raconter. Connectez-vous avec votre numéro de téléphone.'),
+            ...ps(`Rien n’a été envoyé à ${n} : la surprise est intacte. Choisissez le bon moment dans votre espace famille. Vous pourrez ensuite y suivre l’aventure, et même souffler des souvenirs à raconter.`),
             bouton('Ouvrir mon espace famille', DASHBOARD),
             ...ps(REFUND),
             signature(),

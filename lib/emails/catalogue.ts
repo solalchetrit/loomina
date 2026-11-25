@@ -11,7 +11,10 @@ import { panierEmail } from './messages/panier';
 import { bienvenueEmail, bienvenueCadeauEmail } from './messages/commande';
 import { familleEmail } from './messages/famille';
 import { correctionEmail, etapeSuivanteEmail, relanceEmail, relanceOffreurEmail } from './messages/ecriture';
-import { livreTermineEmail, etapeLivreEmail } from './messages/livre';
+import { livreTermineEmail, etapeLivreEmail, livreRecuEmail } from './messages/livre';
+import { appelManqueEmail, recitPretEmail, veilleAppelEmail } from './messages/appels';
+import { jourJEmail } from './messages/cadeau';
+import { contactRecuEmail } from './messages/contact';
 import { remboursementEmail } from './messages/remboursement';
 import type { RenderedEmail } from './mise-en-page';
 
@@ -34,7 +37,7 @@ const EXPIRE = new Date('2026-12-09T12:00:00+01:00');
 const TRACK = { number: '6A12345678901', url: 'https://www.laposte.fr/outils/suivre-vos-envois?code=6A12345678901' };
 const CART = { firstName: 'Marc', isGift: false, narratorFirstName: null, recoveryUrl: 'https://checkout.stripe.com/c/pay/…', optOut: OPT_OUT };
 
-export const ETAPES = ['La démo gratuite', 'Panier abandonné', 'La commande', 'Après chaque appel', 'Pendant l’écriture', 'La fin du livre', 'Remboursement'];
+export const ETAPES = ['La démo gratuite', 'Panier abandonné', 'La commande', 'Autour de chaque appel', 'Pendant l’écriture', 'La fin du livre', 'Remboursement', 'Formulaire de contact'];
 
 export const CATALOGUE: CatalogueEntry[] = [
     {
@@ -69,6 +72,30 @@ export const CATALOGUE: CatalogueEntry[] = [
         quand: 'Juste après le paiement', aQui: 'Celui qui offre',
         variables: ['prénom de celui qui offre', 'prénom de la personne qui racontera'], code: 'lib/loomina/notify.ts (notifyNewOrder)',
         exemple: () => bienvenueCadeauEmail({ narratorFirstName: 'Jeanne', giverFirstName: 'Marc' }),
+    },
+    {
+        id: 'jour-j', etape: ETAPES[2], nom: 'Livre offert : c’est le jour J',
+        quand: 'Le jour choisi par celui qui offre, à 10 h, quand la personne reçoit son SMS de bienvenue', aQui: 'Celui qui offre',
+        variables: ['prénom de celui qui offre', 'prénom de la personne qui racontera'], code: 'lib/loomina/gift-reveal.ts (sweepGiftReveals)',
+        exemple: () => jourJEmail({ giverFirstName: 'Marc', narrator: 'Jeanne' }),
+    },
+    {
+        id: 'veille-appel', etape: ETAPES[3], nom: 'La veille d’un appel programmé',
+        quand: 'La veille, entre 18 h et 21 h, quand Loomina appelle le lendemain', aQui: 'L’auteur',
+        variables: ['prénom', 'tu ou vous', 'heure de l’appel', 'étape du livre (âge de Mémo)', 'lien de désinscription'], code: 'lib/loomina/call-mails.ts (sweepCallEves)',
+        exemple: () => veilleAppelEmail({ firstName: 'Jeanne', tu: false, time: '10:00', age: 2, optOut: OPT_OUT }),
+    },
+    {
+        id: 'recit-pret', etape: ETAPES[3], nom: 'Après l’appel : le récit est écrit',
+        quand: 'Juste après chaque appel, quand le récit est écrit (sauf si Mémo grandit : c’est alors « Mémo grandit » qui part)', aQui: 'L’auteur',
+        variables: ['prénom', 'tu ou vous', 'titre du récit', 'début du récit', 'étape du livre (âge de Mémo)', 'lien de désinscription'], code: 'lib/loomina/call-mails.ts (notifyRecitPret)',
+        exemple: () => recitPretEmail({ firstName: 'Jeanne', tu: false, title: 'L’arrivée à Paris', extrait: 'Je suis arrivée gare de Lyon un matin de septembre 1962, avec une valise en carton et l’adresse d’une cousine griffonnée sur un ticket de métro.', age: 2, optOut: OPT_OUT }),
+    },
+    {
+        id: 'appel-manque', etape: ETAPES[3], nom: 'Appel programmé manqué',
+        quand: 'Quand personne ne décroche à l’heure du rendez-vous (ou un répondeur), avec un SMS qui donne le numéro', aQui: 'L’auteur',
+        variables: ['prénom', 'tu ou vous', 'étape du livre (âge de Mémo)', 'lien de désinscription'], code: 'lib/loomina/call-mails.ts (notifyMissedCall)',
+        exemple: () => appelManqueEmail({ firstName: 'Jeanne', tu: false, age: 2, optOut: OPT_OUT }),
     },
     {
         id: 'famille-premier-appel', etape: ETAPES[3], nom: 'Famille : premier appel fait',
@@ -147,16 +174,33 @@ export const CATALOGUE: CatalogueEntry[] = [
         },
     ]),
     {
+        id: 'livre-recu', etape: ETAPES[5], nom: 'Livre reçu : merci et avis',
+        quand: 'Quand l’équipe clique « Reçu » dans l’admin', aQui: 'L’auteur',
+        variables: ['prénom', 'tu ou vous', 'lien d’avis (LOOMINA_REVIEW_URL, sinon réponse à l’e-mail)'], code: 'lib/loomina/notify.ts (notifyBookStage)',
+        exemple: () => livreRecuEmail({ firstName: 'Jeanne', tu: false }),
+    },
+    {
+        id: 'livre-recu-famille', etape: ETAPES[5], nom: 'Livre reçu (famille)',
+        quand: 'Au même moment (livre offert)', aQui: 'Celui qui offre',
+        variables: ['prénom du proche', 'prénom de l’auteur', 'lien d’avis'], code: 'lib/loomina/notify.ts (notifyBookStage)',
+        exemple: () => livreRecuEmail({ firstName: 'Marc', tu: false, family: { narrator: 'Jeanne' } }),
+    },
+    {
         id: 'remboursement', etape: ETAPES[6], nom: 'Remboursement',
         quand: 'Quand l’équipe rembourse depuis la fiche client', aQui: 'L’acheteur',
         variables: ['prénom', 'montant réellement remboursé par Stripe'], code: 'lib/admin/actions.ts (refundClient)',
         exemple: () => remboursementEmail({ firstName: 'Jeanne', amount: 449 }),
     },
+    {
+        id: 'contact-recu', etape: ETAPES[7], nom: 'Message bien reçu',
+        quand: 'Juste après un message envoyé depuis le formulaire de contact', aQui: 'La personne qui écrit',
+        variables: ['prénom (premier mot du nom)'], code: 'app/api/contact/route.ts',
+        exemple: () => contactRecuEmail({ name: 'Jeanne Martin' }),
+    },
 ];
 
 /** Les moments où aucun e-mail ne part (à décider avec Solal). */
 export const SANS_EMAIL: { etape: string; texte: string }[] = [
-    { etape: ETAPES[2], texte: 'Livre offert : la personne qui va raconter ne reçoit pas de bienvenue (ni e-mail, ni SMS).' },
-    { etape: ETAPES[3], texte: 'Avant un appel programmé : seulement un SMS 30 minutes avant. Après chaque appel : seulement le SMS « votre récit est prêt » à l’auteur.' },
-    { etape: ETAPES[5], texte: 'Livre reçu : pas de merci ni de demande d’avis.' },
+    { etape: ETAPES[2], texte: 'Livre offert : la personne qui va raconter ne reçoit qu’un SMS de bienvenue, le jour choisi par celui qui offre (ou quand il clique « Prévenir maintenant »). Pas d’e-mail : son adresse n’est pas connue.' },
+    { etape: ETAPES[3], texte: 'Pour un livre offert, la veille d’un appel, le récit écrit et l’appel manqué ne partent pas par e-mail (l’adresse est celle de celui qui offre) : l’auteur a seulement les SMS.' },
 ];

@@ -59,7 +59,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const tracking = step === 'shipped' ? parseTracking(form.get('suivi'), form.get('lien')) : null;
 
         const notified = Array.isArray(meta.fulfillment_notified) ? (meta.fulfillment_notified as string[]) : [];
-        const announce = step !== 'delivered' && !notified.includes(step);
+        // « Reçu » aussi, depuis le 25/11/2026 : merci et demande d'avis.
+        const announce = !notified.includes(step);
         const next: Record<string, unknown> = {
             ...meta,
             [STEP_KEY[step]]: new Date().toISOString(),

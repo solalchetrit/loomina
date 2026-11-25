@@ -24,7 +24,7 @@ import { familyAudience } from './giver';
 import { bienvenueEmail, bienvenueCadeauEmail } from '../emails/messages/commande';
 import { familleEmail } from '../emails/messages/famille';
 import { panierEmail } from '../emails/messages/panier';
-import { livreTermineEmail, etapeLivreEmail, FIRST_VERSION_DELAY } from '../emails/messages/livre';
+import { livreTermineEmail, etapeLivreEmail, livreRecuEmail, FIRST_VERSION_DELAY } from '../emails/messages/livre';
 import { memoAge } from '../emails/memo';
 import { etapeSuivanteEmail } from '../emails/messages/ecriture';
 
@@ -217,7 +217,7 @@ export function welcomeTexts(order: Order): { subject: string; email: string; ht
             email: mail.text,
             html: mail.html,
             // Le lien de l'espace devient un lien de connexion directe à l'envoi (lib/loomina/sms.ts).
-            sms: `Loomina : merci pour votre commande. Loomina est prêt pour vous : vous pouvez suivre l'histoire de ${name}. ${name} commence en appelant le ${SITE.phoneDisplay} depuis son téléphone. Votre espace famille : ${HOST}/dashboard`,
+            sms: `Loomina : merci pour votre commande ! Rien n'a été envoyé à ${name}, la surprise est intacte. Choisissez le jour où ${name} découvre son cadeau (maintenant ou le jour J) dans votre espace famille : ${HOST}/dashboard`,
             smsTo: order.giver?.phone ?? null,
         };
     }
@@ -420,7 +420,7 @@ export async function notifyAbandonedCart(cart: AbandonedCart, step: CartStep = 
 // Les étapes du livre après « terminé » (demande de Solal, 20/11/2026)
 // ------------------------------------------------------------
 
-export type AnnouncedStep = 'reviewed' | 'printing' | 'shipped';
+export type AnnouncedStep = 'reviewed' | 'printing' | 'shipped' | 'delivered';
 
 /** Les messages de chaque étape, à l'auteur (tu ou vous) ou à la personne qui a offert le livre. */
 export function bookStageTexts(
@@ -435,6 +435,16 @@ export function bookStageTexts(
     const narrator = who.narratorFirstName?.trim() || 'votre proche';
     // « votre livre » / « ton livre » / « le livre de Jeanne »
     const book = who.family ? `le livre de ${narrator}` : tu ? 'ton livre' : 'votre livre';
+    if (step === 'delivered') {
+        // Le livre est arrivé (25/11/2026) : merci, et un avis.
+        const recu = livreRecuEmail({ firstName: name || null, tu, family: who.family ? { narrator: who.narratorFirstName ?? null } : undefined, reviewUrl: process.env.LOOMINA_REVIEW_URL?.trim() || null });
+        const sms = who.family
+            ? `Loomina : ${book} est arrivé ! Merci de nous avoir confié ses souvenirs. Il vous plaît ? Dites-le-nous à contact@loomina.eu, on lit tout.`
+            : tu
+              ? `${hello}, ton livre est arrivé ! Merci pour tous ces souvenirs partagés. Il te plaît ? Dis-le-nous à contact@loomina.eu, on lit tout. Loomina`
+              : `${hello}, votre livre est arrivé ! Merci pour tous ces souvenirs partagés. Il vous plaît ? Dites-le-nous à contact@loomina.eu, on lit tout. Loomina`;
+        return { subject: recu.subject, email: recu.text, html: recu.html, sms };
+    }
     const mail = etapeLivreEmail({ step, firstName: name || null, tu, family: !!who.family, narratorFirstName: who.narratorFirstName ?? null, tracking });
     const out = (sms: string) => ({ subject: mail.subject, email: mail.text, html: mail.html, sms });
 
@@ -502,6 +512,8 @@ export async function notifyPhaseUp(params: {
     projectMetadata: Record<string, unknown> | null;
     /** La nouvelle étape (2, 3 ou 4). */
     phase: number;
+    /** Le récit écrit à cet appel : l'e-mail de l'auteur en parle (il remplace « ton récit est écrit »). */
+    recitTitle?: string | null;
 }): Promise<void> {
     try {
         if (params.phase !== 2 && params.phase !== 3 && params.phase !== 4) return;
@@ -513,7 +525,7 @@ export async function notifyPhaseUp(params: {
         const { optOutLine, optOutHeaders, isOptedOut } = await import('./optout');
         const authorEmail = authorOwnEmail(params.author, meta);
         if (authorEmail && !(await isOptedOut(authorEmail))) {
-            const m = etapeSuivanteEmail({ firstName: params.author.first_name, tu: params.author.politeness_preference === 'tu', age, optOut: optOutLine(authorEmail) });
+            const m = etapeSuivanteEmail({ firstName: params.author.first_name, tu: params.author.politeness_preference === 'tu', age, optOut: optOutLine(authorEmail), recit: params.recitTitle ?? null });
             jobs.push(sendEmail({ to: authorEmail, subject: m.subject, text: m.text, html: m.html, replyTo: team, headers: optOutHeaders(authorEmail), loginPhone: params.author.phone_number }));
         }
         const giverEmail = meta.is_gift === true && meta.family_news !== false && typeof meta.buyer_email === 'string' ? meta.buyer_email : null;

@@ -34,6 +34,7 @@ import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
 import type { TokenUsage } from './usage';
 import { notifyFamily, alertTeam, notifyAuthorBookComplete, notifyPhaseUp } from './notify';
+import { notifyRecitPret } from './call-mails';
 import { autoCompose } from './book-edition';
 
 /**
@@ -435,9 +436,13 @@ export async function processEndOfCall(params: {
         storyTitle: project.project_metadata?.share_with_giver === true ? writer.chapter_title : undefined,
     });
 
-    // Le livre passe à l'étape suivante : Mémo grandit, on le dit par e-mail (25/11/2026).
-    if (brief.nextPhase && brief.nextPhase > phase && project.status !== 'completed') {
-        await notifyPhaseUp({ author: params.profile, projectMetadata: project.project_metadata, phase: brief.nextPhase });
+    // Un e-mail à l'auteur après l'appel (25/11/2026) : « ton récit est écrit »,
+    // ou, si le livre passe à l'étape suivante, « Mémo grandit » avec le récit.
+    const phaseUp = !!brief.nextPhase && brief.nextPhase > phase && project.status !== 'completed' && [2, 3, 4].includes(brief.nextPhase);
+    if (phaseUp) {
+        await notifyPhaseUp({ author: params.profile, projectMetadata: project.project_metadata, phase: brief.nextPhase!, recitTitle: writer.chapter_title });
+    } else {
+        await notifyRecitPret({ profile: params.profile, projectMetadata: project.project_metadata, title: writer.chapter_title, markdown: writer.chapter_content, phase });
     }
 
     // Le livre se recompose avec ce nouveau récit, sans attendre ici.

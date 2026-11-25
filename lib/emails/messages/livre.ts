@@ -123,3 +123,69 @@ export function etapeLivreEmail(v: EtapeLivreVars): RenderedEmail {
         ],
     });
 }
+
+export interface LivreRecuVars {
+    /** Prénom du destinataire (l'auteur, ou le proche). */
+    firstName: string | null;
+    tu: boolean;
+    /** Pour un proche : le prénom de la personne qui a raconté. */
+    family?: { narrator: string | null };
+    /** Lien pour laisser un avis public (LOOMINA_REVIEW_URL), sinon on demande une réponse à l'e-mail. */
+    reviewUrl?: string | null;
+}
+
+/** Le livre est arrivé (l'équipe le note dans l'admin) : merci, et un avis. */
+export function livreRecuEmail(v: LivreRecuVars): RenderedEmail {
+    const hello = v.firstName ? `Bonjour ${v.firstName} !` : 'Bonjour !';
+    const avis = v.reviewUrl
+        ? [bouton('Laisser un avis', v.reviewUrl)]
+        : [];
+    if (v.family) {
+        const n = v.family.narrator?.trim() || 'votre proche';
+        return renderEmail({
+            subject: `Le livre de ${n} est arrivé !`,
+            preheader: 'Merci de nous avoir confié ses souvenirs.',
+            blocks: [
+                memo({ age: 5, pose: 'e', bulle: `Le livre de ${n} est entre vos mains. Merci !` }),
+                titre(`Le livre de ${n} est arrivé !`),
+                ...ps(
+                    hello,
+                    `Le livre de ${n} est bien arrivé. Merci de tout cœur de nous avoir confié ses souvenirs : c’était un bonheur de les écrire.`,
+                    v.reviewUrl
+                        ? 'Il vous plaît ? Un petit avis nous aide énormément à faire connaître Loomina.'
+                        : 'Il vous plaît ? Dites-le-nous en répondant à cet e-mail, en une phrase ou en dix. On lit tout, avec beaucoup d’émotion.'
+                ),
+                ...avis,
+                ...ps('Envie d’un exemplaire de plus, pour un frère, une sœur, un petit-enfant ? Commandez-le depuis votre espace famille.'),
+                signature(),
+            ],
+        });
+    }
+    const t = (a: string, b: string) => (v.tu ? a : b);
+    return renderEmail({
+        subject: t('Ton livre est arrivé !', 'Votre livre est arrivé !'),
+        preheader: t('Merci pour tous ces souvenirs partagés.', 'Merci pour tous ces souvenirs partagés.'),
+        blocks: [
+            memo({ age: 5, pose: 'e', bulle: t('Ton livre est entre tes mains. Merci pour tout !', 'Votre livre est entre vos mains. Merci pour tout !') }),
+            titre(t('Ton livre est arrivé !', 'Votre livre est arrivé !')),
+            ...ps(
+                hello,
+                t(
+                    'Ton livre est bien arrivé. Merci de tout cœur pour tous ces souvenirs partagés au téléphone : c’était un bonheur de les écrire avec toi.',
+                    'Votre livre est bien arrivé. Merci de tout cœur pour tous ces souvenirs partagés au téléphone : c’était un bonheur de les écrire avec vous.'
+                ),
+                v.reviewUrl
+                    ? t('Il te plaît ? Un petit avis nous aide énormément à faire connaître Loomina.', 'Il vous plaît ? Un petit avis nous aide énormément à faire connaître Loomina.')
+                    : t(
+                          'Il te plaît ? Dis-le-nous en répondant à cet e-mail, en une phrase ou en dix. On lit tout, avec beaucoup d’émotion.',
+                          'Il vous plaît ? Dites-le-nous en répondant à cet e-mail, en une phrase ou en dix. On lit tout, avec beaucoup d’émotion.'
+                      )
+            ),
+            ...avis,
+            frise(SUIVI_LIVRE, 4, t('Ton livre', 'Votre livre')),
+            ...ps(t('Envie d’un exemplaire de plus pour tes proches ? Commande-le depuis ton espace.', 'Envie d’un exemplaire de plus pour vos proches ? Commandez-le depuis votre espace.')),
+            bouton('Ouvrir mon espace', DASHBOARD),
+            signature(),
+        ],
+    });
+}

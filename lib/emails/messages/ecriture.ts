@@ -109,6 +109,8 @@ export interface EtapeSuivanteVars {
     family?: { narrator: string | null };
     /** La ligne de désinscription (lib/loomina/optout.ts), tout en bas. */
     optOut?: string | null;
+    /** Le récit écrit après l'appel qui a fait grandir Mémo (auteur seulement) : cet e-mail remplace alors « ton récit est écrit ». */
+    recit?: string | null;
 }
 
 const GRANDIT: Record<2 | 3 | 4, { sujet: string; bulle: [string, string]; fait: [string, string]; suite: [string, string]; famille: string }> = {
@@ -165,11 +167,12 @@ export function etapeSuivanteEmail(v: EtapeSuivanteVars): RenderedEmail {
             ...ps(
                 hello,
                 `${t(g.fait[0], g.fait[1])}, bravo ! ${t('Ton livre', 'Votre livre')} passe à l’étape suivante, et Mémo a grandi.`,
+                v.recit ? t(`Ce que tu as raconté au dernier appel est devenu un nouveau récit : « ${v.recit} ». Il t’attend dans ton espace.`, `Ce que vous avez raconté au dernier appel est devenu un nouveau récit : « ${v.recit} ». Il vous attend dans votre espace.`) : null,
                 `${last ? 'Dernière étape' : 'Prochaine étape'}, ${t(g.suite[0], g.suite[1])}. ${t('Au prochain appel, Loomina t’emmène là-bas.', 'Au prochain appel, Loomina vous emmène là-bas.')}`
             ),
             progression(v.age, t('Où en est ton livre', 'Où en est votre livre')),
             appeler(),
-            bouton('Ouvrir mon espace', DASHBOARD),
+            bouton(v.recit ? 'Lire mon récit' : 'Ouvrir mon espace', DASHBOARD),
             signature(),
         ],
         optOut: v.optOut,

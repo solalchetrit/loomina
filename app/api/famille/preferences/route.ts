@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/loomina/db';
 import { readSession } from '@/lib/loomina/session';
 import { testFamilyReply } from '@/lib/loomina/test-family';
-import { findGiftProjects, markFamilyWelcome } from '@/lib/loomina/giver';
+import { findGiftProjects, markFamilyWelcome, readGiver } from '@/lib/loomina/giver';
+import { readReveal, revealNow, validRevealDate } from '@/lib/loomina/gift-reveal';
 import { familySetupOpen } from '@/lib/loomina/family-setup';
 
 export const runtime = 'nodejs';
@@ -33,6 +34,23 @@ export async function PATCH(request: NextRequest) {
         // Le livre visé doit être l'un de ceux que ce numéro a offerts.
         const project = (await findGiftProjects(session.phone)).find((p) => p.id === body.projectId);
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+        // Livre offert : quand prévenir la personne (25/11/2026). Celui qui offre seulement, avant tout appel.
+        if (body.reveal !== undefined) {
+            const pm = (project.project_metadata ?? {}) as Record<string, unknown>;
+            if (pm.is_gift !== true || readGiver(pm)?.phone !== session.phone) return NextResponse.json({ error: 'Seule la personne qui a offert le livre choisit ce moment.' }, { status: 403 });
+            if (readReveal(pm).sentAt) return NextResponse.json({ error: 'Le message de bienvenue est déjà parti.' }, { status: 409 });
+            if (body.reveal === 'now') {
+                const sent = await revealNow({ id: project.id, user_id: project.user_id, project_metadata: pm });
+                if (!sent) return NextResponse.json({ error: 'Le SMS n’est pas parti. Réessayez dans un instant.' }, { status: 502 });
+                return NextResponse.json({ saved: true, sentAt: new Date().toISOString() });
+            }
+            const date = body.reveal === null ? null : validRevealDate((body.reveal as { date?: unknown } | null)?.date);
+            if (body.reveal !== null && !date) return NextResponse.json({ error: 'Choisissez une date entre demain et dans un an.' }, { status: 400 });
+            const { error } = await db().from('projects').update({ project_metadata: { ...pm, gift_reveal: date ? { date } : null } }).eq('id', project.id);
+            if (error) throw new Error(error.message);
+            return NextResponse.json({ saved: true, date });
+        }
 
         const meta: Record<string, unknown> = { ...(project.project_metadata ?? {}), family_welcome_done: markFamilyWelcome(project.project_metadata, session.phone) };
 

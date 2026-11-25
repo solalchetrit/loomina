@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/loomina/db";
-import { alertTeam } from "@/lib/loomina/notify";
+import { alertTeam, sendEmail, teamContacts } from "@/lib/loomina/notify";
+import { contactRecuEmail } from "@/lib/emails/messages/contact";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,6 +65,10 @@ export async function POST(request: NextRequest) {
         sms: `message de ${name} (${email}) [${subject}] : ${message.slice(0, 300)}`,
         replyTo: email,
     });
+
+    // Et la personne reçoit tout de suite un « bien reçu » (25/11/2026).
+    const recu = contactRecuEmail({ name });
+    await sendEmail({ to: email, subject: recu.subject, text: recu.text, html: recu.html, replyTo: teamContacts().email }).catch(() => false);
 
     return NextResponse.json({ ok: true });
 }

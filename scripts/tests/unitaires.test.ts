@@ -825,3 +825,41 @@ test('e-mails : Mémo grandit à chaque étape, bouton Appeler Loomina, désinsc
     assert.match(remboursementEmail({ firstName: null, amount: 224.5 }).text, /224,50 €/);
     assert.doesNotMatch(vous.text + fam.text, /Mémo et l’équipe/);
 });
+
+test('e-mails autour des appels : veille, récit écrit, appel manqué, jour J, livre reçu, contact', async () => {
+    const { tomorrowSlot, dueEve } = await import('../../lib/loomina/call-mails');
+    const { appelManqueSms, extraitRecit, recitPretEmail, appelManqueEmail } = await import('../../lib/emails/messages/appels');
+    const { revealDue, validRevealDate } = await import('../../lib/loomina/gift-reveal');
+    const { livreRecuEmail } = await import('../../lib/emails/messages/livre');
+    const { contactRecuEmail } = await import('../../lib/emails/messages/contact');
+    const { annonceCadeauSms } = await import('../../lib/emails/messages/cadeau');
+    // Mercredi 25/11/2026, 19 h à Paris : le rendez-vous du jeudi part demain.
+    const wed19 = new Date('2026-11-25T18:00:00Z');
+    const meta = { call_schedule: { active: true, days: [4], time: '10:00' } };
+    assert.equal(tomorrowSlot(meta, wed19), '2026-11-26 10:00');
+    assert.equal(dueEve(meta, wed19), '2026-11-26 10:00');
+    assert.equal(dueEve({ ...meta, last_eve_slot: '2026-11-26 10:00' }, wed19), null);
+    assert.equal(dueEve(meta, new Date('2026-11-25T12:00:00Z')), null); // 13 h : trop tôt
+    assert.equal(tomorrowSlot({ call_once: { date: '2026-11-26', time: '15:30' } }, wed19), '2026-11-26 15:30');
+    assert.equal(tomorrowSlot({ call_schedule: { active: true, days: [5], time: '10:00' } }, wed19), null);
+    // Appel manqué : le numéro en clair dans le SMS, le bouton dans l'e-mail.
+    assert.match(appelManqueSms('Jeanne', false), /01 59 16 93 57/);
+    assert.match(appelManqueEmail({ firstName: 'Jeanne', tu: false, age: 2 }).html, /tel:\+33159169357/);
+    assert.doesNotMatch(appelManqueSms('Léo', true), /\bvous\b/);
+    // Récit écrit : un extrait court, sans titres markdown.
+    const ex = extraitRecit('# Titre\n\nJe suis arrivée à Paris en 1962. Il pleuvait. ' + 'mot '.repeat(80));
+    assert.ok(ex && !ex.includes('#') && ex.split(' ').length <= 46);
+    assert.match(recitPretEmail({ firstName: 'Léo', tu: true, title: 'Paris', extrait: ex, age: 2 }).subject, /^Ton récit/);
+    // Jour J : à 10 h le jour dit, jamais avant, jamais deux fois.
+    const r = { date: '2026-12-24', sentAt: null, skipped: false };
+    assert.equal(revealDue(r, new Date('2026-12-24T08:30:00Z')), false); // 9 h 30
+    assert.equal(revealDue(r, new Date('2026-12-24T09:05:00Z')), true); // 10 h 05
+    assert.equal(revealDue({ ...r, sentAt: 'x' }, new Date('2026-12-24T09:05:00Z')), false);
+    assert.equal(validRevealDate('2026-11-25', wed19), null); // aujourd'hui : non
+    assert.equal(validRevealDate('2026-12-24', wed19), '2026-12-24');
+    assert.match(annonceCadeauSms({ narratorFirstName: 'Jeanne', giverFirstName: 'Marc', tu: false }), /Marc vous offre/);
+    // Livre reçu et contact.
+    assert.match(livreRecuEmail({ firstName: 'Jeanne', tu: false }).text, /répondant à cet e-mail/);
+    assert.match(livreRecuEmail({ firstName: 'Marc', tu: false, family: { narrator: 'Jeanne' }, reviewUrl: 'https://g.page/x' }).html, /https:\/\/g\.page\/x/);
+    assert.match(contactRecuEmail({ name: 'Jeanne Martin' }).subject, /Bien reçu/);
+});

@@ -25,6 +25,8 @@ import { sweepReviews, sweepRelanceAlerts } from '@/lib/admin/watch';
 import { checkSharedSecret } from '@/lib/loomina/secret';
 import { sweepDemoStories, sweepDemoReminders } from '@/lib/loomina/demo-story';
 import { relanceAbandonedCarts } from '@/lib/loomina/abandoned-cart';
+import { sweepCallEves } from '@/lib/loomina/call-mails';
+import { sweepGiftReveals } from '@/lib/loomina/gift-reveal';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -81,6 +83,12 @@ async function handle(request: NextRequest) {
         const reminders = await sweepDemoReminders();
         if (carts.results.length || reminders.results.length) console.info('[jobs] relances :', { carts: carts.results, reminders: reminders.results });
 
+        // Les e-mails de la veille d'un appel (18 h à 21 h) et les jours J des
+        // livres offerts (25/11/2026). Un souci ici ne bloque pas le reste.
+        const eves = await sweepCallEves().catch((e) => (console.error('[jobs] veille d’appel :', e instanceof Error ? e.message : e), 0));
+        const reveals = await sweepGiftReveals().catch((e) => (console.error('[jobs] jours J :', e instanceof Error ? e.message : e), 0));
+        if (eves || reveals) console.info('[jobs] veilles et jours J :', { eves, reveals });
+
         return NextResponse.json({
             ok: true,
             picked,
@@ -90,6 +98,8 @@ async function handle(request: NextRequest) {
             watch,
             carts: carts.sent,
             reminders: reminders.sent,
+            eves,
+            reveals,
             durationMs: Date.now() - startedAt,
         });
     } catch (err) {
