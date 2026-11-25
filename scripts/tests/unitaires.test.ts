@@ -863,3 +863,28 @@ test('e-mails autour des appels : veille, récit écrit, appel manqué, jour J, 
     assert.match(livreRecuEmail({ firstName: 'Marc', tu: false, family: { narrator: 'Jeanne' }, reviewUrl: 'https://g.page/x' }).html, /https:\/\/g\.page\/x/);
     assert.match(contactRecuEmail({ name: 'Jeanne Martin' }).subject, /Bien reçu/);
 });
+
+// ------------------------------------------------------------
+// Démo : une seule par numéro, limites anti-abus (25/11/2026)
+// ------------------------------------------------------------
+test('démo : empreinte du numéro identique à celle de la migration SQL', async () => {
+    const { demoPhoneHash } = await import('../../lib/loomina/demo-limit');
+    // select encode(sha256(convert_to('loomina-demo|+33600000000','UTF8')),'hex')
+    assert.equal(demoPhoneHash('+33600000000'), '294423d47e5c51550599280dfcf6e01222e4afa20a530f1ea4081df8071ece50');
+});
+
+test('démo : base injoignable → la démo a lieu quand même ; numéro d’équipe sans limite', async () => {
+    const { demoGate, demoRefusal } = await import('../../lib/loomina/demo-limit');
+    const saved = { url: process.env.NEXT_PUBLIC_SUPABASE_URL, unl: process.env.DEMO_UNLIMITED_PHONES };
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    try {
+        assert.equal(await demoGate('+33612345670'), 'ok');
+        process.env.DEMO_UNLIMITED_PHONES = '+33600000001, +33600000002';
+        assert.equal(await demoGate('+33600000002'), 'ok');
+    } finally {
+        if (saved.url) process.env.NEXT_PUBLIC_SUPABASE_URL = saved.url;
+        if (saved.unl === undefined) delete process.env.DEMO_UNLIMITED_PHONES; else process.env.DEMO_UNLIMITED_PHONES = saved.unl;
+    }
+    assert.match(demoRefusal('already_done'), /déjà fait votre essai/);
+    assert.ok(!/relié/.test(demoRefusal('already_done') + demoRefusal('too_many_tries') + demoRefusal('busy')));
+});

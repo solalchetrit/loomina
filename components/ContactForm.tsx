@@ -56,7 +56,7 @@ export default function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div role="status" className="card p-7 md:p-10">
+      <div role="status" className="card rise p-7 md:p-10">
         <p className="t-eyebrow">Message reçu</p>
         <h2 className="t-title mt-3">Merci, {form.name.split(" ")[0]}</h2>
         <p className="t-lead mt-5 max-w-md">
@@ -72,8 +72,10 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="card relative p-7 md:p-10">
-      <div className="grid gap-6 sm:grid-cols-2">
+    <form onSubmit={submit} noValidate className="card rise relative p-7 md:p-10">
+      <h2 className="t-heading">Écrivez-nous</h2>
+      <p className="t-body mt-1">Quelques mots suffisent, nous revenons vers vous par e-mail.</p>
+      <div className="mt-7 grid gap-6 sm:grid-cols-2">
         <Input label="Votre nom" name="name" autoComplete="name" value={form.name} onChange={set("name")} error={errors.name} required />
         <Input
           label="Votre e-mail"

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/loomina/db";
 import { alertTeam, sendEmail, teamContacts } from "@/lib/loomina/notify";
 import { contactRecuEmail } from "@/lib/emails/messages/contact";
+import { allow, clientIp, TOO_MANY } from "@/lib/loomina/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -45,6 +46,11 @@ export async function POST(request: NextRequest) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
         return NextResponse.json({ message: "L’adresse e-mail ne semble pas valide." }, { status: 400 });
     }
+
+    // Limites anti-abus (25/11/2026) : chaque message envoie un SMS à l'équipe.
+    const ip = clientIp(request.headers);
+    const ok = await Promise.all([allow(`contact:ip:${ip}`, 3600, 5), allow(`contact:mail:${email.toLowerCase()}`, 86400, 5)]);
+    if (ok.includes(false)) return NextResponse.json({ message: TOO_MANY }, { status: 429 });
 
     try {
         const { error } = await db().from("contact_messages").insert({ name, email, subject, message });

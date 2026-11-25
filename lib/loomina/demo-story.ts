@@ -25,6 +25,7 @@ import { demoRecitEmail, demoRappelEmail, frenchDay } from '../emails/messages/d
 import { promptText, refreshPrompts } from './prompt-store';
 import { WRITER_SYSTEM, WRITER_MODEL, WRITER_REASONING_EFFORT, WRITER_MAX_TOKENS, countWords } from './writer';
 import { tokenUsage } from './usage';
+import { markDemoDone } from './demo-limit';
 import type { TokenUsage } from './usage';
 
 /**
@@ -198,6 +199,7 @@ export async function processDemoStory(id: string): Promise<string> {
             .update({ status, title: story.title, content: story.content, first_name: story.firstName, usage: { ...demoUsage(row.usage), writer: story.usage ?? undefined } })
             .eq('id', id);
         if (status !== 'written') return status;
+        await markDemoDone(row.phone as string);
         const sent = await sendSms(row.phone as string, demoSmsText(row.token as string));
         if (sent) await db().from('demo_stories').update({ sms_sent_at: new Date().toISOString() }).eq('id', id);
         return sent ? 'written, SMS envoyé' : 'written, SMS en échec';

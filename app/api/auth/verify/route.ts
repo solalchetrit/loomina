@@ -4,6 +4,7 @@ import { findProfileByPhone } from "@/lib/loomina/db";
 import { findGiftProjects } from "@/lib/loomina/giver";
 import { signSession, SESSION_COOKIE, SESSION_MAX_AGE_S } from "@/lib/loomina/session";
 import { isTestAuthorPhone, resetEssai, TEST_AUTHOR_PHONE } from "@/lib/loomina/test-author";
+import { allow, clientIp, TOO_MANY } from "@/lib/loomina/rate-limit";
 import { isTestFamilyPhone, resetFamilyVisit, TEST_FAMILY_PHONE } from "@/lib/loomina/test-family";
 
 // Twilio credentials from environment variables
@@ -65,6 +66,16 @@ export async function POST(request: NextRequest) {
             });
             return resetFamilyVisit(open);
         }
+        // Limites anti-abus (25/11/2026) : envois de SMS payants et essais de codes.
+        const ip = clientIp(request.headers);
+        const limits = action === "start"
+            ? [allow(`otp-envoi:ip:${ip}`, 3600, 10), allow(`otp-envoi:tel:${formattedPhone}`, 3600, 5)]
+            : [allow(`otp-code:ip:${ip}`, 3600, 30), allow(`otp-code:tel:${formattedPhone}`, 3600, 10)];
+        if ((await Promise.all(limits)).includes(false)) {
+            console.warn(`[Verify API] limite atteinte (${action}) pour ***${formattedPhone.slice(-4)}`);
+            return NextResponse.json({ message: TOO_MANY }, { status: 429 });
+        }
+
         const authHeader = "Basic " + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString("base64");
 
         if (action === "start") {

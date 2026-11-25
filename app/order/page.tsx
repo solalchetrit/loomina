@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { blurOf } from "@/lib/photo-blur";
 import Payment from "@/components/order/Payment";
@@ -10,9 +10,12 @@ import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
 import CheckoutBar, { CheckoutFooter } from "@/components/order/CheckoutBar";
-import { OFFER, EXTRA_COPY } from "@/config/offer";
+import { OFFER, EXTRA_COPY, isOrderOpen } from "@/config/offer";
+import OrderSoon from "@/components/order/OrderSoon";
 import CopiesStepper from "@/components/order/CopiesStepper";
 import { track } from "@/lib/analytics";
+
+const noSubscribe = () => () => {};
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
 
@@ -26,7 +29,15 @@ function validPhone(raw: string): boolean {
   return /^\+33[1-9]\d{8}$/.test(e164) || /^\+\d{8,15}$/.test(e164);
 }
 
+/** Avant le lancement (config/offer.ts LAUNCH), la page annonce l'ouverture au lieu du formulaire. */
 export default function OrderPage() {
+  // Lu dans le navigateur (l'heure du visiteur) ; rien côté serveur, la page est statique.
+  const open = useSyncExternalStore(noSubscribe, () => isOrderOpen(), () => null);
+  if (open === null) return null;
+  return open ? <OrderForm /> : <OrderSoon />;
+}
+
+function OrderForm() {
   const [who, setWho] = useState<Who | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { allow, clientIp, TOO_MANY } from '@/lib/loomina/rate-limit';
 import { getDemoStory, isExpired, emailDemoStory, EMAIL_RE } from '@/lib/loomina/demo-story';
 
 export const runtime = 'nodejs';
@@ -11,6 +12,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const body = (await request.json().catch(() => ({}))) as { email?: unknown };
     const email = typeof body.email === 'string' ? body.email.trim().slice(0, 200) : '';
     if (!EMAIL_RE.test(email)) return NextResponse.json({ message: 'Cette adresse e-mail semble incomplète.' }, { status: 400 });
+
+    if (!(await allow(`recit:ip:${clientIp(request.headers)}`, 3600, 10))) return NextResponse.json({ message: TOO_MANY }, { status: 429 });
 
     const story = await getDemoStory(token).catch(() => null);
     if (!story || story.status !== 'written' || !story.content || isExpired(story.created_at)) {
