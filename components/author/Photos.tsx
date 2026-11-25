@@ -183,7 +183,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
  */
 function InviteLink({ onUnauthorized }: { onUnauthorized: () => void }) {
   const [url, setUrl] = useState<string | null>(null);
-  const [state, setState] = useState<"idle" | "copied" | "confirm" | "renewed" | "error">("idle");
+  const [state, setState] = useState<"idle" | "copied" | "error">("idle");
 
   useEffect(() => {
     let cancelled = false;
@@ -218,22 +218,12 @@ function InviteLink({ onUnauthorized }: { onUnauthorized: () => void }) {
     }
   };
 
-  const renew = async () => {
-    const res = await fetch("/api/user/photos/lien", { method: "POST" }).catch(() => null);
-    if (res?.status === 401) return onUnauthorized();
-    const d = res?.ok ? await res.json().catch(() => null) : null;
-    if (typeof d?.url === "string") {
-      setUrl(d.url);
-      setState("renewed");
-    } else setState("error");
-  };
-
   const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   return (
     <div className="mt-4 border-t border-[var(--rule)] pt-3">
       <p className="text-[14px] font-bold text-[var(--ink-2)]">Vos proches aussi</p>
-      <p className="mt-0.5 text-[14px] leading-snug text-[var(--ink-3)]">Envoyez-leur ce lien : ils ajoutent leurs photos, sans compte.</p>
+      <p className="mt-0.5 text-[14px] leading-snug text-[var(--ink-3)]">Envoyez-leur votre lien : ils ajoutent leurs photos, sans compte.</p>
       <div className="mt-2 flex gap-2">
         <button
           type="button"
@@ -252,30 +242,14 @@ function InviteLink({ onUnauthorized }: { onUnauthorized: () => void }) {
           </button>
         )}
       </div>
+      <p className="mt-2 break-all text-[13px] text-[var(--ink-3)]">
+        <span className="select-all font-semibold text-[var(--ink-2)]">{url.replace(/^https?:\/\//, "")}</span>
+      </p>
       {state === "error" && (
-        <p className="mt-2 break-all text-[13px] text-[var(--ink-2)]" role="status">
-          Copiez ce lien : <span className="select-all font-semibold">{url}</span>
+        <p className="mt-1 text-[13px] text-[var(--ink-2)]" role="status">
+          Copie impossible : sélectionnez l’adresse ci-dessus.
         </p>
       )}
-      <p className="mt-2 text-[13px] text-[var(--ink-3)]" role="status">
-        {state === "confirm" ? (
-          <>
-            L’ancien lien ne marchera plus.{" "}
-            <button type="button" onClick={renew} className="link font-bold">
-              Changer
-            </button>{" "}
-            <button type="button" onClick={() => setState("idle")} className="link">
-              Annuler
-            </button>
-          </>
-        ) : state === "renewed" ? (
-          "Nouveau lien prêt. L’ancien ne marche plus."
-        ) : (
-          <button type="button" onClick={() => setState("confirm")} className="link">
-            Changer le lien
-          </button>
-        )}
-      </p>
     </div>
   );
 }

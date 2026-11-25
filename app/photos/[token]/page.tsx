@@ -60,7 +60,7 @@ export default async function InvitePhotosPage({ params }: { params: Promise<{ t
           <>
             <h1 className="t-display">Ce lien ne marche plus</h1>
             <p className="mt-4 text-[18px] leading-relaxed text-[var(--ink-2)]">
-              Il a peut-être été changé, ou le livre est terminé. Demandez un nouveau lien à la personne qui vous l’a envoyé.
+              Le livre est peut-être terminé. Vérifiez l’adresse auprès de la personne qui vous l’a envoyée.
             </p>
             <Link href="/" className="link mt-6 inline-block text-[16px]">
               Découvrir Loomina

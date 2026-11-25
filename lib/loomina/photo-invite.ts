@@ -6,8 +6,8 @@
  * code SMS. Le lien ne montre rien du livre : ni récits, ni photos déjà
  * envoyées, seulement le prénom de l'auteur.
  *
- * Un jeton aléatoire par livre, gardé dans project_metadata.photo_invite.
- * « Changer le lien » en tire un nouveau : l'ancien ne marche plus.
+ * Un jeton aléatoire par livre, gardé dans project_metadata.photo_invite,
+ * créé au premier affichage puis fixe : chaque auteur a son adresse.
  */
 
 import { randomBytes } from 'node:crypto';
@@ -33,15 +33,15 @@ export function inviteUrl(token: string): string {
 }
 
 /**
- * Le lien du livre, créé s'il n'existe pas encore (ou renouvelé avec
- * `renew`). Relit le livre juste avant d'écrire, comme l'ajout d'une photo.
+ * Le lien du livre, créé s'il n'existe pas encore. Relit le livre juste
+ * avant d'écrire, comme l'ajout d'une photo.
  */
-export async function ensureInvite(projectId: string, renew = false): Promise<PhotoInvite> {
+export async function ensureInvite(projectId: string): Promise<PhotoInvite> {
     const { data, error } = await db().from('projects').select('project_metadata').eq('id', projectId).single();
     if (error) throw new Error(error.message);
     const meta = (data.project_metadata ?? {}) as Record<string, unknown>;
     const current = readInvite(meta);
-    if (current && !renew) return current;
+    if (current) return current;
     const invite: PhotoInvite = { token: randomBytes(18).toString('base64url'), created_at: new Date().toISOString() };
     const { error: upErr } = await db().from('projects').update({ project_metadata: { ...meta, photo_invite: invite } }).eq('id', projectId);
     if (upErr) throw new Error(upErr.message);
@@ -49,8 +49,8 @@ export async function ensureInvite(projectId: string, renew = false): Promise<Ph
 }
 
 /**
- * Le livre et son auteur derrière un jeton, ou null : jeton faux, changé
- * depuis, livre remboursé ou terminé.
+ * Le livre et son auteur derrière un jeton, ou null : jeton faux, livre
+ * remboursé ou terminé.
  */
 export async function findByInvite(token: string): Promise<{ project: Project; profile: Profile } | null> {
     if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) return null;

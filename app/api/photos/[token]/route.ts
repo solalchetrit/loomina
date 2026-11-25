@@ -24,7 +24,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         if (token === ESSAI_INVITE_TOKEN) return NextResponse.json({ ok: true, essai: true });
 
         const found = await findByInvite(token);
-        if (!found) return NextResponse.json({ error: 'Ce lien ne marche plus. Demandez-en un nouveau à la personne qui vous l’a envoyé.' }, { status: 404 });
+        if (!found) return NextResponse.json({ error: 'Ce lien ne marche plus. Vérifiez l’adresse auprès de la personne qui vous l’a envoyée.' }, { status: 404 });
         const { project, profile } = found;
         await addPhoto({
             projectId: project.id,
