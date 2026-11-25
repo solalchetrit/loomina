@@ -113,7 +113,7 @@ export default async function AdminClients({ searchParams }: { searchParams: Pro
   return (
     <div className="grid grid-cols-1 gap-[22px]">
       <PageHeader title={total === 0 ? "Pas encore de client" : `${total} client${total > 1 ? "s" : ""}${followUp.length ? `, dont ${followUp.length} à relancer` : ""}`}>
-        Qui a commandé, qui a commencé, qui avance, et qui il faut relancer.{tests.length === 1 ? " Votre client de test est rangé à part et ne compte pas." : tests.length > 1 ? ` Vos ${tests.length} clients de test sont rangés à part et ne comptent pas.` : ""}
+        {tests.length === 1 ? "Votre client de test est rangé à part et ne compte pas." : tests.length > 1 ? `Vos ${tests.length} clients de test sont rangés à part et ne comptent pas.` : null}
       </PageHeader>
 
       {(fait || erreur) && (
