@@ -17,10 +17,13 @@ export default function CallOncePicker({
   value,
   onChange,
   idPrefix,
+  dark = false,
 }: {
   value: CallOnceValue;
   onChange: (v: CallOnceValue) => void;
   idPrefix: string;
+  /** Sur fond sombre (module « Votre prochain appel » de l'Aperçu). */
+  dark?: boolean;
 }) {
   // Les heures encore possibles aujourd'hui : au moins un quart d'heure devant soi.
   const { days, hoursFor } = useMemo(() => {
@@ -57,7 +60,7 @@ export default function CallOncePicker({
       </select>
       {value && (
         <div className="mt-3 flex items-center gap-3">
-          <label htmlFor={`${idPrefix}-heure`} className="field-label !mb-0">
+          <label htmlFor={`${idPrefix}-heure`} className={`field-label !mb-0 ${dark ? "!text-white" : ""}`}>
             À quelle heure
           </label>
           <select id={`${idPrefix}-heure`} className="field max-w-[8.5rem]" value={value.time} onChange={(e) => onChange({ ...value, time: e.target.value })}>

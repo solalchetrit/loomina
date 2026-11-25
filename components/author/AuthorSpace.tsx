@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ComposedBook from "./ComposedBook";
@@ -16,6 +16,7 @@ import Settings from "./Settings";
 import FamilyAccess from "./FamilyAccess";
 import Photos from "./Photos";
 import Onboarding from "./Onboarding";
+import CallOncePicker, { type CallOnceValue } from "./CallOncePicker";
 import Shipping from "./Shipping";
 import { formatDate, type Overview } from "./types";
 
@@ -31,7 +32,52 @@ const TABS: readonly { id: string; label: string; short: string; icon: IconName 
 type Tab = "apercu" | "livre" | "vie" | "appels" | "reglages";
 
 /** Le prochain appel : le numéro, et le sujet que Loomina a prévu d'aborder. */
-function NextCall({ topic, schedule }: { topic: string | null; schedule?: string | null }) {
+/**
+ * « Votre prochain appel » : le sujet prévu, le numéro, et depuis le 25/11/2026
+ * (demande de Solal) le choix du jour et de l'heure du prochain appel, là où
+ * l'auteur le cherche, plus un lien vers Réglages pour les rendez-vous de la semaine.
+ */
+function NextCall({
+  topic,
+  schedule,
+  callOnce,
+  canBook,
+  onBooked,
+  onSettings,
+  onUnauthorized,
+}: {
+  topic: string | null;
+  schedule?: string | null;
+  callOnce: CallOnceValue;
+  canBook: boolean;
+  onBooked: () => void;
+  onSettings: () => void;
+  onUnauthorized: () => void;
+}) {
+  const [once, setOnce] = useState<CallOnceValue>(callOnce);
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error" | "past">("idle");
+  const seq = useRef(0);
+  const book = async (v: CallOnceValue) => {
+    setOnce(v);
+    const n = ++seq.current;
+    setStatus("saving");
+    try {
+      const res = await fetch("/api/user/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callOnce: v }),
+      });
+      if (res.status === 401) return onUnauthorized();
+      if (n !== seq.current) return;
+      if (res.status === 400) return setStatus("past");
+      if (!res.ok) throw new Error();
+      setStatus("saved");
+      onBooked();
+    } catch {
+      if (n === seq.current) setStatus("error");
+    }
+  };
+
   return (
     <section className="flex flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white md:p-7" aria-labelledby="prochain-appel">
       <h2 id="prochain-appel" className="text-[17px] font-bold tracking-normal text-[var(--amber)]">
@@ -45,6 +91,19 @@ function NextCall({ topic, schedule }: { topic: string | null; schedule?: string
       ) : (
         <p className="mt-3 text-[clamp(1.4rem,2.1vw,1.7rem)] font-bold leading-snug tracking-[-0.02em] text-white">Loomina reprendra là où vous vous étiez arrêté.</p>
       )}
+      {canBook && (
+        <div className="mt-5">
+          <label htmlFor="prochain-appel-jour" className="field-label !text-white">
+            Loomina vous appelle
+          </label>
+          <CallOncePicker idPrefix="prochain-appel" value={once} onChange={(v) => void book(v)} dark />
+          <p role="status" className="mt-1.5 text-[14px] font-semibold">
+            {status === "saved" && <span className="text-[var(--amber)]">{once ? "C’est noté. Vous recevrez un SMS une demi-heure avant." : "Appel retiré."}</span>}
+            {status === "past" && <span className="text-[#f3b2a5]">Cette heure est déjà passée. Choisissez-en une autre.</span>}
+            {status === "error" && <span className="text-[#f3b2a5]">L’appel n’a pas été enregistré. Réessayez.</span>}
+          </p>
+        </div>
+      )}
       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
         <a
           href={`tel:${SITE.phone}`}
@@ -56,6 +115,11 @@ function NextCall({ topic, schedule }: { topic: string | null; schedule?: string
           {schedule ? `Loomina vous appelle ${schedule}. Vous pouvez aussi appeler quand vous voulez.` : "Depuis le numéro de votre commande, quand vous voulez."}
         </p>
       </div>
+      {canBook && (
+        <button type="button" onClick={onSettings} className="mt-3 self-start text-[15px] font-semibold text-white underline decoration-[var(--amber)] underline-offset-4 hover:text-[var(--amber)]">
+          Des rendez-vous chaque semaine ? Réglages
+        </button>
+      )}
     </section>
   );
 }
@@ -213,7 +277,15 @@ export default function AuthorSpace({
               {project?.completed && <Shipping saved={data.shipping ?? null} delivery={data.delivery} firstName={data.firstName} onSaved={load} onUnauthorized={onUnauthorized} />}
               {project && (project.weave ? <Companion project={project} demo={data.demo} skipIntro={Boolean(data.welcome)} /> : <Progress project={project} />)}
               <div className="grid gap-3 lg:grid-cols-[1fr_1.2fr]">
-                <NextCall topic={project?.nextTopic ?? null} schedule={project?.scheduleText} />
+                <NextCall
+                  topic={project?.nextTopic ?? null}
+                  schedule={project?.scheduleText}
+                  callOnce={data.prefs.callOnce ?? null}
+                  canBook={Boolean(project && !project.completed)}
+                  onBooked={load}
+                  onSettings={() => setTab("reglages")}
+                  onUnauthorized={onUnauthorized}
+                />
                 {project ? (
                   <SuggestTopic
                     questions={project.openQuestions}
