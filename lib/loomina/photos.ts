@@ -11,8 +11,10 @@
  * lieux, ni dates. Ce qu'il ne sait pas, il le demande.
  */
 
+import { randomUUID } from 'node:crypto';
 import OpenAI from 'openai';
 import { db } from './db';
+import { normalizeContext } from './context';
 
 export const PHOTO_BUCKET = 'photos';
 export const MAX_PHOTOS = 40;
@@ -27,6 +29,8 @@ export interface PhotoEntry {
     at: string;
     /** Le chapitre où l'auteur aimerait la voir (facultatif), par son titre. */
     chapter?: string | null;
+    /** Le prénom du proche qui l'a envoyée par le lien d'invitation (absent : l'auteur). */
+    from?: string | null;
 }
 
 export const VISION_MODEL = 'gpt-5.5';
@@ -76,10 +80,72 @@ export async function describePhoto(params: {
 }
 
 /** Le texte ajouté aux sujets suggérés (lu par l'assistant vocal). */
-export function photoTopic(p: Pick<PhotoEntry, 'caption' | 'description' | 'question' | 'chapter'>): string {
+export function photoTopic(p: Pick<PhotoEntry, 'caption' | 'description' | 'question' | 'chapter' | 'from'>): string {
     const caption = p.caption ? ` (légende : « ${p.caption.slice(0, 60)} »)` : '';
     const chapter = p.chapter ? ` Pour le chapitre « ${p.chapter.slice(0, 60)} ».` : '';
-    return `Photo envoyée sur l'espace${caption}.${chapter} On y voit : ${p.description.slice(0, 140)} Question : ${p.question}`.slice(0, 300);
+    const who = p.from ? `Photo envoyée par un proche, ${p.from.slice(0, 40)}` : `Photo envoyée sur l'espace`;
+    return `${who}${caption}.${chapter} On y voit : ${p.description.slice(0, 140)} Question : ${p.question}`.slice(0, 300);
+}
+
+export const PHOTO_TYPES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+
+export function photosOf(meta: Record<string, unknown> | null | undefined): PhotoEntry[] {
+    return Array.isArray(meta?.photos) ? (meta!.photos as PhotoEntry[]) : [];
+}
+
+/** Une erreur à montrer telle quelle à la personne qui envoie, avec son code HTTP. */
+export class PhotoRefused extends Error {
+    constructor(message: string, readonly status: number) {
+        super(message);
+    }
+}
+
+/**
+ * Ajoute une photo au livre : stockage, description, question pour le
+ * prochain appel. Partagé par l'espace auteur et le lien des proches.
+ * Renvoie la liste à jour des photos du livre.
+ */
+export async function addPhoto(params: {
+    projectId: string;
+    meta: Record<string, unknown> | null;
+    politeness: 'tu' | 'vous';
+    firstName: string;
+    file: File;
+    caption: string | null;
+    chapter: string | null;
+    from?: string | null;
+}): Promise<PhotoEntry[]> {
+    const { file } = params;
+    const ext = PHOTO_TYPES[file.type];
+    if (!ext) throw new PhotoRefused('Format non pris en charge : envoyez une photo JPEG ou PNG.', 415);
+    if (file.size > MAX_PHOTO_BYTES) throw new PhotoRefused('Photo trop lourde (4 Mo au plus).', 413);
+    if (photosOf(params.meta).length >= MAX_PHOTOS) throw new PhotoRefused(`Le livre a déjà ${MAX_PHOTOS} photos, le maximum.`, 409);
+
+    const bytes = Buffer.from(await file.arrayBuffer());
+    const id = randomUUID();
+    const path = `${params.projectId}/${id}.${ext}`;
+    const { error: upErr } = await db().storage.from(PHOTO_BUCKET).upload(path, bytes, { contentType: file.type, upsert: false });
+    if (upErr) throw new Error(`stockage : ${upErr.message}`);
+
+    const { description, question } = await describePhoto({
+        bytes,
+        mime: file.type,
+        caption: params.from ? [params.caption, `envoyée par ${params.from}`].filter(Boolean).join(', ') : params.caption,
+        politeness: params.politeness,
+        firstName: params.firstName,
+    });
+    const entry: PhotoEntry = { id, path, caption: params.caption, description, question, chapter: params.chapter, at: new Date().toISOString(), ...(params.from ? { from: params.from } : {}) };
+
+    // Relire juste avant d'écrire : le pipeline a pu changer le contexte.
+    const { data: fresh, error: readErr } = await db().from('projects').select('context, project_metadata').eq('id', params.projectId).single();
+    if (readErr) throw new Error(readErr.message);
+    const context = normalizeContext(fresh.context);
+    const meta = (fresh.project_metadata ?? {}) as Record<string, unknown>;
+    const photos = [...photosOf(meta), entry];
+    const nextContext = normalizeContext({ ...context, suggested_topics: [...(context.suggested_topics ?? []), photoTopic(entry)] });
+    const { error } = await db().from('projects').update({ context: nextContext, project_metadata: { ...meta, photos } }).eq('id', params.projectId);
+    if (error) throw new Error(error.message);
+    return photos;
 }
 
 /** Liens temporaires (1 h) pour afficher les photos dans l'espace auteur. */
