@@ -7,13 +7,15 @@
  * le cookie de l'admin.
  */
 
-import { db } from '@/lib/loomina/db';
+import { db, phoneVariants } from '@/lib/loomina/db';
 import type { Profile, Project } from '@/lib/loomina/db';
 import { stripe } from '@/lib/stripe';
 import { sendSms } from '@/lib/loomina/sms';
 import { sendEmail, alertTeam, teamContacts } from '@/lib/loomina/notify';
 import { readGiver } from '@/lib/loomina/giver';
 import { SITE } from '@/config/site';
+import { formatToE164 } from '@/lib/phone';
+import { WRITING_STYLES } from '@/lib/loomina/styles';
 
 type Meta = Record<string, unknown>;
 type PaidProject = Project & { created_at: string; stripe_session_id: string | null };
@@ -187,4 +189,84 @@ export async function retryEvent(eventId: string): Promise<RefundResult> {
     if (error) return { ok: false, message: `Relance impossible : ${error.message}` };
     if (!data?.length) return { ok: false, message: 'Cet appel n’est pas en échec.' };
     return { ok: true, message: 'Appel remis dans la file : il sera retraité dans les 5 minutes.' };
+}
+
+// ------------------------------------------------------------
+// Corriger la fiche du narrateur
+// ------------------------------------------------------------
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/** Le texte d'un champ, nettoyé ; null si vide. */
+function text(form: FormData, key: string, max: number): string | null {
+    const v = String(form.get(key) ?? '').replace(/\s+/g, ' ').trim();
+    if (v.length > max) throw new Error(`Champ « ${key} » trop long (${max} caractères au plus).`);
+    return v || null;
+}
+
+/**
+ * Demande de Solal (25/11/2026) : corriger depuis l'admin ce que le narrateur
+ * a donné (prénom, nom, prononciation, téléphone, e-mail, tu ou vous, ton
+ * d'écriture, sujets à éviter). Seule la ligne `profiles` change : l'e-mail
+ * technique du compte (auth.users) reste celui créé à la commande.
+ *
+ * Le téléphone est la clé qui reconnaît l'appelant et que l'on rappelle aux
+ * rendez-vous : il est mis au format +33…, et refusé s'il appartient déjà à
+ * un autre client.
+ */
+export async function updateNarrator(profileId: string, form: FormData): Promise<RefundResult> {
+    const profile = await readProfile(profileId);
+    if (!profile) return { ok: false, message: 'Client introuvable.' };
+
+    const firstName = text(form, 'first_name', 60);
+    const lastName = text(form, 'last_name', 80);
+    const phonetic = text(form, 'first_name_phonetic', 80);
+    const emailRaw = text(form, 'email', 200);
+    const phoneRaw = text(form, 'phone_number', 30);
+    const politeness = String(form.get('politeness_preference') ?? '');
+    const style = String(form.get('writing_style') ?? '').trim();
+    const topicsRaw = String(form.get('sensitive_topics') ?? '').trim();
+
+    if (!firstName) return { ok: false, message: 'Le prénom est obligatoire : Loomina s’en sert pour saluer.' };
+    if (politeness !== 'tu' && politeness !== 'vous') return { ok: false, message: 'Choisir tutoiement ou vouvoiement.' };
+    const styles: readonly string[] = WRITING_STYLES;
+    if (!styles.includes(style) && style !== profile.writing_style) return { ok: false, message: 'Ton d’écriture inconnu.' };
+    if (topicsRaw.length > 1000) return { ok: false, message: 'Sujets à éviter : 1 000 caractères au plus.' };
+
+    const email = emailRaw ? emailRaw.toLowerCase() : null;
+    if (email && !EMAIL_RE.test(email)) return { ok: false, message: `E-mail invalide : « ${emailRaw} ».` };
+
+    if (!phoneRaw) return { ok: false, message: 'Le téléphone est obligatoire : c’est lui qui reconnaît le narrateur quand il appelle.' };
+    const phone = formatToE164(phoneRaw);
+    if (!/^\+\d{8,15}$/.test(phone)) return { ok: false, message: `Numéro invalide : « ${phoneRaw} ». Exemple : 06 12 34 56 78.` };
+    if (phone !== profile.phone_number) {
+        const { data: others, error } = await db().from('profiles').select('id, first_name').in('phone_number', phoneVariants(phone)).neq('id', profileId).limit(1);
+        if (error) throw new Error(`Vérification du numéro impossible : ${error.message}`);
+        if (others && others.length) return { ok: false, message: `Ce numéro est déjà celui d’un autre client (${(others[0] as { first_name: string | null }).first_name ?? 'sans prénom'}).` };
+    }
+
+    const update = {
+        first_name: firstName,
+        last_name: lastName,
+        full_name: [firstName, lastName].filter(Boolean).join(' '),
+        first_name_phonetic: phonetic,
+        email,
+        phone_number: phone,
+        politeness_preference: politeness,
+        writing_style: style,
+        sensitive_topics: topicsRaw || null,
+        updated_at: new Date().toISOString(),
+    };
+    const changed = (Object.keys(update) as Array<keyof typeof update>).filter((k) => k !== 'updated_at' && k !== 'full_name' && (profile as unknown as Record<string, unknown>)[k] !== update[k]);
+    if (changed.length === 0) return { ok: true, message: 'Rien n’a changé.' };
+
+    const { error } = await db().from('profiles').update(update).eq('id', profileId);
+    if (error) throw new Error(`Enregistrement impossible : ${error.message}`);
+    console.log(`[admin] fiche ${profileId} corrigée : ${changed.join(', ')}`);
+
+    const labels: Record<string, string> = {
+        first_name: 'prénom', last_name: 'nom', first_name_phonetic: 'prononciation', email: 'e-mail', phone_number: 'téléphone',
+        politeness_preference: 'tu / vous', writing_style: 'ton d’écriture', sensitive_topics: 'sujets à éviter',
+    };
+    return { ok: true, message: `Fiche enregistrée (${changed.map((k) => labels[k]).join(', ')}).` };
 }

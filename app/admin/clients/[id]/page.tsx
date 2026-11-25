@@ -16,6 +16,7 @@ import { callCostsKept } from "@/lib/admin/cached";
 import BookSteps from "@/components/admin/BookSteps";
 import CallCard from "@/components/admin/CallCard";
 import { readReviews, type ReviewRow } from "@/lib/admin/ecoute";
+import { WRITING_STYLES } from "@/lib/loomina/styles";
 
 /**
  * Refonte du 24/11/2026 (Solal : « la fiche cliente est mal foutue ») : un en-tête
@@ -32,10 +33,11 @@ type Tab = (typeof TABS)[number]["id"];
 
 export const metadata = { title: "Fiche client" };
 
-export default async function AdminClient({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ fait?: string; erreur?: string; onglet?: string }> }) {
+export default async function AdminClient({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ fait?: string; erreur?: string; onglet?: string; modifier?: string }> }) {
   await requireAdmin();
   const { id } = await params;
-  const { fait, erreur, onglet } = await searchParams;
+  const { fait, erreur, onglet, modifier } = await searchParams;
+  const editing = modifier === "1";
   const tab: Tab = TABS.some((t) => t.id === onglet) ? (onglet as Tab) : "appels";
   const c = await getClient(id);
   if (!c) notFound();
@@ -205,17 +207,26 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
       {tab === "fiche" && (
         <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <Panel icon="user" title="Narrateur">
+        <Panel
+          icon="user"
+          title="Narrateur"
+          className={editing ? "md:col-span-2 xl:col-span-3" : ""}
+          action={editing ? undefined : <Link href={`/admin/clients/${id}?onglet=fiche&modifier=1`} className="adm-btn adm-btn-sec"><AIcon name="pen" size={14} /> Modifier</Link>}
+        >
+          {editing ? (
+            <NarratorForm id={id} profile={profile} />
+          ) : (
           <dl>
             <Field label="Prénom, nom">{name}</Field>
             <Field label="Prononcé">{profile.first_name_phonetic ?? "comme écrit"}</Field>
             <Field label="Téléphone">{profile.phone_number}</Field>
-            <Field label="E-mail du compte">{profile.email ? <Link className="underline" href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`}>{profile.email}</Link> : null}</Field>
-            <Field label="Tu / vous">{profile.politeness_preference}</Field>
+            <Field label="E-mail">{profile.email ? <Link className="underline" href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`}>{profile.email}</Link> : null}</Field>
+            <Field label="Tu / vous">{profile.politeness_preference === "tu" ? "tutoiement" : "vouvoiement"}</Field>
             <Field label="Style d’écriture">{profile.writing_style}</Field>
             <Field label="Sujets à éviter">{profile.sensitive_topics || "aucun"}</Field>
             <Field label="Compte créé">{fmtDate(profile.created_at)}</Field>
           </dl>
+          )}
         </Panel>
         <Panel icon="card" title="Commande">
           <dl>
@@ -393,5 +404,64 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
         </>
       )}
     </div>
+  );
+}
+
+const inputCls = "h-9 w-full rounded-[8px] border border-[var(--line)] bg-[var(--surface)] px-3 text-[14px]";
+
+function Input({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <label className="block text-[13px]">
+      <span className="mb-1.5 block font-medium text-[var(--ink-2)]">{label}</span>
+      {children}
+      {hint && <span className="mt-1 block text-[12.5px] text-[var(--ink-3)]">{hint}</span>}
+    </label>
+  );
+}
+
+/** Corriger les infos du narrateur (demande de Solal, 25/11/2026). */
+function NarratorForm({ id, profile }: { id: string; profile: { first_name: string | null; last_name: string | null; first_name_phonetic: string | null; phone_number: string | null; email: string | null; politeness_preference: string | null; writing_style: string | null; sensitive_topics: string | null } }) {
+  const styles: string[] = [...WRITING_STYLES];
+  if (profile.writing_style && !styles.includes(profile.writing_style)) styles.unshift(profile.writing_style);
+  return (
+    <form action={`/api/admin/clients/${id}/fiche`} method="post" className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Input label="Prénom">
+          <input name="first_name" required maxLength={60} defaultValue={profile.first_name ?? ""} className={inputCls} />
+        </Input>
+        <Input label="Nom">
+          <input name="last_name" maxLength={80} defaultValue={profile.last_name ?? ""} className={inputCls} />
+        </Input>
+        <Input label="Prononciation du prénom" hint="Vide : Loomina le dit comme il est écrit.">
+          <input name="first_name_phonetic" maxLength={80} defaultValue={profile.first_name_phonetic ?? ""} className={inputCls} />
+        </Input>
+        <Input label="Téléphone" hint="Reconnaît le narrateur quand il appelle, et sert aux rendez-vous.">
+          <input name="phone_number" type="tel" required maxLength={30} defaultValue={profile.phone_number ?? ""} className={`${inputCls} tabular-nums`} />
+        </Input>
+        <Input label="E-mail">
+          <input name="email" type="email" maxLength={200} defaultValue={profile.email ?? ""} className={inputCls} />
+        </Input>
+        <Input label="Tu ou vous">
+          <select name="politeness_preference" defaultValue={profile.politeness_preference === "tu" ? "tu" : "vous"} className={inputCls}>
+            <option value="vous">Vouvoiement</option>
+            <option value="tu">Tutoiement</option>
+          </select>
+        </Input>
+        <Input label="Ton d’écriture">
+          <select name="writing_style" defaultValue={profile.writing_style ?? WRITING_STYLES[0]} className={inputCls}>
+            {styles.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </Input>
+        <div className="md:col-span-2">
+          <Input label="Sujets à éviter" hint="Loomina n’en parlera pas, et ils restent hors du livre.">
+            <textarea name="sensitive_topics" maxLength={1000} rows={2} defaultValue={profile.sensitive_topics ?? ""} className="w-full rounded-[8px] border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-[14px]" />
+          </Input>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <button className="adm-btn">Enregistrer</button>
+        <Link href={`/admin/clients/${id}?onglet=fiche`} className="adm-btn adm-btn-sec">Annuler</Link>
+      </div>
+    </form>
   );
 }
