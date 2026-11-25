@@ -19,7 +19,7 @@
  * À tenir à jour quand le produit change.
  */
 
-import { OFFER, EXTRA_COPY } from '@/config/offer';
+import { OFFER, EXTRA_COPY, LAUNCH } from '@/config/offer';
 import { SITE } from '@/config/site';
 import { CALL_MINUTES_OPTIONS } from '@/lib/loomina/call-length';
 import { MIN_TRANSCRIPT_CHARS, MIN_DURATION_SECONDS, MIN_CHAPTER_WORDS } from '@/lib/loomina/pipeline';
@@ -129,6 +129,7 @@ export const MAP_GROUPS: MapGroup[] = [
         label: 'Commander',
         about: 'Du bouton « Commander » au compte créé.',
         nodes: [
+            { id: 'c-vitrine', label: 'Vitrine avant le lancement', d: `Depuis le 25/11/2026 (demande de Solal) : jusqu’au ${LAUNCH.label} (config/offer.ts, LAUNCH.opensAt), la page /order affiche « Les commandes ouvrent le ${LAUNCH.label} » avec le bouton de la démo, et l’API de paiement refuse toute nouvelle commande. Les boutons « Commander » du site mènent à cette page. Le jour venu, tout s’ouvre tout seul, sans redéploiement. Les exemplaires en plus des clients existants restent ouverts.`, code: 'components/order/OrderSoon.tsx' },
             { id: 'c-qui', label: 'Pour qui ?', kind: 'q', d: 'Deux cartes avec photo : « Pour moi » ou « Pour offrir ». Une fois le choix fait, les photos se réduisent et l’autre carte passe en grisé.', code: 'app/order/page.tsx' },
             { id: 'c-coord', label: 'Coordonnées du narrateur', d: 'Prénom, nom, téléphone, e-mail. Le téléphone est celui qui le fera reconnaître quand il appellera.' },
             { id: 'c-duree', label: 'Durée des appels', d: `${minutes} min. Modifiable plus tard.` },
