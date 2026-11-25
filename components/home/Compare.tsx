@@ -1,12 +1,12 @@
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import { Section, SectionHead } from "@/components/ui/Section";
-import { OFFER } from "@/config/offer";
+import { OFFER, SHOW_PRICE } from "@/config/offer";
 
 type Cell = { ok: boolean; text: string };
 
 /** Comparaison honnête, en ordres de grandeur, sans chiffre inventé pour les autres options. */
-const ROWS: { label: string; alone: Cell; biographer: Cell; loomina: Cell }[] = [
+const ALL_ROWS: { label: string; alone: Cell; biographer: Cell; loomina: Cell }[] = [
   {
     label: "Ce que vous faites",
     alone: { ok: false, text: "Vous écrivez tout" },
@@ -32,6 +32,9 @@ const ROWS: { label: string; alone: Cell; biographer: Cell; loomina: Cell }[] = 
     loomina: { ok: true, text: `${OFFER.price} €, livre compris` },
   },
 ];
+
+/** Avant le lancement, pas de ligne « Prix » : le prix n'est pas encore annoncé. */
+const ROWS = SHOW_PRICE ? ALL_ROWS : ALL_ROWS.filter((r) => r.label !== "Prix");
 
 function Value({ cell, strong = false }: { cell: Cell; strong?: boolean }) {
   return (
@@ -119,7 +122,7 @@ export default function Compare() {
           Commander mon livre
         </Button>
         <Button href="/offre#detail" variant="secondary" size="lg">
-          Ce que couvre le prix
+          {SHOW_PRICE ? "Ce que couvre le prix" : "Ce qui est compris"}
         </Button>
       </div>
     </Section>

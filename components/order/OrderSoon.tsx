@@ -22,7 +22,7 @@ export default function OrderSoon() {
               Les commandes ouvrent le {LAUNCH.label}.
             </h1>
             <p className="mt-4 text-[18px] leading-relaxed text-[var(--ink-2)]">
-              Le livre de vie, tout compris : {OFFER.price} {OFFER.currencySymbol}. En attendant, vous pouvez essayer
+              En attendant, vous pouvez essayer
               Loomina dès maintenant : appelez, racontez un souvenir pendant {OFFER.demoMinutes} minutes, et recevez-le écrit.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">

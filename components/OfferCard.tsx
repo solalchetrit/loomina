@@ -1,9 +1,9 @@
 import Button from "@/components/ui/Button";
 import Photo from "@/components/ui/Photo";
 import { CheckList } from "@/components/ui/Section";
-import { OFFER, INCLUDED, GUARANTEE } from "@/config/offer";
+import { OFFER, INCLUDED, GUARANTEE, SHOW_PRICE, LAUNCH } from "@/config/offer";
 
-/** Le prix et ce qu'il comprend : deux cartes côte à côte. */
+/** L'offre (le prix, ou la date d'ouverture avant le lancement) et ce qu'elle comprend : deux cartes côte à côte. */
 export default function OfferCard({
   showDetailLink = true,
 }: {
@@ -23,14 +23,20 @@ export default function OfferCard({
           <p className="text-[16px] font-bold text-[var(--ink-2)]">
             {OFFER.name}
           </p>
-          <p className="mt-3 text-[80px] font-extrabold leading-none tracking-[-0.05em] md:text-[96px]">
-            {OFFER.price}
-            <span className="ml-1 align-top text-[0.42em] tracking-normal">
-              {OFFER.currencySymbol}
-            </span>
-          </p>
+          {SHOW_PRICE ? (
+            <p className="mt-3 text-[80px] font-extrabold leading-none tracking-[-0.05em] md:text-[96px]">
+              {OFFER.price}
+              <span className="ml-1 align-top text-[0.42em] tracking-normal">
+                {OFFER.currencySymbol}
+              </span>
+            </p>
+          ) : (
+            <p className="mt-3 text-[44px] font-extrabold leading-none tracking-[-0.045em] md:text-[56px]">
+              Le {LAUNCH.label.replace(/^\S+ /, "")}
+            </p>
+          )}
           <p className="t-body mt-4">
-            Paiement unique, sans abonnement. {OFFER.delivery}.
+            {SHOW_PRICE ? "Paiement unique, sans abonnement." : "Ouverture des commandes."} {OFFER.delivery}.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button href="/order" size="lg">

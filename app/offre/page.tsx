@@ -9,7 +9,7 @@ import Button from "@/components/ui/Button";
 import WhatYouGet from "@/components/home/WhatYouGet";
 import Compare from "@/components/home/Compare";
 import Closing from "@/components/Closing";
-import { OFFER, GUARANTEE } from "@/config/offer";
+import { OFFER, GUARANTEE, SHOW_PRICE, LAUNCH, OFFER_PAGE_LABEL } from "@/config/offer";
 
 const FAQ = [
   {
@@ -33,12 +33,12 @@ const FAQ = [
 export default function OffrePage() {
   return (
     <>
-      {/* Haut de page : une grande carte sombre. Le titre et le prix à gauche, les livres à droite. */}
+      {/* Haut de page : une grande carte sombre. Le titre et le prix (ou la date d'ouverture) à gauche, les livres à droite. */}
       <section className="flex min-h-[100svh] w-full flex-col pb-4 pt-[84px] md:pb-8 md:pt-28">
         <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col px-4 sm:px-6">
           <div className="rise grid flex-1 grid-cols-1 content-center overflow-hidden rounded-[var(--radius-card)] bg-[var(--ink)] text-white md:rounded-[var(--radius-card)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
             <div className="flex min-w-0 flex-col justify-center p-5 pb-4 sm:p-9 lg:px-12 lg:py-10">
-              <p className="text-[14px] font-bold text-[var(--amber)]">Le livre et le prix</p>
+              <p className="text-[14px] font-bold text-[var(--amber)]">{OFFER_PAGE_LABEL}</p>
               <h1 className="t-display mt-2 text-balance text-white">
                 Votre livre, tout compris
               </h1>
@@ -46,11 +46,19 @@ export default function OffrePage() {
                 Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus.
               </p>
               <div className="mt-5 flex items-end gap-4 md:mt-7">
-                <p className="text-[48px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[68px]">
-                  {OFFER.price}
-                  <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
+                {SHOW_PRICE ? (
+                  <p className="text-[48px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[68px]">
+                    {OFFER.price}
+                    <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
+                  </p>
+                ) : (
+                  <p className="text-[34px] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--amber)] md:text-[46px]">
+                    Le {LAUNCH.label.replace(/^\S+ /, "")}
+                  </p>
+                )}
+                <p className="max-w-[13rem] text-[14px] leading-snug text-[#cfcfc8]">
+                  {SHOW_PRICE ? "Paiement unique." : "Ouverture des commandes."} {OFFER.delivery}.
                 </p>
-                <p className="max-w-[13rem] text-[14px] leading-snug text-[#cfcfc8]">Paiement unique. {OFFER.delivery}.</p>
               </div>
               <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 md:mt-7">
                 <Button href="/order" variant="accent">

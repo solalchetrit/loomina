@@ -5,6 +5,16 @@
  * Tout ce qui est écrit ici figure aussi dans les CGV (app/cgv/page.tsx).
  */
 
+/**
+ * Site vitrine avant le lancement (Solal, 25/11/2026) : aucun prix affiché,
+ * le prix est fixé juste avant l'ouverture. Passer à true le jour du lancement,
+ * après avoir mis le bon montant dans OFFER.price.
+ */
+export const SHOW_PRICE = false;
+
+/** Le lien vers /offre, dans le menu et le pied de page. */
+export const OFFER_PAGE_LABEL = SHOW_PRICE ? "Le livre et le prix" : "Le livre";
+
 export const OFFER = {
   name: "Votre livre de vie, tout compris",
   price: 449,

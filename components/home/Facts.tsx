@@ -1,11 +1,13 @@
-import { OFFER } from "@/config/offer";
+import { OFFER, SHOW_PRICE } from "@/config/offer";
 
 /** Quatre repères concrets, tous tirés de l'offre : rien d'inventé. En grand, sur une carte blanche (le bleu nuit est gardé pour moins de blocs). */
 const FACTS: { value: string; label: string }[] = [
   { value: "0", label: "ligne à écrire vous-même" },
   { value: `${OFFER.chapters}`, label: "thèmes pour guider vos souvenirs" },
   { value: OFFER.delay.replace(" à ", "–").replace(" semaines", " sem."), label: "du premier appel au livre validé" },
-  { value: `${OFFER.price} €`, label: "tout compris et livré chez vous" },
+  SHOW_PRICE
+    ? { value: `${OFFER.price} €`, label: "tout compris et livré chez vous" }
+    : { value: "1", label: "livre imprimé, livré chez vous" },
 ];
 
 export default function Facts() {
