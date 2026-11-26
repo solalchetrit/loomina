@@ -101,7 +101,7 @@ check('Prix sans « à partir de »', () => {
     const bad: string[] = [];
     for (const f of textFiles) {
         readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
-            if (/à partir de\s*(\$\{[^}]*price|\d{3}\s*€|449)/i.test(line)) bad.push(`${relative(ROOT, f)}:${i + 1}  ${line.trim().slice(0, 140)}`);
+            if (/à partir de\s*(\$\{[^}]*price|\d{3}\s*€)/i.test(line)) bad.push(`${relative(ROOT, f)}:${i + 1}  ${line.trim().slice(0, 140)}`);
         });
     }
     return bad;

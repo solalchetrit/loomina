@@ -14,7 +14,7 @@
  *         normalement.
  * true  : la version de Noël. Les prix s'affichent (199 € au lieu de 289 €
  *         jusqu'au 24 décembre), le bandeau et les modules de Noël apparaissent,
- *         et les commandes s'ouvrent à LAUNCH.opensAt.
+ *         et les commandes s'ouvrent aussitôt.
  *
  * « Lance la version de Noël » = passer cette ligne à true, puis déployer le
  * site et le serveur d'appels. Rien d'autre à toucher.
@@ -158,6 +158,8 @@ export const LAUNCH = {
 };
 
 export function isOrderOpen(now: number = Date.now()): boolean {
-  // Pas de commande tant que la version de Noël n'est pas lancée : personne ne paie un prix qui n'est pas affiché.
-  return NOEL_LIVE && now >= new Date(LAUNCH.opensAt).getTime();
+  // Les commandes s'ouvrent avec la version de Noël, au moment où Solal la lance (26/11/2026) :
+  // personne ne paie un prix qui n'est pas affiché. La date de LAUNCH n'est plus qu'une annonce.
+  void now;
+  return NOEL_LIVE;
 }

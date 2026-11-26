@@ -49,7 +49,7 @@ Les faits sur l'offre viennent de `config/offer.ts` et `config/site.ts`. Ne jama
 ### 4. Règles de Solal (obligatoires)
 
 - Jamais le mot « relié » : dire « livre » ou « livre imprimé ».
-- Le prix s'écrit « 449 € », sans « à partir de ». Jamais de prix sur un bouton « Commander ».
+- Le prix est lu dans config/offer.ts (289 €, et 199 € en offre de lancement jusqu'au 24 décembre 2026), jamais écrit en dur, sans « à partir de ». Jamais de prix sur un bouton « Commander ».
 - Pas d'application Loomina : tout se fait par téléphone.
 - Lisible à 65 ans et plus.
 
