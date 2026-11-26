@@ -32,10 +32,11 @@ const SCREENS: Record<SpaceId, { id: string; height: number }[]> = {
   famille: [{ id: "famille", height: 2400 }],
 };
 const FRAME_H = 844;
-const HOLD_MS = 900;
-const TAP_MS = 750;
+const HOLD_MS = 1800;
+const TAP_MS = 900;
 const FADE_MS = 400;
-const scrollMs = (height: number) => Math.min(5000, Math.max(1600, (height - FRAME_H) * 2.8));
+// Assez lent pour lire (Solal, 26/11 : « le défilé est trop rapide ») : environ 170 px de l’écran réel par seconde.
+const scrollMs = (height: number) => Math.min(9500, Math.max(3000, (height - FRAME_H) * 6));
 
 export default function SpaceDemo({
   space,
@@ -167,12 +168,13 @@ export default function SpaceDemo({
         {space === "auteur" && (
           <span
             aria-hidden
-            className="pointer-events-none absolute h-7 w-7 -translate-x-1/2 translate-y-1/2 rounded-full bg-[var(--ink)]/25 ring-2 ring-white/80 transition-[opacity,transform] duration-300"
+            className="pointer-events-none absolute aspect-square w-[12%] rounded-full bg-[var(--ink)]/25 ring-2 ring-white/80 transition-[opacity,transform] duration-300"
             style={{
               left: `${((Math.min(scene + 1, 4) + 0.5) / 5) * 100}%`,
-              bottom: `${(40 / FRAME_H) * 100}%`,
+              // Le centre de l'icône de l'onglet, sur la capture du menu.
+              top: `${(800 / FRAME_H) * 100}%`,
               opacity: tapping ? 1 : 0,
-              transform: `translate(-50%, 50%) scale(${tapping ? 1 : 1.6})`,
+              transform: `translate(-50%, -50%) scale(${tapping ? 1 : 1.6})`,
             }}
           />
         )}
