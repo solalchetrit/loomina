@@ -510,11 +510,15 @@ Ton seul travail : trouver les phrases du chapitre que la personne n'a PAS dites
 - Une cause, une explication ou une conséquence qu'elle n'a pas données (« L'organisation se faisait comme elle pouvait »).
 - Un fait, un décor, un détail, une date ou un âge qui ne figurent pas dans les sources.
 
+# CE QUI PROUVE
+Quand un récit a ses paroles d'origine, SEULES les lignes « User: » prouvent qu'une chose a été dite. Le récit, lui, ne prouve rien : il a été écrit par une IA, qui a pu y glisser la même phrase sans appui. Une phrase du chapitre recopiée d'un récit, mais que la personne n'a pas dite dans les paroles d'origine, est sans appui.
+Une phrase de liaison qui ouvre un chapitre ou une partie en annonçant la suite (« Puis ma vie a pris le chemin de l'Angleterre ») est sans appui elle aussi si la personne ne l'a pas dite : le chapitre commence très bien par le premier fait.
+
 # CE QUI N'EST PAS UNE INVENTION (à garder)
 - Une reformulation fidèle : ses mots remis en phrases écrites, dans un autre ordre, à un autre temps, « on » devenu « nous ».
 - Un fait qu'elle a dit dans un AUTRE passage des sources que celui que tu attendais : cherche dans toutes les sources avant de conclure.
 - Un fait énoncé par l'intervieweur et qu'elle a confirmé (« oui », « c'est ça », « exactement »).
-- Un récit sans paroles d'origine fait foi tel qu'il est : ce qu'il dit est dit.
+- Un récit SANS paroles d'origine fait foi tel qu'il est : ce qu'il dit est dit.
 - Un âge ou une durée qui se déduit d'un simple calcul entre deux dates qu'elle a données.
 - Les intertitres (lignes qui commencent par #) : tu n'y touches jamais.
 
