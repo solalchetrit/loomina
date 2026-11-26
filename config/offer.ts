@@ -19,7 +19,7 @@
  * « Lance la version de Noël » = passer cette ligne à true, puis déployer le
  * site et le serveur d'appels. Rien d'autre à toucher.
  */
-export const NOEL_LIVE = false;
+export const NOEL_LIVE = true;
 
 /** Affiche le prix sur le site : avec la version de Noël seulement. */
 export const SHOW_PRICE = NOEL_LIVE;
