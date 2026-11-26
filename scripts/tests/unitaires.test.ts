@@ -883,3 +883,34 @@ test('récap : la phrase du jour et le sujet', () => {
     assert.equal(headline(d), 'Depuis hier 20 h : 1 démo, 1 appel client (22 min), 1 récit écrit, aucune commande.');
     assert.equal(recapSubject(d), 'Récap Loomina de 10 h : 1 démo, 1 appel, 0 commande · 1 point à voir');
 });
+
+// ------------------------------------------------------------
+// Souvenirs soufflés : chacun attend sa période de vie (Solal, 26/11/2026)
+// ------------------------------------------------------------
+
+const souffles = { suggestion_phases: { 'sa rencontre avec papi': 3, 'où êtes-vous née ?': 1, 'la maison de son enfance': 2 } };
+const topics = ['Sa rencontre avec papi', 'Où êtes-vous née ?', 'La maison de son enfance', 'Un sujet pas encore rangé'];
+
+test('souvenirs soufflés : au premier appel, seulement la vue d\'ensemble', () => {
+    const p = prompt(project({ phase: 1, context: {}, next_question_strategy: null, project_metadata: souffles }));
+    const ctx = { suggested_topics: topics };
+    const first = prompt(project({ phase: 1, context: ctx, project_metadata: souffles, next_question_strategy: null }));
+    assert.ok(!p.includes('Sa rencontre avec papi'));
+    assert.ok(!first.includes('Sa rencontre avec papi'));
+    assert.ok(!first.includes('La maison de son enfance'));
+});
+
+test('souvenirs soufflés : en phase 2, l\'enfance oui, la rencontre amoureuse non', () => {
+    const p = prompt(project({ phase: 2, context: { identity: { full_name: 'Jeanne Morel' }, last_call: { summary: 'La maison.' }, suggested_topics: topics }, project_metadata: souffles }));
+    assert.ok(p.includes('La maison de son enfance'));
+    assert.ok(p.includes('Où êtes-vous née ?'));
+    assert.ok(!p.includes('Sa rencontre avec papi'));
+    assert.ok(p.includes('Un sujet pas encore rangé'));
+    assert.ok(p.includes("n'ont pas encore de période attribuée"));
+});
+
+test('souvenirs soufflés : en phase 3, la rencontre arrive', () => {
+    const p = prompt(project({ phase: 3, context: { identity: { full_name: 'Jeanne Morel' }, last_call: { summary: 'La maison.' }, suggested_topics: topics }, project_metadata: souffles }));
+    assert.ok(p.includes('Sa rencontre avec papi'));
+    assert.ok(p.includes('La maison de son enfance'));
+});

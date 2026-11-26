@@ -130,7 +130,7 @@ function Suggest({ book, onAdded, onUnauthorized }: { book: FamilyBook; onAdded:
       <h3 id={`souffler-${book.id}`} className="t-heading">
         Poser une question ou souffler un souvenir
       </h3>
-      <p className="t-body mt-1">Une histoire que vous aimeriez lire, une question que vous n’avez jamais osé poser : Loomina en parlera à {name} à un prochain appel.</p>
+      <p className="t-body mt-1">Une histoire que vous aimeriez lire, une question que vous n’avez jamais osé poser : Loomina en parlera à {name} au moment du récit où il a sa place.</p>
       <form onSubmit={submit} className="mt-5">
         <label htmlFor={`sujet-${book.id}`} className="sr-only">
           Votre question

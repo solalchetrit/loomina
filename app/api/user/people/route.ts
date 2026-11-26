@@ -4,6 +4,7 @@ import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
 import { DEMO_DATA, demoAddPerson, personTopic } from '@/lib/loomina/demo';
 import { testAuthorReply } from '@/lib/loomina/test-author';
+import { rememberSuggestionPhase } from '@/lib/loomina/suggestion-phase-store';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -34,13 +35,14 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: `${name} est déjà dans la liste.` }, { status: 409 });
         }
         const family = [{ name, relation, note: 'ajouté par l’auteur sur son espace : Loomina ne la connaît pas encore, à faire raconter' }, ...context.family];
-        // Dix sujets au plus attendent : au-delà, la personne est quand même retenue dans les proches.
+        // Vingt sujets au plus attendent : au-delà, la personne est quand même retenue dans les proches.
         const topics = context.suggested_topics ?? [];
-        const suggested_topics = topics.length < 10 ? [...topics, personTopic(name, relation)] : topics;
+        const suggested_topics = topics.length < 20 ? [...topics, personTopic(name, relation)] : topics;
         const next = normalizeContext({ ...context, family, suggested_topics });
 
         const { error } = await db().from('projects').update({ context: next }).eq('id', author.project.id);
         if (error) throw new Error(error.message);
+        if (suggested_topics !== topics) await rememberSuggestionPhase(author.project.id, personTopic(name, relation), next.suggested_topics ?? []);
 
         return NextResponse.json({
             family: next.family.map(({ name, relation, deceased }) => ({ name, relation, deceased })),

@@ -4,6 +4,7 @@ import { currentAuthor } from '@/lib/loomina/author';
 import { normalizeContext, pendingTopics } from '@/lib/loomina/context';
 import { DEMO_DATA, demoAddQuestion } from '@/lib/loomina/demo';
 import { testAuthorReply } from '@/lib/loomina/test-author';
+import { rememberSuggestionPhase } from '@/lib/loomina/suggestion-phase-store';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,18 +33,20 @@ export async function POST(request: NextRequest) {
         if (question.length < 5) return NextResponse.json({ error: 'Question trop courte' }, { status: 400 });
 
         const context = normalizeContext(author.project.context);
-        if ((context.suggested_topics?.length ?? 0) >= 10) {
+        if ((context.suggested_topics?.length ?? 0) >= 20) {
             return NextResponse.json(
-                { error: 'Dix sujets attendent déjà : Loomina les abordera avant d’en ajouter d’autres.' },
+                { error: 'Vingt sujets attendent déjà : Loomina les abordera avant d’en ajouter d’autres.' },
                 { status: 409 }
             );
         }
         // La plus ancienne en tête : c'est elle que l'assistant aborde en premier.
-        // normalizeContext déduplique et plafonne la liste à 10.
+        // normalizeContext déduplique et plafonne la liste à 20.
         const next = normalizeContext({ ...context, suggested_topics: [...(context.suggested_topics ?? []), question] });
 
         const { error } = await db().from('projects').update({ context: next }).eq('id', author.project.id);
         if (error) throw new Error(error.message);
+        // Le sujet attendra la période de vie qu'il concerne (voir suggestion-phase.ts).
+        await rememberSuggestionPhase(author.project.id, question, next.suggested_topics ?? []);
 
         return NextResponse.json({ openQuestions: pendingTopics(next) });
     } catch (err) {
