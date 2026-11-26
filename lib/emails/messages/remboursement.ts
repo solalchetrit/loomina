@@ -9,7 +9,7 @@ export interface RemboursementVars {
     amount: number;
 }
 
-/** « 449 € », « 449,50 € ». */
+/** « 199 € », « 199,50 € ». */
 export function euros(amount: number): string {
     return `${amount.toLocaleString('fr-FR', { minimumFractionDigits: Number.isInteger(amount) ? 0 : 2, maximumFractionDigits: 2 }).replace(/ /g, ' ')} €`;
 }

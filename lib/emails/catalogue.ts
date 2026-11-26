@@ -193,7 +193,7 @@ export const CATALOGUE: CatalogueEntry[] = [
         id: 'remboursement', etape: ETAPES[6], nom: 'Remboursement',
         quand: 'Quand l’équipe rembourse depuis la fiche client', aQui: 'L’acheteur',
         variables: ['prénom', 'montant réellement remboursé par Stripe'], code: 'lib/admin/actions.ts (refundClient)',
-        exemple: () => remboursementEmail({ firstName: 'Jeanne', amount: 449 }),
+        exemple: () => remboursementEmail({ firstName: 'Jeanne', amount: 199 }),
     },
     {
         id: 'contact-recu', etape: ETAPES[7], nom: 'Message bien reçu',
