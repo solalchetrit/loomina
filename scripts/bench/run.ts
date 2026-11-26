@@ -163,7 +163,15 @@ ${planted[5]}
 
 ## Les vendredis
 
-Ma mère, avec huit enfants, était à la maison. ${planted[3]} Mes parents sont restés à Saint-Ouen jusqu’au bout. Tous les vendredis soirs, nous étions tous chez eux. ${said[3]} ${planted[4]} ${planted[2]}`;
+Ma mère, avec huit enfants, était à la maison. ${planted[3]} Mes parents sont restés à Saint-Ouen jusqu’au bout. Tous les vendredis soirs, nous étions tous chez eux. ${said[3]} ${planted[4]} ${planted[2]}
+
+## Chez Rose
+
+En 1982, nous sommes rentrés à Paris. J’étais enceinte de ma fille, et je voulais que mes enfants grandissent près de ma famille. Sarah est née en 1982, à Paris. Julien est né en 1985. Quand les enfants étaient petits, je suis restée à la maison trois ou quatre ans. En 1988, j’ai ouvert ma boutique, rue de Lévis, dans le 17e. Elle s’appelait Chez Rose, comme ma mère. Je l’ai gardée vingt-six ans, de 1988 à 2014. J’avais mes clientes, des clientes que j’ai habillées pendant vingt ans, et leurs filles ensuite.
+
+## Aujourd’hui
+
+David et moi avons divorcé en 1996. Nous sommes restés en bons termes, pour les enfants. J’ai eu un compagnon pendant longtemps, Henri, pendant quinze ans à peu près. Il est décédé en 2019. Aujourd’hui, je vis à Paris, toujours dans le 17e. L’été, je vais à Cannes, où j’ai un petit pied-à-terre, parce que j’ai besoin de la mer et du soleil. À Cannes, je nage tous les matins. La brasse, toujours la brasse. Sarah est avocate et elle a trois enfants. Julien vit à Lyon et il a deux enfants. J’ai cinq petits-enfants, et ce sont eux qui m’ont demandé de faire ce livre.`;
     const done = await checkFidelity({ title: 'De Passy à Brighton', content, sources: [1] }, [{ number: 1, title: 'Les grandes lignes de ma vie', content: `Tous les vendredis soirs, nous étions tous chez mes parents. ${planted[4]} ${planted[3]}`, transcript: source.transcript }]);
     const checks: Check[] = [
         ...planted.map((p) => ({ ok: !done.content.includes(p), label: `fidélité : retire « ${p} »` })),
