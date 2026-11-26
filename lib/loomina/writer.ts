@@ -29,6 +29,7 @@
  *    inclut la réflexion, d'où `max_completion_tokens` large.
  */
 
+import { stripSpellings } from './spellings';
 import { promptText, refreshPrompts } from './prompt-store';
 import { tokenUsage } from './usage';
 import type { TokenUsage } from './usage';
@@ -278,7 +279,8 @@ ${params.transcript}`;
         throw new Error(`Écrivain : JSON invalide — ${raw.slice(0, 300)}`);
     }
 
-    const content = typeof parsed.chapter_content === 'string' ? parsed.chapter_content.trim() : '';
+    // Un nom épelé au téléphone ne s'imprime jamais lettre par lettre (voir stripSpellings).
+    const content = typeof parsed.chapter_content === 'string' ? stripSpellings(parsed.chapter_content.trim()) : '';
     const title = typeof parsed.chapter_title === 'string' ? parsed.chapter_title.trim() : '';
 
     return {

@@ -26,7 +26,7 @@ import {
     axisDepth,
 } from '../../lib/loomina/phase-plan';
 import type { PhaseState, Topic, ToldScene } from '../../lib/loomina/phase-plan';
-import { applyPolish, applyFidelity, chapterSignature, renderBook } from '../../lib/loomina/book';
+import { applyPolish, applyFidelity, stripSpellings, chapterSignature, renderBook } from '../../lib/loomina/book';
 import { bookTitle } from '../../lib/loomina/book-print';
 import { toPhase } from '../../lib/loomina/phases';
 import { remainingSuggestions, normalizeContext } from '../../lib/loomina/context';
@@ -328,6 +328,14 @@ test('relecture du livre : une retouche s\'applique seulement si le passage est 
     const locked = applyPolish(chapters, [{ chapter: 2, find: 'La maison sentait la soupe et le feu de bois. ', replace: '', why: 'redite' }], [2]);
     assert.equal(locked.applied, 0);
     assert.equal(locked.chapters[1].content, chapters[1].content);
+});
+
+test('livre : un nom épelé au téléphone n\'est jamais imprimé lettre par lettre', () => {
+    assert.equal(stripSpellings('Je m’appelle Patricia Azoulay. Azoulay, A-Z-O-U-L-A-Y, c’est mon nom de jeune fille.'), 'Je m’appelle Patricia Azoulay. Azoulay, c’est mon nom de jeune fille.');
+    assert.equal(stripSpellings('Mon nom, c’est Azoulay, A, Z, O, U, L, A, Y.'), 'Mon nom, c’est Azoulay.');
+    assert.equal(stripSpellings('Il s’appelait Dany (D-A-N-Y) et il riait.'), 'Il s’appelait Dany et il riait.');
+    // Rien d'autre ne bouge : sigles, initiales, phrases normales.
+    for (const ok of ['J’ai travaillé à la SNCF, puis à la RATP.', 'À Paris, il faisait froid. A Alger, non.', 'Jean-Pierre et Marie-Louise habitaient le 17e.', 'Le choix du roi, comme on dit.']) assert.equal(stripSpellings(ok), ok);
 });
 
 test('relecture de fidélité : retire une phrase sans appui, n\'écrit jamais, ne touche ni citation ni intertitre', () => {

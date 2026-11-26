@@ -36,6 +36,7 @@
  *      demandé pour son livre.
  */
 
+import { stripSpellings } from './spellings';
 import { promptText, refreshPrompts } from './prompt-store';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import OpenAI from 'openai';
@@ -233,6 +234,7 @@ export const WRITE_SYSTEM = `Tu es l'écrivain d'une autobiographie. Tu écris U
 Les récits te disent CE QUI est à raconter. Les paroles d'origine te donnent COMMENT la personne le dit.
 - Écris avec ses mots à elle chaque fois que c'est possible : ses tournures, ses images, ses expressions (« ma foi », « un brave toutou », « on ne roulait pas sur l'or »). En français écrit et propre : sans les hésitations, les reprises ni les tics de l'oral.
 - Reprends dans les paroles d'origine les détails concrets d'une scène de ton plan que le récit a laissés de côté : un nom, un objet, une couleur, un chiffre, une phrase.
+- Quand la personne épelle un nom (« Azoulay, A, Z, O, U, L, A, Y »), c'est pour qu'on l'écrive bien : écris le nom avec cette orthographe, UNE fois, et ne recopie jamais l'épellation ni le nom répété (« Je m'appelle Patricia Azoulay. Azoulay, c'est mon nom de jeune fille », jamais « Azoulay. Azoulay, A-Z-O-U-L-A-Y »).
 - Dans les paroles d'origine, SEULES les lignes de la personne (« User: ») sont une source. Les lignes de l'assistant (« AI: ») sont des questions : jamais une source, même quand il reformule ou conclut à sa place.
 - Les phrases rapportées : quand la personne cite ce que quelqu'un disait (« ma mère disait toujours… »), cite la phrase telle qu'elle l'a dite, entre guillemets français « ». C'est ce qui fait entendre les gens. N'invente jamais une citation, ne complète jamais une phrase rapportée, ne mets jamais entre guillemets ce qu'elle a seulement résumé.
 - Un récit donné sans paroles d'origine a été relu ou corrigé par son auteur : il fait foi tel qu'il est.
@@ -380,7 +382,7 @@ ${renderSourcesWithWords(params.sources.filter((s) => needed.has(s.number)))}`;
     const parsed = await json(promptText('livre.ecriture', WRITE_SYSTEM), user, 'medium');
     const content = typeof parsed.content === 'string' ? parsed.content.trim() : '';
     if (!content) throw new Error(`Livre : chapitre « ${params.chapter.title} » vide`);
-    return { title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim().slice(0, 120) : params.chapter.title, content };
+    return { title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim().slice(0, 120) : params.chapter.title, content: stripSpellings(content) };
 }
 
 // ── La passe finale ──────────────────────────────────────────────────────
@@ -773,3 +775,5 @@ ${params.chapter}`,
     if (!content || parsed.changed === false) return params.chapter;
     return content;
 }
+
+export { stripSpellings };
