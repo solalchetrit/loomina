@@ -408,10 +408,21 @@ export class CallSession {
         // Ne rien dire avant `releaseAt` (voir holdFor). La lecture du flux
         // est suspendue pendant ce temps ; les morceaux attendent.
         let released = releaseAt <= Date.now();
+        // Appel de Patricia (26/11/2026, 24 « Pardon, je n'ai pas bien
+        // entendu ») : le minuteur « OpenAI muet » tournait pendant cette
+        // attente voulue. Avec les délais de #203 (jusqu'à 3,4 s + 1,2 s de
+        // patience), il expirait avant la fin de l'attente alors que la
+        // réponse était déjà là : elle était jetée et remplacée par l'excuse.
+        // Le minuteur est donc arrêté pendant l'attente, puis relancé.
         const hold = async () => {
             if (released) return;
             const wait = releaseAt - Date.now();
-            if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+            if (wait > 0) {
+                if (idle) clearTimeout(idle);
+                idle = null;
+                await new Promise((r) => setTimeout(r, wait));
+                if (!attemptCtl.signal.aborted) watch();
+            }
             released = true;
             if (this.heardAt) this.replyDelaysMs.push(Date.now() - this.heardAt);
         };
@@ -516,7 +527,9 @@ export class CallSession {
         } catch (err) {
             if (controller.signal.aborted) return;
             console.error(`[${this.callSid}] erreur modèle :`, err instanceof Error ? err.message : err);
-            const fallback = "Pardon, je n'ai pas bien entendu. Pouvez-vous répéter ?";
+            const fallback = this.plan.metadata.politeness === 'tu'
+                ? "Pardon, je n'ai pas bien entendu. Tu peux répéter ?"
+                : "Pardon, je n'ai pas bien entendu. Pouvez-vous répéter ?";
             this.sendText(spoken ? ` ${fallback}` : fallback, true);
             spoken = spoken ? `${spoken} ${fallback}` : fallback;
         } finally {
