@@ -348,9 +348,9 @@ function Growth({ age, intro, narrator = null, onClose }: { age: MemoAge; intro:
           <span className={s.growthHalo} aria-hidden="true" />
           <Memo age={shownAge} clip={clip} size={240} onEnd={ended} />
         </div>
-        <p className="text-[14px] font-bold text-[var(--amber-ink)]">{intro ? (narrator ? `Il grandit avec le livre de ${narrator}` : "Il grandit avec votre livre") : "Mémo a grandi"}</p>
+        <p className="text-[14px] font-bold text-[var(--amber-ink)]">{intro ? (narrator ? `Il grandit avec le livre de ${narrator}` : "Il grandit avec votre livre") : meta.event}</p>
         <h2 id="memo-grandit" className="mt-1 text-[clamp(1.5rem,4vw,1.9rem)] font-extrabold leading-tight tracking-[-0.03em]">
-          {intro ? first.event : meta.event}
+          {intro ? first.event : "Mémo a grandi"}
         </h2>
         <p className="mx-auto mt-3 max-w-[26rem] text-[16px] leading-relaxed text-[var(--ink-2)]">
           {narrator
