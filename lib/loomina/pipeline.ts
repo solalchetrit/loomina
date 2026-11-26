@@ -33,7 +33,8 @@ import type { DirectorResult } from './director';
 import { runWriter } from './writer';
 import { notifyChapterReady } from './sms';
 import type { TokenUsage } from './usage';
-import { notifyFamily, alertTeam, notifyAuthorBookComplete } from './notify';
+import { notifyFamily, alertTeam, notifyAuthorBookComplete, notifyPhaseUp } from './notify';
+import { notifyRecitPret } from './call-mails';
 import { autoCompose } from './book-edition';
 
 /**
@@ -434,9 +435,21 @@ export async function processEndOfCall(params: {
         projectMetadata: project.project_metadata,
         narratorFirstName: params.profile.first_name,
         kind: chapterNumber === 1 ? 'first_call' : 'new_story',
+        phase,
         // Le titre ne part que si le narrateur partage ses récits avec l'offreur.
         storyTitle: project.project_metadata?.share_with_giver === true ? writer.chapter_title : undefined,
     });
+
+    // Un e-mail à l'auteur après l'appel (25/11/2026) : « ton récit est écrit ».
+    // Si l'appel a fini une étape, l'auteur reçoit plutôt, quand la partie du livre
+    // est écrite, l'e-mail « Mémo grandit » avec son livre (notifyStageBookReady) ;
+    // ici, seul celui qui a offert le livre est prévenu.
+    const phaseUp = !!brief.nextPhase && brief.nextPhase > phase && project.status !== 'completed' && [2, 3, 4].includes(brief.nextPhase);
+    if (phaseUp) {
+        await notifyPhaseUp({ author: params.profile, projectMetadata: project.project_metadata, phase: brief.nextPhase!, familyOnly: true });
+    } else {
+        await notifyRecitPret({ profile: params.profile, projectMetadata: project.project_metadata, title: writer.chapter_title, markdown: writer.chapter_content, phase });
+    }
 
     // Si cet appel a fini une étape, le livre s'écrit jusqu'à cette étape, sans attendre ici.
     // Sinon rien ne bouge : le livre que l'auteur a lu reste le même jusqu'à la fin de l'étape.
@@ -548,7 +561,7 @@ async function persistDirectorResult(params: {
         }
         // L'auteur d'abord : ce que Loomina vient de lui dire au téléphone, par écrit.
         await notifyAuthorBookComplete(profile, project.project_metadata);
-        await notifyFamily({ projectMetadata: project.project_metadata, narratorFirstName: profile.first_name, kind: 'book_complete' });
+        await notifyFamily({ projectMetadata: project.project_metadata, narratorFirstName: profile.first_name, kind: 'book_complete', phase: 5 });
         await alertTeam({
             subject: `Livre terminé : ${name}`,
             text: `${name} a dit que son livre est complet. Il attend maintenant votre relecture. Loomina lui a annoncé sa première version complète d'ici une semaine, par e-mail et dans son espace : à lui envoyer avant cette date.`,

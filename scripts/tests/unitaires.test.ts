@@ -439,7 +439,7 @@ test('bienvenue : pour soi, le SMS part au narrateur et donne le numéro à appe
     const w = welcomeTexts({ buyerEmail: 'a@b.fr', narratorFirstName: 'Jeanne', narratorPhone: '+33611111111', isGift: false, giver: null });
     assert.equal(w.smsTo, '+33611111111');
     assert.match(w.sms, /01 59 16 93 57/);
-    assert.match(w.email, /Bonjour Jeanne,/);
+    assert.match(w.email, /Bienvenue, Jeanne !/);
 });
 
 test('bienvenue : livre offert, le SMS part à celui qui offre, jamais au narrateur', () => {
@@ -839,6 +839,63 @@ test('voix : les noms propres de l’auteur vont à la transcription', async () 
     assert.deepEqual(hints, ['Patricia', 'Alger', 'Casbah', 'Bab El Oued', 'Charlie']);
 });
 
+test('e-mails : Mémo grandit à chaque étape, bouton Appeler Loomina, désinscription en bas', async () => {
+    const { etapeSuivanteEmail } = await import('../../lib/emails/messages/ecriture');
+    const { panierEmail } = await import('../../lib/emails/messages/panier');
+    const { remboursementEmail } = await import('../../lib/emails/messages/remboursement');
+    const vous = etapeSuivanteEmail({ firstName: 'Jeanne', tu: false, age: 3 });
+    assert.match(vous.subject, /plume/);
+    assert.match(vous.html, /memo-3-c\.png/);
+    assert.match(vous.html, /tel:\+33159169357/);
+    const tu = etapeSuivanteEmail({ firstName: 'Léo', tu: true, age: 2 });
+    assert.doesNotMatch(tu.text, /\bvous\b|\bvotre\b/i);
+    const fam = etapeSuivanteEmail({ firstName: 'Marc', tu: false, age: 4, family: { narrator: 'Jeanne' } });
+    assert.match(fam.subject, /Le livre de Jeanne/);
+    assert.doesNotMatch(fam.html, /tel:/);
+    const cart = panierEmail({ firstName: 'Marc', isGift: false, narratorFirstName: null, recoveryUrl: null, optOut: 'Vous ne souhaitez plus recevoir ces rappels ? https://x/desinscription' }, 1);
+    assert.ok(cart.html.indexOf('desinscription') > cart.html.indexOf('on lit tout'));
+    assert.match(remboursementEmail({ firstName: null, amount: 224.5 }).text, /224,50 €/);
+    assert.doesNotMatch(vous.text + fam.text, /Mémo et l’équipe/);
+});
+
+test('e-mails autour des appels : veille, récit écrit, appel manqué, jour J, livre reçu, contact', async () => {
+    const { tomorrowSlot, dueEve } = await import('../../lib/loomina/call-mails');
+    const { appelManqueSms, extraitRecit, recitPretEmail, appelManqueEmail } = await import('../../lib/emails/messages/appels');
+    const { revealDue, validRevealDate } = await import('../../lib/loomina/gift-reveal');
+    const { livreRecuEmail } = await import('../../lib/emails/messages/livre');
+    const { contactRecuEmail } = await import('../../lib/emails/messages/contact');
+    const { annonceCadeauSms } = await import('../../lib/emails/messages/cadeau');
+    // Mercredi 25/11/2026, 19 h à Paris : le rendez-vous du jeudi part demain.
+    const wed19 = new Date('2026-11-25T18:00:00Z');
+    const meta = { call_schedule: { active: true, days: [4], time: '10:00' } };
+    assert.equal(tomorrowSlot(meta, wed19), '2026-11-26 10:00');
+    assert.equal(dueEve(meta, wed19), '2026-11-26 10:00');
+    assert.equal(dueEve({ ...meta, last_eve_slot: '2026-11-26 10:00' }, wed19), null);
+    assert.equal(dueEve(meta, new Date('2026-11-25T12:00:00Z')), null); // 13 h : trop tôt
+    assert.equal(tomorrowSlot({ call_once: { date: '2026-11-26', time: '15:30' } }, wed19), '2026-11-26 15:30');
+    assert.equal(tomorrowSlot({ call_schedule: { active: true, days: [5], time: '10:00' } }, wed19), null);
+    // Appel manqué : le numéro en clair dans le SMS, le bouton dans l'e-mail.
+    assert.match(appelManqueSms('Jeanne', false), /01 59 16 93 57/);
+    assert.match(appelManqueEmail({ firstName: 'Jeanne', tu: false, age: 2 }).html, /tel:\+33159169357/);
+    assert.doesNotMatch(appelManqueSms('Léo', true), /\bvous\b/);
+    // Récit écrit : un extrait court, sans titres markdown.
+    const ex = extraitRecit('# Titre\n\nJe suis arrivée à Paris en 1962. Il pleuvait. ' + 'mot '.repeat(80));
+    assert.ok(ex && !ex.includes('#') && ex.split(' ').length <= 46);
+    assert.match(recitPretEmail({ firstName: 'Léo', tu: true, title: 'Paris', extrait: ex, age: 2 }).subject, /^Ton récit/);
+    // Jour J : à 10 h le jour dit, jamais avant, jamais deux fois.
+    const r = { date: '2026-12-24', sentAt: null, skipped: false };
+    assert.equal(revealDue(r, new Date('2026-12-24T08:30:00Z')), false); // 9 h 30
+    assert.equal(revealDue(r, new Date('2026-12-24T09:05:00Z')), true); // 10 h 05
+    assert.equal(revealDue({ ...r, sentAt: 'x' }, new Date('2026-12-24T09:05:00Z')), false);
+    assert.equal(validRevealDate('2026-11-25', wed19), null); // aujourd'hui : non
+    assert.equal(validRevealDate('2026-12-24', wed19), '2026-12-24');
+    assert.match(annonceCadeauSms({ narratorFirstName: 'Jeanne', giverFirstName: 'Marc', tu: false }), /Marc vous offre/);
+    // Livre reçu et contact.
+    assert.match(livreRecuEmail({ firstName: 'Jeanne', tu: false }).text, /répondant à cet e-mail/);
+    assert.match(livreRecuEmail({ firstName: 'Marc', tu: false, family: { narrator: 'Jeanne' }, reviewUrl: 'https://g.page/x' }).html, /https:\/\/g\.page\/x/);
+    assert.match(contactRecuEmail({ name: 'Jeanne Martin' }).subject, /Bien reçu/);
+});
+
 // ------------------------------------------------------------
 // Démo : une seule par numéro, limites anti-abus (25/11/2026)
 // ------------------------------------------------------------
@@ -1005,7 +1062,7 @@ test('fin d’étape : l’e-mail et le SMS « une partie de votre livre est pr�
     assert.match(v.email, /3 chapitres/);
     assert.match(v.email, /Prochaine étape : « Les racines »/);
     assert.match(v.sms, /La première partie de votre livre est prête à lire sur .*\/dashboard/);
-    assert.match(v.html, /etape-memo-2\.png/);
+    assert.match(v.html, /memo-2-c\.png/);
     const t = stageBookTexts({ first_name: 'Jeanne', politeness_preference: 'tu' }, 2, 7);
     assert.match(t.subject, /^Ton livre s’est allongé/);
     assert.match(t.email, /tu as fini l’étape « Les racines »/);

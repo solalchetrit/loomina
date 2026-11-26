@@ -84,6 +84,8 @@ async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse):
     // on raccroche plutôt que de mener un entretien avec une messagerie.
     if ((params.AnsweredBy ?? '').startsWith('machine') || params.AnsweredBy === 'fax') {
         console.info(`[voice] ${callSid} : répondeur, message laissé`);
+        // L'auteur n'a pas décroché : SMS et e-mail pour qu'il rappelle (25/11/2026).
+        if (direction.startsWith('outbound') && customer) void reportMissed(customer, callSid);
         // Au tutoiement si l'auteur l'a choisi (« c'est Loumina » : l'orthographe qui se prononce bien).
         const tu = await prefersTu(customer).catch(() => false);
         return reply(
@@ -127,6 +129,36 @@ async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse):
     }
 }
 
+/**
+ * Appel de rendez-vous manqué (25/11/2026) : le site envoie à l'auteur un SMS
+ * avec le numéro et un e-mail avec le bouton « Appeler »
+ * (app/api/jobs/appel-manque). Une fois par créneau, vérifié côté site.
+ */
+async function reportMissed(phone: string, callSid: string): Promise<void> {
+    try {
+        const res = await fetch(`${config.nextBaseUrl}/api/jobs/appel-manque`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'x-vapi-secret': config.webhookSecret },
+            body: JSON.stringify({ phone }),
+        });
+        console.info(`[voice] ${callSid} : appel manqué signalé au site (${res.status})`);
+    } catch (err) {
+        console.warn(`[voice] ${callSid} : appel manqué non signalé :`, err instanceof Error ? err.message : err);
+    }
+}
+
+/** Fin d'un appel de rendez-vous lancé par le serveur : personne n'a décroché ? */
+async function handleStatus(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+    const params = await readForm(req);
+    if (!isFromTwilio(req, params)) return reply(res, 403, 'forbidden');
+    const status = params.CallStatus ?? '';
+    if ((status === 'no-answer' || status === 'busy' || status === 'failed') && params.To) {
+        console.info(`[voice] ${params.CallSid} : rendez-vous sans réponse (${status})`);
+        await reportMissed(params.To, params.CallSid ?? '');
+    }
+    reply(res, 204, '');
+}
+
 async function handleAction(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
     const params = await readForm(req);
     if (!isFromTwilio(req, params)) return reply(res, 403, 'forbidden');
@@ -154,6 +186,7 @@ const server = http.createServer(async (req, res) => {
         }
         if (req.method === 'POST' && path === '/twilio/voice') return await handleVoice(req, res);
         if (req.method === 'POST' && path === '/twilio/action') return await handleAction(req, res);
+        if (req.method === 'POST' && path === '/twilio/status') return await handleStatus(req, res);
         reply(res, 404, 'not found');
     } catch (err) {
         console.error('[http] erreur :', err instanceof Error ? err.message : err);

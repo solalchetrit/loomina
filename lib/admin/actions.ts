@@ -8,6 +8,9 @@
  */
 
 import { db, phoneVariants } from '@/lib/loomina/db';
+import { remboursementEmail } from '../emails/messages/remboursement';
+import { relanceEmail, relanceOffreurEmail } from '../emails/messages/ecriture';
+import { memoAge } from '../emails/memo';
 import type { Profile, Project } from '@/lib/loomina/db';
 import { stripe } from '@/lib/stripe';
 import { sendSms } from '@/lib/loomina/sms';
@@ -85,14 +88,10 @@ export async function refundClient(profileId: string): Promise<RefundResult> {
     const profile = await readProfile(profileId);
     const name = profile?.first_name ?? 'le client';
     const buyerEmail = typeof meta.buyer_email === 'string' ? meta.buyer_email : profile?.email ?? null;
+    const refundMail = remboursementEmail({ firstName: profile?.first_name ?? null, amount });
     await Promise.allSettled([
         buyerEmail
-            ? sendEmail({
-                  to: buyerEmail,
-                  subject: 'Votre remboursement Loomina',
-                  text: `Bonjour,\n\nNous venons de vous rembourser intégralement votre commande Loomina (${amount} €). Selon votre banque, le montant apparaît sur votre compte sous 5 à 10 jours.\n\nMerci d'avoir essayé Loomina. Si vous avez une question, répondez simplement à ce message.\n\nL'équipe Loomina`,
-                  replyTo: teamContacts().email,
-              })
+            ? sendEmail({ to: buyerEmail, subject: refundMail.subject, text: refundMail.text, html: refundMail.html, replyTo: teamContacts().email })
             : Promise.resolve(false),
         alertTeam({
             subject: `Remboursement fait : ${name}`,
@@ -107,26 +106,27 @@ export async function refundClient(profileId: string): Promise<RefundResult> {
 // Relancer un client qui n'appelle pas
 // ------------------------------------------------------------
 
-/** Les textes de relance : au narrateur, ou à celui qui a offert le livre. */
-export function relanceTexts(params: { firstName: string | null; tu: boolean; toGiver: boolean; narrator: string }): { sms: string; subject: string; email: string } {
+/** Les textes de relance : au narrateur, ou à celui qui a offert le livre. E-mails : lib/emails/messages/ecriture.ts. */
+export function relanceTexts(params: { firstName: string | null; tu: boolean; toGiver: boolean; narrator: string; phase?: number | null }): { sms: string; subject: string; email: string; html: string } {
     const host = SITE.url.replace(/^https?:\/\/(www\.)?/, '');
     if (params.toGiver) {
+        const mail = relanceOffreurEmail({ giverFirstName: params.firstName, narrator: params.narrator });
         return {
-            sms: `Loomina : le livre de ${params.narrator} n'attend plus que son premier appel. ${params.narrator} peut appeler le ${SITE.phoneDisplay} depuis son téléphone, quand il ou elle veut. Besoin d'aide ? Écrivez à contact@loomina.eu`,
-            subject: `Le livre de ${params.narrator} n'attend plus que son premier appel`,
-            email: `Bonjour${params.firstName ? ` ${params.firstName}` : ''},\n\nLe livre que vous avez offert à ${params.narrator} est prêt, mais nous n'avons pas encore eu son premier appel.\n\nPour commencer, ${params.narrator} n'a qu'à appeler le ${SITE.phoneDisplay} depuis son propre téléphone, quand il ou elle le souhaite. Il n'y a rien à préparer : Loomina mène la conversation.\n\nSi quelque chose bloque, répondez simplement à ce message : nous vous aidons volontiers.\n\nL'équipe Loomina`,
+            sms: `Loomina : le livre de ${params.narrator} n'attend plus que son premier appel ! ${params.narrator} peut appeler le ${SITE.phoneDisplay} depuis son téléphone, quand il ou elle veut. Besoin d'aide ? Écrivez à contact@loomina.eu`,
+            subject: mail.subject,
+            email: mail.text,
+            html: mail.html,
         };
     }
     const hello = params.firstName ? `Bonjour ${params.firstName}` : 'Bonjour';
+    const mail = relanceEmail({ firstName: params.firstName, tu: params.tu, age: memoAge(params.phase) });
     return {
         sms: params.tu
             ? `${hello}, c'est Loomina. Ton livre t'attend : appelle le ${SITE.phoneDisplay} quand tu veux, je serai ravi de t'écouter. Ton espace : ${host}/dashboard`
             : `${hello}, c'est Loomina. Votre livre vous attend : appelez le ${SITE.phoneDisplay} quand vous voulez, je serai ravi de vous écouter. Votre espace : ${host}/dashboard`,
-        subject: params.tu ? 'Ton livre t’attend' : 'Votre livre vous attend',
-        // Au tutoiement si l'auteur l'a choisi, comme le SMS (23/11/2026).
-        email: params.tu
-            ? `${hello},\n\nTon livre t'attend. Pour continuer, appelle le ${SITE.phoneDisplay} depuis ton téléphone, quand tu veux : il n'y a rien à préparer, Loomina mène la conversation.\n\nTu peux aussi choisir des jours et une heure dans ton espace (${host}/dashboard) : Loomina t'appellera.\n\nSi quelque chose te gêne, réponds simplement à ce message.\n\nL'équipe Loomina`
-            : `${hello},\n\nVotre livre vous attend. Pour continuer, appelez le ${SITE.phoneDisplay} depuis votre téléphone, quand vous le souhaitez : il n'y a rien à préparer, Loomina mène la conversation.\n\nVous pouvez aussi choisir des jours et une heure dans votre espace (${host}/dashboard) : Loomina vous appellera.\n\nSi quelque chose vous gêne, répondez simplement à ce message.\n\nL'équipe Loomina`,
+        subject: mail.subject,
+        email: mail.text,
+        html: mail.html,
     };
 }
 
@@ -150,13 +150,14 @@ export async function relanceClient(profileId: string, opts: { auto?: string } =
         tu: profile.politeness_preference === 'tu',
         toGiver,
         narrator: profile.first_name ?? 'votre proche',
+        phase: project.phase,
     });
     const phone = toGiver ? giver!.phone : profile.phone_number;
     const email = toGiver ? (typeof meta.buyer_email === 'string' ? meta.buyer_email : null) : meta.is_gift === true ? null : profile.email;
 
     const [sms, mail] = await Promise.all([
         phone ? sendSms(phone, texts.sms) : Promise.resolve(false),
-        email ? sendEmail({ to: email, subject: texts.subject, text: texts.email, replyTo: teamContacts().email }) : Promise.resolve(false),
+        email ? sendEmail({ to: email, subject: texts.subject, text: texts.email, html: texts.html, replyTo: teamContacts().email, loginPhone: phone }) : Promise.resolve(false),
     ]);
     if (!sms && !mail) return { ok: false, message: 'Ni le SMS ni l’e-mail ne sont partis (numéro manquant, ou envoi refusé).' };
 

@@ -45,6 +45,8 @@ interface FamilyBook {
   openQuestions: string[];
   /** Exemplaires en plus déjà commandés pour ce livre. */
   extraCopies?: number;
+  /** Livre offert, avant tout appel : quand prévenir la personne (seulement pour celui qui offre). */
+  reveal?: { date: string | null; sentAt: string | null } | null;
 }
 
 interface FamilyOverview {
@@ -173,6 +175,116 @@ function Suggest({ book, onAdded, onUnauthorized }: { book: FamilyBook; onAdded:
   );
 }
 
+/** « 24 décembre » */
+function longDay(ymd: string): string {
+  return new Date(`${ymd}T12:00:00Z`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" });
+}
+
+/**
+ * Livre offert : rien n'est parti vers la personne. Celui qui offre choisit
+ * de la prévenir maintenant, ou le jour J à 10 h (lib/loomina/gift-reveal.ts).
+ */
+function Reveal({ book, name, onChange, onUnauthorized }: { book: FamilyBook; name: string; onChange: (b: FamilyBook) => void; onUnauthorized: () => void }) {
+  const reveal = book.reveal!;
+  const [date, setDate] = useState(reveal.date ?? "");
+  const [busy, setBusy] = useState<"now" | "date" | "cancel" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmNow, setConfirmNow] = useState(false);
+  const today = new Date();
+  const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const min = ymd(new Date(today.getTime() + 86_400_000));
+  const max = ymd(new Date(today.getTime() + 365 * 86_400_000));
+
+  const send = async (kind: "now" | "date" | "cancel") => {
+    setBusy(kind);
+    setError(null);
+    try {
+      const res = await fetch("/api/famille/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: book.id, reveal: kind === "now" ? "now" : kind === "cancel" ? null : { date } }),
+      });
+      if (res.status === 401) return onUnauthorized();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : "L’enregistrement n’a pas abouti. Réessayez.");
+      if (kind === "now") onChange({ ...book, reveal: { date: null, sentAt: data.sentAt ?? new Date().toISOString() } });
+      else onChange({ ...book, reveal: { date: kind === "cancel" ? null : data.date ?? date, sentAt: null } });
+      if (kind === "cancel") setDate("");
+      setConfirmNow(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "L’enregistrement n’a pas abouti. Réessayez.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  if (reveal.sentAt) {
+    return (
+      <section className="card p-6 md:p-8" aria-labelledby={`surprise-${book.id}`}>
+        <h3 id={`surprise-${book.id}`} className="t-heading">
+          Le message de bienvenue est parti
+        </h3>
+        <p className="t-body mt-1">
+          {name} a reçu son SMS de bienvenue, avec le numéro à appeler pour commencer : le 01 59 16 93 57. Un petit coup de pouce aide souvent : être à ses côtés pour le premier appel.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="card p-6 md:p-8" aria-labelledby={`surprise-${book.id}`}>
+      <h3 id={`surprise-${book.id}`} className="t-heading">
+        Quand prévenir {name} ?
+      </h3>
+      {reveal.date ? (
+        <p className="t-body mt-1">
+          Le {longDay(reveal.date)} à 10 h, {name} recevra un SMS de bienvenue avec le numéro à appeler. Vous recevrez un e-mail au même moment. D’ici là, rien ne part : la surprise est intacte.
+        </p>
+      ) : (
+        <p className="t-body mt-1">
+          Rien n’a été envoyé à {name} : la surprise est intacte. Choisissez le jour où {name} reçoit un SMS de bienvenue avec le numéro à appeler, ou envoyez-le maintenant.
+        </p>
+      )}
+      <div className="mt-5 flex flex-wrap items-end gap-3">
+        <label className="flex flex-col gap-1.5 text-[15px] font-bold text-[var(--ink-3)]">
+          Le jour J
+          <input type="date" min={min} max={max} value={date} onChange={(e) => setDate(e.target.value)} className="field !w-auto" />
+        </label>
+        <Button onClick={() => send("date")} loading={busy === "date"} disabled={!date || date === reveal.date || busy !== null}>
+          {reveal.date ? "Changer la date" : "Programmer"}
+        </Button>
+        {reveal.date && (
+          <Button variant="ghost" onClick={() => send("cancel")} loading={busy === "cancel"} disabled={busy !== null}>
+            Annuler
+          </Button>
+        )}
+      </div>
+      <div className="mt-5 border-t border-[var(--line-soft)] pt-4">
+        {confirmNow ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-[16px] font-semibold">Envoyer le SMS de bienvenue à {name} maintenant ?</p>
+            <Button onClick={() => send("now")} loading={busy === "now"} disabled={busy !== null}>
+              Oui, prévenir {name}
+            </Button>
+            <button type="button" className="link text-[16px]" onClick={() => setConfirmNow(false)}>
+              Pas encore
+            </button>
+          </div>
+        ) : (
+          <button type="button" className="link text-[16px]" onClick={() => setConfirmNow(true)}>
+            Prévenir {name} maintenant
+          </button>
+        )}
+      </div>
+      {error && (
+        <p role="alert" className="mt-3 text-[15px] font-semibold text-[var(--danger)]">
+          {error}
+        </p>
+      )}
+    </section>
+  );
+}
+
 /** Le livre après « terminé » : les cinq étapes, en lecture seule. */
 function Delivery({ book, name }: { book: FamilyBook; name: string }) {
   const stage = book.delivery && book.delivery.stage !== "writing" ? book.delivery.stage : "completed";
@@ -267,6 +379,7 @@ function Book({ book, giverFirstName, onChange, onReload, onUnauthorized }: { bo
         />
       )}
 
+      {book.reveal && <Reveal book={book} name={name} onChange={onChange} onUnauthorized={onUnauthorized} />}
       {book.completed && <Delivery book={book} name={name} />}
       {book.weave && <Companion project={asProject(book)} narrator={name} skipIntro={Boolean(book.welcome)} />}
       {book.setup && !book.welcome && <FirstCall book={book} name={name} onEdit={() => setEditing(true)} />}

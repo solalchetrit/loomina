@@ -15,6 +15,7 @@ export const GROUPS: Array<{ title: string; items: Item[] }> = [
     items: [
       { href: "/admin", label: "Aujourd’hui", icon: "home" },
       { href: "/admin/clients", label: "Clients", icon: "users" },
+      { href: "/admin/contacts", label: "Contacts", icon: "user" },
       { href: "/admin/livres", label: "Livres", icon: "book" },
       { href: "/admin/demos", label: "Démos", icon: "phone" },
     ],
@@ -31,6 +32,7 @@ export const GROUPS: Array<{ title: string; items: Item[] }> = [
     title: "Outils",
     items: [
       { href: "/admin/mails", label: "Mails", icon: "message" },
+      { href: "/admin/emails-types", label: "E-mails types", icon: "copy" },
       { href: "/admin/technique", label: "Technique", icon: "server" },
     ],
   },

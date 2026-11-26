@@ -138,6 +138,10 @@ async function placeScheduledCalls(isBusy: (phone: string) => boolean): Promise<
                 // Répondeur : on raccroche plutôt que de parler à une messagerie.
                 machineDetection: 'Enable',
                 timeout: 40,
+                // Fin de l'appel : sans réponse, le site prévient l'auteur (SMS + e-mail, 25/11/2026).
+                statusCallback: `${config.publicUrl}/twilio/status`,
+                statusCallbackEvent: ['completed'],
+                statusCallbackMethod: 'POST',
             });
             console.info(`[rendez-vous] appel ${call.sid} lancé pour le créneau ${slot}`);
         } catch (err) {

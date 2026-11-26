@@ -11,6 +11,8 @@ import { normalizeSchedule, describeCalls, parseCallOnce } from '@/lib/loomina/s
 import { readPhaseState } from '@/lib/loomina/phase-plan';
 import { buildWeave } from '@/lib/loomina/weave';
 import { familySetupOpen } from '@/lib/loomina/family-setup';
+import { readGiver } from '@/lib/loomina/giver';
+import { readReveal } from '@/lib/loomina/gift-reveal';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -95,6 +97,15 @@ export async function GET(request: NextRequest) {
                         : null,
                     // Ce que la famille a réglé avant le premier appel (affiché, plus modifiable une fois l'appel passé).
                     setBy: meta.prefs_set_by === 'giver' ? 'giver' : meta.prefs_set_at ? 'author' : null,
+                    // Livre offert : quand prévenir la personne (lib/loomina/gift-reveal.ts). Seul celui qui offre choisit,
+                    // et seulement avant tout appel.
+                    reveal:
+                        meta.is_gift === true && readGiver(meta)?.phone === session.phone && !completed && (anyCall.count ?? 0) === 0
+                            ? (() => {
+                                  const r = readReveal(meta);
+                                  return { date: r.date, sentAt: r.skipped ? null : r.sentAt };
+                              })()
+                            : null,
                     title: project.title,
                     phaseLabel: PHASE_LABELS[phase],
                     progress: Math.max(0, Math.min(100, project.phase_progress ?? 0)),
