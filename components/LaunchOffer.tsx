@@ -63,7 +63,7 @@ export function LaunchPrice({
           </span>
           <span className={`text-[15px] font-bold ${dark ? "text-white" : "text-[var(--ink)]"}`}>
             jusqu’au {LAUNCH_OFFER.label}
-            {daysLabel && <span className={"whitespace-nowrap " + (dark ? "text-[#ff8f8f]" : "text-[var(--noel)]")}> · {daysLabel}</span>}
+            {daysLabel && <span className={"whitespace-nowrap " + (dark ? "text-[var(--noel-bright)]" : "text-[var(--noel)]")}> · {daysLabel}</span>}
           </span>
         </p>
       )}
@@ -161,15 +161,70 @@ export function NoelBanner() {
           <span className="hidden lg:inline"> jusqu’au {LAUNCH_OFFER.label}</span>
         </span>
         {r && (
-          <span className="shrink-0 whitespace-nowrap rounded-full bg-white px-2.5 py-0.5 text-[13.5px] font-extrabold tabular-nums text-[var(--noel-deep)] sm:text-[14.5px]">
-            <span className="sm:hidden">J-{r.days}</span>
-            <span className="hidden sm:inline">
-              Plus que {r.days} j {two(r.hours)} h {two(r.minutes)} min {two(r.seconds)} s
-            </span>
+          <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap">
+            <span className="hidden text-white/85 sm:inline">Se termine dans</span>
+            {[
+              [String(r.days), r.days <= 1 ? "jour" : "jours"],
+              [two(r.hours), "h"],
+              [two(r.minutes), "min"],
+              [two(r.seconds), "s"],
+            ].map(([value, unit], i) => (
+              <span key={unit} className={`rounded-[8px] bg-[var(--noel-deep)] px-2 py-1 text-[14px] leading-none ${i > 1 ? "hidden sm:inline" : ""} ${i === 3 ? "min-w-[3.1rem] text-center" : ""}`}>
+                <b className="tabular-nums">{value}</b> {unit}
+              </span>
+            ))}
           </span>
         )}
         <span className="hidden shrink-0 font-bold underline underline-offset-4 xl:inline">J’en profite</span>
       </Link>
     </>
+  );
+}
+
+/**
+ * L'offre de lancement dans le haut de l'accueil (Solal, 26/11/2026) : pas
+ * de boîte, de la typographie. Un trait rouge, le prix en grand, l'ancien
+ * prix barré et le temps qui reste.
+ */
+export function HeroOffer({ className = "" }: { className?: string }) {
+  const { active } = useLaunchOffer();
+  const now = useNowSecond();
+  if (!active) return null;
+  const r = now == null ? null : remaining(now);
+  return (
+    <Link href="/#offre-de-noel" className={`group block w-fit max-w-full border-l-[3px] border-[var(--noel)] pl-5 ${className}`}>
+      <span className="flex items-center gap-2 text-[14px] font-extrabold uppercase tracking-[0.08em] text-[var(--noel)]">
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--noel)] opacity-60 motion-reduce:hidden" />
+          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[var(--noel)]" />
+        </span>
+        Offre de lancement · Noël
+      </span>
+      <span className="mt-2 flex flex-wrap items-end gap-x-4 gap-y-1">
+        <span className="text-[56px] font-extrabold leading-[0.9] tracking-[-0.05em] text-[var(--ink)] md:text-[64px]">
+          {LAUNCH_OFFER.price}
+          <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
+        </span>
+        <span className="whitespace-nowrap pb-1 text-[22px] font-bold text-[var(--ink-3)] line-through decoration-[var(--noel)] decoration-2">
+          <span className="sr-only">au lieu de </span>
+          {OFFER.regularPrice} {OFFER.currencySymbol}
+        </span>
+        <span className="pb-1.5 text-[16px] leading-snug text-[var(--ink-2)]">
+          jusqu’au {LAUNCH_OFFER.label}
+          {r && (
+            <>
+              <br />
+              <b className="whitespace-nowrap tabular-nums text-[var(--noel)]">
+                Il reste {r.days} {r.days <= 1 ? "jour" : "jours"} {two(r.hours)} h {two(r.minutes)} min
+              </b>
+            </>
+          )}
+        </span>
+      </span>
+      <span className="mt-2 inline-flex items-center gap-1.5 text-[15px] font-bold text-[var(--ink)] underline decoration-[var(--noel)] decoration-2 underline-offset-4">
+        Le cadeau de Noël à offrir à vos proches
+        <Icon name="arrow" size={16} className="transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </Link>
   );
 }

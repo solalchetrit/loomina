@@ -40,6 +40,7 @@
   --amber-wash: #fdf3e4;     /* fond très clair d'une ligne mise en avant */
   --noel: #b3202b;           /* rouge de Noël : bandeaux d'urgence de l'offre de lancement (Solal, 26/11/2026) */
   --noel-deep: #8f1821;
+  --noel-bright: #ff5a5f;    /* rouge de Noël lisible sur le bleu nuit */
   --noel-soft: #fbe9ea;
   --amber-deep: #6f4005;     /* texte sur --amber-soft */
 

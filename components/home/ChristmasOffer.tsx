@@ -32,7 +32,7 @@ export default function ChristmasOffer() {
                 <Icon name="gift" size={16} />
                 Offre de Noël
               </span>
-              <span className="text-[15px] font-bold text-[#ff8f8f]">Jusqu’au {LAUNCH_OFFER.label} seulement</span>
+              <span className="text-[15px] font-bold text-[var(--noel-bright)]">Jusqu’au {LAUNCH_OFFER.label} seulement</span>
             </p>
 
             <h2 id="offre-de-noel-titre" className="mt-5 text-balance text-[clamp(2rem,4.4vw,3.4rem)] font-extrabold leading-[1.04] tracking-[-0.04em] text-white">
@@ -44,7 +44,7 @@ export default function ChristmasOffer() {
 
             <div className="mt-7 flex flex-wrap items-end gap-x-8 gap-y-6">
               <p className="flex items-end gap-3">
-                <span className="text-[72px] font-extrabold leading-[0.82] tracking-[-0.05em] text-[var(--amber)] md:text-[92px]">
+                <span className="text-[72px] font-extrabold leading-[0.82] tracking-[-0.05em] text-[var(--noel-bright)] md:text-[92px]">
                   {LAUNCH_OFFER.price}
                   <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
                 </span>
@@ -54,13 +54,13 @@ export default function ChristmasOffer() {
                 </span>
               </p>
               <div>
-                <p className="mb-2 text-[14px] font-bold text-[#ff8f8f]">Noël, c’est dans</p>
+                <p className="mb-2 text-[14px] font-bold text-[var(--noel-bright)]">Noël, c’est dans</p>
                 <Countdown />
               </div>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Button href="/order" variant="accent" size="lg">
+              <Button href="/order" size="lg" className="!bg-[var(--noel)] !text-white hover:!bg-[var(--noel-deep)]">
                 Offrir Loomina pour Noël
               </Button>
               <Button href={`tel:${SITE.phone}`} variant="ghost" className="!px-0 !text-white !decoration-white/40 hover:!decoration-white">
@@ -81,7 +81,7 @@ export default function ChristmasOffer() {
             <ol className="rounded-[18px] bg-white/[0.06] p-5 sm:p-6">
               {STEPS.map((s, i) => (
                 <li key={s.title} className={`flex gap-4 ${i ? "mt-4" : ""}`}>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[15px] font-extrabold text-[var(--ink)]">{i + 1}</span>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--noel)] text-[15px] font-extrabold text-white">{i + 1}</span>
                   <span>
                     <span className="block text-[16px] font-bold leading-snug text-white">{s.title}</span>
                     <span className="mt-0.5 block text-[15px] leading-snug text-[#cfcfc8]">{s.text}</span>
