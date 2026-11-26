@@ -130,6 +130,8 @@ export class CallSession {
     private readonly turns: TurnRecord[] = [];
     private readonly modelLatenciesMs: number[] = [];
     private promptTokens = 0;
+    /** Part des jetons lus servie depuis le cache d'OpenAI (facturée 4 fois moins pour gpt-4.1). */
+    private cachedTokens = 0;
     private completionTokens = 0;
     private interruptions = 0;
     /** Attente ajoutée après chaque coupure (voir PATIENCE_STEP_MS). */
@@ -330,6 +332,7 @@ export class CallSession {
             metadata: { ...this.plan.metadata, ...(this.recordingSid ? { recordingSid: this.recordingSid } : {}) },
             modelLatenciesMs: this.modelLatenciesMs,
             promptTokens: this.promptTokens,
+            cachedTokens: this.cachedTokens,
             completionTokens: this.completionTokens,
             interruptions: this.interruptions,
         });
@@ -473,6 +476,7 @@ export class CallSession {
                         if (attemptCtl.signal.aborted) break;
                         if (chunk.usage) {
                             this.promptTokens += chunk.usage.prompt_tokens ?? 0;
+                            this.cachedTokens += chunk.usage.prompt_tokens_details?.cached_tokens ?? 0;
                             this.completionTokens += chunk.usage.completion_tokens ?? 0;
                         }
                         const delta = chunk.choices?.[0]?.delta?.content ?? '';

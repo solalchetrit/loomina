@@ -61,24 +61,26 @@ function twilioPrice(r: { price?: string | null; price_unit?: string | null } | 
 }
 
 /** Les SMS envoyés à un numéro entre deux instants (rappel avant l'appel, « récit prêt » après), prix réel. */
-async function smsAround(phone: string, from: Date, to: Date): Promise<{ count: number; amount: number; pending: number }> {
+async function smsAround(phone: string, from: Date, to: Date): Promise<{ count: number; amount: number; pending: number; segments: number }> {
     const day = from.toISOString().slice(0, 10);
-    const page = await twilioJson<{ messages: Array<{ date_sent: string | null; date_created: string; price: string | null; price_unit: string | null; direction: string }> }>(
+    const page = await twilioJson<{ messages: Array<{ date_sent: string | null; date_created: string; price: string | null; price_unit: string | null; direction: string; num_segments?: string | null }> }>(
         `/Messages.json?To=${encodeURIComponent(phone)}&DateSent%3E=${day}&PageSize=100`
     );
     let count = 0;
     let amount = 0;
     let pending = 0;
+    let segments = 0;
     for (const m of page?.messages ?? []) {
         if (!m.direction.startsWith('outbound')) continue;
         const at = new Date(m.date_sent ?? m.date_created).getTime();
         if (at < from.getTime() || at > to.getTime()) continue;
         count += 1;
+        segments += Number(m.num_segments) || 1;
         const p = twilioPrice(m);
         if (p == null) pending += 1;
         else amount += p;
     }
-    return { count, amount, pending };
+    return { count, amount, pending, segments };
 }
 
 interface InterviewRow {
@@ -99,17 +101,19 @@ interface InterviewRow {
 export async function callCosts(interviews: InterviewRow[], detail?: { phone: string | null; projectId: string | null }): Promise<Map<string, CallCost>> {
     const out = new Map<string, CallCost>();
     const eventIds = interviews.map((i) => i.call_event_id).filter((v): v is string => typeof v === 'string');
-    const events = new Map<string, { sid: string | null; prompt: number; completion: number; model: string | null; rec: string | null }>();
+    const events = new Map<string, { sid: string | null; prompt: number; cached: number | null; completion: number; model: string | null; rec: string | null }>();
     if (eventIds.length) {
         const { data } = await db()
             .from('call_events')
             .select('id, vapi_call_id, tokens:payload->message->costBreakdown, model:payload->message->call->metadata->>model, rec:payload->message->call->metadata->>recordingSid')
             .in('id', eventIds);
         for (const e of (data ?? []) as Array<Record<string, unknown>>) {
-            const t = (e.tokens ?? {}) as { llmPromptTokens?: number; llmCompletionTokens?: number };
+            const t = (e.tokens ?? {}) as { llmPromptTokens?: number; llmCachedTokens?: number; llmCompletionTokens?: number };
             events.set(String(e.id), {
                 sid: typeof e.vapi_call_id === 'string' ? e.vapi_call_id : null,
                 prompt: Number(t.llmPromptTokens) || 0,
+                // Compté depuis le 26/11/2026 ; avant, inconnu (null).
+                cached: t.llmCachedTokens == null ? null : Number(t.llmCachedTokens) || 0,
                 completion: Number(t.llmCompletionTokens) || 0,
                 model: typeof e.model === 'string' ? e.model : null,
                 rec: typeof e.rec === 'string' && e.rec.length > 0 ? e.rec : null,
@@ -144,21 +148,25 @@ export async function callCosts(interviews: InterviewRow[], detail?: { phone: st
             const items: CostItem[] = [];
 
             const [realLine, recording] = await Promise.all([
-                event?.sid && /^CA[0-9a-f]{32}$/i.test(event.sid) ? twilioJson<{ price?: string | null; price_unit?: string | null }>(`/Calls/${event.sid}.json`) : Promise.resolve(null),
+                event?.sid && /^CA[0-9a-f]{32}$/i.test(event.sid) ? twilioJson<{ price?: string | null; price_unit?: string | null; direction?: string | null }>(`/Calls/${event.sid}.json`) : Promise.resolve(null),
                 event?.rec && /^RE[0-9a-f]{32}$/i.test(event.rec) ? twilioJson<{ price?: string | null; price_unit?: string | null }>(`/Recordings/${event.rec}.json`) : Promise.resolve(null),
             ]);
             const line = twilioPrice(realLine);
             items.push({
                 provider: 'Twilio',
                 label: 'Ligne téléphonique',
-                detail: `${Math.ceil(minutes)} min d’appel vers un mobile français`,
+                // Appel de Patricia du 26/11/2026 : c'est elle qui avait appelé,
+                // la fiche disait pourtant « vers un mobile ».
+                detail: realLine?.direction === 'inbound'
+                    ? `${Math.ceil(minutes)} min, appel reçu sur le numéro de Loomina`
+                    : `${Math.ceil(minutes)} min, appel passé par Loomina`,
                 amount: line ?? eur(minutes * COSTS.lineFallbackPerMinute),
                 source: line == null ? 'estimé' : 'réel',
             });
             items.push({
                 provider: 'Twilio',
-                label: 'Écoute et voix (ConversationRelay)',
-                detail: `transcription Deepgram et voix ElevenLabs comprises, ${COSTS.conversationRelayPerMinute} $ la minute (Twilio ne donne pas ce prix appel par appel)`,
+                label: 'Écoute (Deepgram) et voix (ElevenLabs)',
+                detail: `facturées ensemble par Twilio ConversationRelay, ${COSTS.conversationRelayPerMinute} $ la minute (tarif public, Twilio ne donne pas ce prix appel par appel)`,
                 amount: eur(minutes * COSTS.conversationRelayPerMinute),
                 source: 'tarif',
             });
@@ -177,9 +185,15 @@ export async function callCosts(interviews: InterviewRow[], detail?: { phone: st
                 items.push({
                     provider: 'OpenAI',
                     label: 'IA de la conversation',
-                    detail: `${model}, ${fmtTokens(event.prompt)} jetons lus, ${fmtTokens(event.completion)} écrits`,
-                    amount: eur(tokensCostUsd({ model, input: event.prompt, cached: 0, output: event.completion })),
-                    source: 'réel',
+                    // Le 26/11/2026 : la part lue depuis le cache d'OpenAI (presque
+                    // tout l'historique, relu à chaque réplique) coûte 4 fois moins
+                    // et n'était pas comptée. Avant cette date, on ne la connaît
+                    // pas : le montant est un plafond.
+                    detail: event.cached == null
+                        ? `${model}, ${fmtTokens(event.prompt)} jetons lus, ${fmtTokens(event.completion)} écrits. Plafond : la part lue depuis le cache d’OpenAI, 4 fois moins chère, n’était pas comptée avant le 26/11/2026`
+                        : `${model}, ${fmtTokens(event.prompt)} jetons lus dont ${fmtTokens(event.cached)} depuis le cache, ${fmtTokens(event.completion)} écrits`,
+                    amount: eur(tokensCostUsd({ model, input: event.prompt, cached: Math.min(event.cached ?? 0, event.prompt), output: event.completion })),
+                    source: event.cached == null ? 'estimé' : 'réel',
                 });
             } else if (minutes > 0) {
                 items.push({ provider: 'OpenAI', label: 'IA de la conversation', detail: 'jetons non comptés pour cet appel', amount: eur(minutes * COSTS.conversationFallbackPerMinute), source: 'estimé' });
@@ -204,7 +218,7 @@ export async function callCosts(interviews: InterviewRow[], detail?: { phone: st
                         items.push({
                             provider: 'Twilio',
                             label: 'SMS',
-                            detail: `${sms.count} SMS au narrateur (rappel avant l’appel, « récit prêt » après)${sms.pending ? `, dont ${sms.pending} pas encore facturé(s)` : ''}`,
+                            detail: `${sms.count} SMS au narrateur (rappel avant l’appel, « récit prêt » après)${sms.segments > sms.count ? `, ${sms.segments} parties facturées : un SMS avec accents ou un long lien compte pour plusieurs` : ''}${sms.pending ? `, dont ${sms.pending} pas encore facturé(s)` : ''}`,
                             amount: sms.amount,
                             source: 'réel',
                         });
@@ -235,7 +249,7 @@ export async function callCosts(interviews: InterviewRow[], detail?: { phone: st
 
             const sum = (pred: (x: CostItem) => boolean) => items.filter(pred).reduce((s, x) => s + x.amount, 0);
             const lineAmount = sum((x) => x.label === 'Ligne téléphonique');
-            const voice = sum((x) => x.label.startsWith('Écoute et voix') || x.label === 'Enregistrement');
+            const voice = sum((x) => x.label === 'Écoute (Deepgram) et voix (ElevenLabs)' || x.label === 'Enregistrement');
             const conversation = sum((x) => x.label === 'IA de la conversation');
             const writing = sum((x) => x.label.startsWith('Directeur') || x.label.startsWith('Écrivain') || x.label.startsWith('Analyse et écriture'));
             const totalAll = sum(() => true);
