@@ -3,7 +3,7 @@ import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import GuidePage from "@/components/guide/GuidePage";
 import { SITE } from "@/config/site";
-import { OFFER } from "@/config/offer";
+import { OFFER, SHOW_PRICE, OFFER_PAGE_LABEL } from "@/config/offer";
 
 export const metadata: Metadata = {
   ...pageMeta({
@@ -72,9 +72,9 @@ export default function Page() {
             <p>
               Un livre imprimé ({OFFER.format}), avec vos photos placées dans le texte, et sa version numérique (
               {OFFER.digital}) à partager avec toute la famille. Comptez en général {OFFER.delay} du premier appel au livre
-              validé, pour {OFFER.price} € tout compris. Tous les détails sont sur la page{" "}
+              validé{SHOW_PRICE ? `, pour ${OFFER.price} € tout compris` : ", tout compris"}. Tous les détails sont sur la page{" "}
               <Link href="/offre" className="link">
-                le livre et le prix
+                {OFFER_PAGE_LABEL.toLowerCase()}
               </Link>
               .
             </p>

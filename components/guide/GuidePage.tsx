@@ -4,6 +4,7 @@ import { PageHeader, Section } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import Closing from "@/components/Closing";
 import { SITE } from "@/config/site";
+import { OFFER_PAGE_LABEL } from "@/config/offer";
 
 export type GuideSection = { title: string; body: ReactNode };
 
@@ -44,7 +45,7 @@ export default function GuidePage({
               Essayer la démo : {SITE.phoneDisplay}
             </Button>
             <Button href="/offre" variant="ghost" size="lg">
-              Le livre et le prix
+              {OFFER_PAGE_LABEL}
             </Button>
           </div>
         }

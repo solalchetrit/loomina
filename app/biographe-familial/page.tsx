@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
 import GuidePage from "@/components/guide/GuidePage";
 import { SITE } from "@/config/site";
-import { OFFER } from "@/config/offer";
+import { OFFER, SHOW_PRICE } from "@/config/offer";
 
 export const metadata: Metadata = {
   ...pageMeta({
     title: "Biographe familial : prix et alternative",
-    description: `Faire écrire la biographie d’un parent : ce que fait un biographe familial, ce que cela coûte, et comment Loomina propose un livre imprimé pour ${OFFER.price} €, par téléphone.`,
+    description: `Faire écrire la biographie d’un parent : ce que fait un biographe familial, ce que cela coûte, et comment Loomina propose un livre imprimé${SHOW_PRICE ? ` pour ${OFFER.price} €` : ""}, par téléphone.`,
     path: "/biographe-familial",
   }),
 };
@@ -45,7 +45,7 @@ export default function Page() {
                 sur un détail. Le récit de chaque appel est écrit dans ses mots.
               </p>
               <p>
-                Loomina est une intelligence artificielle : c’est ce qui permet un prix de {OFFER.price} € tout compris. Mais
+                Loomina est une intelligence artificielle : c’est ce qui permet {SHOW_PRICE ? `un prix de ${OFFER.price} € tout compris` : "un prix bien plus doux"}. Mais
                 le livre n’est pas laissé à la machine : la personne relit et corrige, et notre équipe relit l’ensemble avant
                 l’impression.
               </p>
@@ -72,7 +72,7 @@ export default function Page() {
       questions={[
         {
           q: "Combien coûte un biographe familial ?",
-          a: `Le plus souvent plusieurs milliers d’euros, selon la longueur du livre et le nombre de rencontres. Avec Loomina, le livre imprimé coûte ${OFFER.price} € tout compris, livraison incluse en France métropolitaine.`,
+          a: `Le plus souvent plusieurs milliers d’euros, selon la longueur du livre et le nombre de rencontres. Avec Loomina, le livre imprimé coûte ${SHOW_PRICE ? `${OFFER.price} €` : "une fraction de ce prix"} tout compris, livraison incluse en France métropolitaine.`,
         },
         {
           q: "Combien de temps faut-il pour écrire une biographie familiale ?",

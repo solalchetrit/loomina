@@ -27,6 +27,7 @@ import { sweepDemoStories, sweepDemoReminders } from '@/lib/loomina/demo-story';
 import { relanceAbandonedCarts } from '@/lib/loomina/abandoned-cart';
 import { sweepCallEves } from '@/lib/loomina/call-mails';
 import { sweepGiftReveals } from '@/lib/loomina/gift-reveal';
+import { sweepRecap } from '@/lib/admin/recap';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -88,9 +89,13 @@ async function handle(request: NextRequest) {
         const eves = await sweepCallEves().catch((e) => (console.error('[jobs] veille d’appel :', e instanceof Error ? e.message : e), 0));
         const reveals = await sweepGiftReveals().catch((e) => (console.error('[jobs] jours J :', e instanceof Error ? e.message : e), 0));
         if (eves || reveals) console.info('[jobs] veilles et jours J :', { eves, reveals });
+        // Le récap de 10 h et de 20 h par e-mail (26/11/2026), une seule fois par créneau.
+        const recap = await sweepRecap();
+        if (recap) console.info('[jobs] récap envoyé :', recap);
 
         return NextResponse.json({
             ok: true,
+            recap,
             picked,
             results,
             corrections,
