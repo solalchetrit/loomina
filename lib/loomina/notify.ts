@@ -26,9 +26,10 @@ import { familleEmail } from '../emails/messages/famille';
 import { panierEmail } from '../emails/messages/panier';
 import { livreTermineEmail, etapeLivreEmail, livreRecuEmail, FIRST_VERSION_DELAY } from '../emails/messages/livre';
 import { memoAge } from '../emails/memo';
-import { etapeSuivanteEmail } from '../emails/messages/ecriture';
+import { etapeSuivanteEmail, partieLivreEmail } from '../emails/messages/ecriture';
 
 export { FIRST_VERSION_DELAY };
+import { MEMO_AGES } from './memo';
 
 const HOST = SITE.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
 
@@ -280,6 +281,88 @@ export function authorOwnEmail(author: { email?: string | null }, projectMetadat
     return author.email?.trim() || null;
 }
 
+/** Après l'étape 1, 2, 3 : ce que raconte l'étape suivante, en vous et en tu. */
+const NEXT_STAGE_ABOUT: [string, string][] = [
+    ['Vous racontez vos racines : vos parents, votre enfance, l’école.', 'Tu racontes tes racines : tes parents, ton enfance, l’école.'],
+    ['Vous racontez votre vie adulte : votre métier, vos amours, vos enfants.', 'Tu racontes ta vie adulte : ton métier, tes amours, tes enfants.'],
+    ['Vous dites ce que vous voulez transmettre : vos valeurs, vos messages.', 'Tu dis ce que tu veux transmettre : tes valeurs, tes messages.'],
+];
+
+/**
+ * Une étape de Mémo est finie et la partie du livre qui lui correspond vient
+ * d'être écrite (Solal, 26/11/2026 : « quand un utilisateur a fini une phase,
+ * il faut qu'il ait un mail »). `through` : l'étape finie, de 1 à 3 (la
+ * quatrième finit le livre : c'est le message « livre terminé » qui part).
+ */
+export function stageBookTexts(
+    author: { first_name: string | null; politeness_preference?: string | null },
+    through: number,
+    chapters: number
+): { subject: string; email: string; sms: string; html: string } {
+    const tu = author.politeness_preference === 'tu';
+    const name = author.first_name?.trim();
+    const hello = name ? `Bonjour ${name}` : 'Bonjour';
+    const n = Math.min(Math.max(Math.round(through), 1), 3);
+    const done = MEMO_AGES[n - 1].stage;
+    const next = MEMO_AGES[n];
+    const first = n === 1;
+    const where = `${HOST}/dashboard`;
+    // Ce que la prochaine étape raconte, dans les mots de Mémo (lib/loomina/memo.ts).
+    const about = NEXT_STAGE_ABOUT[n - 1][0];
+    const aboutTu = NEXT_STAGE_ABOUT[n - 1][1];
+    const count = `${chapters} chapitre${chapters > 1 ? 's' : ''}`;
+    const subject = first
+        ? tu ? 'La première partie de ton livre est prête' : 'La première partie de votre livre est prête'
+        : tu ? 'Ton livre s’est allongé : une nouvelle partie est prête' : 'Votre livre s’est allongé : une nouvelle partie est prête';
+    const lines = tu
+        ? [
+              `${hello},`,
+              `Bravo : tu as fini l’étape « ${done} ».`,
+              first
+                  ? `Loomina vient d’écrire la première partie de ton livre avec tout ce que tu as raconté : ${count}, à lire dès maintenant.`
+                  : `Loomina vient d’écrire la suite de ton livre avec tout ce que tu as raconté pendant cette étape. Il compte maintenant ${count}.`,
+              `Mémo a grandi. Prochaine étape : « ${next.stage} ». ${aboutTu}`,
+              `Appelle quand tu veux au ${SITE.phoneDisplay}.`,
+          ]
+        : [
+              `${hello},`,
+              `Bravo : vous avez fini l’étape « ${done} ».`,
+              first
+                  ? `Loomina vient d’écrire la première partie de votre livre avec tout ce que vous avez raconté : ${count}, à lire dès maintenant.`
+                  : `Loomina vient d’écrire la suite de votre livre avec tout ce que vous avez raconté pendant cette étape. Il compte maintenant ${count}.`,
+              `Mémo a grandi. Prochaine étape : « ${next.stage} ». ${about}`,
+              `Appelez quand vous voulez au ${SITE.phoneDisplay}.`,
+          ];
+    // Le même e-mail que « Mémo grandit » (lib/emails), avec la partie du livre prête (26/11/2026).
+    const mail = partieLivreEmail({ tu, age: (n + 1) as 2 | 3 | 4, subject, lignes: lines as [string, string, string, string, string] });
+    const email = mail.text;
+    const html = mail.html;
+    const sms = tu
+        ? `${hello}, bravo : tu as fini l'étape « ${done} ». ${first ? 'La première partie de ton livre' : 'La suite de ton livre'} est prête à lire sur ${where}. Loomina`
+        : `${hello}, bravo : vous avez fini l'étape « ${done} ». ${first ? 'La première partie de votre livre' : 'La suite de votre livre'} est prête à lire sur ${where}. Loomina`;
+    return { subject, email, sms, html };
+}
+
+/** Prévient l'auteur, par SMS et par e-mail, qu'une partie de son livre est prête à lire. Ne lève jamais. */
+export async function notifyStageBookReady(
+    author: { first_name: string | null; politeness_preference?: string | null; phone_number?: string | null; email?: string | null },
+    projectMetadata: Record<string, unknown> | null | undefined,
+    through: number,
+    chapters: number
+): Promise<void> {
+    try {
+        if (through < 1 || through > 3) return;
+        const t = stageBookTexts(author, through, chapters);
+        const email = authorOwnEmail(author, projectMetadata);
+        await Promise.allSettled([
+            author.phone_number ? sendSms(author.phone_number, t.sms) : Promise.resolve(false),
+            email ? sendEmail({ to: email, subject: t.subject, text: t.email, html: t.html }) : Promise.resolve(false),
+        ]);
+    } catch (e) {
+        console.error('[notify] partie du livre prête, auteur non prévenu', e);
+    }
+}
+
 /** Prévient l'auteur, par SMS et par e-mail, que son livre est terminé. Ne lève jamais. */
 export async function notifyAuthorBookComplete(
     author: {
@@ -514,6 +597,8 @@ export async function notifyPhaseUp(params: {
     phase: number;
     /** Le récit écrit à cet appel : l'e-mail de l'auteur en parle (il remplace « ton récit est écrit »). */
     recitTitle?: string | null;
+    /** Seulement celui qui a offert le livre : l'auteur reçoit « Mémo grandit » avec la partie de son livre (notifyStageBookReady). */
+    familyOnly?: boolean;
 }): Promise<void> {
     try {
         if (params.phase !== 2 && params.phase !== 3 && params.phase !== 4) return;
@@ -524,7 +609,7 @@ export async function notifyPhaseUp(params: {
         // E-mail « en plus » : la désinscription l'arrête (25/11/2026).
         const { optOutLine, optOutHeaders, isOptedOut } = await import('./optout');
         const authorEmail = authorOwnEmail(params.author, meta);
-        if (authorEmail && !(await isOptedOut(authorEmail))) {
+        if (authorEmail && !params.familyOnly && !(await isOptedOut(authorEmail))) {
             const m = etapeSuivanteEmail({ firstName: params.author.first_name, tu: params.author.politeness_preference === 'tu', age, optOut: optOutLine(authorEmail), recit: params.recitTitle ?? null });
             jobs.push(sendEmail({ to: authorEmail, subject: m.subject, text: m.text, html: m.html, replyTo: team, headers: optOutHeaders(authorEmail), loginPhone: params.author.phone_number }));
         }

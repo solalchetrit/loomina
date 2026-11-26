@@ -17,6 +17,7 @@ import { jourJEmail } from './messages/cadeau';
 import { contactRecuEmail } from './messages/contact';
 import { remboursementEmail } from './messages/remboursement';
 import type { RenderedEmail } from './mise-en-page';
+import { stageBookTexts } from '../loomina/notify';
 
 export interface CatalogueEntry {
     id: string;
@@ -117,10 +118,13 @@ export const CATALOGUE: CatalogueEntry[] = [
     },
     ...([2, 3, 4] as const).flatMap((age) => [
         {
-            id: `etape-${age}`, etape: ETAPES[4], nom: `Mémo grandit : étape ${age} sur 4`,
-            quand: 'Après l’appel qui fait passer le livre à l’étape suivante', aQui: 'L’auteur',
-            variables: ['prénom', 'tu ou vous', 'nouvelle étape (âge de Mémo)'], code: 'lib/loomina/notify.ts (notifyPhaseUp)',
-            exemple: () => etapeSuivanteEmail({ firstName: 'Jeanne', tu: false, age }),
+            id: `etape-${age}`, etape: ETAPES[4], nom: `Mémo grandit : étape ${age} sur 4, la partie du livre est prête`,
+            quand: 'Quand la partie du livre de l’étape finie est écrite (le livre s’écrit à la fin de chaque étape)', aQui: 'L’auteur',
+            variables: ['prénom', 'tu ou vous', 'étape finie et suivante (âge de Mémo)', 'nombre de chapitres'], code: 'lib/loomina/notify.ts (notifyStageBookReady)',
+            exemple: () => {
+                const t = stageBookTexts({ first_name: 'Jeanne', politeness_preference: 'vous' }, age - 1, [3, 7, 11][age - 2]);
+                return { subject: t.subject, preheader: '', text: t.email, html: t.html };
+            },
         },
         ...(age === 2
             ? [{

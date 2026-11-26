@@ -52,7 +52,7 @@ export default function SuggestTopic({
       <h2 id="suggerer" className="text-[19px] font-extrabold tracking-[-0.02em]">
         Suggérer un sujet
       </h2>
-      <p className="mt-0.5 text-[15px] text-[var(--ink-2)]">Un souvenir à ne pas oublier, une question de la famille : Loomina l’abordera au prochain appel.</p>
+      <p className="mt-0.5 text-[15px] text-[var(--ink-2)]">Un souvenir à ne pas oublier, une question de la famille : Loomina l’abordera au moment du récit où il a sa place.</p>
 
       <form onSubmit={submit} className="mt-3">
         <label htmlFor="sujet" className="sr-only">
@@ -79,7 +79,7 @@ export default function SuggestTopic({
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-4">
           <Button type="submit" loading={status === "saving"} disabled={text.trim().length < 5}>
-            Ajouter au prochain appel
+            Ajouter
           </Button>
           <p role="status" className="text-[15px] font-semibold">
             {status === "saved" && <span className="text-[var(--success)]">C’est noté, Loomina vous en parlera.</span>}

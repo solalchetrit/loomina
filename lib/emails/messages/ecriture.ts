@@ -178,3 +178,37 @@ export function etapeSuivanteEmail(v: EtapeSuivanteVars): RenderedEmail {
         optOut: v.optOut,
     });
 }
+
+export interface PartieLivreVars {
+    tu: boolean;
+    /** Le nouvel âge de Mémo (l'étape qui commence). */
+    age: 2 | 3 | 4;
+    /** Les phrases du message (lib/loomina/notify.ts, stageBookTexts) : bonjour, bravo, le livre, la suite, appeler. */
+    lignes: [string, string, string, string, string];
+    subject: string;
+}
+
+/**
+ * Fin d'une étape : la partie du livre de cette étape est écrite (26/11/2026).
+ * C'est le « Mémo grandit » de l'auteur, avec son livre à lire.
+ */
+export function partieLivreEmail(v: PartieLivreVars): RenderedEmail {
+    const t = (a: string, b: string) => (v.tu ? a : b);
+    const g = GRANDIT[v.age];
+    const [hello, bravo, livre, suite, appel] = v.lignes;
+    return renderEmail({
+        subject: v.subject,
+        preheader: livre,
+        blocks: [
+            memo({ age: v.age, pose: 'c', bulle: t(g.bulle[0], g.bulle[1]) }),
+            titre(bravo),
+            ...ps(hello, livre),
+            bouton('Lire mon livre', DASHBOARD),
+            ...ps(suite),
+            progression(v.age, t('Où en est ton livre', 'Où en est votre livre')),
+            ...ps(appel),
+            appeler(),
+            signature(),
+        ],
+    });
+}

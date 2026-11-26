@@ -79,7 +79,7 @@ async function main() {
         assert.match(c!.block, /ajouter des détails/);
     });
     await check('A', 'Démo : répond sur le prix, le remboursement et le fonctionnement', () => {
-        assert.match(DEMO_SYSTEM, /449 euros/);
+        assert.match(DEMO_SYSTEM, /- Le prix : /);
         assert.match(DEMO_SYSTEM, /remboursement intégral[^\n]*7 jours/);
         assert.doesNotMatch(DEMO_SYSTEM, /ne parle pas de prix/);
     });

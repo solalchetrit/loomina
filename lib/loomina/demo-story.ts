@@ -243,6 +243,8 @@ async function demoPromoCode(story: DemoStory): Promise<{ code: string; expires:
         const known = story.promo_expires_at ? new Date(story.promo_expires_at) : await promoExpiry(story.id, story.promo_code);
         return { code: story.promo_code, expires: known ?? new Date(Date.now() + DEMO_PROMO.days * 86_400_000) };
     }
+    // Plus de nouvelle réduction (config/offer.ts) : l'e-mail part avec le bouton seul.
+    if (!DEMO_PROMO.enabled) return null;
     const expires = new Date(Date.now() + DEMO_PROMO.days * 86_400_000);
     const code = `RECIT${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
     try {

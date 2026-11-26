@@ -1,10 +1,8 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
+import ChristmasOffer from "@/components/home/ChristmasOffer";
 import Facts from "@/components/home/Facts";
 import Audiences from "@/components/home/Audiences";
-import WhatYouGet from "@/components/home/WhatYouGet";
-import ThemePicker from "@/components/home/ThemePicker";
-import Compare from "@/components/home/Compare";
 import HowItWorks from "@/components/HowItWorks";
 import MemoSection from "@/components/home/MemoSection";
 import AuthorShowcase from "@/components/AuthorShowcase";
@@ -48,6 +46,9 @@ export default function Home() {
         <Hero />
       </div>
 
+      {/* L'offre de lancement pour Noël (Solal, 26/11/2026) : disparaît seule après le 24 décembre. */}
+      <ChristmasOffer />
+
       <div>
         <HowItWorks />
       </div>
@@ -79,17 +80,6 @@ export default function Home() {
       <div>
         <VoiceToPage />
       </div>
-      <div>
-        <ThemePicker />
-      </div>
-      <div>
-        <WhatYouGet />
-      </div>
-
-      <div>
-        <Compare />
-      </div>
-
       {/* Le mot du fondateur, à la place d'avis clients que nous n'avons pas encore. */}
       <Section>
         <figure className="card mx-auto grid max-w-5xl items-center gap-8 p-5 md:grid-cols-[1fr_1.5fr] md:gap-12 md:p-6">

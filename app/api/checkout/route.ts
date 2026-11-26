@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { OFFER, LAUNCH, isOrderOpen, normalizeExtraCopies } from "@/config/offer";
+import { OFFER, LAUNCH, isOrderOpen, isLaunchOffer, normalizeExtraCopies } from "@/config/offer";
 import { extraCopiesLineItem } from "@/lib/loomina/extra-copies";
 import { stripe } from "@/lib/stripe";
 import { allow, clientIp, TOO_MANY } from "@/lib/loomina/rate-limit";
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
                     price_data: {
                         currency: "eur",
                         product_data: {
-                            name: `Loomina — ${OFFER.name}`,
+                            name: `Loomina — ${OFFER.name}${isLaunchOffer() ? " (offre de lancement)" : ""}`,
                             description: `Entretiens par téléphone, écriture, relecture humaine, livre imprimé (${OFFER.format}) livré chez vous, version numérique.`,
                             images: ["https://www.loomina.eu/og-image.jpg"],
                         },

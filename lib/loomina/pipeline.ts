@@ -318,6 +318,9 @@ export async function processEndOfCall(params: {
             .update({ processing_status: 'processed' })
             .eq('id', interviewId);
 
+        // Un appel sans récit peut quand même finir une étape (« on passe à la suite ») : le livre s'écrit alors.
+        await autoCompose(project.id);
+
         return {
             status: 'no_material',
             interviewId,
@@ -370,6 +373,7 @@ export async function processEndOfCall(params: {
     // rendu 28 mots de politesses (« J'allais bien, un peu fatiguée »).
     if (writer.word_count < MIN_CHAPTER_WORDS) {
         await supabase.from('interviews').update({ processing_status: 'processed' }).eq('id', interviewId);
+        await autoCompose(project.id);
         return {
             status: 'no_material',
             interviewId,
@@ -436,16 +440,19 @@ export async function processEndOfCall(params: {
         storyTitle: project.project_metadata?.share_with_giver === true ? writer.chapter_title : undefined,
     });
 
-    // Un e-mail à l'auteur après l'appel (25/11/2026) : « ton récit est écrit »,
-    // ou, si le livre passe à l'étape suivante, « Mémo grandit » avec le récit.
+    // Un e-mail à l'auteur après l'appel (25/11/2026) : « ton récit est écrit ».
+    // Si l'appel a fini une étape, l'auteur reçoit plutôt, quand la partie du livre
+    // est écrite, l'e-mail « Mémo grandit » avec son livre (notifyStageBookReady) ;
+    // ici, seul celui qui a offert le livre est prévenu.
     const phaseUp = !!brief.nextPhase && brief.nextPhase > phase && project.status !== 'completed' && [2, 3, 4].includes(brief.nextPhase);
     if (phaseUp) {
-        await notifyPhaseUp({ author: params.profile, projectMetadata: project.project_metadata, phase: brief.nextPhase!, recitTitle: writer.chapter_title });
+        await notifyPhaseUp({ author: params.profile, projectMetadata: project.project_metadata, phase: brief.nextPhase!, familyOnly: true });
     } else {
         await notifyRecitPret({ profile: params.profile, projectMetadata: project.project_metadata, title: writer.chapter_title, markdown: writer.chapter_content, phase });
     }
 
-    // Le livre se recompose avec ce nouveau récit, sans attendre ici.
+    // Si cet appel a fini une étape, le livre s'écrit jusqu'à cette étape, sans attendre ici.
+    // Sinon rien ne bouge : le livre que l'auteur a lu reste le même jusqu'à la fin de l'étape.
     await autoCompose(project.id);
 
     return {

@@ -940,3 +940,102 @@ test('récap : la phrase du jour et le sujet', () => {
     assert.equal(headline(d), 'Depuis hier 20 h : 1 démo, 1 appel client (22 min), 1 récit écrit, aucune commande.');
     assert.equal(recapSubject(d), 'Récap Loomina de 10 h : 1 démo, 1 appel, 0 commande · 1 point à voir');
 });
+
+// ------------------------------------------------------------
+// Souvenirs soufflés : chacun attend sa période de vie (Solal, 26/11/2026)
+// ------------------------------------------------------------
+
+const souffles = { suggestion_phases: { 'sa rencontre avec papi': 3, 'où êtes-vous née ?': 1, 'la maison de son enfance': 2 } };
+const topics = ['Sa rencontre avec papi', 'Où êtes-vous née ?', 'La maison de son enfance', 'Un sujet pas encore rangé'];
+
+test('souvenirs soufflés : au premier appel, seulement la vue d\'ensemble', () => {
+    const p = prompt(project({ phase: 1, context: {}, next_question_strategy: null, project_metadata: souffles }));
+    const ctx = { suggested_topics: topics };
+    const first = prompt(project({ phase: 1, context: ctx, project_metadata: souffles, next_question_strategy: null }));
+    assert.ok(!p.includes('Sa rencontre avec papi'));
+    assert.ok(!first.includes('Sa rencontre avec papi'));
+    assert.ok(!first.includes('La maison de son enfance'));
+});
+
+test('souvenirs soufflés : en phase 2, l\'enfance oui, la rencontre amoureuse non', () => {
+    const p = prompt(project({ phase: 2, context: { identity: { full_name: 'Jeanne Morel' }, last_call: { summary: 'La maison.' }, suggested_topics: topics }, project_metadata: souffles }));
+    assert.ok(p.includes('La maison de son enfance'));
+    assert.ok(p.includes('Où êtes-vous née ?'));
+    assert.ok(!p.includes('Sa rencontre avec papi'));
+    assert.ok(p.includes('Un sujet pas encore rangé'));
+    assert.ok(p.includes("n'ont pas encore de période attribuée"));
+});
+
+test('souvenirs soufflés : en phase 3, la rencontre arrive', () => {
+    const p = prompt(project({ phase: 3, context: { identity: { full_name: 'Jeanne Morel' }, last_call: { summary: 'La maison.' }, suggested_topics: topics }, project_metadata: souffles }));
+    assert.ok(p.includes('Sa rencontre avec papi'));
+    assert.ok(p.includes('La maison de son enfance'));
+});
+
+// ── Codes promo de l'admin (26/11/2026) ─────────────────────────────────────
+import { newPromoCode, parsePromoForm } from '../../lib/admin/promo';
+
+test('codes promo : un code tiré au hasard, sans lettres ambiguës', () => {
+    const a = newPromoCode();
+    assert.match(a, /^LOOM-[A-HJKMNP-Z2-9]{5}-[A-HJKMNP-Z2-9]{5}$/);
+    assert.notEqual(a, newPromoCode());
+    assert.match(newPromoCode('Noël 2026 !'), /^NOEL2026-/);
+});
+
+test('codes promo : le formulaire refuse ce qui n’a pas de sens', () => {
+    const form = (o: Record<string, string>) => { const f = new FormData(); for (const [k, v] of Object.entries(o)) f.set(k, v); return f; };
+    const ok = { note: 'Tante Monique', type: 'percent', valeur: '100', utilisations: '1', jours: '30', mot: '' };
+    assert.deepEqual(parsePromoForm(form(ok)), { note: 'Tante Monique', word: '', kind: 'percent', value: 100, uses: 1, days: 30 });
+    assert.equal(typeof parsePromoForm(form({ ...ok, valeur: '120' })), 'string');
+    assert.equal(typeof parsePromoForm(form({ ...ok, note: ' ' })), 'string');
+    assert.equal(typeof parsePromoForm(form({ ...ok, utilisations: '0' })), 'string');
+});
+
+// ------------------------------------------------------------
+// Le livre s'écrit à la fin de chaque étape (lib/loomina/book-edition.ts)
+// ------------------------------------------------------------
+test('le livre va jusqu’à la dernière étape finie', async () => {
+    const { bookThrough, inScope, upToDate } = await import('../../lib/loomina/book-edition');
+    // Première étape en cours : pas encore de livre.
+    assert.equal(bookThrough({ phase: 1, status: 'active' }), 0);
+    assert.equal(bookThrough({ phase: 2, status: 'active' }), 1);
+    assert.equal(bookThrough({ phase: 4, status: 'active' }), 3);
+    // Récit complet : tout le livre.
+    assert.equal(bookThrough({ phase: 4, status: 'completed' }), 4);
+
+    // C'est l'étape de l'APPEL qui compte, pas la période racontée : un souvenir
+    // d'enfance (période 2) dit pendant « Faire connaissance » (étape 1) entre dans le livre dès la fin de l'étape 1.
+    assert.equal(inScope({ callPhase: 1, phase: 2 }, 1), true);
+    // Un récit de l'étape en cours attend la fin de son étape.
+    assert.equal(inScope({ callPhase: 2, phase: 2 }, 1), false);
+    assert.equal(inScope({ callPhase: 2, phase: 1 }, 1), false);
+    // Sans appel connu, le récit suit sa période. Livre complet : tout entre.
+    assert.equal(inScope({ callPhase: null, phase: 1 }, 1), true);
+    assert.equal(inScope({ callPhase: null, phase: 3 }, 1), false);
+    assert.equal(inScope({ callPhase: 4, phase: 4 }, 4), true);
+
+    // Un livre est à jour s'il raconte la bonne étape avec tous ses récits.
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 1, 3), true);
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 2, 7), false);
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 1, 4), false);
+    // Un livre d'avant les étapes (pas d'étape notée) n'est jamais « à jour ».
+    assert.equal(upToDate({ source_count: 3, extras: {} }, 1, 3), false);
+});
+
+test('fin d’étape : l’e-mail et le SMS « une partie de votre livre est prête »', async () => {
+    const { stageBookTexts } = await import('../../lib/loomina/notify');
+    const v = stageBookTexts({ first_name: 'Jeanne', politeness_preference: 'vous' }, 1, 3);
+    assert.equal(v.subject, 'La première partie de votre livre est prête');
+    assert.match(v.email, /vous avez fini l’étape « Faire connaissance »/);
+    assert.match(v.email, /3 chapitres/);
+    assert.match(v.email, /Prochaine étape : « Les racines »/);
+    assert.match(v.sms, /La première partie de votre livre est prête à lire sur .*\/dashboard/);
+    assert.match(v.html, /memo-2-c\.png/);
+    const t = stageBookTexts({ first_name: 'Jeanne', politeness_preference: 'tu' }, 2, 7);
+    assert.match(t.subject, /^Ton livre s’est allongé/);
+    assert.match(t.email, /tu as fini l’étape « Les racines »/);
+    assert.match(t.email, /Tu racontes ta vie adulte : ton métier, tes amours, tes enfants\./);
+    assert.doesNotMatch(t.email + t.sms, /\b(vous|votre|vos)\b/i);
+    // Jamais « relié », jamais de prix.
+    for (const x of [v, t]) assert.doesNotMatch(x.email + x.sms + x.html, /reli[ée]|€/);
+});

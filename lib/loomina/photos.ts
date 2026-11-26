@@ -15,6 +15,7 @@ import { randomUUID } from 'node:crypto';
 import OpenAI from 'openai';
 import { db } from './db';
 import { normalizeContext } from './context';
+import { rememberSuggestionPhase } from './suggestion-phase-store';
 
 export const PHOTO_BUCKET = 'photos';
 export const MAX_PHOTOS = 40;
@@ -145,6 +146,8 @@ export async function addPhoto(params: {
     const nextContext = normalizeContext({ ...context, suggested_topics: [...(context.suggested_topics ?? []), photoTopic(entry)] });
     const { error } = await db().from('projects').update({ context: nextContext, project_metadata: { ...meta, photos } }).eq('id', params.projectId);
     if (error) throw new Error(error.message);
+    // La photo d'un mariage attendra que le livre arrive à la vie adulte (voir suggestion-phase.ts).
+    await rememberSuggestionPhase(params.projectId, photoTopic(entry), nextContext.suggested_topics ?? []);
     return photos;
 }
 

@@ -5,12 +5,19 @@
  * plan, puis un par chapitre). Une fonction du site est limitée à 300 s :
  * chaque appel à `advanceEdition` ne fait donc qu'UNE étape, et l'étape
  * suivante est demandée par `kickEdition`. Si la chaîne casse, la lecture
- * de l'espace auteur la relance : rien ne reste bloqué.
+ * de l'espace auteur la relance, et le rattrapage (toutes les 5 minutes,
+ * `sweepEditions`) la reprend même si personne n'ouvre l'espace.
+ *
+ * QUAND LE LIVRE S'ÉCRIT (Solal, 26/11/2026) : à la fin de chaque étape de
+ * Mémo, pas après chaque appel. L'auteur lit son livre dès qu'il a fini une
+ * étape, et le livre va jusqu'à la fin de la dernière étape finie. L'écriture
+ * a ainsi toute une période de vie sous les yeux, pas un appel isolé.
  */
 
 import { db } from './db';
 import type { Profile, Project } from './db';
 import { normalizeContext } from './context';
+import { toPhase } from './phases';
 import { planBook, writeBookChapter, carryCorrection, polishBook, writePieces, chapterSignature, RECIPE, bookUsage, mergeUsage } from './book';
 import type { UsageMap } from './book';
 import type { PlannedChapter, BookChapter, Source, BookPieces } from './book';
@@ -45,6 +52,8 @@ export interface Edition {
 export interface EditionExtras {
     /** Recette de composition (book.ts RECIPE) : une édition d'une autre recette n'est pas reprise. */
     recipe?: number;
+    /** La dernière étape finie que ce livre raconte (1 à 4). Absent : édition d'avant le 26/11/2026, composée de tous les récits. */
+    through?: number;
     /** Chapitres repris mot pour mot de l'édition précédente. */
     reused?: number;
     /** Leurs numéros : la relecture finale les lit mais n'y touche pas. */
@@ -62,34 +71,85 @@ const MAX_TRANSCRIPT_CHARS = 120_000;
 /** Une étape réclamée depuis plus longtemps est tenue pour abandonnée (fonction tuée). */
 const CLAIM_TTL_MS = 6 * 60 * 1000;
 
-async function readSources(projectId: string): Promise<Source[]> {
+/**
+ * Jusqu'où le livre peut être écrit : la dernière étape FINIE.
+ * 0 tant que la première étape est en cours (pas encore de livre),
+ * 4 quand le récit est complet (tout le livre).
+ */
+export function bookThrough(project: Pick<Project, 'phase' | 'status'>): number {
+    return project.status === 'completed' ? 4 : toPhase(project.phase) - 1;
+}
+
+/**
+ * Un récit entre dans le livre si son appel a eu lieu pendant une étape
+ * finie. On regarde l'étape de l'APPEL, pas la période racontée : un
+ * souvenir d'enfance dit pendant « Faire connaissance » est dans le livre dès
+ * la fin de cette étape. Un récit sans appel connu suit sa période.
+ */
+export function inScope(row: { callPhase: number | null; phase: number | null }, through: number): boolean {
+    if (through >= 4) return true;
+    return (row.callPhase ?? row.phase ?? 1) <= through;
+}
+
+type SourceRow = { chapter_number: number; title: string | null; content_markdown: string | null; version: number | null; latest_interview_id: string | null; phase: number | null };
+
+/** Les récits qui entrent dans le livre, avec l'appel dont chacun est tiré. */
+async function scopedRows(projectId: string, through: number, withTranscripts: boolean): Promise<{ rows: SourceRow[]; calls: Map<string, { phase: number | null; transcript: string | null }> }> {
     const { data, error } = await db()
         .from('chapters')
-        .select('chapter_number, title, content_markdown, version, latest_interview_id')
+        .select(withTranscripts ? 'chapter_number, title, content_markdown, version, latest_interview_id, phase' : 'chapter_number, version, latest_interview_id, phase')
         .eq('project_id', projectId)
         .neq('status', 'archived')
         .order('chapter_number', { ascending: true });
     if (error) throw new Error(`Lecture chapters impossible : ${error.message}`);
-    const rows = data ?? [];
+    const all = (data ?? []) as unknown as SourceRow[];
+    const ids = [...new Set(all.map((c) => c.latest_interview_id).filter((id): id is string => Boolean(id)))];
+    const calls = new Map<string, { phase: number | null; transcript: string | null }>();
+    if (ids.length) {
+        const { data: found, error: callErr } = await db().from('interviews').select(withTranscripts ? 'id, phase, transcript' : 'id, phase').in('id', ids);
+        // Sans les appels, le livre se compose quand même : chaque récit suit sa période, sans paroles d'origine.
+        if (callErr) console.warn('[livre] appels illisibles :', callErr.message);
+        for (const i of (found ?? []) as unknown as Array<{ id: string; phase: number | null; transcript?: string | null }>) {
+            calls.set(i.id, { phase: i.phase ?? null, transcript: typeof i.transcript === 'string' && i.transcript.trim() ? i.transcript : null });
+        }
+    }
+    const rows = all.filter((c) => inScope({ callPhase: c.latest_interview_id ? calls.get(c.latest_interview_id)?.phase ?? null : null, phase: c.phase }, through));
+    return { rows, calls };
+}
+
+/** Combien de récits entrent dans le livre aujourd'hui (lecture légère, sans les textes). */
+export async function countSources(projectId: string, through: number): Promise<number> {
+    if (through < 1) return 0;
+    return (await scopedRows(projectId, through, false)).rows.length;
+}
+
+async function readSources(projectId: string, through: number): Promise<Source[]> {
+    const { rows, calls } = await scopedRows(projectId, through, true);
 
     // Les paroles d'origine : la transcription de l'appel dont chaque récit
     // est tiré. Jamais pour un récit que l'auteur a corrigé (version > 1) :
     // le récit fait alors foi, et la transcription réintroduirait ce qu'il
     // a retiré ou rectifié.
-    const ids = rows.filter((c) => ((c.version as number | null) ?? 1) <= 1 && c.latest_interview_id).map((c) => c.latest_interview_id as string);
-    const transcripts = new Map<string, string>();
-    if (ids.length) {
-        const { data: calls, error: callErr } = await db().from('interviews').select('id, transcript').in('id', ids);
-        // Sans les transcriptions, le livre se compose quand même, à partir des récits.
-        if (callErr) console.warn('[livre] paroles d’origine illisibles :', callErr.message);
-        for (const i of calls ?? []) if (typeof i.transcript === 'string' && i.transcript.trim()) transcripts.set(i.id as string, i.transcript.slice(0, MAX_TRANSCRIPT_CHARS));
-    }
     return rows.map((c) => ({
-        number: c.chapter_number as number,
-        title: c.title as string | null,
-        content: (c.content_markdown as string) ?? '',
-        transcript: ((c.version as number | null) ?? 1) <= 1 && c.latest_interview_id ? transcripts.get(c.latest_interview_id as string) ?? null : null,
+        number: c.chapter_number,
+        title: c.title,
+        content: c.content_markdown ?? '',
+        transcript: (c.version ?? 1) <= 1 && c.latest_interview_id ? calls.get(c.latest_interview_id)?.transcript?.slice(0, MAX_TRANSCRIPT_CHARS) ?? null : null,
     }));
+}
+
+/** Le texte d'erreur d'une composition remplacée par une autre : ce n'est pas un échec à montrer. */
+const REPLACED = 'Remplacée';
+
+async function projectThrough(projectId: string): Promise<number> {
+    const { data, error } = await db().from('projects').select('phase, status').eq('id', projectId).single();
+    if (error || !data) throw new Error('Projet introuvable');
+    return bookThrough(data as Pick<Project, 'phase' | 'status'>);
+}
+
+/** Cette édition raconte-t-elle exactement ce que le livre doit raconter aujourd'hui ? */
+export function upToDate(edition: Pick<Edition, 'source_count' | 'extras'>, through: number, count: number): boolean {
+    return edition.extras?.through === through && edition.source_count === count;
 }
 
 /** La dernière édition prête, et celle en cours s'il y en a une. */
@@ -101,7 +161,7 @@ export async function readEditions(projectId: string): Promise<{ ready: Edition 
     return {
         ready: rows.find((r) => r.status === 'ready') ?? null,
         running: latest && (latest.status === 'planning' || latest.status === 'writing') ? latest : null,
-        failed: latest?.status === 'failed' ? latest : null,
+        failed: latest?.status === 'failed' && !latest.error?.startsWith(REPLACED) ? latest : null,
     };
 }
 
@@ -109,11 +169,13 @@ export async function readEditions(projectId: string): Promise<{ ready: Edition 
 export async function startEdition(projectId: string): Promise<Edition> {
     const { running } = await readEditions(projectId);
     if (running) return running;
-    const sources = await readSources(projectId);
-    if (sources.length < 2) throw new Error('Il faut au moins deux appels racontés pour composer le livre.');
+    const through = await projectThrough(projectId);
+    if (through < 1) throw new Error('Votre livre s’écrit à la fin de la première étape.');
+    const sources = await readSources(projectId, through);
+    if (sources.length < 1) throw new Error('Il n’y a pas encore de récit à mettre dans le livre.');
     const { data, error } = await db()
         .from('book_editions')
-        .insert({ project_id: projectId, status: 'planning', source_count: sources.length, source_words: sources.reduce((a, s) => a + countWords(s.content), 0) })
+        .insert({ project_id: projectId, status: 'planning', source_count: sources.length, source_words: sources.reduce((a, s) => a + countWords(s.content), 0), extras: { through } })
         .select('*')
         .single();
     if (error) throw new Error(`Écriture book_editions impossible : ${error.message}`);
@@ -180,7 +242,8 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
         const { data: project, error: pErr } = await supabase.from('projects').select('*').eq('id', edition.project_id).single();
         if (pErr || !project) throw new Error('Projet introuvable');
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', (project as Project).user_id).single();
-        const sources = await readSources(edition.project_id);
+        // Une édition d'avant le 26/11/2026 n'a pas d'étape notée : elle prend tous les récits, comme avant.
+        const sources = await readSources(edition.project_id, edition.extras?.through ?? 4);
         const context = normalizeContext((project as Project).context);
         const wishes = readWishes((project as Project).project_metadata);
         // L'édition précédente, si elle a été composée avec la même recette :
@@ -269,7 +332,16 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
             console.error(`[livre] pièces de l'édition ${id} non écrites :`, err instanceof Error ? err.message : String(err));
             pieces = previous?.extras?.pieces ?? null;
         }
-        return await save({ status: 'ready', extras: { ...extras, pieces, pieces_at: new Date().toISOString() } });
+        const finished = await save({ status: 'ready', extras: { ...extras, pieces, pieces_at: new Date().toISOString() } });
+        // Une étape de plus dans le livre : l'auteur est prévenu que sa nouvelle partie est prête à lire
+        // (pas pour une simple remise à jour de la même étape, ni pour la fin du livre, qui a son propre message).
+        const through = finished.extras?.through;
+        const before = ready && ready.id !== edition.id ? ready.extras?.through : 0;
+        if (profile && typeof through === 'number' && through >= 1 && through <= 3 && typeof before === 'number' && before < through) {
+            const { notifyStageBookReady } = await import('./notify');
+            await notifyStageBookReady(profile as Profile, (project as Project).project_metadata, through, finished.chapters.length);
+        }
+        return finished;
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         console.error(`[livre] édition ${id} en échec :`, message);
@@ -278,32 +350,90 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
 }
 
 /**
- * Après chaque appel raconté : le livre se recompose tout seul, en
- * arrière-plan. L'auteur n'a pas à savoir qu'il faut cliquer (Solal,
- * 16/11/2026). Une composition en cours est remplacée : elle ne contenait
- * pas le récit qui vient d'arriver.
+ * Appelé après chaque appel, et à l'ouverture de l'espace auteur : compose le
+ * livre SI une étape vient d'être finie (ou si le livre a pris du retard sur
+ * ce qu'il doit raconter). Entre deux fins d'étape, il ne fait rien : le
+ * livre que l'auteur a lu ne bouge pas.
  *
- * Ne lève jamais : un livre non recomposé ne doit pas faire échouer le
+ * `legacy: false` laisse en place un livre composé avant le 26/11/2026 (sans
+ * étape notée) : l'ouverture de l'espace ne le réécrit pas, seul un appel le fait.
+ *
+ * Ne lève jamais : un livre non composé ne doit pas faire échouer le
  * traitement d'un appel. `LOOMINA_AUTO_BOOK=off` coupe ce comportement
  * (batterie de tests, poste local).
  */
-export async function autoCompose(projectId: string, origin: string = SITE.url): Promise<void> {
-    if (process.env.LOOMINA_AUTO_BOOK === 'off') return;
+export async function autoCompose(projectId: string, origin: string = SITE.url, opts: { legacy?: boolean } = {}): Promise<'started' | 'running' | 'nothing'> {
+    if (process.env.LOOMINA_AUTO_BOOK === 'off') return 'nothing';
     try {
-        const { running } = await readEditions(projectId);
+        const through = await projectThrough(projectId);
+        const count = await countSources(projectId, through);
+        const { ready, running } = await readEditions(projectId);
         if (running) {
+            if (through >= 1 && upToDate(running, through, count)) {
+                await kickEdition(running.id, origin);
+                return 'running';
+            }
+            // Elle ne raconte plus ce qu'il faut (une étape s'est finie entre-temps, ou elle date d'avant les étapes).
             await db()
                 .from('book_editions')
-                .update({ status: 'failed', error: 'Remplacée : un nouvel appel est arrivé pendant la composition.', claimed_at: null, updated_at: new Date().toISOString() })
+                .update({ status: 'failed', error: `${REPLACED} : le livre s'écrit maintenant à la fin de chaque étape.`, claimed_at: null, updated_at: new Date().toISOString() })
                 .eq('id', running.id);
         }
+        if (through < 1 || count < 1) return 'nothing';
+        if (ready && upToDate(ready, through, count)) return 'nothing';
+        if (ready && ready.extras?.through === undefined && opts.legacy === false) return 'nothing';
         const edition = await startEdition(projectId);
         await kickEdition(edition.id, origin);
-        console.info(`[livre] recomposition lancée pour le projet ${projectId}`);
+        console.info(`[livre] composition lancée pour le projet ${projectId} (jusqu'à l'étape ${through}, ${count} récit(s))`);
+        return 'started';
     } catch (err) {
-        // Moins de deux récits, base indisponible… : le bouton de l'espace auteur reste là.
-        console.info('[livre] pas de recomposition automatique :', err instanceof Error ? err.message : String(err));
+        console.info('[livre] pas de composition automatique :', err instanceof Error ? err.message : String(err));
+        return 'nothing';
     }
+}
+
+/** Une composition sans nouvelle depuis ce délai est tenue pour arrêtée. */
+export const STALE_EDITION_MS = 3 * 60 * 1000;
+
+/**
+ * Le rattrapage (toutes les 5 minutes, /api/jobs/process) : reprend les
+ * compositions arrêtées en route. La chaîne d'étapes peut casser (Vercel
+ * refuse parfois qu'une fonction en appelle une autre, erreur 508 ; un
+ * déploiement coupe la fonction en cours) : sans cela, un livre restait à
+ * moitié écrit jusqu'à ce que quelqu'un ouvre l'espace auteur.
+ *
+ * Fait UNE étape lui-même (pas d'appel du site à lui-même), puis redemande la
+ * suite. Si la chaîne casse encore, le passage suivant reprend.
+ */
+export async function sweepEditions(origin: string = SITE.url, limit = 2): Promise<{ resumed: number }> {
+    const stale = new Date(Date.now() - STALE_EDITION_MS).toISOString();
+    const { data, error } = await db()
+        .from('book_editions')
+        .select('id, project_id, source_count, extras')
+        .in('status', ['planning', 'writing'])
+        .lt('updated_at', stale)
+        .order('updated_at', { ascending: true })
+        .limit(limit);
+    if (error) throw new Error(`Lecture book_editions impossible : ${error.message}`);
+    let resumed = 0;
+    for (const row of (data ?? []) as Array<Pick<Edition, 'id' | 'project_id' | 'source_count' | 'extras'>>) {
+        try {
+            const through = await projectThrough(row.project_id);
+            // Elle ne raconte plus ce que le livre doit raconter : autoCompose la remplace (ou l'arrête).
+            if (through < 1 || !upToDate(row, through, await countSources(row.project_id, through))) {
+                await autoCompose(row.project_id, origin);
+                resumed += 1;
+                continue;
+            }
+            const edition = await advanceEdition(row.id);
+            if (!edition) continue;
+            resumed += 1;
+            if (edition.status === 'planning' || edition.status === 'writing') await kickEdition(edition.id, origin);
+        } catch (err) {
+            console.error(`[livre] reprise de l'édition ${row.id} impossible :`, err instanceof Error ? err.message : String(err));
+        }
+    }
+    return { resumed };
 }
 
 /**
@@ -328,6 +458,8 @@ export async function carryIntoBook(params: {
             await autoCompose(params.projectId, params.origin);
             return;
         }
+        // Un récit qui n'est pas encore dans le livre (son étape n'est pas finie) : rien à reporter.
+        if (!ready.chapters.some((c) => c.sources.includes(params.source))) return;
         const chapters: BookChapter[] = [];
         let touched = 0;
         for (const c of ready.chapters) {
@@ -389,5 +521,6 @@ export function publicEdition(e: Edition) {
         sourceCount: e.source_count,
         at: e.updated_at,
         pieces: e.extras?.pieces ?? null,
+        through: e.extras?.through ?? null,
     };
 }

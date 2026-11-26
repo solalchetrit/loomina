@@ -18,14 +18,14 @@ const example: RecapData = {
     calls: [{ client: 'Jeanne Martin', profileId: 'exemple', at: '2026-11-26T08:20:00Z', seconds: 1382, status: 'processed', costHt: 1.12, costTtc: 1.34, estimated: false, first: false }],
     testCalls: 1,
     signups: [{ name: 'Marie Dupont', at: '2026-11-26T08:12:00Z', paid: true, isGift: true }],
-    orders: [{ client: 'Marie Dupont', at: '2026-11-26T08:12:00Z', isGift: true, paid: 449, discount: null }],
+    orders: [{ client: 'Marie Dupont', at: '2026-11-26T08:12:00Z', isGift: true, paid: 199, discount: null }],
     contacts: [{ name: 'Jean', subject: 'Question sur le livre offert', at: '2026-11-26T06:30:00Z' }],
     upcoming: [
         { day: 'aujourd’hui', time: '10:00', client: 'Jeanne Martin', first: false },
         { day: 'aujourd’hui', time: '18:30', client: 'Marie Dupont', first: true },
     ],
     totals: { clients: 3, activeBooks: 3, completedBooks: 0, realCalls: 4, minutes: 71, words: 6420, demos30: 8 },
-    month: { label: 'novembre 2026', spendHt: 84.3, spendTtc: 101.16, collected: 449, orders: 1 },
+    month: { label: 'novembre 2026', spendHt: 84.3, spendTtc: 101.16, collected: 199, orders: 1 },
     audience: { label: 'hier sur la journée', sessions: 142, users: 118, linkedin: 64, demoClicks: 9, checkouts: 2, sources: [{ source: 'linkedin.com', sessions: 58 }, { source: 'direct', sessions: 41 }, { source: 'google', sessions: 22 }, { source: 'lnkd.in', sessions: 6 }] },
     alerts: [
         { level: 'orange', text: 'Une démo trop courte pour en faire un récit (la personne a raccroché vite).' },

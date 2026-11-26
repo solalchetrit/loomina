@@ -17,7 +17,7 @@ const clean = (v: unknown, max: number): string | null => {
 
 /**
  * L'accueil de l'espace famille : la personne qui a offert le livre
- * prépare le premier appel du narrateur (prénom et prononciation, tu ou
+ * prépare le premier appel du narrateur (prénom, tu ou
  * vous, sujets à éviter), ou dit simplement qu'elle a vu l'accueil.
  * Les réglages ne s'écrivent qu'avant tout appel et tant que le narrateur
  * n'a rien réglé lui-même (lib/loomina/family-setup.ts). Au premier appel,

@@ -28,7 +28,7 @@ const AUDIENCES: { icon: IconName; title: string; text: string; points: string[]
 export default function Audiences() {
   return (
     <Section id="pour-qui">
-      <SectionHead title="Racontez votre histoire, ou offrez-la à un proche" text="Vous pouvez commander pour vous, ou pour un parent qui racontera à son tour. Tout le reste est identique." />
+      <SectionHead title="Racontez votre histoire, ou offrez-la à un proche" />
       <div className="head-gap grid gap-4 md:grid-cols-2" data-reveal>
         {AUDIENCES.map((a) => (
           <div

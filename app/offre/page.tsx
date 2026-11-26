@@ -8,8 +8,10 @@ import Icon from "@/components/ui/Icon";
 import Button from "@/components/ui/Button";
 import WhatYouGet from "@/components/home/WhatYouGet";
 import Compare from "@/components/home/Compare";
+import ChristmasOffer from "@/components/home/ChristmasOffer";
 import Closing from "@/components/Closing";
 import { OFFER, GUARANTEE, SHOW_PRICE, LAUNCH, OFFER_PAGE_LABEL } from "@/config/offer";
+import { LaunchPrice } from "@/components/LaunchOffer";
 
 const FAQ = [
   {
@@ -45,12 +47,9 @@ export default function OffrePage() {
               <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-[#cfcfc8] md:mt-5 md:text-[17px]">
                 Les entretiens, l’écriture, la relecture, la mise en page, l’impression et la livraison. Pas d’abonnement, rien à payer en plus.
               </p>
-              <div className="mt-5 flex items-end gap-4 md:mt-7">
+              <div className="mt-5 flex flex-wrap items-end gap-x-4 gap-y-3 md:mt-7">
                 {SHOW_PRICE ? (
-                  <p className="text-[48px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[68px]">
-                    {OFFER.price}
-                    <span className="ml-1 align-top text-[0.42em] tracking-normal">{OFFER.currencySymbol}</span>
-                  </p>
+                  <LaunchPrice tone="dark" priceClassName="text-[48px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[68px]" />
                 ) : (
                   <p className="whitespace-nowrap text-[34px] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--amber)] md:text-[46px]">
                     {LAUNCH.label.replace(/^\S+ /, "")}
@@ -65,7 +64,7 @@ export default function OffrePage() {
                   Commander
                 </Button>
                 <Button href={`tel:${SITE.phone}`} variant="ghost" className="!px-0 !text-white !decoration-white/40 hover:!decoration-white">
-                  Essayer d’abord gratuitement
+                  Essayer la démo
                 </Button>
               </div>
               <p className="mt-4 flex items-center gap-3 text-[15px] text-white md:mt-6">
@@ -110,6 +109,9 @@ export default function OffrePage() {
       />
 
       <Compare />
+
+      {/* L’offre de lancement de Noël, aussi hors de l’accueil (Solal, 26/11/2026). Disparaît seule après le 24 décembre. */}
+      <ChristmasOffer />
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">

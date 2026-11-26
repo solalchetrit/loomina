@@ -2,6 +2,7 @@ import Button from "@/components/ui/Button";
 import Photo from "@/components/ui/Photo";
 import { CheckList } from "@/components/ui/Section";
 import { OFFER, INCLUDED, GUARANTEE, SHOW_PRICE, LAUNCH } from "@/config/offer";
+import { LaunchPrice } from "@/components/LaunchOffer";
 
 /** L'offre (le prix, ou la date d'ouverture avant le lancement) et ce qu'elle comprend : deux cartes côte à côte. */
 export default function OfferCard({
@@ -24,12 +25,9 @@ export default function OfferCard({
             {OFFER.name}
           </p>
           {SHOW_PRICE ? (
-            <p className="mt-3 text-[80px] font-extrabold leading-none tracking-[-0.05em] md:text-[96px]">
-              {OFFER.price}
-              <span className="ml-1 align-top text-[0.42em] tracking-normal">
-                {OFFER.currencySymbol}
-              </span>
-            </p>
+            <div className="mt-4">
+              <LaunchPrice priceClassName="text-[80px] font-extrabold leading-none tracking-[-0.05em] md:text-[96px]" />
+            </div>
           ) : (
             <p className="mt-3 whitespace-nowrap text-[44px] font-extrabold leading-none tracking-[-0.045em] md:text-[56px]">
               {LAUNCH.label.replace(/^\S+ /, "")}

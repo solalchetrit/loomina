@@ -86,7 +86,7 @@ const MAX_THEMES = 25;
 const MAX_QUESTIONS = 15;
 const MAX_PLACES = 20;
 const MAX_SPELLINGS = 20;
-const MAX_SUGGESTIONS = 10;
+const MAX_SUGGESTIONS = 20;
 const MAX_CORRECTIONS = 30;
 const MAX_TEXT = 600;
 
