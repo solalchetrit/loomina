@@ -7,8 +7,8 @@
  * appel par appel (prix réel) ; la valeur ci-dessous ne sert que de repli.
  */
 export const COSTS = {
-    /** Dollar → euro. */
-    usdToEur: 0.92,
+    /** Dollar → euro (≈ 1,10 $ pour 1 €, mi-novembre 2026 ; 0,92 avant le 26/11/2026). */
+    usdToEur: 0.91,
     /** TVA française, pour afficher un montant TTC. */
     vat: 0.2,
     /** Prix par million de jetons : entrée, entrée en cache, sortie. */

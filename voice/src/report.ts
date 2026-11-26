@@ -39,6 +39,7 @@ export interface CallReportInput {
     metadata: Record<string, unknown>;
     modelLatenciesMs: number[];
     promptTokens: number;
+    cachedTokens: number;
     completionTokens: number;
     interruptions: number;
 }
@@ -90,6 +91,7 @@ export function buildEndOfCallReport(input: CallReportInput) {
             // Coût Twilio/ElevenLabs/Deepgram non connu ici ; le modèle seul.
             costBreakdown: {
                 llmPromptTokens: input.promptTokens,
+                llmCachedTokens: input.cachedTokens,
                 llmCompletionTokens: input.completionTokens,
             },
         },
