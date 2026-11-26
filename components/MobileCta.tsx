@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE } from "@/config/site";
+import { LaunchOfferLine } from "@/components/LaunchOffer";
 
 /** Sur téléphone, les deux actions restent à portée de pouce une fois le haut de page passé. */
 export default function MobileCta() {
@@ -22,12 +23,13 @@ export default function MobileCta() {
 
   return (
     <>
-      <div aria-hidden="true" className="h-24 xl:hidden" />
+      <div aria-hidden="true" className="h-32 xl:hidden" />
       <div
         className={`fixed inset-x-0 bottom-0 z-[900] px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-300 xl:hidden ${
           visible ? "translate-y-0" : "translate-y-[120%]"
         }`}
       >
+        <LaunchOfferLine className="mx-auto mb-1.5 w-fit max-w-md rounded-full bg-[var(--amber-soft)] px-3.5 py-1.5 text-center text-[14px] text-[var(--amber-deep)] shadow-[var(--shadow-bar)]" />
         <div className="mx-auto flex max-w-md gap-2 rounded-[22px] border border-[var(--line)] bg-white/95 p-2 shadow-[var(--shadow-bar)] backdrop-blur-md">
           <a
             href={`tel:${SITE.phone}`}

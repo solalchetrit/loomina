@@ -10,14 +10,41 @@
  * le prix est fixé juste avant l'ouverture. Passer à true le jour du lancement,
  * après avoir mis le bon montant dans OFFER.price.
  */
-export const SHOW_PRICE = false;
+export const SHOW_PRICE = true;
 
 /** Le lien vers /offre, dans le menu et le pied de page. */
 export const OFFER_PAGE_LABEL = SHOW_PRICE ? "Le livre et le prix" : "Le livre";
 
+/**
+ * Offre de lancement (Solal, 26/11/2026) : 199 € au lieu de 289 €, du
+ * lancement au 24 décembre inclus. Après, le prix normal revient tout seul
+ * au paiement (l'API lit l'heure). Les pages construites à l'avance gardent
+ * le prix du jour de leur construction : redéployer le site le 25 décembre.
+ */
+export const LAUNCH_OFFER = {
+  price: 199,
+  /** Première minute où le prix de lancement ne s'applique plus. */
+  endsAt: "2026-12-25T00:00:00+01:00",
+  label: "24 décembre",
+};
+
+export function isLaunchOffer(now: number = Date.now()): boolean {
+  return now < new Date(LAUNCH_OFFER.endsAt).getTime();
+}
+
+/** Jours pleins restants avant la fin de l'offre (0 le dernier jour). */
+export function launchOfferDaysLeft(now: number = Date.now()): number {
+  return Math.max(0, Math.ceil((new Date(LAUNCH_OFFER.endsAt).getTime() - now) / 86_400_000) - 1);
+}
+
 export const OFFER = {
   name: "Votre livre de vie, tout compris",
-  price: 449,
+  /** Le prix normal, hors offre de lancement. */
+  regularPrice: 289,
+  /** Le prix payé aujourd'hui : celui de l'offre de lancement jusqu'au 24 décembre. */
+  get price(): number {
+    return isLaunchOffer() ? LAUNCH_OFFER.price : this.regularPrice;
+  },
   currencySymbol: "€",
   /** Du premier appel au livre validé, en général. */
   delay: "6 à 8 semaines",

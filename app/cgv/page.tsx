@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
-import { OFFER, SHOW_PRICE } from "@/config/offer";
+import { OFFER, SHOW_PRICE, LAUNCH, LAUNCH_OFFER } from "@/config/offer";
 import { SELLER } from "@/config/legal";
 
 export const metadata: Metadata = {
@@ -48,7 +48,7 @@ export default function CGVPage() {
 
       <h2>4. Prix et paiement</h2>
       <p>
-        {SHOW_PRICE ? (<>Le prix du service est de <strong>{OFFER.price} € TTC</strong>, tout compris</>) : "Le prix du service est indiqué en euros TTC sur la page de commande. Il est tout compris"} ({SELLER.vat}). Il se règle par carte bancaire, en une fois, ou en trois
+        {SHOW_PRICE ? (<>Le prix du service est de <strong>{OFFER.regularPrice} € TTC</strong>, tout compris. Offre de lancement : <strong>{LAUNCH_OFFER.price} € TTC</strong> pour toute commande validée du {LAUNCH.label} au {LAUNCH_OFFER.label} 2026 inclus</>) : "Le prix du service est indiqué en euros TTC sur la page de commande. Il est tout compris"} ({SELLER.vat}). Il se règle par carte bancaire, en une fois, ou en trois
         ou quatre fois avec Klarna, via la plateforme sécurisée Stripe. Loomina ne conserve aucune donnée bancaire. Le prix applicable est celui
         affiché au moment de la validation de la commande.
       </p>

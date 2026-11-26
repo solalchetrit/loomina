@@ -1,12 +1,13 @@
 "use client";
 
-import { extraCopiesLabel } from "@/config/offer";
+import { extraCopiesLabel, LAUNCH_OFFER, OFFER as OFFER_PRICE } from "@/config/offer";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 // « /pure » : le script de Stripe ne se charge qu'à l'ouverture du paiement, pas sur toutes les pages du site.
 import { loadStripe } from "@stripe/stripe-js/pure";
 import { CheckoutElementsProvider, PaymentElement, useCheckout } from "@stripe/react-stripe-js/checkout";
 import Icon from "@/components/ui/Icon";
+import { useLaunchOffer } from "@/components/LaunchOffer";
 
 /**
  * L'étape « Paiement » de la commande, dessinée par Loomina (demande de Solal, 18/11/2026).
@@ -116,6 +117,7 @@ function PaymentForm({
   const [codeBusy, setCodeBusy] = useState(false);
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
+  const launch = useLaunchOffer();
 
   if (state.type === "loading") {
     return (
@@ -184,6 +186,11 @@ function PaymentForm({
             <span className="tabular-nums">{item ? item.subtotal.amount : checkout.total.subtotal.amount}</span>
           </div>
         ))}
+        {launch.active && (
+          <p className="mt-1.5 text-[14px] font-semibold text-[var(--amber-deep)]">
+            Offre de lancement : {LAUNCH_OFFER.price} € au lieu de <span className="line-through">{OFFER_PRICE.regularPrice} €</span>, jusqu’au {LAUNCH_OFFER.label}.
+          </p>
+        )}
         {discount && (
           <div className="mt-2 flex items-center justify-between gap-4 text-[15px] text-[var(--success)]">
             <span className="flex items-center gap-2">

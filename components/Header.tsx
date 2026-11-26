@@ -8,6 +8,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SITE } from "@/config/site";
 import { OFFER_PAGE_LABEL } from "@/config/offer";
+import { LaunchOfferPill, LaunchOfferLine } from "@/components/LaunchOffer";
 
 const NAV_LINKS = [
   { href: "/experience", label: "Comment ça marche" },
@@ -61,6 +62,7 @@ export default function Header() {
           </nav>
 
           <div className="hidden items-center gap-2 xl:flex">
+            <LaunchOfferPill />
             <Link
               href="/dashboard"
               aria-current={isActive("/dashboard") ? "page" : undefined}
@@ -124,6 +126,7 @@ export default function Header() {
               ))}
             </ul>
             <div className="mt-auto flex flex-col gap-3 pt-8">
+              <LaunchOfferLine className="rounded-[var(--radius-btn)] bg-[var(--amber-soft)] px-4 py-3 text-center text-[16px] text-[var(--amber-deep)]" />
               <Link
                 href="/order"
                 onClick={close}
