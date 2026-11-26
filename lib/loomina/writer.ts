@@ -108,6 +108,7 @@ Cela vaut aussi pour les décors et les portraits : une odeur, une pièce, un tr
 # LONGUEUR, ADAPTÉE À LA DENSITÉ
 - Transcript riche : chapitre complet de 900 à 1 800 mots.
 - Transcript moyen : 500 à 900 mots.
+- Appel de survol (le narrateur enchaîne les faits de sa vie sans les raconter : état civil, parents, métiers, mariage, séparation, enfants, petits-enfants, lieux, dates, décès) : ce n'est PAS un transcript pauvre. Écris CHAQUE fait dit, dans l'ordre de la vie, sans en écarter un seul parce qu'il est bref, triste ou sans anecdote : une séparation, un deuil, un compagnon, ce que font les enfants, la vie d'aujourd'hui. De 300 à 800 mots selon le nombre de faits.
 - Transcript pauvre (un ou deux faits nus) : 60 à 150 mots. Un fait = une ou deux phrases. Pas de clôture qui annonce la suite, pas de « cette période a été marquée par… ».
 Ne délaye jamais pour atteindre une longueur. Il n'y a AUCUNE longueur minimale : trois phrases vraies valent mieux que trois paragraphes brodés.
 
@@ -191,6 +192,32 @@ export function renderSensitive(topics?: string | null): string {
     return `# SUJETS SENSIBLES (demandés par le narrateur)\n${t}\nN'en écris rien de plus que ce que le narrateur en a dit lui-même dans ce transcript, avec retenue, sans détail douloureux ajouté ni commentaire. S'il les a seulement effleurés, laisse-les de côté. N'écris jamais qu'il préfère ne pas en parler.\n\n`;
 }
 
+/** Nombre de mots dits par le narrateur (lignes « User: ») dans un transcript. */
+export function narratorWords(transcript: string): number {
+    return transcript
+        .split('\n')
+        .filter((l) => /^\s*User\s*:/i.test(l))
+        .join(' ')
+        .replace(/^\s*User\s*:/gi, ' ')
+        .split(/\s+/)
+        .filter(Boolean).length;
+}
+
+/** Au-delà, un appel n'est plus « mince », quoi qu'en dise le Directeur. */
+export const THIN_MAX_NARRATOR_WORDS = 300;
+
+/**
+ * Garde-fou (26/11/2026). Sur un appel de survol (nom, naissance, métiers,
+ * mariage, divorce, enfants : 1 100 mots du narrateur), le Directeur a jugé la
+ * matière « mince » faute d'anecdote, et l'Écrivain, bridé à 150 mots, a écarté
+ * les trois quarts de ce qui avait été dit. Le livre, qui part des récits, ne
+ * l'a jamais su. Quand le narrateur a beaucoup parlé, la bride saute : la
+ * longueur suit alors la densité, comme pour tout autre appel.
+ */
+export function effectiveMaterial(material: 'thin' | 'rich' | undefined, transcript: string): 'thin' | 'rich' | undefined {
+    return material === 'thin' && narratorWords(transcript) > THIN_MAX_NARRATOR_WORDS ? 'rich' : material;
+}
+
 export async function runWriter(params: {
     transcript: string;
     context: LoominaContext;
@@ -207,7 +234,7 @@ export async function runWriter(params: {
 }): Promise<WriterResult> {
     await refreshPrompts();
     const thinNote =
-        params.material === 'thin'
+        effectiveMaterial(params.material, params.transcript) === 'thin'
             ? `# MATIÈRE JUGÉE MINCE PAR LE DIRECTEUR
 Le narrateur n'a livré qu'un ou deux faits nus. Écris 60 à 150 mots maximum : les faits, à la première personne, rien d'autre. Aucune émotion, aucun « moment fort », aucune « camaraderie » qui n'aient été dits.
 
