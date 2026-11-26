@@ -6,10 +6,23 @@
  */
 
 /**
- * Affiche le prix sur le site. Resté à false pendant la vitrine (25/11/2026) ;
- * à true depuis que Solal a fixé le prix (26/11/2026).
+ * L'INTERRUPTEUR DE LA VERSION DE NOËL (Solal, 26/11/2026).
+ *
+ * false : le site reste la vitrine d'avant le lancement. Aucun prix affiché,
+ *         pas de bandeau rouge, pas de module de Noël, commandes fermées.
+ *         Tout le reste du site (ce qui ne concerne pas Noël) se met en ligne
+ *         normalement.
+ * true  : la version de Noël. Les prix s'affichent (199 € au lieu de 289 €
+ *         jusqu'au 24 décembre), le bandeau et les modules de Noël apparaissent,
+ *         et les commandes s'ouvrent à LAUNCH.opensAt.
+ *
+ * « Lance la version de Noël » = passer cette ligne à true, puis déployer le
+ * site et le serveur d'appels. Rien d'autre à toucher.
  */
-export const SHOW_PRICE = true;
+export const NOEL_LIVE = false;
+
+/** Affiche le prix sur le site : avec la version de Noël seulement. */
+export const SHOW_PRICE = NOEL_LIVE;
 
 /** Le lien vers /offre, dans le menu et le pied de page. */
 export const OFFER_PAGE_LABEL = SHOW_PRICE ? "Le livre et le prix" : "Le livre";
@@ -28,7 +41,7 @@ export const LAUNCH_OFFER = {
 };
 
 export function isLaunchOffer(now: number = Date.now()): boolean {
-  return now < new Date(LAUNCH_OFFER.endsAt).getTime();
+  return NOEL_LIVE && now < new Date(LAUNCH_OFFER.endsAt).getTime();
 }
 
 /** Jours pleins restants avant la fin de l'offre (0 le dernier jour). */
@@ -145,5 +158,6 @@ export const LAUNCH = {
 };
 
 export function isOrderOpen(now: number = Date.now()): boolean {
-  return now >= new Date(LAUNCH.opensAt).getTime();
+  // Pas de commande tant que la version de Noël n'est pas lancée : personne ne paie un prix qui n'est pas affiché.
+  return NOEL_LIVE && now >= new Date(LAUNCH.opensAt).getTime();
 }
