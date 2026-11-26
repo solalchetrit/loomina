@@ -226,7 +226,6 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
           ) : (
           <dl>
             <Field label="Prénom, nom">{name}</Field>
-            <Field label="Prononcé">{profile.first_name_phonetic ?? "comme écrit"}</Field>
             <Field label="Téléphone">{profile.phone_number}</Field>
             <Field label="E-mail">{profile.email ? <Link className="underline" href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`}>{profile.email}</Link> : null}</Field>
             <Field label="Tu / vous">{profile.politeness_preference === "tu" ? "tutoiement" : "vouvoiement"}</Field>
@@ -439,9 +438,6 @@ function NarratorForm({ id, profile }: { id: string; profile: { first_name: stri
         </Input>
         <Input label="Nom">
           <input name="last_name" maxLength={80} defaultValue={profile.last_name ?? ""} className={inputCls} />
-        </Input>
-        <Input label="Prononciation du prénom" hint="Vide : Loomina le dit comme il est écrit.">
-          <input name="first_name_phonetic" maxLength={80} defaultValue={profile.first_name_phonetic ?? ""} className={inputCls} />
         </Input>
         <Input label="Téléphone" hint="Reconnaît le narrateur quand il appelle, et sert aux rendez-vous.">
           <input name="phone_number" type="tel" required maxLength={30} defaultValue={profile.phone_number ?? ""} className={`${inputCls} tabular-nums`} />

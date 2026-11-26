@@ -223,7 +223,6 @@ function FirstCall({ book, name, onEdit }: { book: FamilyBook; name: string; onE
             <dt className="text-[14px] font-bold text-[var(--ink-3)]">Prénom</dt>
             <dd className="mt-0.5 font-semibold">
               {setup.firstName || name}
-              {setup.firstNamePhonetic && <span className="font-normal text-[var(--ink-3)]"> · se dit « {setup.firstNamePhonetic} »</span>}
             </dd>
           </div>
           <div>

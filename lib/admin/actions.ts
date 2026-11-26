@@ -206,7 +206,7 @@ function text(form: FormData, key: string, max: number): string | null {
 
 /**
  * Demande de Solal (25/11/2026) : corriger depuis l'admin ce que le narrateur
- * a donné (prénom, nom, prononciation, téléphone, e-mail, tu ou vous, ton
+ * a donné (prénom, nom, téléphone, e-mail, tu ou vous, ton
  * d'écriture, sujets à éviter). Seule la ligne `profiles` change : l'e-mail
  * technique du compte (auth.users) reste celui créé à la commande.
  *
@@ -220,7 +220,6 @@ export async function updateNarrator(profileId: string, form: FormData): Promise
 
     const firstName = text(form, 'first_name', 60);
     const lastName = text(form, 'last_name', 80);
-    const phonetic = text(form, 'first_name_phonetic', 80);
     const emailRaw = text(form, 'email', 200);
     const phoneRaw = text(form, 'phone_number', 30);
     const politeness = String(form.get('politeness_preference') ?? '');
@@ -249,7 +248,6 @@ export async function updateNarrator(profileId: string, form: FormData): Promise
         first_name: firstName,
         last_name: lastName,
         full_name: [firstName, lastName].filter(Boolean).join(' '),
-        first_name_phonetic: phonetic,
         email,
         phone_number: phone,
         politeness_preference: politeness,
@@ -265,7 +263,7 @@ export async function updateNarrator(profileId: string, form: FormData): Promise
     console.log(`[admin] fiche ${profileId} corrigée : ${changed.join(', ')}`);
 
     const labels: Record<string, string> = {
-        first_name: 'prénom', last_name: 'nom', first_name_phonetic: 'prononciation', email: 'e-mail', phone_number: 'téléphone',
+        first_name: 'prénom', last_name: 'nom', email: 'e-mail', phone_number: 'téléphone',
         politeness_preference: 'tu / vous', writing_style: 'ton d’écriture', sensitive_topics: 'sujets à éviter',
     };
     return { ok: true, message: `Fiche enregistrée (${changed.map((k) => labels[k]).join(', ')}).` };
