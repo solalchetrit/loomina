@@ -56,15 +56,14 @@ export function LaunchPrice({
       {active && (
         <p className="mb-3 flex flex-wrap items-center gap-2">
           <span
-            className={`inline-flex items-center rounded-full px-3 py-1 text-[14px] font-bold ${
-              dark ? "bg-[var(--amber)] text-[var(--ink)]" : "bg-[var(--amber-soft)] text-[var(--amber-deep)]"
-            }`}
+            className="inline-flex items-center gap-1.5 rounded-full bg-[var(--noel)] px-3 py-1 text-[14px] font-bold text-white"
           >
-            Offre de lancement
+            <Icon name="gift" size={15} />
+            Offre de Noël
           </span>
           <span className={`text-[15px] font-bold ${dark ? "text-white" : "text-[var(--ink)]"}`}>
             jusqu’au {LAUNCH_OFFER.label}
-            {daysLabel && <span className={"whitespace-nowrap " + (dark ? "text-[var(--amber)]" : "text-[var(--amber-deep)]")}> · {daysLabel}</span>}
+            {daysLabel && <span className={"whitespace-nowrap " + (dark ? "text-[#ff8f8f]" : "text-[var(--noel)]")}> · {daysLabel}</span>}
           </span>
         </p>
       )}
@@ -84,33 +83,6 @@ export function LaunchPrice({
   );
 }
 
-/** Une ligne courte pour les barres : « Offre de Noël : 199 € au lieu de 289 € · J-12 ». */
-export function LaunchOfferLine({ className = "" }: { className?: string }) {
-  const now = useNow();
-  const { active } = useLaunchOffer();
-  if (!active) return null;
-  const d = now == null ? null : launchOfferDaysLeft(now);
-  return (
-    <p className={`whitespace-nowrap ${className}`}>
-      <b>Offre de Noël :</b> {LAUNCH_OFFER.price} € <span className="line-through opacity-70">{OFFER.regularPrice} €</span>
-      {d == null ? "" : d === 0 ? " · dernier jour" : ` · plus que ${d} j`}
-    </p>
-  );
-}
-
-/** La pastille du menu, sur grand écran : « 199 € jusqu'au 24 décembre ». */
-export function LaunchOfferPill() {
-  const { active, daysLabel } = useLaunchOffer();
-  if (!active) return null;
-  return (
-    <span
-      className="hidden whitespace-nowrap rounded-full bg-[var(--amber-soft)] px-3 py-1.5 text-[14px] font-bold text-[var(--amber-deep)] min-[1520px]:inline-flex"
-      title={`Offre de lancement : ${LAUNCH_OFFER.price} € au lieu de ${OFFER.regularPrice} €, jusqu’au ${LAUNCH_OFFER.label}`}
-    >
-      Lancement : {LAUNCH_OFFER.price} € {daysLabel ? `· ${daysLabel.toLowerCase()}` : `jusqu’au ${LAUNCH_OFFER.label}`}
-    </span>
-  );
-}
 
 function subscribeSecond(onChange: () => void) {
   const id = window.setInterval(onChange, 1000);
@@ -146,8 +118,8 @@ export function Countdown({ tone = "dark" }: { tone?: "dark" | "light" }) {
     [r ? two(r.minutes) : "–", "minutes"],
     [r ? two(r.seconds) : "–", "secondes"],
   ];
-  const box = tone === "dark" ? "bg-white/[0.08] text-white" : "bg-white text-[var(--ink)] shadow-[inset_0_0_0_1px_var(--amber-line)]";
-  const unit = tone === "dark" ? "text-[#cfcfc8]" : "text-[var(--amber-deep)]";
+  const box = tone === "dark" ? "bg-[var(--noel)] text-white" : "bg-[var(--noel-soft)] text-[var(--noel-deep)]";
+  const unit = tone === "dark" ? "text-white/80" : "text-[var(--noel-deep)]";
   return (
     <div
       role="timer"
@@ -165,37 +137,39 @@ export function Countdown({ tone = "dark" }: { tone?: "dark" | "light" }) {
 }
 
 /**
- * Sous le titre de l'accueil : l'offre de Noël en une carte, avec le temps
- * qui reste. Mène au grand module de l'offre, plus bas.
+ * Le bandeau rouge de Noël, tout en haut du site (Solal, 26/11/2026 : du rouge
+ * sur ce qui annonce l'urgence, et parler de Noël). Fixe, au-dessus du menu ;
+ * il pousse la page de sa hauteur (--promo-h). Disparaît seul après le 24 décembre.
  */
-export function LaunchOfferCard({ className = "" }: { className?: string }) {
+export function NoelBanner() {
   const { active } = useLaunchOffer();
   const now = useNowSecond();
   if (!active) return null;
   const r = now == null ? null : remaining(now);
   return (
-    <Link
-      href="/#offre-de-noel"
-      className={`press group flex w-full max-w-[35rem] items-center gap-4 rounded-[20px] border border-[var(--amber-line)] bg-[var(--amber-wash)] p-3 pr-4 hover:border-[var(--amber)] ${className}`}
-    >
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-[var(--amber)] text-[var(--ink)]">
-        <Icon name="gift" size={24} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-[16px] font-extrabold leading-snug text-[var(--ink)] sm:text-[17px]">
-          Offre de lancement pour Noël : {LAUNCH_OFFER.price} €{" "}
-          <span className="whitespace-nowrap font-bold text-[var(--ink-3)] line-through">{OFFER.regularPrice} €</span>
+    <>
+      <style>{`:root{--promo-h:44px}body{padding-top:var(--promo-h)}`}</style>
+      <Link
+        href="/#offre-de-noel"
+        className="fixed inset-x-0 top-0 z-[1001] flex h-[44px] items-center justify-center gap-x-3 bg-[var(--noel)] px-3 text-[14.5px] text-white hover:bg-[var(--noel-deep)] sm:text-[15.5px]"
+      >
+        <Icon name="gift" size={18} className="hidden shrink-0 min-[380px]:block" />
+        <span className="truncate">
+          <b>Offre de Noël</b>
+          <span className="hidden md:inline"> pour le lancement</span> : {LAUNCH_OFFER.price} €{" "}
+          <span className="line-through opacity-75">{OFFER.regularPrice} €</span>
+          <span className="hidden lg:inline"> jusqu’au {LAUNCH_OFFER.label}</span>
         </span>
-        <span className="mt-0.5 block text-[15px] leading-snug text-[var(--amber-deep)]">
-          Jusqu’au {LAUNCH_OFFER.label}.{" "}
-          {r && (
-            <b className="whitespace-nowrap tabular-nums">
+        {r && (
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-white px-2.5 py-0.5 text-[13.5px] font-extrabold tabular-nums text-[var(--noel-deep)] sm:text-[14.5px]">
+            <span className="sm:hidden">J-{r.days}</span>
+            <span className="hidden sm:inline">
               Plus que {r.days} j {two(r.hours)} h {two(r.minutes)} min {two(r.seconds)} s
-            </b>
-          )}
-        </span>
-      </span>
-      <Icon name="arrow" size={20} className="shrink-0 text-[var(--amber-deep)] transition-transform group-hover:translate-x-0.5" />
-    </Link>
+            </span>
+          </span>
+        )}
+        <span className="hidden shrink-0 font-bold underline underline-offset-4 xl:inline">J’en profite</span>
+      </Link>
+    </>
   );
 }

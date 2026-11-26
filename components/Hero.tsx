@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 import Button from "@/components/ui/Button";
-import { LaunchOfferCard } from "@/components/LaunchOffer";
 import Icon from "@/components/ui/Icon";
 import VoiceToBook from "@/components/home/VoiceToBook";
 import ScrollCue from "@/components/home/ScrollCue";
@@ -34,7 +33,6 @@ export default function Hero() {
           </p>
           </div>
           <div className="mt-9 max-lg:order-3">
-          <LaunchOfferCard className="rise mb-5" />
           <div className="rise flex flex-col gap-3 sm:flex-row" style={{ "--i": 3 } as CSSProperties}>
             <Button href="/order" size="lg">
               Commander

@@ -8,7 +8,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SITE } from "@/config/site";
 import { OFFER_PAGE_LABEL } from "@/config/offer";
-import { LaunchOfferPill, LaunchOfferLine } from "@/components/LaunchOffer";
+import { NoelBanner } from "@/components/LaunchOffer";
 
 const NAV_LINKS = [
   { href: "/experience", label: "Comment ça marche" },
@@ -35,7 +35,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-[1000] px-3 pt-3 sm:px-4 sm:pt-4">
+      <NoelBanner />
+      <header className="fixed inset-x-0 top-[var(--promo-h,0px)] z-[1000] px-3 pt-3 sm:px-4 sm:pt-4">
         <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-4 rounded-[22px] border border-white/70 bg-white/70 pl-5 pr-2.5 shadow-[var(--shadow-bar)] backdrop-blur-xl backdrop-saturate-150 md:h-[68px] md:pl-6">
           <Link href="/" className="relative z-[920] flex shrink-0 items-center" aria-label="Loomina, accueil">
             <span className="relative block h-7 w-[118px] md:h-[30px] md:w-[128px]">
@@ -62,7 +63,6 @@ export default function Header() {
           </nav>
 
           <div className="hidden items-center gap-2 xl:flex">
-            <LaunchOfferPill />
             <Link
               href="/dashboard"
               aria-current={isActive("/dashboard") ? "page" : undefined}
@@ -109,7 +109,7 @@ export default function Header() {
       </header>
 
       {isOpen && (
-        <div id="menu-mobile" className="fixed inset-0 z-[910] flex flex-col bg-[var(--canvas)] px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-24 xl:hidden">
+        <div id="menu-mobile" className="fixed inset-0 z-[910] flex flex-col bg-[var(--canvas)] px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[calc(6rem+var(--promo-h,0px))] xl:hidden">
           <nav className="flex flex-1 flex-col" aria-label="Navigation mobile">
             <ul className="card divide-y divide-[var(--line-soft)] px-5">
               {[...NAV_LINKS, { href: "/dashboard", label: "Espace auteur" }].map((item) => (
@@ -126,7 +126,6 @@ export default function Header() {
               ))}
             </ul>
             <div className="mt-auto flex flex-col gap-3 pt-8">
-              <LaunchOfferLine className="rounded-[var(--radius-btn)] bg-[var(--amber-soft)] px-4 py-3 text-center text-[16px] text-[var(--amber-deep)]" />
               <Link
                 href="/order"
                 onClick={close}

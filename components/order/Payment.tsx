@@ -187,8 +187,8 @@ function PaymentForm({
           </div>
         ))}
         {launch.active && (
-          <p className="mt-1.5 text-[14px] font-semibold text-[var(--amber-deep)]">
-            Offre de lancement : {LAUNCH_OFFER.price} € au lieu de <span className="line-through">{OFFER_PRICE.regularPrice} €</span>, jusqu’au {LAUNCH_OFFER.label}.
+          <p className="mt-1.5 text-[14px] font-semibold text-[var(--noel)]">
+            Offre de Noël : {LAUNCH_OFFER.price} € au lieu de <span className="line-through">{OFFER_PRICE.regularPrice} €</span>, jusqu’au {LAUNCH_OFFER.label}.
           </p>
         )}
         {discount && (

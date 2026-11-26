@@ -9,7 +9,7 @@ import { SITE } from "@/config/site";
 
 const STEPS = [
   { title: "Vous commandez avant le 24 décembre", text: "Trois minutes, avec le prénom et le numéro de votre proche." },
-  { title: "À Noël, vous lui annoncez", text: "Son cadeau : raconter sa vie, et la recevoir en livre." },
+  { title: "Le soir de Noël, vous lui annoncez", text: "Son cadeau : raconter sa vie, et la recevoir en livre." },
   { title: "Il appelle quand il est prêt", text: "Loomina écrit, le livre imprimé arrive chez lui." },
 ];
 
@@ -24,22 +24,22 @@ export default function ChristmasOffer() {
 
   return (
     <section id="offre-de-noel" className="section-y mx-auto w-full max-w-[1240px] scroll-mt-28 px-5 sm:px-6" aria-labelledby="offre-de-noel-titre">
-      <div className="overflow-hidden rounded-[var(--radius-card)] bg-[var(--ink)] text-white" data-reveal>
+      <div className="overflow-hidden rounded-[var(--radius-card)] border-t-[6px] border-[var(--noel)] bg-[var(--ink)] text-white" data-reveal>
         <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
           <div className="p-6 sm:p-10 lg:p-12">
             <p className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span className="inline-flex items-center gap-2 rounded-full bg-[var(--amber)] px-3.5 py-1.5 text-[14px] font-extrabold text-[var(--ink)]">
+              <span className="inline-flex items-center gap-2 rounded-full bg-[var(--noel)] px-3.5 py-1.5 text-[14px] font-extrabold text-white">
                 <Icon name="gift" size={16} />
-                Offre de lancement
+                Offre de Noël
               </span>
-              <span className="text-[15px] font-bold text-[var(--amber)]">Jusqu’au {LAUNCH_OFFER.label} seulement</span>
+              <span className="text-[15px] font-bold text-[#ff8f8f]">Jusqu’au {LAUNCH_OFFER.label} seulement</span>
             </p>
 
             <h2 id="offre-de-noel-titre" className="mt-5 text-balance text-[clamp(2rem,4.4vw,3.4rem)] font-extrabold leading-[1.04] tracking-[-0.04em] text-white">
               À Noël, offrez-lui le livre de sa vie
             </h2>
             <p className="mt-4 max-w-xl text-[17px] leading-relaxed text-[#cfcfc8] md:text-[18px]">
-              Pour le lancement de Loomina, le livre est à {LAUNCH_OFFER.price} € au lieu de {OFFER.regularPrice} €. L’offre s’arrête le soir du {LAUNCH_OFFER.label} : après, le prix revient à {OFFER.regularPrice} €.
+              Le cadeau de Noël qu’on garde toute une vie. Pour le lancement de Loomina, le livre est à {LAUNCH_OFFER.price} € au lieu de {OFFER.regularPrice} €. L’offre s’arrête le soir du réveillon : après, le prix revient à {OFFER.regularPrice} €.
             </p>
 
             <div className="mt-7 flex flex-wrap items-end gap-x-8 gap-y-6">
@@ -54,14 +54,14 @@ export default function ChristmasOffer() {
                 </span>
               </p>
               <div>
-                <p className="mb-2 text-[14px] font-bold text-[#cfcfc8]">L’offre se termine dans</p>
+                <p className="mb-2 text-[14px] font-bold text-[#ff8f8f]">Noël, c’est dans</p>
                 <Countdown />
               </div>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
               <Button href="/order" variant="accent" size="lg">
-                Offrir Loomina à {LAUNCH_OFFER.price} €
+                Offrir Loomina pour Noël
               </Button>
               <Button href={`tel:${SITE.phone}`} variant="ghost" className="!px-0 !text-white !decoration-white/40 hover:!decoration-white">
                 Essayer d’abord gratuitement
