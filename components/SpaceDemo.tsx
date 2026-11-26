@@ -29,7 +29,7 @@ const SCREENS: Record<SpaceId, { id: string; height: number }[]> = {
     { id: "auteur-appels", height: 1113 },
     { id: "auteur-reglages", height: 2150 },
   ],
-  famille: [{ id: "famille", height: 2400 }],
+  famille: [{ id: "famille-complet", height: 2093 }],
 };
 const FRAME_H = 844;
 const HOLD_MS = 1800;
