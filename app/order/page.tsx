@@ -319,19 +319,23 @@ function OrderForm() {
                     hint={isGift ? "Celui d’où cette personne appellera Loomina." : "Celui d’où vous appellerez Loomina."}
                     required
                   />
-                  <Input
-                    className={field}
-                    label="E-mail"
-                    name="email"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={onChange}
-                    error={errors.email}
-                    hint={isGift ? "Le vôtre ou le sien, pour la confirmation." : "Pour la confirmation et les nouvelles du livre."}
-                    required
-                  />
+                  {/* Livre offert : on ne demande que l'e-mail de celui qui offre, pour ne pas
+                      gâcher la surprise (audit du 26/11/2026). Le champ passe dans « Et vous ? ». */}
+                  {!isGift && (
+                    <Input
+                      className={field}
+                      label="E-mail"
+                      name="email"
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      value={form.email}
+                      onChange={onChange}
+                      error={errors.email}
+                      hint="Pour la confirmation et les nouvelles du livre."
+                      required
+                    />
+                  )}
                   {isGift && (
                     <div className="rounded-[16px] bg-[var(--canvas)] p-4 sm:col-span-2 sm:p-5">
                       <p className="text-[16px] font-bold">Et vous ?</p>
@@ -352,6 +356,21 @@ function OrderForm() {
                           hint="Pour recevoir votre code par SMS."
                           required
                         />
+                        <div className="sm:col-span-2">
+                          <Input
+                            className={field}
+                            label="Votre e-mail"
+                            name="email"
+                            type="email"
+                            inputMode="email"
+                            autoComplete="email"
+                            value={form.email}
+                            onChange={onChange}
+                            error={errors.email}
+                            hint={`Pour la confirmation de commande. Rien n’est envoyé à ${form.firstName.trim() || "votre proche"} : c’est vous qui annoncez le cadeau.`}
+                            required
+                          />
+                        </div>
                       </div>
 
                       {/* D'autres proches peuvent suivre le livre, chacun avec son numéro (Solal, 20/11/2026). */}

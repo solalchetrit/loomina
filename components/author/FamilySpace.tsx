@@ -244,6 +244,27 @@ function FirstCall({ book, name, onEdit }: { book: FamilyBook; name: string; onE
   );
 }
 
+/** Avant le premier appel : la carte à imprimer pour annoncer le cadeau (app/carte-cadeau). */
+function GiftCard({ book, name, giverFirstName }: { book: FamilyBook; name: string; giverFirstName: string | null }) {
+  const q = new URLSearchParams();
+  if (book.narratorFirstName) q.set("pour", book.setup?.firstName || book.narratorFirstName);
+  if (giverFirstName) q.set("de", giverFirstName);
+  if (book.setup?.politeness === "vous") q.set("tu", "0");
+  return (
+    <section className="card flex flex-wrap items-center justify-between gap-4 p-6 md:p-8" aria-labelledby={`carte-${book.id}`}>
+      <div className="max-w-xl">
+        <h3 id={`carte-${book.id}`} className="t-heading">
+          La carte à offrir
+        </h3>
+        <p className="t-body mt-1">Une carte à imprimer pour annoncer le cadeau à {name}, avec le numéro à appeler.</p>
+      </div>
+      <Link href={`/carte-cadeau?${q.toString()}`} className="link text-[16px] font-semibold">
+        Préparer la carte
+      </Link>
+    </section>
+  );
+}
+
 function Book({ book, giverFirstName, onChange, onReload, onUnauthorized }: { book: FamilyBook; giverFirstName: string | null; onChange: (b: FamilyBook) => void; onReload: () => void; onUnauthorized: () => void }) {
   const name = book.narratorFirstName ?? "votre proche";
   const lastCall = book.calls[0];
@@ -270,6 +291,7 @@ function Book({ book, giverFirstName, onChange, onReload, onUnauthorized }: { bo
       {book.completed && <Delivery book={book} name={name} />}
       {book.weave && <Companion project={asProject(book)} narrator={name} skipIntro={Boolean(book.welcome)} />}
       {book.setup && !book.welcome && <FirstCall book={book} name={name} onEdit={() => setEditing(true)} />}
+      {!book.completed && book.calls.length === 0 && !book.welcome && <GiftCard book={book} name={name} giverFirstName={giverFirstName} />}
 
       <div className="grid gap-3 lg:grid-cols-[1fr_1.2fr]">
         <section className="card p-6 md:p-8" aria-labelledby={`suivi-${book.id}`}>

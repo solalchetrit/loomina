@@ -840,3 +840,34 @@ html[data-space="auteur"],
 html[data-space="famille"] { --promo-h: 0px; }
 html[data-space="auteur"] body,
 html[data-space="famille"] body { padding-top: 0; }
+
+/* La carte à offrir (app/carte-cadeau) : une A4, la carte sur la moitié du haut,
+   on plie la feuille en deux. Tailles fixes en mm à l'impression. */
+@media print {
+  html[data-print="carte"] { background: #fff; }
+  html[data-print="carte"] body { background: #fff !important; padding: 0 !important; }
+  html[data-print="carte"] body > :not(main),
+  html[data-print="carte"] .site-chrome,
+  html[data-print="carte"] .carte-ecran { display: none !important; }
+  html[data-print="carte"] main > div { max-width: none; padding: 0; margin: 0; }
+  html[data-print="carte"] main > div > div { display: block; }
+  html[data-print="carte"] .carte-feuille { width: 210mm; height: 296mm; position: relative; }
+  html[data-print="carte"] .carte {
+    width: 210mm; height: 148.5mm; max-width: none; aspect-ratio: auto; box-shadow: none; margin: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  html[data-print="carte"] .carte-cadre { inset: 8mm; }
+  html[data-print="carte"] .carte-pour { font-size: 11pt; }
+  html[data-print="carte"] .carte-titre { font-size: 34pt; }
+  html[data-print="carte"] .carte-texte,
+  html[data-print="carte"] .carte-appel { font-size: 11pt; }
+  html[data-print="carte"] .carte-numero { font-size: 24pt; }
+  html[data-print="carte"] .carte-appel span:last-child { font-size: 10pt; }
+  html[data-print="carte"] .carte-mot { font-size: 12pt; }
+  html[data-print="carte"] .carte-de { font-size: 10.5pt; }
+  html[data-print="carte"] .carte-pli {
+    position: absolute; left: 0; right: 0; top: 148.5mm; border-top: 0.3mm dashed #c9ccd3;
+  }
+}
+@page carte { size: A4 portrait; margin: 0; }
+.carte-feuille { page: carte; }
