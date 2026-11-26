@@ -91,7 +91,15 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
             <span className="text-[var(--ink-3)]">client depuis le {fmtDate(profile.created_at, false)}</span>
           </p>
         </div>
-        {profile.email && <Link href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`} className="adm-btn adm-btn-sec"><AIcon name="message" size={15} /> Lui écrire</Link>}
+        <div className="flex flex-wrap gap-2">
+          {profile.phone_number && (
+            // Lien simple (pas de <Link>) : une redirection serveur vers /l/<jeton>, dans un nouvel onglet.
+            <a href={`/api/admin/clients/${id}/espace`} target="_blank" rel="noopener noreferrer" className="adm-btn adm-btn-sec" title="Ouvre son espace auteur dans un nouvel onglet, comme le lien de ses SMS">
+              <AIcon name="external" size={15} /> Ouvrir son espace
+            </a>
+          )}
+          {profile.email && <Link href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`} className="adm-btn adm-btn-sec"><AIcon name="message" size={15} /> Lui écrire</Link>}
+        </div>
       </header>
 
       {(fait || erreur) && (
