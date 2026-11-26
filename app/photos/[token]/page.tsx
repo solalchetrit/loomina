@@ -45,10 +45,6 @@ export default async function InvitePhotosPage({ params }: { params: Promise<{ t
           <>
             <p className="t-eyebrow">{firstName ? `Le livre ${whose}` : "Un livre en cours"}</p>
             <h1 className="t-display mt-3">Ajoutez une photo au livre {whose}</h1>
-            <p className="mt-4 text-[18px] leading-relaxed text-[var(--ink-2)]">
-              {firstName ?? "La personne"} écrit le livre de sa vie avec Loomina, en racontant ses souvenirs au téléphone. Envoyez une photo de famille, d’un lieu ou d’un moment :
-              Loomina en parlera avec {firstName ?? "elle"} lors d’un prochain appel, et la photo pourra trouver sa place dans le livre.
-            </p>
             <div className="card mt-8 p-6 sm:p-7">
               <InvitePhotoForm token={token} essai={essai} />
             </div>
