@@ -142,12 +142,12 @@ async function runCase(c: Case) {
 
 /**
  * La relecture de fidélité du livre, sur un chapitre où quatre phrases
- * jamais dites ont été glissées (celles du livre de test du 26/11/2026).
+ * jamais dites ont été glissées, dont deux recopiées du récit (celles du livre de test du 26/11/2026).
  * Elle doit les retirer et garder ce que la personne a vraiment dit.
  */
 async function fidelityCheck(): Promise<{ checks: Check[]; content: string }> {
     const source = JSON.parse(readFileSync(join(DIR, 'cas', '06-survol-dense.json'), 'utf8')) as Case;
-    const planted = ['Je n’étais pas à ma place là-dedans.', 'Peu à peu, j’ai trouvé ma place.', 'Ma famille est restée là, au centre.', 'L’organisation se faisait comme elle pouvait.'];
+    const planted = ['Je n’étais pas à ma place là-dedans.', 'Peu à peu, j’ai trouvé ma place.', 'Ma famille est restée là, au centre.', 'L’organisation se faisait comme elle pouvait.', 'Ces vendredis faisaient partie des scènes joyeuses de cette période.', 'Puis ma vie a pris le chemin de l’Angleterre.'];
     const said = ['Là, j’étais vraiment heureuse.', 'Les Anglaises adoraient ça.', 'Nous nous sommes mariés en 1975', 'Nous étions quarante parfois.'];
     const content = `Après mon brevet, mon père a voulu que j’aie un métier. J’ai fait une école de secrétariat. Sténodactylo, ça s’appelait à l’époque. Cela ne me plaisait pas du tout, mais il fallait un métier.
 
@@ -157,12 +157,14 @@ Ensuite, j’ai trouvé une place de vendeuse dans une boutique de prêt-à-port
 
 ## Londres, puis Brighton
 
+${planted[5]}
+
 À Paris, j’ai rencontré David Marchand. Il travaillait dans l’hôtellerie. ${said[2]}, et nous sommes partis à Londres. Au début, je ne parlais pas anglais. C’était très difficile. Puis j’ai appris. À Brighton, j’ai travaillé dans une boutique de mode française, dans les Lanes. ${said[1]} ${planted[1]}
 
 ## Les vendredis
 
-Ma mère, avec huit enfants, était à la maison. ${planted[3]} Mes parents sont restés à Saint-Ouen jusqu’au bout. Tous les vendredis soirs, nous étions tous chez eux. ${said[3]} ${planted[2]}`;
-    const done = await checkFidelity({ title: 'De Passy à Brighton', content, sources: [1] }, [{ number: 1, title: 'Les grandes lignes de ma vie', content: '', transcript: source.transcript }]);
+Ma mère, avec huit enfants, était à la maison. ${planted[3]} Mes parents sont restés à Saint-Ouen jusqu’au bout. Tous les vendredis soirs, nous étions tous chez eux. ${said[3]} ${planted[4]} ${planted[2]}`;
+    const done = await checkFidelity({ title: 'De Passy à Brighton', content, sources: [1] }, [{ number: 1, title: 'Les grandes lignes de ma vie', content: `Tous les vendredis soirs, nous étions tous chez mes parents. ${planted[4]} ${planted[3]}`, transcript: source.transcript }]);
     const checks: Check[] = [
         ...planted.map((p) => ({ ok: !done.content.includes(p), label: `fidélité : retire « ${p} »` })),
         ...said.map((p) => ({ ok: done.content.includes(p), label: `fidélité : garde « ${p} »` })),
