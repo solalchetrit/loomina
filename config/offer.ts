@@ -6,9 +6,8 @@
  */
 
 /**
- * Site vitrine avant le lancement (Solal, 25/11/2026) : aucun prix affiché,
- * le prix est fixé juste avant l'ouverture. Passer à true le jour du lancement,
- * après avoir mis le bon montant dans OFFER.price.
+ * Affiche le prix sur le site. Resté à false pendant la vitrine (25/11/2026) ;
+ * à true depuis que Solal a fixé le prix (26/11/2026).
  */
 export const SHOW_PRICE = true;
 
@@ -93,6 +92,12 @@ export function normalizeExtraCopies(raw: unknown): number {
  * Le coupon est créé une fois dans Stripe avec cet identifiant.
  */
 export const DEMO_PROMO = {
+  /**
+   * Solal, 26/11/2026 : plus de réduction dans l'e-mail de la démo, elle se
+   * cumulait avec l'offre de lancement. Les codes déjà envoyés restent valables
+   * jusqu'à leur date. Repasser à true pour la remettre.
+   */
+  enabled: false,
   couponId: "loomina-recit-demo-10",
   /** Réduction en pourcentage (Solal, 18/11/2026 : 10 %). */
   percentOff: 10,

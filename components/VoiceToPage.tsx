@@ -102,11 +102,12 @@ export default function VoiceToPage() {
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <SectionHead
           title={
-            <>
+            // Un peu plus petit sur téléphone, pour que la seconde ligne tienne sans se couper.
+            <span className="block max-sm:text-[0.84em]">
               Vous racontez,
               <br />
               Loomina écrit votre récit.
-            </>
+            </span>
           }
           text="Vos mots et vos expressions sont gardés. Rien n’est inventé."
         />
