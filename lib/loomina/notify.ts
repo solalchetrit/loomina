@@ -19,6 +19,7 @@
 import { sendSms } from './sms';
 import { SITE } from '../../config/site';
 import { familyAudience } from './giver';
+import { MEMO_AGES } from './memo';
 
 const HOST = SITE.url.replace(/^https?:\/\//, '').replace(/^www\./, '');
 
@@ -269,6 +270,98 @@ export function bookCompleteTexts(author: { first_name: string | null; politenes
 export function authorOwnEmail(author: { email?: string | null }, projectMetadata?: Record<string, unknown> | null): string | null {
     if (projectMetadata?.is_gift === true) return null;
     return author.email?.trim() || null;
+}
+
+/** Après l'étape 1, 2, 3 : ce que raconte l'étape suivante, en vous et en tu. */
+const NEXT_STAGE_ABOUT: [string, string][] = [
+    ['Vous racontez vos racines : vos parents, votre enfance, l’école.', 'Tu racontes tes racines : tes parents, ton enfance, l’école.'],
+    ['Vous racontez votre vie adulte : votre métier, vos amours, vos enfants.', 'Tu racontes ta vie adulte : ton métier, tes amours, tes enfants.'],
+    ['Vous dites ce que vous voulez transmettre : vos valeurs, vos messages.', 'Tu dis ce que tu veux transmettre : tes valeurs, tes messages.'],
+];
+
+/**
+ * Une étape de Mémo est finie et la partie du livre qui lui correspond vient
+ * d'être écrite (Solal, 26/11/2026 : « quand un utilisateur a fini une phase,
+ * il faut qu'il ait un mail »). `through` : l'étape finie, de 1 à 3 (la
+ * quatrième finit le livre : c'est le message « livre terminé » qui part).
+ */
+export function stageBookTexts(
+    author: { first_name: string | null; politeness_preference?: string | null },
+    through: number,
+    chapters: number
+): { subject: string; email: string; sms: string; html: string } {
+    const tu = author.politeness_preference === 'tu';
+    const name = author.first_name?.trim();
+    const hello = name ? `Bonjour ${name}` : 'Bonjour';
+    const n = Math.min(Math.max(Math.round(through), 1), 3);
+    const done = MEMO_AGES[n - 1].stage;
+    const next = MEMO_AGES[n];
+    const first = n === 1;
+    const where = `${HOST}/dashboard`;
+    // Ce que la prochaine étape raconte, dans les mots de Mémo (lib/loomina/memo.ts).
+    const about = NEXT_STAGE_ABOUT[n - 1][0];
+    const aboutTu = NEXT_STAGE_ABOUT[n - 1][1];
+    const count = `${chapters} chapitre${chapters > 1 ? 's' : ''}`;
+    const subject = first
+        ? tu ? 'La première partie de ton livre est prête' : 'La première partie de votre livre est prête'
+        : tu ? 'Ton livre s’est allongé : une nouvelle partie est prête' : 'Votre livre s’est allongé : une nouvelle partie est prête';
+    const lines = tu
+        ? [
+              `${hello},`,
+              `Bravo : tu as fini l’étape « ${done} ».`,
+              first
+                  ? `Loomina vient d’écrire la première partie de ton livre avec tout ce que tu as raconté : ${count}, à lire dès maintenant.`
+                  : `Loomina vient d’écrire la suite de ton livre avec tout ce que tu as raconté pendant cette étape. Il compte maintenant ${count}.`,
+              `Mémo a grandi. Prochaine étape : « ${next.stage} ». ${aboutTu}`,
+              `Appelle quand tu veux au ${SITE.phoneDisplay}.`,
+          ]
+        : [
+              `${hello},`,
+              `Bravo : vous avez fini l’étape « ${done} ».`,
+              first
+                  ? `Loomina vient d’écrire la première partie de votre livre avec tout ce que vous avez raconté : ${count}, à lire dès maintenant.`
+                  : `Loomina vient d’écrire la suite de votre livre avec tout ce que vous avez raconté pendant cette étape. Il compte maintenant ${count}.`,
+              `Mémo a grandi. Prochaine étape : « ${next.stage} ». ${about}`,
+              `Appelez quand vous voulez au ${SITE.phoneDisplay}.`,
+          ];
+    const button = 'Lire mon livre';
+    const email = [lines[0], lines[1], lines[2], `${button} : https://${where}`, lines[3], lines[4], 'L’équipe Loomina'].join('\n\n');
+    const site = SITE.url.replace(/\/$/, '');
+    const p = (t: string, extra = '') => `<p style="margin:0 0 16px;${extra}">${escapeHtml(t)}</p>`;
+    const html = brandEmailHtml(
+        `<div style="text-align:center;margin:0 0 20px"><img src="${site}/email/etape-memo-${n + 1}.png" height="150" alt="Mémo, l’éléphant de Loomina, saute de joie" style="border:0;height:150px;width:auto"></div>` +
+            p(lines[0]) +
+            p(lines[1], 'font-size:20px;line-height:1.35;font-weight:700') +
+            p(lines[2]) +
+            `<div style="margin:24px 0;text-align:center"><a href="https://${where}" style="display:inline-block;background:#171d2b;color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:999px">${button}</a></div>` +
+            p(lines[3]) +
+            p(lines[4]) +
+            p('L’équipe Loomina', 'margin-bottom:0')
+    );
+    const sms = tu
+        ? `${hello}, bravo : tu as fini l'étape « ${done} ». ${first ? 'La première partie de ton livre' : 'La suite de ton livre'} est prête à lire sur ${where}. Loomina`
+        : `${hello}, bravo : vous avez fini l'étape « ${done} ». ${first ? 'La première partie de votre livre' : 'La suite de votre livre'} est prête à lire sur ${where}. Loomina`;
+    return { subject, email, sms, html };
+}
+
+/** Prévient l'auteur, par SMS et par e-mail, qu'une partie de son livre est prête à lire. Ne lève jamais. */
+export async function notifyStageBookReady(
+    author: { first_name: string | null; politeness_preference?: string | null; phone_number?: string | null; email?: string | null },
+    projectMetadata: Record<string, unknown> | null | undefined,
+    through: number,
+    chapters: number
+): Promise<void> {
+    try {
+        if (through < 1 || through > 3) return;
+        const t = stageBookTexts(author, through, chapters);
+        const email = authorOwnEmail(author, projectMetadata);
+        await Promise.allSettled([
+            author.phone_number ? sendSms(author.phone_number, t.sms) : Promise.resolve(false),
+            email ? sendEmail({ to: email, subject: t.subject, text: t.email, html: t.html }) : Promise.resolve(false),
+        ]);
+    } catch (e) {
+        console.error('[notify] partie du livre prête, auteur non prévenu', e);
+    }
 }
 
 /** Prévient l'auteur, par SMS et par e-mail, que son livre est terminé. Ne lève jamais. */

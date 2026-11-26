@@ -7,6 +7,8 @@ import type { ReactNode } from "react";
 import Button from "@/components/ui/Button";
 import { More, PAGE, PAGE_KICKER, PAGE_TITLE, ReaderLayout, Toc } from "./Reader";
 import { MEMO_AGES } from "@/lib/loomina/memo";
+import Memo from "@/components/brand/Memo";
+import type { MemoAge } from "@/components/brand/Memo";
 
 interface BookChapter {
   number: number;
@@ -41,7 +43,7 @@ interface Payload {
   failed: boolean;
   sourceCount: number;
   /** L'étape en cours (1 à 4), la dernière étape finie (0 : aucune), et si le récit est complet. */
-  stage?: { current: number; through: number; complete: boolean } | null;
+  stage?: { current: number; through: number; complete: boolean; progress?: number } | null;
   error?: string;
 }
 
@@ -287,11 +289,30 @@ export default function ComposedBook({ onUnauthorized, top, aside, after }: { on
         </>
       }
     >
-      {/* Pas encore de livre : la page dit quand il arrivera, au lieu de rester vide. */}
-      {!edition && !running && stageNote && (
-        <section aria-label="Votre livre" className={PAGE}>
-          <p className={PAGE_KICKER}>Bientôt</p>
-          <p className="mx-auto mt-3 max-w-[30rem] text-center font-serif text-[1.25rem] leading-relaxed text-[var(--ink-2)]">{stageNote}</p>
+      {/* Pas encore de livre : Mémo attend avec l'auteur, et la page dit quand le livre arrivera. */}
+      {!edition && stage && !stage.complete && (
+        <section aria-label="Votre livre" className={`${PAGE} text-center`}>
+          <div className="mx-auto w-[200px] max-w-full" aria-hidden="true">
+            <Memo age={Math.min(Math.max(stage.current, 1), 4) as MemoAge} clip={running ? "rest" : "idle"} size={200} />
+          </div>
+          <p className={`${PAGE_KICKER} mt-2`}>
+            Étape {stage.current} sur 4 · {stageName(stage.current)}
+          </p>
+          <h3 className={PAGE_TITLE.replace("italic ", "")}>{running ? "Loomina écrit la première partie de votre livre" : "Votre livre arrive à la fin de cette étape"}</h3>
+          <p className="mx-auto mt-4 max-w-[32rem] text-[16.5px] leading-relaxed text-[var(--ink-2)]">
+            {running
+              ? "Vous avez fini une étape. Votre livre s’écrit avec tout ce que vous avez raconté. Comptez quelques minutes : vous le lirez ici."
+              : `Mémo garde chaque souvenir que vous racontez. Quand l’étape « ${stageName(stage.current)} » sera finie, Loomina écrira la première partie de votre livre avec tous ces souvenirs. Vous la lirez ici.`}
+          </p>
+          {!running && (
+            <div className="mx-auto mt-7 max-w-[22rem]">
+              <div className="h-2.5 overflow-hidden rounded-full bg-[var(--line-soft)]" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={stage.progress ?? 0} aria-label="Avancée de l’étape">
+                <div className="h-full rounded-full bg-[var(--amber)]" style={{ width: `${Math.min(100, Math.max(4, stage.progress ?? 0))}%` }} />
+              </div>
+              <p className="mt-2 text-[14px] text-[var(--ink-3)]">Étape racontée à {Math.min(100, Math.max(0, stage.progress ?? 0))} %</p>
+            </div>
+          )}
+          <p className="mx-auto mt-6 max-w-[32rem] text-[14.5px] text-[var(--ink-3)]">En attendant, le récit de chaque appel se lit dans « Mes appels ».</p>
         </section>
       )}
       {edition && (

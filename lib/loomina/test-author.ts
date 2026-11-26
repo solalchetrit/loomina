@@ -223,7 +223,7 @@ export async function testAuthorReply(request: NextRequest, route: TestRoute): P
         case 'stories':
             return NextResponse.json([]);
         case 'book':
-            return NextResponse.json({ edition: null, running: null, failed: false, sourceCount: 0, stage: { current: 1, through: 0, complete: false } });
+            return NextResponse.json({ edition: null, running: null, failed: false, sourceCount: 0, stage: { current: 1, through: 0, complete: false, progress: 0 } });
         case 'book-plan':
             return NextResponse.json({ plan: null });
         case 'book-pdf':

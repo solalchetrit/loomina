@@ -332,7 +332,16 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
             console.error(`[livre] pièces de l'édition ${id} non écrites :`, err instanceof Error ? err.message : String(err));
             pieces = previous?.extras?.pieces ?? null;
         }
-        return await save({ status: 'ready', extras: { ...extras, pieces, pieces_at: new Date().toISOString() } });
+        const finished = await save({ status: 'ready', extras: { ...extras, pieces, pieces_at: new Date().toISOString() } });
+        // Une étape de plus dans le livre : l'auteur est prévenu que sa nouvelle partie est prête à lire
+        // (pas pour une simple remise à jour de la même étape, ni pour la fin du livre, qui a son propre message).
+        const through = finished.extras?.through;
+        const before = ready && ready.id !== edition.id ? ready.extras?.through : 0;
+        if (profile && typeof through === 'number' && through >= 1 && through <= 3 && typeof before === 'number' && before < through) {
+            const { notifyStageBookReady } = await import('./notify');
+            await notifyStageBookReady(profile as Profile, (project as Project).project_metadata, through, finished.chapters.length);
+        }
+        return finished;
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         console.error(`[livre] édition ${id} en échec :`, message);

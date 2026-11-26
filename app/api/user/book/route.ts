@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
             failed: Boolean(failed),
             sourceCount: count,
             // Où en est l'auteur : l'étape en cours (1 à 4), la dernière étape finie, et si le récit est complet.
-            stage: { current: toPhase(author.project.phase), through, complete: author.project.status === 'completed' },
+            stage: { current: toPhase(author.project.phase), through, complete: author.project.status === 'completed', progress: Math.round(Number(author.project.phase_progress) || 0) },
         });
     } catch (err) {
         console.error('[user/book]', err);
