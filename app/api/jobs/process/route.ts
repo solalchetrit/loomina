@@ -25,6 +25,7 @@ import { sweepReviews, sweepRelanceAlerts } from '@/lib/admin/watch';
 import { checkSharedSecret } from '@/lib/loomina/secret';
 import { sweepDemoStories, sweepDemoReminders } from '@/lib/loomina/demo-story';
 import { relanceAbandonedCarts } from '@/lib/loomina/abandoned-cart';
+import { sweepRecap } from '@/lib/admin/recap';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -81,8 +82,13 @@ async function handle(request: NextRequest) {
         const reminders = await sweepDemoReminders();
         if (carts.results.length || reminders.results.length) console.info('[jobs] relances :', { carts: carts.results, reminders: reminders.results });
 
+        // Le récap de 10 h et de 20 h par e-mail (26/11/2026), une seule fois par créneau.
+        const recap = await sweepRecap();
+        if (recap) console.info('[jobs] récap envoyé :', recap);
+
         return NextResponse.json({
             ok: true,
+            recap,
             picked,
             results,
             corrections,
