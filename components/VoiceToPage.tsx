@@ -101,7 +101,8 @@ export default function VoiceToPage() {
     <Section id="exemple">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <SectionHead
-          title="De l’appel à la page du livre"
+          title="Vous racontez. Loomina écrit la page."
+          text="Vos mots et vos expressions sont gardés. Rien n’est inventé."
         />
         {!still && (
           <button

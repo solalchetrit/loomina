@@ -55,6 +55,7 @@ export default function AuthorShowcase({
             <SectionHead
               eyebrow="Inclus avec chaque livre"
               title="Un espace pour l’auteur, un pour sa famille"
+              text="L’auteur relit et corrige son livre. Sa famille le suit et y participe."
             />
             <div className="head-gap" />
             {/* Le sélecteur : deux boutons côte à côte. */}
