@@ -23,8 +23,9 @@ export default function ChristmasOffer() {
   if (!active) return null;
 
   return (
-    <section id="offre-de-noel" className="section-y mx-auto w-full max-w-[1240px] scroll-mt-28 px-5 sm:px-6" aria-labelledby="offre-de-noel-titre">
-      <div className="overflow-hidden rounded-[var(--radius-card)] border-t-[6px] border-[var(--noel)] bg-[var(--ink)] text-white" data-reveal>
+    <section className="section-y mx-auto w-full max-w-[1240px] px-5 sm:px-6" aria-labelledby="offre-de-noel-titre">
+      {/* L'ancre est sur le panneau lui-même : un clic vers l'offre le cadre juste sous le menu. */}
+      <div id="offre-de-noel" className="scroll-mt-[calc(var(--promo-h,0px)-8px)] overflow-hidden rounded-[var(--radius-card)] border-t-[6px] border-[var(--noel)] bg-[var(--ink)] text-white" data-reveal>
         <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
           <div className="p-6 sm:p-10 lg:p-12">
             <p className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -72,8 +73,8 @@ export default function ChristmasOffer() {
 
           <div className="flex flex-col gap-3 p-3 pt-0 lg:p-3 lg:pl-0">
             <Photo
-              name="livre-arrive-chez-vous"
-              alt="Un livre Loomina à couverture bleu nuit, posé dans sa boîte ouverte, prêt à être offert"
+              name="noel-livre-rouge"
+              alt="Un livre Loomina à couverture rouge, posé sur son papier cadeau ouvert, près du sapin de Noël"
               ratio="aspect-[16/10] lg:aspect-auto lg:min-h-[240px] lg:flex-1"
               sizes="(min-width: 1024px) 480px, 100vw"
               className="!rounded-[18px]"

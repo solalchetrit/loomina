@@ -9,7 +9,8 @@ import { Section, SectionHead } from "@/components/ui/Section";
  * Les deux espaces de Loomina dans un seul module (Solal, 26/11/2026) :
  * un petit sélecteur « Espace auteur » / « Espace famille », puis pour chacun
  * une phrase, trois points et l'espace sur un téléphone. Compact exprès
- * (Solal : les versions précédentes prenaient trop de place). Volontairement léger : la
+ * (Solal : les versions précédentes prenaient trop de place), et sans carte
+ * blanche autour : le contenu est posé directement sur la page. Volontairement léger : la
  * première version, avec quatre onglets par espace, était trop lourde.
  * Une vraie capture de chaque espace (public/espace-auteur/mobile-*.webp),
  * prise sur le livre d'exemple de Jeanne (personne fictive, présentée comme telle).
@@ -49,15 +50,15 @@ export default function AuthorShowcase({
 
   return (
     <Section id={id} className={className}>
-      <SectionHead
-        eyebrow="Inclus avec chaque livre"
-        title="Un espace pour l’auteur, un pour sa famille"
-        text="Le livre se construit en ligne, sous vos yeux."
-      />
-
-      <div className="head-gap card mx-auto max-w-[880px] overflow-hidden" data-reveal>
-        <div className="grid items-center sm:grid-cols-[1fr_auto]">
-          <div className="p-6 sm:p-8">
+      {/* Pas de carte : le titre et le sélecteur à gauche, le téléphone à droite sur toute la hauteur. */}
+      <div className="grid items-center gap-y-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-x-12 lg:gap-x-24" data-reveal>
+          <div className="min-w-0">
+            <SectionHead
+              eyebrow="Inclus avec chaque livre"
+              title="Un espace pour l’auteur, un pour sa famille"
+              text="Le livre se construit en ligne, sous vos yeux."
+            />
+            <div className="head-gap" />
             {/* Le sélecteur : deux boutons côte à côte. */}
             <div role="tablist" aria-label="Les deux espaces" className="grid w-full max-w-[24rem] grid-cols-2 gap-1 rounded-full bg-[var(--surface-2)] p-1">
               {ORDER.map((key) => {
@@ -97,21 +98,20 @@ export default function AuthorShowcase({
           </div>
 
           {/* L'espace choisi, sur un téléphone : une vraie capture, sur un livre d'exemple. */}
-          <figure className="flex h-[230px] justify-center overflow-hidden bg-[var(--canvas)] px-8 pt-6 [mask-image:linear-gradient(to_bottom,#000_75%,transparent)] sm:m-3 sm:h-[320px] sm:rounded-[20px] sm:px-10">
-            <div className="h-fit w-[180px] shrink-0 rounded-[30px] bg-[var(--ink)] p-[7px] shadow-[0_24px_50px_-24px_rgba(20,24,34,0.55)]">
+          <figure className="flex h-[260px] justify-center overflow-hidden px-8 pt-2 [mask-image:linear-gradient(to_bottom,#000_78%,transparent)] md:h-[470px] md:px-6 lg:pr-16">
+            <div className="h-fit w-[190px] shrink-0 rounded-[30px] md:w-[250px] md:rounded-[38px] bg-[var(--ink)] p-[7px] shadow-[0_24px_50px_-24px_rgba(20,24,34,0.55)]">
               <Image
                 key={space}
                 src={`/espace-auteur/mobile-${space}.webp`}
                 alt={current.alt}
                 width={780}
                 height={1520}
-                sizes="180px"
-                className="h-auto w-full rounded-[24px]"
+                sizes="(min-width: 768px) 250px, 190px"
+                className="h-auto w-full rounded-[24px] md:rounded-[31px]"
               />
             </div>
             <figcaption className="sr-only">{current.label}, sur un livre d’exemple.</figcaption>
           </figure>
-        </div>
       </div>
     </Section>
   );
