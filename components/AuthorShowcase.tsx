@@ -16,11 +16,10 @@ import SpaceDemo, { type SpaceId } from "@/components/SpaceDemo";
  * de vraies captures sur le livre d'exemple de Jeanne (personne fictive).
  */
 
-const SPACES: Record<SpaceId, { label: string; who: string; lead: string; points: string[]; url: string; alt: string }> = {
+const SPACES: Record<SpaceId, { label: string; who: string; points: string[]; url: string; alt: string }> = {
   auteur: {
     label: "Espace auteur",
     who: "Pour celui qui raconte",
-    lead: "Après chaque appel, il retrouve son livre en ligne.",
     points: ["Il lit chaque chapitre, mis en page comme dans le livre.", "Il corrige un passage, ou demande à Loomina de le faire.", "Il choisit le sujet du prochain appel."],
     url: "loomina.eu/espace-auteur",
     alt: "L’espace auteur de Jeanne, parcouru écran par écran : l’aperçu, son livre, sa vie, ses appels et ses réglages",
@@ -28,7 +27,6 @@ const SPACES: Record<SpaceId, { label: string; who: string; lead: string; points
   famille: {
     label: "Espace famille",
     who: "Pour celui qui offre",
-    lead: "Il suit le livre et y participe, sans déranger l’auteur.",
     points: ["Il voit le livre avancer, appel après appel.", "Il pose une question, que Loomina glisse dans un prochain appel.", "Il commande un exemplaire pour chaque membre de la famille."],
     url: "loomina.eu/espace-famille",
     alt: "L’espace famille de Claire : le suivi du livre de Jeanne, la question à poser et les récits à lire",
@@ -57,7 +55,6 @@ export default function AuthorShowcase({
             <SectionHead
               eyebrow="Inclus avec chaque livre"
               title="Un espace pour l’auteur, un pour sa famille"
-              text="Le livre se construit en ligne, sous vos yeux."
             />
             <div className="head-gap" />
             {/* Le sélecteur : deux boutons côte à côte. */}
@@ -86,9 +83,8 @@ export default function AuthorShowcase({
             </div>
 
             <div id={`${id}-espace`} role="tabpanel">
-              <p className="mt-5 text-[15px] font-bold text-[var(--amber-ink)]">{current.who}</p>
-              <p className="mt-1.5 max-w-md text-[clamp(1.2rem,1.8vw,1.4rem)] font-extrabold leading-[1.2] tracking-[-0.025em] text-[var(--ink)]">{current.lead}</p>
-              <ul className="mt-4 space-y-2">
+              <p className="mt-6 text-[15px] font-bold text-[var(--amber-ink)]">{current.who}</p>
+              <ul className="mt-3 space-y-2.5">
                 {current.points.map((point) => (
                   <li key={point} className="flex gap-3 text-[15px] leading-snug text-[var(--ink-2)]">
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
