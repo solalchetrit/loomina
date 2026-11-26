@@ -39,7 +39,7 @@ function openai(): OpenAI {
     // sous les 300 s de la fonction : Directeur 2 × 45 s + Écrivain 200 s.
     // la fonction Vercel (300 s) était tuée avant, et l'appel restait bloqué.
     // Pas de nouvel essai du SDK : en cas d'échec on passe au modèle de
-    // repli, plus rapide. Budget : 60 s + 45 s + Écrivain 180 s < 300 s.
+    // repli, plus rapide. Délais : voir DIRECTOR_TIMEOUT_MS plus bas.
     client = new OpenAI({ apiKey, maxRetries: 0 });
     return client;
 }
@@ -55,9 +55,24 @@ function openai(): OpenAI {
 export const DIRECTOR_MODEL = process.env.LOOMINA_DIRECTOR_MODEL?.trim() || 'gpt-5.5';
 export const DIRECTOR_REASONING_EFFORT = 'low';
 export const DIRECTOR_FALLBACK_MODEL = 'gpt-4o';
-export const DIRECTOR_MAX_TOKENS = 2048;
+/**
+ * 26/11/2026 : 2048 → 10240 (Solal : « 5 fois plus longue »). La mémoire du livre grossit à chaque appel et la
+ * réponse avec elle : sur un appel riche en faits (nom, dates, métiers,
+ * enfants), le repli gpt-4o a rendu un JSON coupé net à 2048 jetons, trois
+ * fois de suite, et le récit de l'appel ne s'écrivait jamais.
+ */
+export const DIRECTOR_MAX_TOKENS = 10240;
+/**
+ * Délais du modèle principal puis du repli. Avant : 60 s et 45 s. gpt-5.5
+ * rendait déjà 3 500 à 4 500 jetons par appel, à la limite des 60 s : un
+ * appel dense les dépassait. L'analyse est sauvée avant la rédaction, donc
+ * si la fonction (300 s) est coupée pendant l'Écrivain, l'essai suivant
+ * reprend à la rédaction sans refaire l'analyse. Solal, 26/11 : 200 s.
+ */
+export const DIRECTOR_TIMEOUT_MS = 200_000;
+export const DIRECTOR_FALLBACK_TIMEOUT_MS = 80_000;
 /** Réflexion comprise, pour un modèle à raisonnement. */
-export const DIRECTOR_MAX_COMPLETION_TOKENS = 12000;
+export const DIRECTOR_MAX_COMPLETION_TOKENS = 24000;
 export const DIRECTOR_TEMPERATURE = 0.3;
 
 function isReasoningModel(model: string): boolean {
@@ -403,14 +418,14 @@ export async function runDirector(params: DirectorInput): Promise<DirectorResult
     let raw: string;
     let usage: TokenUsage | undefined;
     try {
-        ({ raw, usage } = await complete(model, system, user, 60_000));
+        ({ raw, usage } = await complete(model, system, user, DIRECTOR_TIMEOUT_MS));
     } catch (err) {
         if (model === DIRECTOR_FALLBACK_MODEL) throw err;
         console.warn(
             `[directeur] ${model} en échec (${err instanceof Error ? err.message : String(err)}), repli sur ${DIRECTOR_FALLBACK_MODEL}`
         );
         model = DIRECTOR_FALLBACK_MODEL;
-        ({ raw, usage } = await complete(model, system, user, 45_000));
+        ({ raw, usage } = await complete(model, system, user, DIRECTOR_FALLBACK_TIMEOUT_MS));
     }
     const parsed = JSON.parse(raw) as Record<string, unknown>;
 
