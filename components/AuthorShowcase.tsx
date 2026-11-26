@@ -55,9 +55,9 @@ export default function AuthorShowcase({
         text="Le livre se construit en ligne, sous vos yeux."
       />
 
-      <div className="head-gap card mx-auto max-w-[980px] overflow-hidden" data-reveal>
+      <div className="head-gap card mx-auto max-w-[880px] overflow-hidden" data-reveal>
         <div className="grid items-center sm:grid-cols-[1fr_auto]">
-          <div className="p-6 sm:p-9 lg:p-11">
+          <div className="p-6 sm:p-8">
             {/* Le sélecteur : deux boutons côte à côte. */}
             <div role="tablist" aria-label="Les deux espaces" className="grid w-full max-w-[24rem] grid-cols-2 gap-1 rounded-full bg-[var(--surface-2)] p-1">
               {ORDER.map((key) => {
@@ -81,11 +81,11 @@ export default function AuthorShowcase({
             </div>
 
             <div id={`${id}-espace`} role="tabpanel">
-              <p className="mt-7 text-[15px] font-bold text-[var(--amber-ink)]">{current.who}</p>
-              <p className="mt-1.5 max-w-md text-[clamp(1.3rem,2vw,1.6rem)] font-extrabold leading-[1.2] tracking-[-0.025em] text-[var(--ink)]">{current.lead}</p>
-              <ul className="mt-5 space-y-2.5">
+              <p className="mt-5 text-[15px] font-bold text-[var(--amber-ink)]">{current.who}</p>
+              <p className="mt-1.5 max-w-md text-[clamp(1.2rem,1.8vw,1.4rem)] font-extrabold leading-[1.2] tracking-[-0.025em] text-[var(--ink)]">{current.lead}</p>
+              <ul className="mt-4 space-y-2">
                 {current.points.map((point) => (
-                  <li key={point} className="flex gap-3 text-[16px] leading-snug text-[var(--ink-2)]">
+                  <li key={point} className="flex gap-3 text-[15px] leading-snug text-[var(--ink-2)]">
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
                       <Icon name="check" size={12} />
                     </span>
@@ -97,16 +97,16 @@ export default function AuthorShowcase({
           </div>
 
           {/* L'espace choisi, sur un téléphone : une vraie capture, sur un livre d'exemple. */}
-          <figure className="flex h-[300px] justify-center overflow-hidden bg-[var(--canvas)] px-8 pt-7 [mask-image:linear-gradient(to_bottom,#000_80%,transparent)] sm:m-3 sm:h-auto sm:rounded-[20px] sm:px-12 sm:py-8 sm:[mask-image:none]">
-            <div className="h-fit w-[216px] shrink-0 rounded-[34px] bg-[var(--ink)] p-[7px] shadow-[0_24px_50px_-24px_rgba(20,24,34,0.55)]">
+          <figure className="flex h-[230px] justify-center overflow-hidden bg-[var(--canvas)] px-8 pt-6 [mask-image:linear-gradient(to_bottom,#000_75%,transparent)] sm:m-3 sm:h-[320px] sm:rounded-[20px] sm:px-10">
+            <div className="h-fit w-[180px] shrink-0 rounded-[30px] bg-[var(--ink)] p-[7px] shadow-[0_24px_50px_-24px_rgba(20,24,34,0.55)]">
               <Image
                 key={space}
                 src={`/espace-auteur/mobile-${space}.webp`}
                 alt={current.alt}
                 width={780}
                 height={1520}
-                sizes="216px"
-                className="h-auto w-full rounded-[27px]"
+                sizes="180px"
+                className="h-auto w-full rounded-[24px]"
               />
             </div>
             <figcaption className="sr-only">{current.label}, sur un livre d’exemple.</figcaption>
