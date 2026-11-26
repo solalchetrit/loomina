@@ -97,6 +97,7 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
         title={todo === 0 ? "Rien à faire aujourd’hui" : `${NUMBERS[todo] ?? todo} chose${todo > 1 ? "s" : ""} à regarder aujourd’hui`}
         action={
           <div className="flex flex-wrap gap-2">
+            <a href="/api/admin/recap" className="adm-btn adm-btn-sec" title="Le récap envoyé par e-mail à 10 h et 20 h"><AIcon name="chart" size={15} /> Récap du jour</a>
             <Link href="/admin/mails" className="adm-btn adm-btn-sec"><AIcon name="message" size={15} /> Écrire un mail</Link>
             <Link href="/admin/clients" className="adm-btn"><AIcon name="users" size={15} /> Voir les clients</Link>
           </div>

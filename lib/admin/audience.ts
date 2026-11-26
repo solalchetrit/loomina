@@ -174,6 +174,32 @@ export async function getAudience(days = 28): Promise<Audience> {
     };
 }
 
+/**
+ * Les visites d'une période courte, pour le récap de 10 h (hier), de 20 h
+ * (aujourd'hui jusqu'ici) et du lundi (les 7 derniers jours). LinkedIn compté à part : c'est là que Solal publie
+ * avant le lancement (« linkedin.com », « lnkd.in », « linkedin » en utm_source).
+ */
+export async function audienceDay(startDate: string, endDate = startDate): Promise<{ sessions: number; users: number; sources: Array<{ source: string; sessions: number }>; linkedin: number; demoClicks: number; checkouts: number }> {
+    const token = await accessToken('https://www.googleapis.com/auth/analytics.readonly');
+    const range = { startDate, endDate };
+    const [totals, sources, events] = await Promise.all([
+        report(token, { dateRanges: [range], metrics: [{ name: 'sessions' }, { name: 'totalUsers' }] }),
+        report(token, { dateRanges: [range], dimensions: [{ name: 'sessionSource' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 20 }),
+        report(token, { dateRanges: [range], dimensions: [{ name: 'eventName' }], metrics: [{ name: 'eventCount' }] }),
+    ]);
+    const t = totals.rows?.[0];
+    const list = (sources.rows ?? []).map((r) => ({ source: dim(r) === '(direct)' ? 'direct' : dim(r), sessions: met(r) }));
+    const count = (name: string) => met((events.rows ?? []).find((x) => dim(x) === name) ?? {});
+    return {
+        sessions: t ? met(t, 0) : 0,
+        users: t ? met(t, 1) : 0,
+        sources: list.slice(0, 6),
+        linkedin: list.filter((s) => /linkedin|lnkd/i.test(s.source)).reduce((n, s) => n + s.sessions, 0),
+        demoClicks: count(KEY_EVENTS.demo),
+        checkouts: count(KEY_EVENTS.checkout),
+    };
+}
+
 /* ───────────────────────── Search Console ───────────────────────── */
 
 /** La propriété Search Console : domaine entier d'abord, puis l'adresse du site. */
