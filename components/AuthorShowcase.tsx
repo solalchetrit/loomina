@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Icon from "@/components/ui/Icon";
 import { Section, SectionHead } from "@/components/ui/Section";
+import SpaceDemo, { type SpaceId } from "@/components/SpaceDemo";
 
 /**
  * Les deux espaces de Loomina dans un seul module (Solal, 26/11/2026) :
@@ -12,10 +12,9 @@ import { Section, SectionHead } from "@/components/ui/Section";
  * (Solal : les versions précédentes prenaient trop de place), et sans carte
  * blanche autour : le contenu est posé directement sur la page. Volontairement léger : la
  * première version, avec quatre onglets par espace, était trop lourde.
- * Une vraie capture de chaque espace (public/espace-auteur/mobile-*.webp),
- * prise sur le livre d'exemple de Jeanne (personne fictive, présentée comme telle).
+ * Le téléphone montre l'espace tout seul, comme une vidéo (SpaceDemo), à partir
+ * de vraies captures sur le livre d'exemple de Jeanne (personne fictive).
  */
-type SpaceId = "auteur" | "famille";
 
 const SPACES: Record<SpaceId, { label: string; who: string; lead: string; points: string[]; url: string; alt: string }> = {
   auteur: {
@@ -24,7 +23,7 @@ const SPACES: Record<SpaceId, { label: string; who: string; lead: string; points
     lead: "Après chaque appel, il retrouve son livre en ligne.",
     points: ["Il lit chaque chapitre, mis en page comme dans le livre.", "Il corrige un passage, ou demande à Loomina de le faire.", "Il choisit le sujet du prochain appel."],
     url: "loomina.eu/espace-auteur",
-    alt: "L’espace auteur de Jeanne : Mémo, le sujet du prochain appel et la carte « Suggérer un sujet »",
+    alt: "L’espace auteur de Jeanne, parcouru écran par écran : l’aperçu, son livre, sa vie, ses appels et ses réglages",
   },
   famille: {
     label: "Espace famille",
@@ -32,7 +31,7 @@ const SPACES: Record<SpaceId, { label: string; who: string; lead: string; points
     lead: "Il suit le livre et y participe, sans déranger l’auteur.",
     points: ["Il voit le livre avancer, appel après appel.", "Il pose une question, que Loomina glisse dans un prochain appel.", "Il commande un exemplaire pour chaque membre de la famille."],
     url: "loomina.eu/espace-famille",
-    alt: "L’espace famille de Claire : Mémo, le suivi du livre de Jeanne et la carte pour poser une question",
+    alt: "L’espace famille de Claire : le suivi du livre de Jeanne, la question à poser et les récits à lire",
   },
 };
 
@@ -46,6 +45,8 @@ export default function AuthorShowcase({
   className?: string;
 }) {
   const [space, setSpace] = useState<SpaceId>("auteur");
+  // Tant que le visiteur n'a rien choisi, le téléphone enchaîne espace auteur puis espace famille.
+  const [auto, setAuto] = useState(true);
   const current = SPACES[space];
 
   return (
@@ -70,7 +71,10 @@ export default function AuthorShowcase({
                     role="tab"
                     aria-selected={on}
                     aria-controls={`${id}-espace`}
-                    onClick={() => setSpace(key)}
+                    onClick={() => {
+                      setAuto(false);
+                      setSpace(key);
+                    }}
                     className={`press min-h-11 whitespace-nowrap rounded-full px-2 text-[15px] font-bold transition-colors sm:px-4 ${
                       on ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"
                     }`}
@@ -97,19 +101,9 @@ export default function AuthorShowcase({
             </div>
           </div>
 
-          {/* L'espace choisi, sur un téléphone : une vraie capture, sur un livre d'exemple. */}
-          <figure className="flex h-[260px] justify-center overflow-hidden px-8 pt-2 [mask-image:linear-gradient(to_bottom,#000_78%,transparent)] md:h-[470px] md:px-6 lg:pr-16">
-            <div className="h-fit w-[190px] shrink-0 rounded-[30px] md:w-[250px] md:rounded-[38px] bg-[var(--ink)] p-[7px] shadow-[0_24px_50px_-24px_rgba(20,24,34,0.55)]">
-              <Image
-                key={space}
-                src={`/espace-auteur/mobile-${space}.webp`}
-                alt={current.alt}
-                width={780}
-                height={1520}
-                sizes="(min-width: 768px) 250px, 190px"
-                className="h-auto w-full rounded-[24px] md:rounded-[31px]"
-              />
-            </div>
+          {/* L'espace choisi, sur un téléphone : il se parcourt tout seul (components/SpaceDemo.tsx). */}
+          <figure className="flex justify-center md:px-6 lg:pr-16">
+            <SpaceDemo space={space} auto={auto} onAutoNext={setSpace} label={current.alt} />
             <figcaption className="sr-only">{current.label}, sur un livre d’exemple.</figcaption>
           </figure>
       </div>

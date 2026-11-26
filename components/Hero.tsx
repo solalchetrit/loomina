@@ -40,7 +40,7 @@ export default function Hero() {
               Commander
             </Button>
             <Button href={`tel:${SITE.phone}`} variant="secondary" size="lg">
-              Essayer gratuitement
+              Essayer la démo
             </Button>
           </div>
           <p className="rise mt-4 text-[16px] text-[var(--ink-2)]" style={{ "--i": 4 } as CSSProperties}>

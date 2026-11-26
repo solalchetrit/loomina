@@ -141,6 +141,14 @@ export function Countdown({ tone = "dark" }: { tone?: "dark" | "light" }) {
  * sur ce qui annonce l'urgence, et parler de Noël). Fixe, au-dessus du menu ;
  * il pousse la page de sa hauteur (--promo-h). Disparaît seul après le 24 décembre.
  */
+/** Le module de Noël est aussi sur d'autres pages : s'il est sur celle-ci, on y descend au lieu de repartir à l'accueil. */
+function goToOfferHere(e: React.MouseEvent<HTMLAnchorElement>) {
+  const target = document.getElementById("offre-de-noel");
+  if (!target || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  e.preventDefault();
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 export function NoelBanner() {
   const { active } = useLaunchOffer();
   const now = useNowSecond();
@@ -151,6 +159,7 @@ export function NoelBanner() {
       <style>{`:root{--promo-h:44px}body{padding-top:var(--promo-h)}`}</style>
       <Link
         href="/#offre-de-noel"
+        onClick={goToOfferHere}
         className="fixed inset-x-0 top-0 z-[1001] flex h-[44px] items-center justify-center gap-x-3 bg-[var(--noel)] px-3 text-[14.5px] text-white hover:bg-[var(--noel-deep)] sm:text-[15.5px]"
       >
         <Icon name="gift" size={18} className="hidden shrink-0 min-[380px]:block" />
@@ -192,7 +201,7 @@ export function HeroOffer({ className = "" }: { className?: string }) {
   if (!active) return null;
   const r = now == null ? null : remaining(now);
   return (
-    <Link href="/#offre-de-noel" className={`group block w-fit max-w-full border-l-[3px] border-[var(--noel)] pl-5 ${className}`}>
+    <Link href="/#offre-de-noel" onClick={goToOfferHere} className={`group block w-fit max-w-full border-l-[3px] border-[var(--noel)] pl-5 ${className}`}>
       <span className="flex items-center gap-2 text-[14px] font-extrabold uppercase tracking-[0.08em] text-[var(--noel)]">
         <span className="relative flex h-2.5 w-2.5">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--noel)] opacity-60 motion-reduce:hidden" />

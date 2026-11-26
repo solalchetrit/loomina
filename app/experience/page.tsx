@@ -5,6 +5,7 @@ import ThemePicker from "@/components/home/ThemePicker";
 import Photo from "@/components/ui/Photo";
 import { CallPreview } from "@/components/HowItWorks";
 import Closing from "@/components/Closing";
+import ChristmasOffer from "@/components/home/ChristmasOffer";
 import AuthorShowcase from "@/components/AuthorShowcase";
 import MemoSection from "@/components/home/MemoSection";
 import { SITE } from "@/config/site";
@@ -168,7 +169,7 @@ export default function ExperiencePage() {
             </ul>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button href={`tel:${SITE.phone}`} size="lg">
-                Essayer {OFFER.demoMinutes} minutes gratuitement
+                Essayer la démo
               </Button>
               <Button href="#avant" variant="secondary" size="lg">
                 Voir les étapes
@@ -230,7 +231,7 @@ export default function ExperiencePage() {
                           Commander
                         </Button>
                         <a href={`tel:${SITE.phone}`} className="link self-center text-[15px]">
-                          Essayer d’abord la démo
+                          Essayer la démo
                         </a>
                       </div>
                     </div>
@@ -247,6 +248,9 @@ export default function ExperiencePage() {
       <MemoSection />
 
       <ThemePicker />
+
+      {/* L’offre de lancement de Noël, aussi hors de l’accueil (Solal, 26/11/2026). Disparaît seule après le 24 décembre. */}
+      <ChristmasOffer />
 
       <Closing title="Essayez d’abord, commandez ensuite" />
     </>

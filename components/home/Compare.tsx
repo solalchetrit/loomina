@@ -121,7 +121,7 @@ export default function Compare() {
         <Button href="/order" size="lg">
           Commander mon livre
         </Button>
-        <Button href="/offre#detail" variant="secondary" size="lg">
+        <Button href="/offre#le-livre" variant="secondary" size="lg">
           {SHOW_PRICE ? "Ce que couvre le prix" : "Ce qui est compris"}
         </Button>
       </div>

@@ -65,7 +65,7 @@ export default function ChristmasOffer() {
                 Offrir Loomina pour Noël
               </Button>
               <Button href={`tel:${SITE.phone}`} variant="ghost" className="!px-0 !text-white !decoration-white/40 hover:!decoration-white">
-                Essayer d’abord gratuitement
+                Essayer la démo
               </Button>
             </div>
             <p className="mt-4 text-[15px] text-[#cfcfc8]">Tout compris, livraison incluse. Satisfait ou remboursé pendant {OFFER.guaranteeDays} jours.</p>

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Photo from "@/components/ui/Photo";
 import Button from "@/components/ui/Button";
 import Closing from "@/components/Closing";
+import ChristmasOffer from "@/components/home/ChristmasOffer";
 import Markdown from "@/components/blog/Markdown";
 import { allPosts, anchor, frenchDate, getPost } from "@/lib/blog";
 import { SITE } from "@/config/site";
@@ -143,6 +144,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </div>
       </article>
       <div className="section-y !pb-0" />
+      {/* L’offre de lancement de Noël, aussi hors de l’accueil (Solal, 26/11/2026). Disparaît seule après le 24 décembre. */}
+      <ChristmasOffer />
       <Closing />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     </>

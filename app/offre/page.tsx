@@ -8,6 +8,7 @@ import Icon from "@/components/ui/Icon";
 import Button from "@/components/ui/Button";
 import WhatYouGet from "@/components/home/WhatYouGet";
 import Compare from "@/components/home/Compare";
+import ChristmasOffer from "@/components/home/ChristmasOffer";
 import Closing from "@/components/Closing";
 import { OFFER, GUARANTEE, SHOW_PRICE, LAUNCH, OFFER_PAGE_LABEL } from "@/config/offer";
 import { LaunchPrice } from "@/components/LaunchOffer";
@@ -63,7 +64,7 @@ export default function OffrePage() {
                   Commander
                 </Button>
                 <Button href={`tel:${SITE.phone}`} variant="ghost" className="!px-0 !text-white !decoration-white/40 hover:!decoration-white">
-                  Essayer d’abord gratuitement
+                  Essayer la démo
                 </Button>
               </div>
               <p className="mt-4 flex items-center gap-3 text-[15px] text-white md:mt-6">
@@ -108,6 +109,9 @@ export default function OffrePage() {
       />
 
       <Compare />
+
+      {/* L’offre de lancement de Noël, aussi hors de l’accueil (Solal, 26/11/2026). Disparaît seule après le 24 décembre. */}
+      <ChristmasOffer />
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
