@@ -141,7 +141,6 @@ export default function ExperiencePage() {
             un livre
           </>
         }
-        text="Vous parlez, Loomina écrit, notre équipe relit, et le livre arrive chez vous. Voici le détail, dans l’ordre où vous le vivrez."
         photo={{
           name: "mains-telephone",
           alt: "Les mains d’une personne âgée tiennent un téléphone.",

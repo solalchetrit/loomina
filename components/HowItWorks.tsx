@@ -73,7 +73,7 @@ export default function HowItWorks() {
   return (
     <Section id="parcours">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-        <SectionHead title="Trois étapes, et rien à écrire" text="Pas d’application, rien à installer. Un téléphone suffit." />
+        <SectionHead title="Trois étapes, et rien à écrire" />
         <Link href="/experience" className="link shrink-0 text-[16px]">
           Le détail, appel par appel
         </Link>

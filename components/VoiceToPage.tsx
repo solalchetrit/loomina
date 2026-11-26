@@ -102,7 +102,6 @@ export default function VoiceToPage() {
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <SectionHead
           title="De l’appel à la page du livre"
-          text="Vos souvenirs et vos expressions, mis en forme, sans rien inventer."
         />
         {!still && (
           <button
