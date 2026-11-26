@@ -30,7 +30,7 @@ const TIMERS = [
   ["Chaque minute", "Serveur vocal", "Appelle les narrateurs dont c’est l’heure de rendez-vous. Renvoie les rapports d’appel restés en attente."],
   ["Toutes les 5 minutes", "Serveur vocal", "Demande au site de retraiter les appels dont l’analyse ou l’écriture a échoué."],
   ["Chaque nuit à 3 h", "Site (cron Vercel)", "Même rattrapage, au cas où le serveur vocal serait arrêté."],
-  ["Après chaque récit", "Site", "Recompose le livre (plan puis chapitres, par étapes)."],
+  ["À la fin de chaque étape de Mémo", "Site", "Écrit le livre jusqu’à l’étape finie (plan puis chapitres, un par un). Un livre arrêté en route est repris tout seul dans les 5 minutes."],
 ];
 
 function Diagram() {

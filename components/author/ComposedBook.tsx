@@ -6,6 +6,7 @@ import { Fragment, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import Button from "@/components/ui/Button";
 import { More, PAGE, PAGE_KICKER, PAGE_TITLE, ReaderLayout, Toc } from "./Reader";
+import { MEMO_AGES } from "@/lib/loomina/memo";
 
 interface BookChapter {
   number: number;
@@ -30,6 +31,8 @@ interface Edition {
   sourceCount: number;
   at: string;
   pieces?: BookPieces | null;
+  /** La dernière étape finie que ce livre raconte (absent : livre d'avant les étapes). */
+  through?: number | null;
 }
 
 interface Payload {
@@ -37,6 +40,8 @@ interface Payload {
   running: { done: number; total: number; status: string } | null;
   failed: boolean;
   sourceCount: number;
+  /** L'étape en cours (1 à 4), la dernière étape finie (0 : aucune), et si le récit est complet. */
+  stage?: { current: number; through: number; complete: boolean } | null;
   error?: string;
 }
 
@@ -85,6 +90,9 @@ const formatDate = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", { 
  * Le livre composé : les chapitres ne suivent pas les appels. Loomina relit
  * tout ce qui a été raconté, range les souvenirs dans l'ordre de la vie et
  * ne garde qu'une fois ce qui a été dit plusieurs fois.
+ *
+ * Le livre s'écrit à la fin de chaque étape de Mémo (Solal, 26/11/2026) :
+ * l'auteur le lit dès qu'il a fini une étape, et il s'allonge à chaque étape finie.
  */
 export default function ComposedBook({ onUnauthorized, top, aside, after }: { onUnauthorized: () => void; top?: ReactNode; aside?: ReactNode; /** Sous la carte du livre, dans la colonne de gauche. */ after?: ReactNode }) {
   const [data, setData] = useState<Payload | null>(null);
@@ -176,8 +184,20 @@ export default function ComposedBook({ onUnauthorized, top, aside, after }: { on
 
   const edition = data?.edition ?? null;
   const running = data?.running ?? null;
-  const newCalls = edition && data ? data.sourceCount - edition.sourceCount : 0;
-  const canCompose = (data?.sourceCount ?? 0) >= 2;
+  const stage = data?.stage ?? null;
+  const canCompose = (data?.sourceCount ?? 0) >= 1 && (!stage || stage.through >= 1);
+  const stageName = (n: number) => MEMO_AGES[Math.min(Math.max(n, 1), 4) - 1].stage;
+  // Ce que l'auteur lit sous le titre : où s'arrête son livre, et quand viendra la suite.
+  const reach = edition?.through ?? stage?.through ?? 0;
+  const stageNote = !stage
+    ? null
+    : stage.complete
+      ? null
+      : !edition
+        ? `Votre livre s’écrit étape par étape. Vous lirez ici la première partie à la fin de l’étape « ${stageName(stage.current)} ».`
+        : reach >= 1
+          ? `Votre livre va jusqu’à la fin de l’étape « ${stageName(reach)} ». La suite s’écrira à la fin de l’étape « ${stageName(stage.current)} ».`
+          : null;
 
   const pieces = edition?.pieces ?? null;
 
@@ -233,7 +253,7 @@ export default function ComposedBook({ onUnauthorized, top, aside, after }: { on
                     Réessayer
                   </Button>
                 )}
-                {!canCompose && <p className={small}>Votre livre sera composé à partir de deux appels racontés.</p>}
+                {stageNote && edition && <p className="text-[14.5px] leading-snug text-[var(--ink-2)]">{stageNote}</p>}
                 {edition && (
                   <Button onClick={download} loading={downloading} variant="secondary" className="!min-h-11 w-full !px-4 !text-[15px]">
                     {!downloading && (
@@ -247,7 +267,6 @@ export default function ComposedBook({ onUnauthorized, top, aside, after }: { on
                 {edition && (
                   <p className={small}>
                     Mis à jour le {formatDate(edition.at)}
-                    {newCalls > 0 ? ` · ${newCalls === 1 ? "le dernier appel arrive" : `les ${newCalls} derniers appels arrivent`} dans quelques minutes` : ""}
                   </p>
                 )}
               </div>
@@ -260,7 +279,7 @@ export default function ComposedBook({ onUnauthorized, top, aside, after }: { on
             )}
             <More label="Comment ce livre est composé ?">
               Loomina relit tout ce que vous avez raconté, range vos souvenirs dans l’ordre de votre vie et ne garde qu’une fois ce qui a été dit plusieurs fois. Rien n’est ajouté. Le
-              livre se met à jour tout seul après chaque appel. Pour corriger un passage, ouvrez l’appel concerné dans « Mes appels » : le reste ne change pas.
+              livre s’écrit à la fin de chaque étape : Loomina a alors toute une période de votre vie sous les yeux. Pour corriger un passage, ouvrez l’appel concerné dans « Mes appels » : le reste ne change pas.
             </More>
             {edition && <Toc label="Sommaire" parts={toc} />}
           </div>
@@ -268,6 +287,13 @@ export default function ComposedBook({ onUnauthorized, top, aside, after }: { on
         </>
       }
     >
+      {/* Pas encore de livre : la page dit quand il arrivera, au lieu de rester vide. */}
+      {!edition && !running && stageNote && (
+        <section aria-label="Votre livre" className={PAGE}>
+          <p className={PAGE_KICKER}>Bientôt</p>
+          <p className="mx-auto mt-3 max-w-[30rem] text-center font-serif text-[1.25rem] leading-relaxed text-[var(--ink-2)]">{stageNote}</p>
+        </section>
+      )}
       {edition && (
         <>
           {pieces?.dedication && (

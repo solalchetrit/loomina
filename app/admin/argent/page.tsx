@@ -269,7 +269,7 @@ export default async function AdminMoney({ searchParams }: { searchParams: Promi
           ) : (
             <>
               <BarList items={s.compositions.map((c) => ({ key: c.projectId, label: c.profileId ? <Link className="hover:underline" href={`/admin/clients/${c.profileId}`}>{c.client}</Link> : c.client, value: c.count, display: `${c.count} · ${money(c.total)}` }))} />
-              <p className="t-small mt-3">Le livre se recompose tout seul après chaque appel et chaque correction. Coût estimé à {money(COSTS.compositionFallbackPerEdition * COSTS.usdToEur)} par composition{oa ? " ; la facture OpenAI ci-dessus donne le vrai total" : ""}.</p>
+              <p className="t-small mt-3">Le livre s’écrit à la fin de chaque étape de Mémo (4 fois par livre), et une correction est reportée dans les chapitres concernés. Coût estimé à {money(COSTS.compositionFallbackPerEdition * COSTS.usdToEur)} par composition{oa ? " ; la facture OpenAI ci-dessus donne le vrai total" : ""}.</p>
             </>
           )}
         </Panel>

@@ -933,3 +933,34 @@ test('codes promo : le formulaire refuse ce qui n’a pas de sens', () => {
     assert.equal(typeof parsePromoForm(form({ ...ok, note: ' ' })), 'string');
     assert.equal(typeof parsePromoForm(form({ ...ok, utilisations: '0' })), 'string');
 });
+
+// ------------------------------------------------------------
+// Le livre s'écrit à la fin de chaque étape (lib/loomina/book-edition.ts)
+// ------------------------------------------------------------
+test('le livre va jusqu’à la dernière étape finie', async () => {
+    const { bookThrough, inScope, upToDate } = await import('../../lib/loomina/book-edition');
+    // Première étape en cours : pas encore de livre.
+    assert.equal(bookThrough({ phase: 1, status: 'active' }), 0);
+    assert.equal(bookThrough({ phase: 2, status: 'active' }), 1);
+    assert.equal(bookThrough({ phase: 4, status: 'active' }), 3);
+    // Récit complet : tout le livre.
+    assert.equal(bookThrough({ phase: 4, status: 'completed' }), 4);
+
+    // C'est l'étape de l'APPEL qui compte, pas la période racontée : un souvenir
+    // d'enfance (période 2) dit pendant « Faire connaissance » (étape 1) entre dans le livre dès la fin de l'étape 1.
+    assert.equal(inScope({ callPhase: 1, phase: 2 }, 1), true);
+    // Un récit de l'étape en cours attend la fin de son étape.
+    assert.equal(inScope({ callPhase: 2, phase: 2 }, 1), false);
+    assert.equal(inScope({ callPhase: 2, phase: 1 }, 1), false);
+    // Sans appel connu, le récit suit sa période. Livre complet : tout entre.
+    assert.equal(inScope({ callPhase: null, phase: 1 }, 1), true);
+    assert.equal(inScope({ callPhase: null, phase: 3 }, 1), false);
+    assert.equal(inScope({ callPhase: 4, phase: 4 }, 4), true);
+
+    // Un livre est à jour s'il raconte la bonne étape avec tous ses récits.
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 1, 3), true);
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 2, 7), false);
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 1, 4), false);
+    // Un livre d'avant les étapes (pas d'étape notée) n'est jamais « à jour ».
+    assert.equal(upToDate({ source_count: 3, extras: {} }, 1, 3), false);
+});

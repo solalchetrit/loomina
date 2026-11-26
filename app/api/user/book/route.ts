@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse, after } from 'next/server';
-import { db } from '@/lib/loomina/db';
 import { currentAuthor } from '@/lib/loomina/author';
-import { readEditions, startEdition, kickEdition, publicEdition, autoCompose } from '@/lib/loomina/book-edition';
+import { readEditions, startEdition, kickEdition, publicEdition, autoCompose, bookThrough, countSources, upToDate, STALE_EDITION_MS } from '@/lib/loomina/book-edition';
+import { toPhase } from '@/lib/loomina/phases';
 import { DEMO_DATA, demoEdition } from '@/lib/loomina/demo';
 import { testAuthorReply } from '@/lib/loomina/test-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-/** Une composition sans nouvelle depuis ce délai est relancée par la lecture. */
-const STALE_MS = 3 * 60 * 1000;
 
 /**
  * Le livre composé de l'auteur connecté : la dernière édition prête, et
@@ -22,32 +19,37 @@ export async function GET(request: NextRequest) {
     try {
         const author = await currentAuthor(request);
         if (author instanceof NextResponse) return author;
-        if (!author.project) return NextResponse.json({ edition: null, running: null, failed: false, sourceCount: 0 });
+        if (!author.project) return NextResponse.json({ edition: null, running: null, failed: false, sourceCount: 0, stage: null });
 
-        const { ready, running, failed } = await readEditions(author.project.id);
-        const { count } = await db().from('chapters').select('id', { count: 'exact', head: true }).eq('project_id', author.project.id).neq('status', 'archived');
+        const projectId = author.project.id;
+        const origin = request.nextUrl.origin;
+        // Le livre va jusqu'à la dernière étape finie (0 : la première étape est en cours, pas encore de livre).
+        const through = bookThrough(author.project);
+        const [{ ready, running, failed }, count] = await Promise.all([readEditions(projectId), countSources(projectId, through)]);
 
-        // La chaîne d'étapes a pu casser (déploiement, fonction tuée) : on la relance.
-        // Une étape encore au travail refusera simplement la relance (verrou).
-        if (running && Date.now() - new Date(running.updated_at).getTime() > STALE_MS) {
-            const origin = request.nextUrl.origin;
-            after(() => kickEdition(running.id, origin));
-        }
-        // Livre commencé avant la composition automatique : on le compose
-        // à la première visite, sans attendre le prochain appel.
+        let showRunning = running;
         let starting = false;
-        // Et un livre en retard sur ses appels (recomposition manquée) est rattrapé.
-        if (!running && !failed && (count ?? 0) >= 2 && (!ready || (count ?? 0) > ready.source_count)) {
-            const origin = request.nextUrl.origin;
-            const projectId = author.project.id;
-            after(() => autoCompose(projectId, origin));
+        if (running && !upToDate(running, through, count)) {
+            // Une composition qui ne raconte plus ce qu'il faut (étape finie entre-temps, ou lancée avant les étapes) : remplacée.
+            after(() => autoCompose(projectId, origin, { legacy: false }));
+            showRunning = null;
+            starting = through >= 1 && count >= 1;
+        } else if (running && Date.now() - new Date(running.updated_at).getTime() > STALE_EDITION_MS) {
+            // La chaîne d'étapes a pu casser (déploiement, fonction tuée) : on la relance.
+            // Une étape encore au travail refusera simplement la relance (verrou).
+            after(() => kickEdition(running.id, origin));
+        } else if (!running && !failed && through >= 1 && count >= 1 && (!ready || (ready.extras?.through !== undefined && !upToDate(ready, through, count)))) {
+            // Une étape finie dont le livre n'a pas été écrit (composition manquée) est rattrapée à la visite.
+            after(() => autoCompose(projectId, origin, { legacy: false }));
             starting = true;
         }
         return NextResponse.json({
             edition: ready ? publicEdition(ready) : null,
-            running: running ? { done: running.chapters.length, total: running.plan.length, status: running.status } : starting ? { done: 0, total: 0, status: 'planning' } : null,
+            running: showRunning ? { done: showRunning.chapters.length, total: showRunning.plan.length, status: showRunning.status } : starting ? { done: 0, total: 0, status: 'planning' } : null,
             failed: Boolean(failed),
-            sourceCount: count ?? 0,
+            sourceCount: count,
+            // Où en est l'auteur : l'étape en cours (1 à 4), la dernière étape finie, et si le récit est complet.
+            stage: { current: toPhase(author.project.phase), through, complete: author.project.status === 'completed' },
         });
     } catch (err) {
         console.error('[user/book]', err);
@@ -55,7 +57,7 @@ export async function GET(request: NextRequest) {
     }
 }
 
-/** Compose (ou recompose) le livre à partir de tous les appels. */
+/** Relance la composition du livre, jusqu'à la dernière étape finie (bouton « Réessayer »). */
 export async function POST(request: NextRequest) {
     const essai = await testAuthorReply(request, 'book-compose');
     if (essai) return essai;
