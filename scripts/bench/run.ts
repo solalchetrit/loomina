@@ -191,7 +191,13 @@ async function simulateVoice() {
         id: 'bench', user_id: 'bench', title: null, status: 'active', phase: 2, phase_progress: 30, current_topic_id: null,
         next_question_strategy: 'La dernière fois, vous m\'avez parlé de la boulangerie de vos parents. Racontez-moi une journée là-bas.',
         context: { identity: { full_name: 'Marcel Ferrand' }, last_call: { summary: 'La boulangerie des parents à Roanne.' }, suggested_topics: ['Raconte-nous les vacances chez tante Odette'] },
-        project_metadata: {}, global_context: null,
+        // En vrai, chaque souvenir soufflé est rangé dans sa période de vie à
+        // l'enregistrement (lib/loomina/suggestion-phase.ts, PR #232). Les
+        // vacances d'enfance chez tante Odette sont de la phase 2, celle de
+        // l'appel : la voix doit les amener. Sans ce rangement, le sujet tombait
+        // dans le cas « période inconnue » et la voix pouvait le garder pour
+        // plus tard, d'où un contrôle rouge au hasard.
+        project_metadata: { suggestion_phases: { 'raconte-nous les vacances chez tante odette': 2 } }, global_context: null,
     } as unknown as Project;
     const { assistant } = buildAssistant({ profile, project, prompt: null, phase: 2, serverUrl: 'bench' });
     const system = assistant.model.messages[0].content;

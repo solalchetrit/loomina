@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import LogoMotion from "@/components/brand/LogoMotion";
 
 import { useEffect, useState } from "react";
@@ -108,6 +109,9 @@ export default function BienvenuePage() {
     }
   };
 
+  // La carte à glisser sous le sapin, déjà remplie (app/carte-cadeau).
+  const cardHref = `/carte-cadeau?${new URLSearchParams({ ...(name ? { pour: name } : {}), ...(giver ? { de: giver } : {}) }).toString()}`;
+
   // « ***1298 » → « (celui qui finit par 1298) »
   const last4 = (info?.authorPhone ?? "").replace(/\D/g, "");
   const ends = last4 ? ` (celui qui finit par ${last4})` : "";
@@ -138,9 +142,14 @@ export default function BienvenuePage() {
             <>
               Tout se passe au téléphone. {name || "Votre proche"} appelle le {phoneLine} depuis le numéro indiqué à la commande{ends} : Loomina reconnaît ce numéro, se présente et commence par les premiers souvenirs. Vous pouvez lui envoyer ce message :
               <span className="mt-4 block rounded-[16px] bg-[var(--canvas)] p-4 text-[16px] italic">{message}</span>
-              <button type="button" onClick={copy} className="link mt-3 text-[16px] font-semibold">
-                {copied ? "Message copié" : "Copier le message"}
-              </button>
+              <span className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                <button type="button" onClick={copy} className="link text-[16px] font-semibold">
+                  {copied ? "Message copié" : "Copier le message"}
+                </button>
+                <Link href={cardHref} className="link text-[16px] font-semibold">
+                  Imprimer une carte à offrir
+                </Link>
+              </span>
             </>
           ),
         },

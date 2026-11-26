@@ -11,6 +11,6 @@ import { usePathname } from "next/navigation";
 export default function HideOnAdmin({ children, checkout = false }: { children: React.ReactNode; checkout?: boolean }) {
   const pathname = usePathname();
   if (pathname === "/admin" || pathname.startsWith("/admin/")) return null;
-  if (checkout && (pathname.startsWith("/order") || pathname.startsWith("/bienvenue") || pathname.startsWith("/recit") || pathname.startsWith("/photos/"))) return null;
+  if (checkout && (pathname.startsWith("/order") || pathname.startsWith("/bienvenue") || pathname.startsWith("/recit") || pathname.startsWith("/photos/") || pathname.startsWith("/carte-cadeau"))) return null;
   return <>{children}</>;
 }
