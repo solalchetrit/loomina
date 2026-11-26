@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageHeader, Section } from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import Closing from "@/components/Closing";
+import ChristmasOffer from "@/components/home/ChristmasOffer";
 import { SITE } from "@/config/site";
 import { OFFER_PAGE_LABEL } from "@/config/offer";
 
@@ -96,6 +97,8 @@ export default function GuidePage({
           </nav>
         </article>
       </Section>
+      {/* L’offre de lancement de Noël, aussi hors de l’accueil (Solal, 26/11/2026). Disparaît seule après le 24 décembre. */}
+      <ChristmasOffer />
       <Closing />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
     </>

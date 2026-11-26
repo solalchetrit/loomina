@@ -4,6 +4,7 @@
  * l'appel, le chapitre et la base.
  */
 
+import { SHOW_PRICE } from '../../config/offer';
 import type { Seed } from './lib/profils';
 import type { Persona } from './lib/narrateur';
 import type { Behaviour } from './lib/appel';
@@ -304,7 +305,7 @@ export const SCENARIOS: Scenario[] = [
         },
         behaviour: { maxRepliques: 10 },
         // Depuis le 17/11/2026, la démonstration répond sur le prix (demande de Solal).
-        attendu: { fin: ['loomina'], loominaDit: ['449'] },
+        attendu: { fin: ['loomina'], loominaDit: [SHOW_PRICE ? '199' : 'décembre'] },
     },
     {
         id: '11-hors-role',

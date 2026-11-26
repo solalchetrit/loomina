@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
+import ChristmasOffer from "@/components/home/ChristmasOffer";
 import Facts from "@/components/home/Facts";
 import Audiences from "@/components/home/Audiences";
 import WhatYouGet from "@/components/home/WhatYouGet";
@@ -47,6 +48,9 @@ export default function Home() {
       <div>
         <Hero />
       </div>
+
+      {/* L'offre de lancement pour Noël (Solal, 26/11/2026) : disparaît seule après le 24 décembre. */}
+      <ChristmasOffer />
 
       <div>
         <HowItWorks />

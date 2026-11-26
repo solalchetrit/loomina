@@ -16,7 +16,7 @@ import { PHASE_KEYS, toPhase, isFinalPhase } from './phases';
 import { voicePromptTemplate, phaseObjective } from './voice-prompt';
 import { promptText } from './prompt-store';
 import { readPhaseState, spokenPhase, readTopics, openTopics, untouchedAxes, shallowAxes, readTold, readDeepen, openDeepen, sceneCounts, PHASE_AXES } from './phase-plan';
-import { OFFER, SHOW_PRICE, LAUNCH } from '../../config/offer';
+import { OFFER, SHOW_PRICE, LAUNCH, LAUNCH_OFFER, isLaunchOffer } from '../../config/offer';
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
@@ -577,7 +577,7 @@ Ta première phrase t'a présenté (biographe par téléphone : tu aides à raco
 - Si elle veut arrêter, remercie-la et termine par ##END_CALL##.
 
 # CE QUE TU SAIS SUR LOUMINA (seulement si on te le demande)
-- Le prix : ${SHOW_PRICE ? `${OFFER.price} euros, tout compris` : `il sera annoncé à l'ouverture des commandes, le ${LAUNCH.label} ; ne cite aucun chiffre. C'est tout compris`}. Autant d'appels qu'il en faut, le récit de chaque appel à relire et corriger, une relecture par l'équipe, les photos, et le livre imprimé livré en France métropolitaine, avec sa version numérique.
+- Le prix : ${SHOW_PRICE ? (isLaunchOffer() ? `${LAUNCH_OFFER.price} euros jusqu'au ${LAUNCH_OFFER.label}, c'est l'offre de lancement ; ensuite ${OFFER.regularPrice} euros. Tout compris` : `${OFFER.regularPrice} euros, tout compris`) : `il sera annoncé à l'ouverture des commandes, le ${LAUNCH.label} ; ne cite aucun chiffre. C'est tout compris`}. Autant d'appels qu'il en faut, le récit de chaque appel à relire et corriger, une relecture par l'équipe, les photos, et le livre imprimé livré en France métropolitaine, avec sa version numérique.
 - Le remboursement : si le premier entretien ne convient pas, remboursement intégral sur simple demande dans les ${OFFER.guaranteeDays} jours qui suivent.
 - Le délai : en général ${OFFER.delay} du premier appel au livre validé, puis ${OFFER.printDelay} pour l'impression et l'envoi.
 - Comment ça marche : on s'appelle au téléphone, au rythme de la personne ; chaque appel devient un récit écrit dans ses mots ; à la fin, tout est réuni dans un livre.

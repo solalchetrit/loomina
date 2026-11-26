@@ -1,5 +1,5 @@
 import { SITE } from "@/config/site";
-import { OFFER, SHOW_PRICE } from "@/config/offer";
+import { OFFER, SHOW_PRICE, isLaunchOffer } from "@/config/offer";
 
 /**
  * La fiche produit envoyée à Google : seulement sur l'accueil et sur « Le livre et le prix »,
@@ -21,6 +21,7 @@ export default function ProductJsonLd() {
       url: `${SITE.url}/offre`,
       priceCurrency: "EUR",
       price: OFFER.price.toFixed(2),
+      ...(isLaunchOffer() ? { priceValidUntil: "2026-12-24" } : {}),
       availability: "https://schema.org/InStock",
       seller: { "@id": `${SITE.url}/#organisation` },
       // Livraison incluse en France métropolitaine (config/offer.ts).
