@@ -26,7 +26,7 @@ import {
     axisDepth,
 } from '../../lib/loomina/phase-plan';
 import type { PhaseState, Topic, ToldScene } from '../../lib/loomina/phase-plan';
-import { applyPolish, chapterSignature, renderBook } from '../../lib/loomina/book';
+import { applyPolish, applyFidelity, stripSpellings, chapterSignature, renderBook } from '../../lib/loomina/book';
 import { bookTitle } from '../../lib/loomina/book-print';
 import { toPhase } from '../../lib/loomina/phases';
 import { remainingSuggestions, normalizeContext } from '../../lib/loomina/context';
@@ -328,6 +328,38 @@ test('relecture du livre : une retouche s\'applique seulement si le passage est 
     const locked = applyPolish(chapters, [{ chapter: 2, find: 'La maison sentait la soupe et le feu de bois. ', replace: '', why: 'redite' }], [2]);
     assert.equal(locked.applied, 0);
     assert.equal(locked.chapters[1].content, chapters[1].content);
+});
+
+test('livre : un nom épelé au téléphone n\'est jamais imprimé lettre par lettre', () => {
+    assert.equal(stripSpellings('Je m’appelle Patricia Azoulay. Azoulay, A-Z-O-U-L-A-Y, c’est mon nom de jeune fille.'), 'Je m’appelle Patricia Azoulay. Azoulay, c’est mon nom de jeune fille.');
+    assert.equal(stripSpellings('Mon nom, c’est Azoulay, A, Z, O, U, L, A, Y.'), 'Mon nom, c’est Azoulay.');
+    assert.equal(stripSpellings('Il s’appelait Dany (D-A-N-Y) et il riait.'), 'Il s’appelait Dany et il riait.');
+    // Rien d'autre ne bouge : sigles, initiales, phrases normales.
+    for (const ok of ['J’ai travaillé à la SNCF, puis à la RATP.', 'À Paris, il faisait froid. A Alger, non.', 'Jean-Pierre et Marie-Louise habitaient le 17e.', 'Le choix du roi, comme on dit.']) assert.equal(stripSpellings(ok), ok);
+});
+
+test('relecture de fidélité : retire une phrase sans appui, n\'écrit jamais, ne touche ni citation ni intertitre', () => {
+    const content = '## Rue de Passy\n\nJ’ai travaillé deux ans dans un bureau d’assurance. Je n’étais pas à ma place là-dedans.\n\nMa mère m’a dit : « Tu as fait ce que je n’ai pas pu faire. » Peu à peu, j’ai trouvé ma place, près de la mer.\n\n' + 'Nous partions à pied à l’école, et le chemin était long. '.repeat(8);
+    const done = applyFidelity(content, [
+        { find: 'Je n’étais pas à ma place là-dedans.', replace: '' },
+        // Une partie de phrase retirée, sans mot nouveau : acceptée.
+        { find: 'Peu à peu, j’ai trouvé ma place, près de la mer.', replace: 'Près de la mer.' },
+        // Un mot nouveau : refusé.
+        { find: 'J’ai travaillé deux ans dans un bureau d’assurance.', replace: 'J’ai travaillé longtemps.' },
+        // Une citation : refusée.
+        { find: 'Ma mère m’a dit : « Tu as fait ce que je n’ai pas pu faire. »', replace: '' },
+        // Un intertitre : refusé.
+        { find: '## Rue de Passy', replace: '' },
+    ]);
+    assert.equal(done.removed, 2);
+    assert.ok(!done.content.includes('à ma place là-dedans'));
+    assert.ok(done.content.includes('Près de la mer.'));
+    assert.ok(done.content.includes('bureau d’assurance.'));
+    assert.ok(done.content.includes('« Tu as fait ce que je n’ai pas pu faire. »'));
+    assert.ok(done.content.startsWith('## Rue de Passy'));
+    // Trop de retraits d'un coup (plus d'un cinquième du chapitre) : rien n'est retiré.
+    const big = applyFidelity('Une phrase assez longue pour compter. Une autre phrase assez longue aussi.', [{ find: 'Une phrase assez longue pour compter. ', replace: '' }]);
+    assert.equal(big.removed, 0);
 });
 
 test('livre : un chapitre dont les scènes n\'ont pas changé garde la même empreinte', () => {

@@ -18,7 +18,7 @@ import { db } from './db';
 import type { Profile, Project } from './db';
 import { normalizeContext } from './context';
 import { toPhase } from './phases';
-import { planBook, writeBookChapter, carryCorrection, polishBook, writePieces, chapterSignature, RECIPE, bookUsage, mergeUsage } from './book';
+import { planBook, writeBookChapter, carryCorrection, polishBook, checkFidelity, writePieces, chapterSignature, RECIPE, bookUsage, mergeUsage } from './book';
 import type { UsageMap } from './book';
 import type { PlannedChapter, BookChapter, Source, BookPieces } from './book';
 import { readWishes } from './phase-plan';
@@ -60,6 +60,8 @@ export interface EditionExtras {
     kept?: number[];
     /** La passe finale : faite (avec le nombre de retouches) ou sautée après un échec. */
     polish?: { applied: number; proposed: number; at: string; error?: string };
+    /** La relecture de fidélité, chapitre par chapitre : combien sont relus, combien de phrases sans appui retirées. */
+    fidelity?: { checked: number; removed: number; proposed: number; at: string; errors?: number };
     /** Les pièces du livre : null si leur écriture a échoué (le livre reste lisible sans elles). */
     pieces?: BookPieces | null;
     pieces_at?: string;
@@ -321,6 +323,29 @@ export async function advanceEdition(id: string): Promise<Edition | null> {
                 console.error(`[livre] passe finale de l'édition ${id} sautée :`, message);
                 return await save({ extras: { ...extras, polish: { applied: 0, proposed: 0, at, error: message.slice(0, 300) } } });
             }
+        }
+
+        // La relecture de fidélité : un chapitre par étape, face aux paroles
+        // d'origine. Les phrases que la personne n'a pas dites sont retirées.
+        // Un chapitre repris de l'édition précédente a déjà été relu ; un échec
+        // ne coûte pas le livre, le chapitre reste tel quel.
+        const fidelity = extras.fidelity ?? { checked: 0, removed: 0, proposed: 0, at: new Date().toISOString() };
+        if (process.env.LOOMINA_FIDELITY !== 'off' && fidelity.checked < edition.chapters.length) {
+            const at = fidelity.checked;
+            const chapters = [...edition.chapters];
+            const next = { ...fidelity, checked: at + 1, at: new Date().toISOString() };
+            if (!(extras.kept ?? []).includes(at + 1)) {
+                try {
+                    const checked = await checkFidelity(chapters[at], sources);
+                    if (checked.removed) chapters[at] = { ...chapters[at], content: checked.content, word_count: countWords(checked.content) };
+                    next.removed += checked.removed;
+                    next.proposed += checked.proposed;
+                } catch (err) {
+                    console.error(`[livre] relecture de fidélité du chapitre ${at + 1} (édition ${id}) sautée :`, err instanceof Error ? err.message : String(err));
+                    next.errors = (fidelity.errors ?? 0) + 1;
+                }
+            }
+            return await save({ chapters, extras: { ...extras, fidelity: next } });
         }
 
         // Les pièces du livre, puis le livre est prêt.
