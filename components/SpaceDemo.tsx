@@ -23,13 +23,13 @@ export type SpaceId = "auteur" | "famille";
 /** Hauteur de chaque capture, en pixels d'un écran de 390 de large (l'écran du téléphone en fait 844). */
 const SCREENS: Record<SpaceId, { id: string; height: number }[]> = {
   auteur: [
-    { id: "auteur-apercu", height: 1859 },
+    { id: "auteur-apercu", height: 1815 },
     { id: "auteur-livre", height: 2400 },
-    { id: "auteur-vie", height: 2058 },
-    { id: "auteur-appels", height: 1113 },
-    { id: "auteur-reglages", height: 2150 },
+    { id: "auteur-vie", height: 2014 },
+    { id: "auteur-appels", height: 1069 },
+    { id: "auteur-reglages", height: 2106 },
   ],
-  famille: [{ id: "famille-complet", height: 2093 }],
+  famille: [{ id: "famille-complet", height: 2049 }],
 };
 const FRAME_H = 844;
 const HOLD_MS = 1800;

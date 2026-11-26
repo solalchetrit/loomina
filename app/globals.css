@@ -834,3 +834,9 @@ img[src*="photos/photos-de-famille"] {
 .site-chrome { display: contents; }
 html[data-space="auteur"] .site-chrome,
 html[data-space="famille"] .site-chrome { display: none; }
+/* Le bandeau de Noël (NoelBanner) est caché avec le reste du site : on retire aussi
+   la place qu'il réservait en haut, sinon un grand vide sépare le menu de l'espace (Solal, 26/11/2026). */
+html[data-space="auteur"],
+html[data-space="famille"] { --promo-h: 0px; }
+html[data-space="auteur"] body,
+html[data-space="famille"] body { padding-top: 0; }
