@@ -24,6 +24,7 @@ import { join } from 'node:path';
 import OpenAI from 'openai';
 import { runDirector } from '../../lib/loomina/director';
 import { runWriter } from '../../lib/loomina/writer';
+import { checkFidelity } from '../../lib/loomina/book';
 import { normalizeContext, renderContext } from '../../lib/loomina/context';
 import { buildAssistant } from '../../lib/loomina/assistant';
 import { toPhase } from '../../lib/loomina/phases';
@@ -139,6 +140,37 @@ async function runCase(c: Case) {
     return { c, director, chapter, words, inventions, checks, tDirector, tWriter };
 }
 
+/**
+ * La relecture de fidélité du livre, sur un chapitre où quatre phrases
+ * jamais dites ont été glissées (celles du livre de test du 26/11/2026).
+ * Elle doit les retirer et garder ce que la personne a vraiment dit.
+ */
+async function fidelityCheck(): Promise<{ checks: Check[]; content: string }> {
+    const source = JSON.parse(readFileSync(join(DIR, 'cas', '06-survol-dense.json'), 'utf8')) as Case;
+    const planted = ['Je n’étais pas à ma place là-dedans.', 'Peu à peu, j’ai trouvé ma place.', 'Ma famille est restée là, au centre.', 'L’organisation se faisait comme elle pouvait.'];
+    const said = ['Là, j’étais vraiment heureuse.', 'Les Anglaises adoraient ça.', 'Nous nous sommes mariés en 1975', 'Nous étions quarante parfois.'];
+    const content = `Après mon brevet, mon père a voulu que j’aie un métier. J’ai fait une école de secrétariat. Sténodactylo, ça s’appelait à l’époque. Cela ne me plaisait pas du tout, mais il fallait un métier.
+
+J’ai travaillé environ deux ans dans un bureau d’assurance. C’était très, très ennuyeux. ${planted[0]}
+
+Ensuite, j’ai trouvé une place de vendeuse dans une boutique de prêt-à-porter, à Paris, rue de Passy. J’avais dix-neuf ans. ${said[0]}
+
+## Londres, puis Brighton
+
+À Paris, j’ai rencontré David Marchand. Il travaillait dans l’hôtellerie. ${said[2]}, et nous sommes partis à Londres. Au début, je ne parlais pas anglais. C’était très difficile. Puis j’ai appris. À Brighton, j’ai travaillé dans une boutique de mode française, dans les Lanes. ${said[1]} ${planted[1]}
+
+## Les vendredis
+
+Ma mère, avec huit enfants, était à la maison. ${planted[3]} Mes parents sont restés à Saint-Ouen jusqu’au bout. Tous les vendredis soirs, nous étions tous chez eux. ${said[3]} ${planted[2]}`;
+    const done = await checkFidelity({ title: 'De Passy à Brighton', content, sources: [1] }, [{ number: 1, title: 'Les grandes lignes de ma vie', content: '', transcript: source.transcript }]);
+    const checks: Check[] = [
+        ...planted.map((p) => ({ ok: !done.content.includes(p), label: `fidélité : retire « ${p} »` })),
+        ...said.map((p) => ({ ok: done.content.includes(p), label: `fidélité : garde « ${p} »` })),
+        { ok: done.content.includes('## Londres, puis Brighton'), label: 'fidélité : intertitres gardés' },
+    ];
+    return { checks, content: done.content };
+}
+
 /** Une conversation simulée de 8 tours avec l'assistant vocal. */
 async function simulateVoice() {
     const profile = {
@@ -242,6 +274,24 @@ async function main() {
         for (const x of v.checks.filter((y) => !y.ok)) console.log(`   ✗ ${x.label}`);
         if (ko) console.log(v.transcript.split('\n').map((l) => `   ${l}`).join('\n'));
         lines.push(`## ${ko ? '❌' : '✅'} Conversation simulée (voix ${VOICE_MODEL})`, '', ...v.checks.map((x) => `- ${x.ok ? '✅' : '❌'} ${x.label}`), '', '<details><summary>Conversation</summary>', '', v.transcript, '', '</details>', '');
+    }
+
+    if (!only.length || only.includes('fidelite')) {
+        process.stdout.write('relecture de fidélité … ');
+        try {
+            const r = await fidelityCheck();
+            const ko = r.checks.filter((x) => !x.ok).length;
+            failed += ko;
+            total += r.checks.length;
+            console.log(ko ? `${ko} échec(s)` : 'ok');
+            for (const x of r.checks.filter((y) => !y.ok)) console.log(`   ✗ ${x.label}`);
+            lines.push(`## ${ko ? '❌' : '✅'} Relecture de fidélité du livre`, '', ...r.checks.map((x) => `- ${x.ok ? '✅' : '❌'} ${x.label}`), '', '<details><summary>Chapitre après relecture</summary>', '', r.content, '', '</details>', '');
+        } catch (err) {
+            failed += 1;
+            total += 1;
+            console.log(`erreur : ${err instanceof Error ? err.message : String(err)}`);
+            lines.push('## ❌ Relecture de fidélité du livre', `Erreur : ${err instanceof Error ? err.message : String(err)}`, '');
+        }
     }
 
     lines.splice(1, 0, `**${total - failed} / ${total} vérifications réussies**`, '');
