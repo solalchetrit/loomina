@@ -266,7 +266,7 @@ Le narrateur peut revenir sur une période déjà couverte, ou prendre de l'avan
 L'Écrivain ne doit écrire que s'il y a quelque chose à raconter. Évalue ce que le narrateur (lignes « User: ») a réellement apporté de NOUVEAU dans cet appel :
 - "none" : rien de racontable — bavardage, questions sur l'assistant, épellations, tests, ou uniquement des choses déjà en mémoire. Aucun chapitre ne sera écrit.
 - "thin" : un ou deux faits nus (« j'ai joué au foot à l'ACBB ») sans anecdote ni détail. Le chapitre fera quelques phrases.
-- "rich" : au moins une anecdote concrète, des détails, des émotions exprimées par le narrateur.
+- "rich" : au moins une anecdote concrète, des détails, des émotions exprimées par le narrateur. OU beaucoup de faits nouveaux, même sans anecdote : un appel où le narrateur survole sa vie (son nom, sa naissance, ses parents, ses métiers, un mariage, une séparation, des enfants, des lieux, des dates) est "rich". Six faits nouveaux ou plus ne sont jamais "thin" : tout ce qu'il a dit doit pouvoir s'écrire.
 Sois sévère : un chapitre de remplissage fait plus de mal qu'un appel sans chapitre.
 
 # SENTIMENT (\`sentiment_score\`)
