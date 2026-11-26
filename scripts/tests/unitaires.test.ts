@@ -914,3 +914,22 @@ test('souvenirs soufflés : en phase 3, la rencontre arrive', () => {
     assert.ok(p.includes('Sa rencontre avec papi'));
     assert.ok(p.includes('La maison de son enfance'));
 });
+
+// ── Codes promo de l'admin (26/11/2026) ─────────────────────────────────────
+import { newPromoCode, parsePromoForm } from '../../lib/admin/promo';
+
+test('codes promo : un code tiré au hasard, sans lettres ambiguës', () => {
+    const a = newPromoCode();
+    assert.match(a, /^LOOM-[A-HJKMNP-Z2-9]{5}-[A-HJKMNP-Z2-9]{5}$/);
+    assert.notEqual(a, newPromoCode());
+    assert.match(newPromoCode('Noël 2026 !'), /^NOEL2026-/);
+});
+
+test('codes promo : le formulaire refuse ce qui n’a pas de sens', () => {
+    const form = (o: Record<string, string>) => { const f = new FormData(); for (const [k, v] of Object.entries(o)) f.set(k, v); return f; };
+    const ok = { note: 'Tante Monique', type: 'percent', valeur: '100', utilisations: '1', jours: '30', mot: '' };
+    assert.deepEqual(parsePromoForm(form(ok)), { note: 'Tante Monique', word: '', kind: 'percent', value: 100, uses: 1, days: 30 });
+    assert.equal(typeof parsePromoForm(form({ ...ok, valeur: '120' })), 'string');
+    assert.equal(typeof parsePromoForm(form({ ...ok, note: ' ' })), 'string');
+    assert.equal(typeof parsePromoForm(form({ ...ok, utilisations: '0' })), 'string');
+});

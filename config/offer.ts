@@ -66,6 +66,12 @@ export function normalizeExtraCopies(raw: unknown): number {
  * Le coupon est créé une fois dans Stripe avec cet identifiant.
  */
 export const DEMO_PROMO = {
+  /**
+   * Solal, 26/11/2026 : plus de réduction dans l'e-mail de la démo, elle se
+   * cumulerait avec l'offre de lancement. Les codes déjà envoyés restent valables
+   * jusqu'à leur date. Repasser à true pour la remettre.
+   */
+  enabled: false,
   couponId: "loomina-recit-demo-10",
   /** Réduction en pourcentage (Solal, 18/11/2026 : 10 %). */
   percentOff: 10,
