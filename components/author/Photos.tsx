@@ -121,7 +121,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
 
       {open && (
       <form onSubmit={send} className="mt-3 space-y-2.5">
-        <p className="text-[14px] leading-snug text-[var(--ink-3)]">Loomina vous posera une question sur cette photo au prochain appel.</p>
+        <p className="text-[14px] leading-snug text-[var(--ink-3)]">Loomina vous posera une question sur cette photo au bon moment du récit.</p>
         <label htmlFor="photo-fichier" className="sr-only">
           Choisir une photo
         </label>
@@ -166,7 +166,7 @@ export default function Photos({ onUnauthorized }: { onUnauthorized: () => void 
           Envoyer la photo
         </Button>
         <p role="status" className="text-[14px] font-semibold">
-          {status === "sent" && <span className="text-[var(--success)]">Reçue. Loomina vous en parlera au prochain appel.</span>}
+          {status === "sent" && <span className="text-[var(--success)]">Reçue. Loomina vous en parlera au bon moment du récit.</span>}
           {status === "error" && <span className="text-[var(--danger)]">{error}</span>}
         </p>
       </form>

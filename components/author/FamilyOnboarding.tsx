@@ -107,7 +107,7 @@ export default function FamilyOnboarding({
               {giverFirstName ? `Bienvenue, ${giverFirstName}` : "Bienvenue"}
             </h2>
             <p className={text}>
-              Ici, vous suivez le livre de {who}. Après chaque appel, vous le voyez avancer. Et vous pouvez poser une question ou souffler un souvenir, que Loomina abordera au prochain appel.
+              Ici, vous suivez le livre de {who}. Après chaque appel, vous le voyez avancer. Et vous pouvez poser une question ou souffler un souvenir, que Loomina abordera au bon moment du récit.
             </p>
           </div>
         )}

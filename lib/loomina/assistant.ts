@@ -21,6 +21,7 @@ import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
 import { normalizeCallMinutes } from './call-length';
+import { suggestionsForCall } from './suggestion-phase';
 
 /**
  * LE réglage qui change tout côté coût.
@@ -263,13 +264,20 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
         );
     }
 
-    const suggestions = ctx.suggested_topics ?? [];
+    // Chaque sujet attend la période de vie qu'il concerne (suggestion-phase.ts) :
+    // « sa rencontre avec papi » ne tombe pas au premier appel, mais quand le
+    // livre arrive à la vie adulte.
+    const { now: ready, unsure } = suggestionsForCall(ctx.suggested_topics ?? [], meta, phaseNow, first);
+    const suggestions = [...ready, ...unsure];
     if (suggestions.length) {
         parts.push(
             [
                 `# SUJETS DEMANDÉS DEPUIS L'ESPACE AUTEUR (par ${name} ou un proche)`,
                 ...suggestions.map((t, i) => `${i + 1}. ${t}`),
                 `- Aborde le sujet n° 1 au cours de cet appel, puis les suivants dans l'ordre, un à la fois, tant que la durée souhaitée n'est pas atteinte (voir TEMPS DE L'APPEL) et que ${name} est en forme. Il n'y a pas de nombre maximum : seul le temps compte.`,
+                ...(unsure.length
+                    ? [`- Les sujets n° ${unsure.map((_, i) => ready.length + i + 1).join(', ')} n'ont pas encore de période attribuée : n'en parle que s'ils touchent la période de vie dont vous parlez en ce moment, ou une période déjà racontée. S'ils portent sur une période plus tardive de sa vie, garde-les pour plus tard, sans le dire.`]
+                    : []),
                 "- Choisis le bon moment : quand une histoire vient de se terminer, ou quand la conversation s'essouffle. Ne coupe jamais un récit pour ça.",
                 `- Présente-le simplement, sans dire qui l'a écrit : « On m'a glissé une question sur ${tu ? 'ton' : 'votre'} espace : … ». Reformule-le en ${tu ? 'tutoyant' : 'vouvoyant'} si besoin.`,
                 `- Si le sujet commence par « Photo envoyée » : dis d'abord que tu as bien vu la photo et ce qu'on y voit, en une phrase, puis demande simplement si ${name} veut ${tu ? "t'en" : 'vous en'} dire plus (« J'ai vu la photo… ${tu ? 'Tu veux' : 'Vous voulez'} me raconter ce qu'il y a derrière ? »). Si ${name} n'a rien à ajouter, n'insiste pas.`,
