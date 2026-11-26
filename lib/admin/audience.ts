@@ -175,13 +175,13 @@ export async function getAudience(days = 28): Promise<Audience> {
 }
 
 /**
- * Les visites d'une seule journée, pour le récap de 10 h (hier) et de 20 h
- * (aujourd'hui jusqu'ici). LinkedIn compté à part : c'est là que Solal publie
+ * Les visites d'une période courte, pour le récap de 10 h (hier), de 20 h
+ * (aujourd'hui jusqu'ici) et du lundi (les 7 derniers jours). LinkedIn compté à part : c'est là que Solal publie
  * avant le lancement (« linkedin.com », « lnkd.in », « linkedin » en utm_source).
  */
-export async function audienceDay(which: 'today' | 'yesterday'): Promise<{ sessions: number; users: number; sources: Array<{ source: string; sessions: number }>; linkedin: number; demoClicks: number; checkouts: number }> {
+export async function audienceDay(startDate: string, endDate = startDate): Promise<{ sessions: number; users: number; sources: Array<{ source: string; sessions: number }>; linkedin: number; demoClicks: number; checkouts: number }> {
     const token = await accessToken('https://www.googleapis.com/auth/analytics.readonly');
-    const range = { startDate: which, endDate: which };
+    const range = { startDate, endDate };
     const [totals, sources, events] = await Promise.all([
         report(token, { dateRanges: [range], metrics: [{ name: 'sessions' }, { name: 'totalUsers' }] }),
         report(token, { dateRanges: [range], dimensions: [{ name: 'sessionSource' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 20 }),

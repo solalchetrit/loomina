@@ -53,14 +53,20 @@ export interface RecapCall {
 
 export interface RecapData {
     slot: {
-        hour: 10 | 20;
+        /** Le récap de 10 h ou 20 h, ou celui du lundi 9 h pour la semaine passée. */
+        kind: 'jour' | 'semaine';
+        hour: number;
         start: string;
         end: string;
         /** « jeudi 26 novembre ». */
         dayLabel: string;
-        /** « depuis hier 20 h » ou « depuis ce matin 10 h ». */
+        /** « depuis hier 20 h », « depuis ce matin 10 h » ou « la semaine du 23 au 29 novembre ». */
         since: string;
     };
+    /** La période d'avant, de même durée (récap de la semaine) : pour comparer. */
+    previous: { demos: number; calls: number; minutes: number; recits: number; signups: number; orders: number; sessions: number | null } | null;
+    /** Jour par jour (récap de la semaine). */
+    byDay: Array<{ label: string; demos: number; calls: number; minutes: number; orders: number }> | null;
     demos: RecapDemo[];
     /** Les appels des vrais clients (les tests sont comptés à part). */
     calls: RecapCall[];
@@ -146,7 +152,17 @@ export function recapSubject(d: RecapData): string {
     const bits = [plural(d.demos.length, 'démo'), plural(calls, 'appel'), plural(d.orders.length, 'commande')];
     const red = d.alerts.filter((a) => a.level === 'rouge').length;
     const flag = red ? ` · ${plural(red, 'alerte')}` : d.alerts.length ? ` · ${plural(d.alerts.length, 'point')} à voir` : '';
-    return `Récap Loomina ${d.slot.hour} h : ${bits.join(', ')}${flag}`;
+    return `${title(d).replace('Récap', 'Récap Loomina')} : ${bits.join(', ')}${flag}`;
+}
+
+/** « Récap de 10 h » ou « Récap de la semaine ». */
+export function title(d: RecapData): string {
+    return d.slot.kind === 'semaine' ? 'Récap de la semaine' : `Récap de ${d.slot.hour} h`;
+}
+
+/** « (3 la semaine d'avant) », pour comparer. */
+function before(n: number | null | undefined): string {
+    return n == null ? '' : ` (${n.toLocaleString('fr-FR')} la semaine d’avant)`;
 }
 
 /* ───────────────────────── texte brut ───────────────────────── */
@@ -156,7 +172,21 @@ export function recapText(d: RecapData): string {
     const calls = d.calls;
     const callHt = sum(calls, (c) => c.costHt);
     const callTtc = sum(calls, (c) => c.costTtc);
-    L.push(`Récap de ${d.slot.hour} h, ${d.slot.dayLabel}`, '', headline(d), '');
+    L.push(`${title(d)}, ${d.slot.dayLabel}`, '', headline(d), '');
+    if (d.previous) {
+        const v = d.previous;
+        L.push('COMPARÉ À LA SEMAINE D’AVANT');
+        L.push(`Démos : ${d.demos.length}${before(v.demos)}`);
+        L.push(`Appels clients : ${realCalls(d).length}${before(v.calls)}, ${Math.round(sum(realCalls(d), (c) => c.seconds) / 60)} min${before(v.minutes)}`);
+        L.push(`Inscrits : ${d.signups.length}${before(v.signups)} · Commandes : ${d.orders.length}${before(v.orders)}`);
+        if (d.audience) L.push(`Visites : ${d.audience.sessions}${before(v.sessions)}`);
+        L.push('');
+    }
+    if (d.byDay) {
+        L.push('JOUR PAR JOUR');
+        for (const x of d.byDay) L.push(`- ${x.label} : ${plural(x.demos, 'démo')}, ${plural(x.calls, 'appel')} (${x.minutes} min), ${plural(x.orders, 'commande')}`);
+        L.push('');
+    }
     if (d.alerts.length) {
         L.push('À REGARDER');
         for (const a of d.alerts) L.push(`${a.level === 'rouge' ? '[!] ' : '- '}${a.text}`);
@@ -188,8 +218,8 @@ export function recapText(d: RecapData): string {
         L.push('');
     }
 
-    L.push('PROCHAINS APPELS PRÉVUS');
-    if (!d.upcoming.length) L.push('Aucun d’ici le prochain récap.');
+    L.push(d.slot.kind === 'semaine' ? 'APPELS PRÉVUS CETTE SEMAINE' : 'PROCHAINS APPELS PRÉVUS');
+    if (!d.upcoming.length) L.push(d.slot.kind === 'semaine' ? 'Aucun.' : 'Aucun d’ici le prochain récap.');
     for (const u of d.upcoming) L.push(`- ${u.day} à ${u.time.replace(':', ' h ')} · ${u.client}${u.first ? ' (premier appel)' : ''}`);
     L.push('');
 
@@ -236,11 +266,13 @@ function rows(items: Array<{ left: string; right?: string; sub?: string }>): str
     );
 }
 
-function tiles(list: Array<{ n: string; label: string }>): string {
-    const cell = (t: { n: string; label: string }) =>
+function tiles(list: Array<{ n: string; label: string; was?: string }>): string {
+    const cell = (t: { n: string; label: string; was?: string }) =>
         `<td width="33%" style="padding:4px"><div style="background:${SOFT};border-radius:12px;padding:12px 10px;text-align:center">` +
         `<div style="font-size:24px;font-weight:700;color:${BLUE};line-height:1.2">${esc(t.n)}</div>` +
-        `<div style="font-size:12px;color:${MUTED};line-height:1.3;margin-top:2px">${esc(t.label)}</div></div></td>`;
+        `<div style="font-size:12px;color:${MUTED};line-height:1.3;margin-top:2px">${esc(t.label)}</div>` +
+        (t.was ? `<div style="font-size:11px;color:${MUTED};margin-top:3px">${esc(t.was)}</div>` : '') +
+        `</div></td>`;
     const lines: string[] = [];
     for (let i = 0; i < list.length; i += 3) lines.push(`<tr>${list.slice(i, i + 3).map(cell).join('')}${'<td width="33%"></td>'.repeat(Math.max(0, 3 - list.slice(i, i + 3).length))}</tr>`);
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 -4px">${lines.join('')}</table>`;
@@ -254,7 +286,7 @@ export function recapInnerHtml(d: RecapData): string {
     const real = realCalls(d);
     const out: string[] = [];
 
-    out.push(`<div style="font-size:13px;color:${MUTED};margin:0 0 6px">Récap de ${d.slot.hour} h · ${esc(d.slot.dayLabel)}</div>`);
+    out.push(`<div style="font-size:13px;color:${MUTED};margin:0 0 6px">${title(d)} · ${esc(d.slot.dayLabel)}</div>`);
     out.push(`<h1 style="margin:0 0 18px;font-size:21px;line-height:1.35;font-weight:700;color:${INK}">${esc(headline(d))}</h1>`);
 
     // Ce qui demande un geste.
@@ -272,17 +304,30 @@ export function recapInnerHtml(d: RecapData): string {
     // Les chiffres de la période.
     const costHt = sum(calls, (c) => c.costHt) + sum(d.demos, (x) => x.costHt);
     const costTtc = sum(calls, (c) => c.costTtc) + sum(d.demos, (x) => x.costTtc);
-    out.push(h2(`Depuis ${d.slot.since.replace(/^depuis /, '')}`));
+    out.push(h2(d.slot.kind === 'semaine' ? d.slot.since : `Depuis ${d.slot.since.replace(/^depuis /, '')}`));
+    const v = d.previous;
+    const was = (n: number | undefined, unit = '') => (v && n != null ? `${n.toLocaleString('fr-FR')}${unit} la semaine d’avant` : undefined);
     out.push(
         tiles([
-            { n: String(d.demos.length), label: d.demos.length > 1 ? 'démos' : 'démo' },
-            { n: String(real.length), label: real.length > 1 ? 'appels clients' : 'appel client' },
-            { n: `${Math.round(sum(real, (c) => c.seconds) / 60)} min`, label: 'au téléphone' },
-            { n: String(recits(d) + d.demos.filter((x) => x.status === 'written').length), label: 'récits écrits' },
-            { n: String(d.signups.length), label: d.signups.length > 1 ? 'nouveaux inscrits' : 'nouvel inscrit' },
-            { n: String(d.orders.length), label: d.orders.length > 1 ? 'commandes' : 'commande' },
+            { n: String(d.demos.length), label: d.demos.length > 1 ? 'démos' : 'démo', was: was(v?.demos) },
+            { n: String(real.length), label: real.length > 1 ? 'appels clients' : 'appel client', was: was(v?.calls) },
+            { n: `${Math.round(sum(real, (c) => c.seconds) / 60)} min`, label: 'au téléphone', was: was(v?.minutes, ' min') },
+            { n: String(recits(d) + d.demos.filter((x) => x.status === 'written').length), label: 'récits écrits', was: was(v?.recits) },
+            { n: String(d.signups.length), label: d.signups.length > 1 ? 'nouveaux inscrits' : 'nouvel inscrit', was: was(v?.signups) },
+            { n: String(d.orders.length), label: d.orders.length > 1 ? 'commandes' : 'commande', was: was(v?.orders) },
         ])
     );
+    if (d.byDay) {
+        out.push(h2('Jour par jour'));
+        out.push(
+            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-size:14px">` +
+                `<tr style="color:${MUTED};font-size:12px"><td style="padding:4px 0"></td><td align="right">démos</td><td align="right">appels</td><td align="right">minutes</td><td align="right">commandes</td></tr>` +
+                d.byDay
+                    .map((x) => `<tr><td style="padding:7px 0;border-top:1px solid ${LINE}">${esc(x.label)}</td>${[x.demos, x.calls, x.minutes, x.orders].map((n) => `<td align="right" style="padding:7px 0 7px 8px;border-top:1px solid ${LINE};${n ? 'font-weight:600' : `color:${MUTED}`}">${n}</td>`).join('')}</tr>`)
+                    .join('') +
+                `</table>`
+        );
+    }
     out.push(p(muted(`Coût des appels et démos de la période : ${eur(costHt)} HT, ${eur(costTtc)} TTC.`), 'margin-top:10px;font-size:14px'));
 
     // Les démos.
@@ -332,18 +377,18 @@ export function recapInnerHtml(d: RecapData): string {
     }
 
     // Les prochains appels.
-    out.push(h2('Prochains appels prévus'));
+    out.push(h2(d.slot.kind === 'semaine' ? 'Appels prévus cette semaine' : 'Prochains appels prévus'));
     out.push(
         d.upcoming.length
             ? rows(d.upcoming.map((u) => ({ left: `<strong>${esc(u.client)}</strong>${u.first ? pill('premier appel', BLUE) : ''}`, right: `${esc(u.day)} à ${u.time.replace(':', ' h ')}` })))
-            : p(muted('Aucun d’ici le prochain récap.'))
+            : p(muted(d.slot.kind === 'semaine' ? 'Aucun pour l’instant.' : 'Aucun d’ici le prochain récap.'))
     );
 
     // Le site.
     if (d.audience) {
         const a = d.audience;
         out.push(h2(`Le site, ${a.label}`));
-        out.push(p(`<strong>${plural(a.sessions, 'visite')}</strong>, ${plural(a.users, 'visiteur')}. <strong>${plural(a.linkedin, 'visite')} depuis LinkedIn</strong>. ${plural(a.demoClicks, 'clic')} sur « essayer la démo », ${plural(a.checkouts, 'début')} de commande.`));
+        out.push(p(`<strong>${plural(a.sessions, 'visite')}</strong>${v?.sessions != null ? muted(before(v.sessions)) : ''}, ${plural(a.users, 'visiteur')}. <strong>${plural(a.linkedin, 'visite')} depuis LinkedIn</strong>. ${plural(a.demoClicks, 'clic')} sur « essayer la démo », ${plural(a.checkouts, 'début')} de commande.`));
         if (a.sources.length) out.push(p(muted(`D’où viennent les visites : ${a.sources.map((s) => `${s.source} (${s.sessions})`).join(', ')}.`), 'font-size:14px'));
         out.push(p(muted('Google Analytics ne compte que les visiteurs qui ont accepté les cookies.'), 'font-size:12px'));
     }

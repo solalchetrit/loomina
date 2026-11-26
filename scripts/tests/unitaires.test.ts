@@ -835,7 +835,7 @@ test('démo : base injoignable → la démo a lieu quand même ; numéro d’éq
 // ------------------------------------------------------------
 // Le récap de 10 h et de 20 h (26/11/2026)
 // ------------------------------------------------------------
-import { slotFor, dueSlot } from '../../lib/admin/recap';
+import { slotFor, dueSlot, weekSlotFor } from '../../lib/admin/recap';
 import { headline, recapSubject, type RecapData } from '../../lib/admin/recap-mail';
 
 test('récap : créneaux à l’heure de Paris, hiver comme été', () => {
@@ -850,11 +850,20 @@ test('récap : créneaux à l’heure de Paris, hiver comme été', () => {
     assert.equal(dueSlot(new Date('2026-11-26T09:04:00Z'))?.key, 'recap:2026-11-26:10');
     assert.equal(dueSlot(new Date('2026-11-26T19:59:00Z'))?.key, 'recap:2026-11-26:20');
     assert.equal(dueSlot(new Date('2026-11-26T12:00:00Z')), null);
+    // Le lundi à 9 h : la semaine passée, du lundi 0 h au lundi suivant 0 h.
+    const week = dueSlot(new Date('2026-11-30T08:10:00Z'));
+    assert.equal(week?.key, 'recap:semaine:2026-11-30');
+    assert.equal(week?.start.toISOString(), '2026-11-22T23:00:00.000Z');
+    assert.equal(week?.end.toISOString(), '2026-11-29T23:00:00.000Z');
+    assert.equal(weekSlotFor('2026-12-02').key, 'recap:semaine:2026-11-30');
+    assert.equal(dueSlot(new Date('2026-11-26T08:10:00Z')), null);
 });
 
 test('récap : la phrase du jour et le sujet', () => {
     const d = {
-        slot: { hour: 10, start: '', end: '', dayLabel: 'jeudi 26 novembre', since: 'depuis hier 20 h' },
+        slot: { kind: 'jour', hour: 10, start: '', end: '', dayLabel: 'jeudi 26 novembre', since: 'depuis hier 20 h' },
+        previous: null,
+        byDay: null,
         demos: [{ name: 'Joana', at: '2026-11-25T20:10:00Z', seconds: 300, status: 'written', smsSent: true, email: true, costHt: 0.3, costTtc: 0.36, estimated: false }],
         calls: [
             { client: 'Patricia', profileId: 'x', at: '2026-11-26T08:00:00Z', seconds: 1320, status: 'processed', costHt: 1, costTtc: 1.2, estimated: false, first: false },
@@ -872,5 +881,5 @@ test('récap : la phrase du jour et le sujet', () => {
         errors: [],
     } satisfies RecapData;
     assert.equal(headline(d), 'Depuis hier 20 h : 1 démo, 1 appel client (22 min), 1 récit écrit, aucune commande.');
-    assert.equal(recapSubject(d), 'Récap Loomina 10 h : 1 démo, 1 appel, 0 commande · 1 point à voir');
+    assert.equal(recapSubject(d), 'Récap Loomina de 10 h : 1 démo, 1 appel, 0 commande · 1 point à voir');
 });

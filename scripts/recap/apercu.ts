@@ -8,7 +8,9 @@ import { brandEmailHtml } from '../../lib/loomina/notify';
 import { recapInnerHtml, recapSubject, recapText, type RecapData } from '../../lib/admin/recap-mail';
 
 const example: RecapData = {
-    slot: { hour: 10, start: '2026-11-25T19:00:00Z', end: '2026-11-26T09:00:00Z', dayLabel: 'jeudi 26 novembre', since: 'depuis hier 20 h' },
+    slot: { kind: 'jour', hour: 10, start: '2026-11-25T19:00:00Z', end: '2026-11-26T09:00:00Z', dayLabel: 'jeudi 26 novembre', since: 'depuis hier 20 h' },
+    previous: null,
+    byDay: null,
     demos: [
         { name: 'Prénom inconnu', at: '2026-11-25T20:25:12Z', seconds: 16, status: 'unusable', smsSent: false, email: false, costHt: 0.02, costTtc: 0.024, estimated: false },
         { name: 'Joana', at: '2026-11-26T07:42:00Z', seconds: 312, status: 'written', smsSent: true, email: true, costHt: 0.41, costTtc: 0.49, estimated: false },
@@ -32,8 +34,19 @@ const example: RecapData = {
     errors: [],
 };
 
+const weekly: RecapData = {
+    ...example,
+    slot: { kind: 'semaine', hour: 9, start: '2026-11-22T23:00:00Z', end: '2026-11-29T23:00:00Z', dayLabel: 'lundi 30 novembre', since: 'la semaine du 23 au 29 novembre' },
+    previous: { demos: 3, calls: 2, minutes: 41, recits: 2, signups: 0, orders: 0, sessions: 380 },
+    byDay: ['lundi 23', 'mardi 24', 'mercredi 25', 'jeudi 26', 'vendredi 27', 'samedi 28', 'dimanche 29'].map((label, i) => ({ label, demos: [0, 1, 1, 2, 0, 1, 0][i], calls: [0, 1, 0, 1, 1, 0, 0][i], minutes: [0, 22, 0, 23, 19, 0, 0][i], orders: [0, 0, 0, 1, 0, 0, 0][i] })),
+    audience: example.audience && { ...example.audience, label: 'sur la semaine', sessions: 812, users: 640, linkedin: 402 },
+};
+
 const out = process.argv[2] ?? 'recap-apercu.html';
 const banner = '<div style="background:#fff3cd;color:#7a5b00;font:13px system-ui;padding:8px 16px;text-align:center">Aperçu avec des chiffres d’exemple · sujet : « ' + recapSubject(example) + ' »</div>';
 writeFileSync(out, brandEmailHtml(recapInnerHtml(example)).replace(/<body([^>]*)>/, `<body$1>${banner}`));
 writeFileSync(out.replace(/\.html$/, '.txt'), recapText(example));
+const weekBanner = banner.replace(recapSubject(example), recapSubject(weekly));
+writeFileSync(out.replace(/\.html$/, '-semaine.html'), brandEmailHtml(recapInnerHtml(weekly)).replace(/<body([^>]*)>/, `<body$1>${weekBanner}`));
+writeFileSync(out.replace(/\.html$/, '-semaine.txt'), recapText(weekly));
 console.log(`écrit : ${out}`);

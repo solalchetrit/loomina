@@ -1,5 +1,6 @@
 /**
- * Le récap de 10 h et de 20 h, envoyé par e-mail (demande de Solal, 26/11/2026).
+ * Le récap de 10 h et de 20 h, envoyé par e-mail (demande de Solal, 26/11/2026),
+ * et celui de la semaine, le lundi à 9 h (même jour, deuxième demande).
  *
  * QUAND : le passage du serveur vocal (toutes les 5 minutes, /api/jobs/process)
  * appelle `sweepRecap`. Entre 10 h et 10 h 59 (heure de Paris), puis entre
@@ -54,28 +55,46 @@ export function parisInstant(day: string, hour: number): Date {
     return new Date(guess.getTime() - diff * 3_600_000);
 }
 
-const previousDay = (day: string) => new Date(new Date(`${day}T12:00:00Z`).getTime() - 86_400_000).toISOString().slice(0, 10);
+const shiftDay = (day: string, days: number) => new Date(new Date(`${day}T12:00:00Z`).getTime() + days * 86_400_000).toISOString().slice(0, 10);
+const previousDay = (day: string) => shiftDay(day, -1);
+/** 1 = lundi … 7 = dimanche. */
+const weekday = (day: string) => ((new Date(`${day}T12:00:00Z`).getUTCDay() + 6) % 7) + 1;
 
 export interface RecapSlot {
     key: string;
-    hour: 10 | 20;
+    kind: 'jour' | 'semaine';
+    hour: 9 | 10 | 20;
     day: string;
     start: Date;
     end: Date;
 }
 
-/** Le récap dû à cet instant (entre 10 h et 10 h 59, ou 20 h et 20 h 59), sinon null. */
+/**
+ * Les récaps dus à cet instant : celui du jour entre 10 h et 10 h 59, ou
+ * 20 h et 20 h 59 ; celui de la semaine le lundi entre 9 h et 9 h 59.
+ */
 export function dueSlot(now = new Date()): RecapSlot | null {
     const { day, hour } = paris(now);
+    if (hour === 9 && weekday(day) === 1) return weekSlotFor(day);
     if (hour !== 10 && hour !== 20) return null;
     return slotFor(day, hour);
+}
+
+/**
+ * Le récap de la semaine (demande de Solal, 26/11/2026) : envoyé le lundi
+ * `monday` à 9 h, il couvre la semaine passée, du lundi 0 h au dimanche
+ * minuit, comparée à celle d'avant.
+ */
+export function weekSlotFor(monday: string): RecapSlot {
+    const day = shiftDay(monday, -(weekday(monday) - 1));
+    return { key: `recap:semaine:${day}`, kind: 'semaine', hour: 9, day, start: parisInstant(shiftDay(day, -7), 0), end: parisInstant(day, 0) };
 }
 
 /** Le récap d'un jour et d'une heure donnés (aperçu, envoi à la main). */
 export function slotFor(day: string, hour: 10 | 20): RecapSlot {
     const end = parisInstant(day, hour);
     const start = hour === 10 ? parisInstant(previousDay(day), 20) : parisInstant(day, 10);
-    return { key: `recap:${day}:${hour}`, hour, day, start, end };
+    return { key: `recap:${day}:${hour}`, kind: 'jour', hour, day, start, end };
 }
 
 /** Le dernier récap passé à cet instant (pour l'aperçu de l'admin). */
@@ -105,6 +124,7 @@ export async function gatherRecap(slot: RecapSlot): Promise<RecapData> {
     const alerts: RecapData['alerts'] = [];
     const startIso = slot.start.toISOString();
     const endIso = slot.end.toISOString();
+    const week = slot.kind === 'semaine';
     const range: Range = { period: 'mois', start: slot.start, end: slot.end, label: '', elapsedDays: 1, totalDays: 1 };
     const inWindow = (iso: unknown) => typeof iso === 'string' && iso >= startIso && iso < endIso;
     const supabase = db();
@@ -194,14 +214,14 @@ export async function gatherRecap(slot: RecapSlot): Promise<RecapData> {
 
     const contacts = ((contactsRes.data ?? []) as Row[]).map((m) => ({ name: String(m.name ?? 'Sans nom'), subject: (m.subject as string | null) ?? null, at: String(m.created_at) }));
 
-    // Les prochains rendez-vous, jusqu'au récap suivant (et un peu après).
-    const until = new Date(slot.end.getTime() + 14 * 3_600_000).toISOString();
-    const agendaNow = (await settle('agenda', getAgenda(slot.end.getTime()), errors)) ?? [];
+    // Les prochains rendez-vous, jusqu'au récap suivant (et un peu après) ; la semaine qui commence pour le récap du lundi.
+    const until = new Date(slot.end.getTime() + (week ? 7 * 24 : 14) * 3_600_000).toISOString();
+    const agendaNow = (await settle('agenda', getAgenda(slot.end.getTime() - (week ? 60_000 : 0)), errors)) ?? [];
     const agendaNext = (await settle('agenda', getAgenda(slot.end.getTime() + 7 * 86_400_000), errors)) ?? [];
     const slotAt = (s: { day: string; time: string }) => parisInstant(s.day, Number(s.time.slice(0, 2))).getTime() + Number(s.time.slice(3, 5)) * 60_000;
     const seenSlot = new Set<string>();
     const upcoming = [...agendaNow, ...agendaNext]
-        .filter((s) => s.state === 'planned' && slotAt(s) >= slot.end.getTime() && new Date(slotAt(s)).toISOString() < until)
+        .filter((s) => s.state === 'planned' && slotAt(s) >= Math.max(slot.end.getTime(), Date.now() - 3_600_000) && new Date(slotAt(s)).toISOString() < until)
         .filter((s) => {
             const k = `${s.day} ${s.time} ${s.profileId}`;
             if (seenSlot.has(k)) return false;
@@ -220,9 +240,9 @@ export async function gatherRecap(slot: RecapSlot): Promise<RecapData> {
     // Le site.
     let audience: RecapData['audience'] = null;
     if (audienceConfigured()) {
-        const which = slot.hour === 10 ? 'yesterday' : 'today';
-        const a = await settle('Google Analytics', audienceDay(which), errors);
-        if (a) audience = { label: which === 'yesterday' ? 'hier sur la journée' : 'aujourd’hui jusqu’ici', ...a };
+        const [from, to, label] = week ? ['7daysAgo', 'yesterday', 'sur la semaine'] : slot.hour === 10 ? ['yesterday', 'yesterday', 'hier sur la journée'] : ['today', 'today', 'aujourd’hui jusqu’ici'];
+        const a = await settle('Google Analytics', audienceDay(from, to), errors);
+        if (a) audience = { label, ...a };
     }
 
     // Le cumul.
@@ -269,8 +289,52 @@ export async function gatherRecap(slot: RecapSlot): Promise<RecapData> {
     const toRelance = (crm?.clients ?? []).filter((c) => !c.test && (c.health === 'relancer' || c.health === 'inactif'));
     if (toRelance.length) alerts.push({ level: 'orange', text: `À relancer : ${toRelance.map((c) => c.name).join(', ')}.` });
 
+    // La semaine : comparée à celle d'avant, et jour par jour.
+    let previous: RecapData['previous'] = null;
+    let byDay: RecapData['byDay'] = null;
+    if (week) {
+        const pStart = new Date(slot.start.getTime() - (slot.end.getTime() - slot.start.getTime())).toISOString();
+        const inPrev = (iso: unknown) => typeof iso === 'string' && iso >= pStart && iso < startIso;
+        const prevCalls = interviews.filter((i) => inPrev(i.created_at) && !testProjects.has(String(i.project_id)) && i.processing_status !== 'too_short');
+        const { data: prevDemos } = await supabase.from('demo_stories').select('id').gte('created_at', pStart).lt('created_at', startIso).limit(1000);
+        const prevSessions = audienceConfigured() ? await settle('Google Analytics', audienceDay('14daysAgo', '8daysAgo'), errors) : null;
+        previous = {
+            demos: (prevDemos ?? []).length,
+            calls: prevCalls.length,
+            minutes: Math.round(prevCalls.reduce((s, i) => s + (Number(i.duration_seconds) || 0), 0) / 60),
+            recits: prevCalls.filter((i) => i.processing_status === 'processed').length,
+            signups: profiles.filter((p) => inPrev(p.created_at) && !testUsers.has(String(p.id))).length,
+            orders: allOrders.filter((o) => inPrev(o.at)).length,
+            sessions: prevSessions ? prevSessions.sessions : null,
+        };
+        byDay = Array.from({ length: 7 }, (_, i) => {
+            const d0 = parisInstant(shiftDay(slot.day, i - 7), 0).toISOString();
+            const d1 = parisInstant(shiftDay(slot.day, i - 6), 0).toISOString();
+            const within = (iso: string) => iso >= d0 && iso < d1;
+            const dayCalls = calls.filter((c) => c.status !== 'too_short' && within(c.at));
+            return {
+                label: fmtDay.format(new Date(`${shiftDay(slot.day, i - 7)}T12:00:00Z`)).replace(/ \S+$/, ''),
+                demos: demos.filter((x) => within(x.at)).length,
+                calls: dayCalls.length,
+                minutes: Math.round(dayCalls.reduce((s, c) => s + c.seconds, 0) / 60),
+                orders: orders.filter((o) => within(o.at)).length,
+            };
+        });
+    }
+    const lastSunday = new Date(slot.end.getTime() - 3_600_000).toISOString();
+    const short = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'long' });
+
     return {
-        slot: { hour: slot.hour, start: startIso, end: endIso, dayLabel: dayLabel(endIso), since: slot.hour === 10 ? 'depuis hier 20 h' : 'depuis ce matin 10 h' },
+        slot: {
+            kind: slot.kind,
+            hour: slot.hour,
+            start: startIso,
+            end: endIso,
+            dayLabel: week ? `lundi ${short.format(slot.end)}` : dayLabel(endIso),
+            since: week ? `la semaine du ${short.format(slot.start).replace(/ \S+$/, '')} au ${short.format(new Date(lastSunday))}` : slot.hour === 10 ? 'depuis hier 20 h' : 'depuis ce matin 10 h',
+        },
+        previous,
+        byDay,
         demos,
         calls,
         testCalls: lines.length - realLines.length,
