@@ -990,3 +990,17 @@ test('numéro lisible des démos', () => {
     assert.equal(fmtPhone('+447700900123'), '+447700900123');
     assert.equal(fmtPhone(null), 'numéro masqué');
 });
+
+test('récit : un appel où le narrateur a beaucoup parlé n’est jamais bridé comme « mince »', async () => {
+    const { narratorWords, effectiveMaterial, THIN_MAX_NARRATOR_WORDS } = await import('../../lib/loomina/writer');
+    const court = 'AI: Tu travaillais où ?\nUser: J’étais secrétaire dans une banque.\nAI: Et ensuite ?\nUser: Je suis fatiguée, on arrête.';
+    assert.equal(narratorWords(court), 11);
+    assert.equal(effectiveMaterial('thin', court), 'thin');
+    // Les questions de Loomina ne comptent pas, même très longues.
+    const bavarde = `AI: ${'mot '.repeat(1000)}\nUser: Oui.`;
+    assert.equal(effectiveMaterial('thin', bavarde), 'thin');
+    const survol = `AI: Raconte.\nUser: ${'fait '.repeat(THIN_MAX_NARRATOR_WORDS + 1)}`;
+    assert.equal(effectiveMaterial('thin', survol), 'rich');
+    assert.equal(effectiveMaterial('rich', court), 'rich');
+    assert.equal(effectiveMaterial(undefined, survol), undefined);
+});
