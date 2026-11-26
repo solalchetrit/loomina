@@ -33,6 +33,7 @@ import { callLines, demoLines, monthRange, type Range } from './spend';
 import { getSpendKept, realRevenueKept, voiceHealthKept } from './cached';
 import { getAgenda, getCrm, getOverview, configWarnings, listOrders } from './data';
 import { audienceConfigured, audienceDay } from './audience';
+import { fmtPhone } from './format';
 import { recapSubject, recapText, recapInnerHtml, dayLabel, at, type RecapData } from './recap-mail';
 
 type Row = Record<string, unknown>;
@@ -133,7 +134,7 @@ export async function gatherRecap(slot: RecapSlot): Promise<RecapData> {
         supabase.from('projects').select('id, user_id, status, project_metadata, stripe_session_id, created_at').limit(2000),
         supabase.from('profiles').select('id, first_name, last_name, created_at').limit(2000),
         supabase.from('interviews').select('id, project_id, created_at, processing_status, duration_seconds').limit(10000),
-        supabase.from('demo_stories').select('id, created_at, status, sms_sent_at, email').limit(1000),
+        supabase.from('demo_stories').select('id, created_at, status, sms_sent_at, email, phone').limit(1000),
         supabase.from('contact_messages').select('name, subject, created_at, handled_at').gte('created_at', startIso).lt('created_at', endIso).limit(50),
         supabase.from('call_events').select('id, project_id, status, created_at, error').in('status', ['failed', 'pending', 'processing']).limit(100),
     ]);
@@ -173,6 +174,7 @@ export async function gatherRecap(slot: RecapSlot): Promise<RecapData> {
             const m = demoMeta.get(x.id);
             return {
                 name: x.name,
+                phone: m?.phone ? fmtPhone(m.phone) : null,
                 at: x.at,
                 seconds: x.seconds,
                 status: x.status,

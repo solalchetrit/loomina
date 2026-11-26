@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
 import { listDemos } from "@/lib/admin/data";
-import { fmtDate, fmtDuration, fmtNumber } from "@/lib/admin/format";
+import { fmtDate, fmtDuration, fmtNumber, fmtPhone } from "@/lib/admin/format";
 import type { Tone } from "@/lib/admin/format";
 import { Badge, Panel, Empty, PageHeader, Fold } from "@/components/admin/ui";
 import { DEMO_STORY_DAYS } from "@/lib/loomina/demo-story";
@@ -50,7 +50,7 @@ export default async function AdminDemos() {
                   <div className="flex flex-wrap items-center gap-2 text-[14px]">
                     <b>{fmtDate(d.created_at)}</b>
                     <span className="text-[var(--ink-3)]">
-                      · {d.first_name ? String(d.first_name) : "prénom inconnu"} · {fmtDuration(d.duration_seconds)} · <span className="tabular-nums">{String(d.phone ?? "numéro masqué")}</span>
+                      · {d.first_name ? String(d.first_name) : "prénom inconnu"} · {fmtDuration(d.duration_seconds)} · {d.phone ? <a href={`tel:${String(d.phone)}`} className="font-semibold tabular-nums text-[var(--ink)] underline-offset-2 hover:underline">{fmtPhone(d.phone)}</a> : "numéro masqué"}
                     </span>
                     <Badge tone={s.tone}>{s.label}</Badge>
                     {d.sms_sent_at ? <Badge tone="ok">SMS envoyé</Badge> : null}
