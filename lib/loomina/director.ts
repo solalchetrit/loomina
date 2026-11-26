@@ -56,23 +56,23 @@ export const DIRECTOR_MODEL = process.env.LOOMINA_DIRECTOR_MODEL?.trim() || 'gpt
 export const DIRECTOR_REASONING_EFFORT = 'low';
 export const DIRECTOR_FALLBACK_MODEL = 'gpt-4o';
 /**
- * 26/11/2026 : 2048 → 6000. La mémoire du livre grossit à chaque appel et la
+ * 26/11/2026 : 2048 → 10240 (Solal : « 5 fois plus longue »). La mémoire du livre grossit à chaque appel et la
  * réponse avec elle : sur un appel riche en faits (nom, dates, métiers,
  * enfants), le repli gpt-4o a rendu un JSON coupé net à 2048 jetons, trois
  * fois de suite, et le récit de l'appel ne s'écrivait jamais.
  */
-export const DIRECTOR_MAX_TOKENS = 6000;
+export const DIRECTOR_MAX_TOKENS = 10240;
 /**
  * Délais du modèle principal puis du repli. Avant : 60 s et 45 s. gpt-5.5
  * rendait déjà 3 500 à 4 500 jetons par appel, à la limite des 60 s : un
  * appel dense les dépassait. L'analyse est sauvée avant la rédaction, donc
  * si la fonction (300 s) est coupée pendant l'Écrivain, l'essai suivant
- * reprend à la rédaction sans refaire l'analyse.
+ * reprend à la rédaction sans refaire l'analyse. Solal, 26/11 : 200 s.
  */
-export const DIRECTOR_TIMEOUT_MS = 100_000;
-export const DIRECTOR_FALLBACK_TIMEOUT_MS = 70_000;
+export const DIRECTOR_TIMEOUT_MS = 200_000;
+export const DIRECTOR_FALLBACK_TIMEOUT_MS = 80_000;
 /** Réflexion comprise, pour un modèle à raisonnement. */
-export const DIRECTOR_MAX_COMPLETION_TOKENS = 12000;
+export const DIRECTOR_MAX_COMPLETION_TOKENS = 24000;
 export const DIRECTOR_TEMPERATURE = 0.3;
 
 function isReasoningModel(model: string): boolean {
