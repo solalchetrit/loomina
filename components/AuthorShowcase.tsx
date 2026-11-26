@@ -4,15 +4,14 @@ import { useState } from "react";
 import Image from "next/image";
 import Icon from "@/components/ui/Icon";
 import { Section, SectionHead } from "@/components/ui/Section";
-import Button from "@/components/ui/Button";
-import { SITE } from "@/config/site";
 
 /**
  * Les deux espaces de Loomina dans un seul module (Solal, 26/11/2026) :
  * un petit sélecteur « Espace auteur » / « Espace famille », puis pour chacun
- * une phrase, trois points et une seule image, en grand. Volontairement léger : la
+ * une phrase, trois points et l'espace sur un téléphone. Compact exprès
+ * (Solal : les versions précédentes prenaient trop de place). Volontairement léger : la
  * première version, avec quatre onglets par espace, était trop lourde.
- * Une vraie capture de chaque espace (public/espace-auteur/apercu-*.webp),
+ * Une vraie capture de chaque espace (public/espace-auteur/mobile-*.webp),
  * prise sur le livre d'exemple de Jeanne (personne fictive, présentée comme telle).
  */
 type SpaceId = "auteur" | "famille";
@@ -56,69 +55,63 @@ export default function AuthorShowcase({
         text="Le livre se construit en ligne, sous vos yeux."
       />
 
-      <div className="head-gap card overflow-hidden p-3" data-reveal>
-        <div className="p-3 pb-6 sm:p-6 sm:pb-8 lg:p-8">
-          {/* Le sélecteur : deux boutons côte à côte. */}
-          <div role="tablist" aria-label="Les deux espaces" className="grid w-full max-w-[26rem] grid-cols-2 gap-1 rounded-full bg-[var(--surface-2)] p-1">
-            {ORDER.map((key) => {
-              const on = key === space;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  role="tab"
-                  aria-selected={on}
-                  aria-controls={`${id}-espace`}
-                  onClick={() => setSpace(key)}
-                  className={`press min-h-12 whitespace-nowrap rounded-full px-2 text-[15px] font-bold transition-colors sm:px-4 sm:text-[16px] ${
-                    on ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"
-                  }`}
-                >
-                  {SPACES[key].label}
-                </button>
-              );
-            })}
-          </div>
-
-          <div id={`${id}-espace`} role="tabpanel" className="mt-7 grid gap-x-12 gap-y-5 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-            <div>
-              <p className="text-[15px] font-bold text-[var(--amber-ink)]">{current.who}</p>
-              <p className="mt-1.5 text-[clamp(1.4rem,2.2vw,1.75rem)] font-extrabold leading-[1.2] tracking-[-0.025em] text-[var(--ink)]">{current.lead}</p>
+      <div className="head-gap card mx-auto max-w-[980px] overflow-hidden" data-reveal>
+        <div className="grid items-center sm:grid-cols-[1fr_auto]">
+          <div className="p-6 sm:p-9 lg:p-11">
+            {/* Le sélecteur : deux boutons côte à côte. */}
+            <div role="tablist" aria-label="Les deux espaces" className="grid w-full max-w-[24rem] grid-cols-2 gap-1 rounded-full bg-[var(--surface-2)] p-1">
+              {ORDER.map((key) => {
+                const on = key === space;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    role="tab"
+                    aria-selected={on}
+                    aria-controls={`${id}-espace`}
+                    onClick={() => setSpace(key)}
+                    className={`press min-h-11 whitespace-nowrap rounded-full px-2 text-[15px] font-bold transition-colors sm:px-4 ${
+                      on ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"
+                    }`}
+                  >
+                    {SPACES[key].label}
+                  </button>
+                );
+              })}
             </div>
-            <ul className="space-y-2.5">
-              {current.points.map((point) => (
-                <li key={point} className="flex gap-3 text-[17px] leading-snug text-[var(--ink-2)]">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
-                    <Icon name="check" size={14} />
-                  </span>
-                  {point}
-                </li>
-              ))}
-            </ul>
+
+            <div id={`${id}-espace`} role="tabpanel">
+              <p className="mt-7 text-[15px] font-bold text-[var(--amber-ink)]">{current.who}</p>
+              <p className="mt-1.5 max-w-md text-[clamp(1.3rem,2vw,1.6rem)] font-extrabold leading-[1.2] tracking-[-0.025em] text-[var(--ink)]">{current.lead}</p>
+              <ul className="mt-5 space-y-2.5">
+                {current.points.map((point) => (
+                  <li key={point} className="flex gap-3 text-[16px] leading-snug text-[var(--ink-2)]">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
+                      <Icon name="check" size={12} />
+                    </span>
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+
+          {/* L'espace choisi, sur un téléphone : une vraie capture, sur un livre d'exemple. */}
+          <figure className="flex h-[300px] justify-center overflow-hidden bg-[var(--canvas)] px-8 pt-7 [mask-image:linear-gradient(to_bottom,#000_80%,transparent)] sm:m-3 sm:h-auto sm:rounded-[20px] sm:px-12 sm:py-8 sm:[mask-image:none]">
+            <div className="h-fit w-[216px] shrink-0 rounded-[34px] bg-[var(--ink)] p-[7px] shadow-[0_24px_50px_-24px_rgba(20,24,34,0.55)]">
+              <Image
+                key={space}
+                src={`/espace-auteur/mobile-${space}.webp`}
+                alt={current.alt}
+                width={780}
+                height={1520}
+                sizes="216px"
+                className="h-auto w-full rounded-[27px]"
+              />
+            </div>
+            <figcaption className="sr-only">{current.label}, sur un livre d’exemple.</figcaption>
+          </figure>
         </div>
-
-        {/* Une seule image : la vraie page de l'espace choisi. */}
-        <figure className="overflow-hidden rounded-[18px] border border-[var(--line)] bg-[var(--canvas)]">
-          <div className="overflow-hidden">
-            <Image
-              key={space}
-              src={`/espace-auteur/apercu-${space}.webp`}
-              alt={current.alt}
-              width={1770}
-              height={860}
-              sizes="(min-width: 1240px) 1170px, (min-width: 640px) 100vw, 170vw"
-              className="h-auto w-[170%] max-w-none sm:w-full"
-            />
-          </div>
-          <figcaption className="border-t border-[var(--line)] bg-white px-4 py-2.5 text-[13.5px] text-[var(--ink-3)]">{current.label}, sur un livre d’exemple.</figcaption>
-        </figure>
-      </div>
-
-      <div className="mt-6 flex justify-end">
-        <Button href={`tel:${SITE.phone}`} variant="secondary">
-          Essayer Loomina gratuitement
-        </Button>
       </div>
     </Section>
   );
