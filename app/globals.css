@@ -32,21 +32,21 @@
   --ink-3: #61656e;          /* texte discret, ≥ 5:1 */
 
   /* Ambre, la couleur de l'étoile */
-  --amber: #385a9f;          /* BLEU BRILLANT (Solal, 27/11/2026 : « plus de beige ni de doré ») : bouton de démo, icônes, accents. Le nom « amber » reste pour ne rien casser. */
-  --amber-ink: #2f4f90;      /* ambre lisible en texte courant (5:1) */
-  --amber-display: #385a9f;  /* ambre des grands titres seulement (3.3:1) */
-  --amber-soft: #e8edf6;     /* fond de pastille */
-  --amber-line: #c9d4e8;
-  --amber-wash: #f2f5fa;     /* fond très clair d'une ligne mise en avant */
+  --amber: #2c55b8;          /* BLEU BRILLANT (Solal, 27/11/2026 : « plus de beige ni de doré ») : bouton de démo, icônes, accents. Le nom « amber » reste pour ne rien casser. */
+  --amber-ink: #2649a4;      /* ambre lisible en texte courant (5:1) */
+  --amber-display: #2c55b8;  /* ambre des grands titres seulement (3.3:1) */
+  --amber-soft: #e7edfa;     /* fond de pastille */
+  --amber-line: #c5d2ef;
+  --amber-wash: #f2f5fc;     /* fond très clair d'une ligne mise en avant */
   --noel: #b3202b;           /* rouge de Noël : bandeaux d'urgence de l'offre de lancement (Solal, 26/11/2026) */
   --noel-deep: #8f1821;
   --noel-bright: #ff5a5f;    /* rouge de Noël lisible sur le bleu nuit */
   --noel-soft: #fbe9ea;
-  --amber-deep: #24406f;
-  --amber-bright: #a3b9e8;   /* le même saphir, éclairci pour rester lisible en texte sur le bleu nuit */
-  --gloss-1: #4a6cb2;        /* pastille et bouton brillants : haut, milieu, bas du dégradé */
-  --gloss-2: #385a9f;
-  --gloss-3: #2e4c88;     /* texte sur --amber-soft */
+  --amber-deep: #1f3c85;
+  --amber-bright: #a9bff2;   /* le même saphir, éclairci pour rester lisible en texte sur le bleu nuit */
+  --gloss-1: #3661c6;        /* pastille et bouton brillants : haut, milieu, bas du dégradé */
+  --gloss-2: #2c55b8;
+  --gloss-3: #264ba8;     /* texte sur --amber-soft */
 
   /* États */
   --success: #2f5b3a;

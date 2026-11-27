@@ -33,7 +33,7 @@ function Funnel({ a }: { a: Audience }) {
             {s.label} <Delta now={s.value} before={s.before} />
           </p>
           <div className="h-9 overflow-hidden rounded-[8px] bg-[var(--surface-2)]">
-            <div className="flex h-full items-center rounded-[8px] bg-[var(--amber)] px-3 text-[14px] font-semibold text-[var(--ink)]" style={{ width: `${Math.max(s.value ? (100 * s.value) / max : 0, s.value ? 7 : 0)}%` }}>
+            <div className="flex h-full items-center rounded-[8px] bg-[var(--amber)] px-3 text-[14px] font-semibold text-white" style={{ width: `${Math.max(s.value ? (100 * s.value) / max : 0, s.value ? 7 : 0)}%` }}>
               {s.value ? fmtNumber(s.value) : ""}
             </div>
           </div>

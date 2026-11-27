@@ -316,7 +316,7 @@ export function MailApp({ user, folders, folder, q, liste, ouvrir, ecrire }: {
               className={cx("press rounded-[7px] px-3 py-1.5 text-[13.5px] transition-colors", d.key === folder ? "bg-[var(--amber-soft)] font-semibold text-[var(--amber-deep)]" : "font-semibold text-[var(--ink-2)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]")}
             >
               {d.label}
-              {d.key === "inbox" && folder === "inbox" && liste.unseen > 0 ? <span className="ml-1.5 rounded-full bg-[var(--amber)] px-1.5 text-[11px] font-semibold text-[var(--ink)]">{liste.unseen}</span> : null}
+              {d.key === "inbox" && folder === "inbox" && liste.unseen > 0 ? <span className="ml-1.5 rounded-full bg-[var(--amber)] px-1.5 text-[11px] font-semibold text-white">{liste.unseen}</span> : null}
             </button>
           ))}
         </nav>

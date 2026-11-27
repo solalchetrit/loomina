@@ -560,7 +560,7 @@ export default function MapTree({ groups, roots, links }: { groups: MapGroup[]; 
             {L.boxes.map((b) => (
               <div
                 key={`h-${b.group.key}`}
-                className="absolute flex items-center justify-center rounded-[8px] bg-[var(--amber)] px-3 text-center text-[13.5px] font-semibold leading-tight text-[var(--ink)] transition-opacity"
+                className="absolute flex items-center justify-center rounded-[8px] bg-[var(--amber)] px-3 text-center text-[13.5px] font-semibold leading-tight text-white transition-opacity"
                 style={{ left: b.x + PAD, top: b.y, width: b.w - PAD * 2, height: HEAD, opacity: filter !== "all" && filter !== "todo" && filter !== b.group.key ? 0.3 : 1 }}
               >
                 {b.group.label}

@@ -135,7 +135,7 @@ export default function Header() {
               </Link>
               <a
                 href={`tel:${SITE.phone}`}
-                className="press flex h-14 items-center justify-center rounded-[var(--radius-btn)] bg-[var(--amber)] text-[17px] font-bold text-[var(--ink)]"
+                className="press flex h-14 items-center justify-center rounded-[var(--radius-btn)] gloss text-[17px] font-bold"
               >
                 Essayer la démo : {SITE.phoneDisplay}
               </a>
