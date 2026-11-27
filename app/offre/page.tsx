@@ -68,7 +68,7 @@ export default function OffrePage() {
                 </Button>
               </div>
               <p className="mt-4 flex items-center gap-3 text-[15px] text-white md:mt-6">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-white">
                   <Icon name="check" size={14} />
                 </span>
                 <span>

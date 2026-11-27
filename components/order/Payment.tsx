@@ -69,7 +69,7 @@ export default function Payment({
             },
             rules: {
               ".Input": { border: "1px solid #d4d3cc", boxShadow: "none", padding: "13px 14px" },
-              ".Input:focus": { border: "1px solid #171d2b", boxShadow: "0 0 0 3px #fcebd2" },
+              ".Input:focus": { border: "1px solid #171d2b", boxShadow: "0 0 0 3px #e8efff" },
               ".Label": { fontWeight: "600", fontSize: "14px", marginBottom: "6px" },
             },
           },

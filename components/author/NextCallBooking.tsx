@@ -66,7 +66,7 @@ export default function NextCallBooking({
 
   const pill = (on: boolean) =>
     `press rounded-[14px] text-center font-bold transition-colors ${
-      on ? "bg-[var(--amber)] text-[var(--ink)]" : "bg-white/[0.07] text-white hover:bg-white/[0.14]"
+      on ? "bg-[var(--amber)] text-white" : "bg-white/[0.07] text-white hover:bg-white/[0.14]"
     }`;
 
   // Appel réservé : on l'affiche, avec « Changer » et « Annuler ».
@@ -152,7 +152,7 @@ export default function NextCallBooking({
           type="button"
           disabled={!ready || status === "saving"}
           onClick={() => date && time && void save({ date, time })}
-          className="press inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap rounded-full bg-[var(--amber)] px-4 text-[15px] font-extrabold sm:w-auto sm:px-6 sm:text-[16px] text-[var(--ink)] hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-40"
+          className="press inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap rounded-full bg-[var(--amber)] px-4 text-[15px] font-extrabold sm:w-auto sm:px-6 sm:text-[16px] text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {status === "saving" ? "Enregistrement…" : "Enregistrer mon prochain appel"}
         </button>
