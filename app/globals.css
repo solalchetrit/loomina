@@ -32,21 +32,21 @@
   --ink-3: #61656e;          /* texte discret, ≥ 5:1 */
 
   /* Ambre, la couleur de l'étoile */
-  --amber: #2b5fd0;          /* BLEU BRILLANT (Solal, 27/11/2026 : « plus de beige ni de doré ») : bouton de démo, icônes, accents. Le nom « amber » reste pour ne rien casser. */
-  --amber-ink: #2452b8;      /* ambre lisible en texte courant (5:1) */
-  --amber-display: #2b5fd0;  /* ambre des grands titres seulement (3.3:1) */
-  --amber-soft: #e6edfb;     /* fond de pastille */
-  --amber-line: #c5d4f5;
-  --amber-wash: #f1f5fd;     /* fond très clair d'une ligne mise en avant */
+  --amber: #385a9f;          /* BLEU BRILLANT (Solal, 27/11/2026 : « plus de beige ni de doré ») : bouton de démo, icônes, accents. Le nom « amber » reste pour ne rien casser. */
+  --amber-ink: #2f4f90;      /* ambre lisible en texte courant (5:1) */
+  --amber-display: #385a9f;  /* ambre des grands titres seulement (3.3:1) */
+  --amber-soft: #e8edf6;     /* fond de pastille */
+  --amber-line: #c9d4e8;
+  --amber-wash: #f2f5fa;     /* fond très clair d'une ligne mise en avant */
   --noel: #b3202b;           /* rouge de Noël : bandeaux d'urgence de l'offre de lancement (Solal, 26/11/2026) */
   --noel-deep: #8f1821;
   --noel-bright: #ff5a5f;    /* rouge de Noël lisible sur le bleu nuit */
   --noel-soft: #fbe9ea;
-  --amber-deep: #1c3f94;
-  --amber-bright: #8fb1ff;   /* le même saphir, éclairci pour rester lisible en texte sur le bleu nuit */
-  --gloss-1: #4c7de2;        /* pastille et bouton brillants : haut, milieu, bas du dégradé */
-  --gloss-2: #2b5fd0;
-  --gloss-3: #2049ae;     /* texte sur --amber-soft */
+  --amber-deep: #24406f;
+  --amber-bright: #a3b9e8;   /* le même saphir, éclairci pour rester lisible en texte sur le bleu nuit */
+  --gloss-1: #4a6cb2;        /* pastille et bouton brillants : haut, milieu, bas du dégradé */
+  --gloss-2: #385a9f;
+  --gloss-3: #2e4c88;     /* texte sur --amber-soft */
 
   /* États */
   --success: #2f5b3a;
@@ -395,12 +395,11 @@
   border-radius: 14px;
   color: #fff;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)) top / 100% 55% no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
     linear-gradient(180deg, var(--gloss-1), var(--gloss-2) 55%, var(--gloss-3));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.12),
-    0 4px 10px -6px var(--gloss-2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(20, 24, 34, 0.12);
 }
 
 /* Le même brillant pour les boutons et les petites pastilles rondes (Solal, 27/11/2026 :
@@ -408,12 +407,11 @@
 .gloss {
   color: #fff;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)) top / 100% 55% no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
     linear-gradient(180deg, var(--gloss-1), var(--gloss-2) 55%, var(--gloss-3));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1),
-    0 4px 10px -6px var(--gloss-2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(20, 24, 34, 0.12);
 }
 
 .chip-icon-neutral {
