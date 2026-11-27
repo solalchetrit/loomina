@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Icon from "@/components/ui/Icon";
 import { usePathname } from "next/navigation";
 import { SITE } from "@/config/site";
 
@@ -35,7 +34,6 @@ export default function MobileCta() {
             tabIndex={visible ? 0 : -1}
             className="press flex h-12 flex-1 items-center justify-center rounded-[14px] gloss gloss-btn text-[16px] font-bold"
           >
-            <span aria-hidden="true" className="gloss gloss-dot"><Icon name="phone" size={14} /></span>
             Essayer la démo
           </a>
           <Link

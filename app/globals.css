@@ -416,32 +416,16 @@
     0 1px 2px rgba(110, 64, 5, 0.22);
 }
 
-/* Les boutons dorés (Solal, 27/11/2026 : ni écriture blanche ni écriture bleue SUR l'or) :
-   bouton blanc, contour doré brillant, écriture bleu nuit ; l'or plein reste dans la petite pastille. */
+/* Les boutons dorés (choix de Solal, 27/11/2026, « version A ») : or brillant, écriture brune
+   ton sur ton. Les pastilles d'icônes gardent l'ambre brillant et le motif blanc. */
 .gloss-btn {
-  color: #171d2b;
-  border: 2px solid transparent;
+  color: #4a2a02;
   background:
-    linear-gradient(180deg, #ffffff, #fffaf1) padding-box,
-    linear-gradient(180deg, #f6c377, var(--gloss-2) 55%, var(--gloss-3)) border-box;
-  box-shadow: 0 1px 2px rgba(110, 64, 5, 0.16);
-}
-.gloss-btn:hover {
-  filter: none;
-  background:
-    linear-gradient(180deg, #fffaf1, #fdf0db) padding-box,
-    linear-gradient(180deg, #f6c377, var(--gloss-2) 55%, var(--gloss-3)) border-box;
-}
-/* La petite pastille dorée à l'intérieur du bouton. */
-.gloss-dot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  margin-right: 9px;
-  border-radius: 9px;
-  flex-shrink: 0;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
+    linear-gradient(180deg, #f8be68, #f1a843 55%, #e6982c);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 1px 2px rgba(110, 64, 5, 0.2);
 }
 
 .chip-icon-neutral {
