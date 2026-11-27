@@ -92,7 +92,7 @@ export default function Compare() {
               <th scope="col" className="bg-[var(--ink)] px-5 py-4 font-bold text-white">
                 <span className="inline-flex items-center gap-2">
                   Loomina
-                  <span className="pill bg-[var(--amber)] text-white">Le plus simple</span>
+                  <span className="pill bg-[var(--amber)] text-[var(--ink)]">Le plus simple</span>
                 </span>
               </th>
             </tr>

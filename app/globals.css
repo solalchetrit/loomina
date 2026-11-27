@@ -32,21 +32,21 @@
   --ink-3: #61656e;          /* texte discret, ≥ 5:1 */
 
   /* Ambre, la couleur de l'étoile */
-  --amber: #2c55b8;          /* BLEU BRILLANT (Solal, 27/11/2026 : « plus de beige ni de doré ») : bouton de démo, icônes, accents. Le nom « amber » reste pour ne rien casser. */
-  --amber-ink: #2649a4;      /* ambre lisible en texte courant (5:1) */
-  --amber-display: #2c55b8;  /* ambre des grands titres seulement (3.3:1) */
-  --amber-soft: #e7edfa;     /* fond de pastille */
-  --amber-line: #c5d2ef;
-  --amber-wash: #f2f5fc;     /* fond très clair d'une ligne mise en avant */
+  --amber: #f1a843;          /* bouton de démo, icônes sur fond sombre (un ton plus clair que l'étoile, Solal 19/11/2026) */
+  --amber-ink: #95580a;      /* ambre lisible en texte courant (5:1) */
+  --amber-display: #c27610;  /* ambre des grands titres seulement (3.3:1) */
+  --amber-soft: #fcebd2;     /* fond de pastille */
+  --amber-line: #f6ddb5;
+  --amber-wash: #fdf3e4;     /* fond très clair d'une ligne mise en avant */
   --noel: #b3202b;           /* rouge de Noël : bandeaux d'urgence de l'offre de lancement (Solal, 26/11/2026) */
   --noel-deep: #8f1821;
   --noel-bright: #ff5a5f;    /* rouge de Noël lisible sur le bleu nuit */
   --noel-soft: #fbe9ea;
-  --amber-deep: #1f3c85;
-  --amber-bright: #a9bff2;   /* le même saphir, éclairci pour rester lisible en texte sur le bleu nuit */
-  --gloss-1: #3661c6;        /* pastille et bouton brillants : haut, milieu, bas du dégradé */
-  --gloss-2: #2c55b8;
-  --gloss-3: #264ba8;     /* texte sur --amber-soft */
+  --amber-deep: #6f4005;     /* texte sur --amber-soft */
+  --amber-bright: var(--amber); /* l'ambre sur le bleu nuit */
+  --gloss-1: #f0a63f;        /* pastille brillante, motif blanc (Solal, 27/11/2026) : haut, milieu, bas du dégradé */
+  --gloss-2: #e08f22;
+  --gloss-3: #c97a12;
 
   /* États */
   --success: #2f5b3a;
@@ -395,23 +395,33 @@
   border-radius: 14px;
   color: #fff;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
     linear-gradient(180deg, var(--gloss-1), var(--gloss-2) 55%, var(--gloss-3));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 1px 2px rgba(20, 24, 34, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 1px 2px rgba(110, 64, 5, 0.22);
 }
 
 /* Le même brillant pour les boutons et les petites pastilles rondes (Solal, 27/11/2026 :
-   fond saphir avec un reflet discret, motif blanc ; la même couleur partout). */
+   fond ambre avec un reflet discret, motif blanc). */
 .gloss {
   color: #fff;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
     linear-gradient(180deg, var(--gloss-1), var(--gloss-2) 55%, var(--gloss-3));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 1px 2px rgba(20, 24, 34, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 1px 2px rgba(110, 64, 5, 0.22);
+}
+
+/* Les boutons ambre gardent leur texte bleu nuit (lisible), avec le même reflet, sur l'ambre clair. */
+.gloss-btn {
+  color: #171d2b;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
+    linear-gradient(180deg, #f6b65a, var(--amber) 55%, #e99c30);
 }
 
 .chip-icon-neutral {
@@ -722,7 +732,7 @@ textarea.field {
 
   /* L'ambre : aplat, avec le même filet de lumière. */
   .bg-\[var\(--amber\)\] {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 1px 2px rgba(20, 40, 110, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 1px 2px rgba(110, 64, 5, 0.12);
   }
 }
 
