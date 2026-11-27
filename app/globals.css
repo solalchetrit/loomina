@@ -419,7 +419,8 @@
 /* Les boutons dorés (choix de Solal, 27/11/2026, « version A ») : or brillant, écriture brune
    ton sur ton. Les pastilles d'icônes gardent l'ambre brillant et le motif blanc. */
 .gloss-btn {
-  color: #4a2a02;
+  color: #fff; /* essai demandé par Solal (27/11, 11:35) : écriture blanche ; version A = #4a2a02 */
+  text-shadow: 0 1px 1px rgba(110, 64, 5, 0.35);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
     linear-gradient(180deg, #f8be68, #f1a843 55%, #e6982c);
