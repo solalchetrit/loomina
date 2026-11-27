@@ -20,7 +20,7 @@ const COLUMNS = [
     title: "Votre livre",
     links: [
       { href: "/order", label: "Commander" },
-      { href: "/dashboard", label: "Espace auteur" },
+      { href: "/dashboard", label: "Se connecter" },
       { href: "/contact", label: "Nous écrire" },
     ],
   },
