@@ -50,7 +50,8 @@ export default function AuthorShowcase({
   return (
     <Section id={id} className={className}>
       {/* Pas de carte : le titre et le sélecteur à gauche, le téléphone à droite sur toute la hauteur. */}
-      <div className="grid items-center gap-y-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-x-12 lg:gap-x-24" data-reveal>
+      {/* Les deux modules restent groupés et centrés : sur grand écran, plus de grand vide entre le texte et le téléphone. */}
+      <div className="grid items-center gap-y-8 md:grid-cols-[minmax(0,34rem)_auto] md:justify-center md:gap-x-12 lg:gap-x-20" data-reveal>
           <div className="min-w-0">
             <SectionHead
               eyebrow="Inclus avec chaque livre"
@@ -99,7 +100,7 @@ export default function AuthorShowcase({
           </div>
 
           {/* L'espace choisi, sur un téléphone : il se parcourt tout seul (components/SpaceDemo.tsx). */}
-          <figure className="flex justify-center md:px-6 lg:pr-16">
+          <figure className="flex justify-center">
             <SpaceDemo space={space} auto={auto} onAutoNext={setSpace} label={current.alt} />
             <figcaption className="sr-only">{current.label}, sur un livre d’exemple.</figcaption>
           </figure>
