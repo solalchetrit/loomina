@@ -159,7 +159,7 @@ export default function ExperiencePage() {
                 `En général ${OFFER.delay} jusqu’au livre validé`,
               ].map((t) => (
                 <li key={t} className="flex items-center gap-3">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full gloss">
                     <Icon name="check" size={16} />
                   </span>
                   {t}
@@ -218,7 +218,7 @@ export default function ExperiencePage() {
                           "Livraison incluse en France métropolitaine",
                         ].map((t) => (
                           <li key={t} className="flex items-start gap-2.5 text-[15px] leading-snug text-[var(--ink-2)]">
-                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full gloss">
                               <Icon name="check" size={12} />
                             </span>
                             {t}

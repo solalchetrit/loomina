@@ -57,7 +57,7 @@ export default function Hero() {
           >
             {REASSURANCE.map((r) => (
               <li key={r.title} className="flex gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full gloss">
                   <Icon name="check" size={14} />
                 </span>
                 <p className="text-[15px] leading-snug text-[var(--ink-2)]">

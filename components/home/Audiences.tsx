@@ -37,7 +37,7 @@ export default function Audiences() {
           >
             <Photo {...a.photo} ratio="aspect-[16/10]" className="!rounded-[20px]" />
             <div className="flex flex-1 flex-col p-4 pt-7 md:p-7 md:pt-8">
-            <span className={`chip-icon ${a.dark ? "!bg-[var(--amber)] !text-[var(--ink)]" : ""}`}>
+            <span className={"chip-icon"}>
               <Icon name={a.icon} />
             </span>
             <h3 className={`t-heading mt-6 !text-[clamp(1.45rem,2.2vw,1.8rem)] ${a.dark ? "text-white" : ""}`}>{a.title}</h3>

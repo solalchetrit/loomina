@@ -88,7 +88,7 @@ export default function AuthorShowcase({
               <ul className="mt-3 space-y-2.5">
                 {current.points.map((point) => (
                   <li key={point} className="flex gap-3 text-[15px] leading-snug text-[var(--ink-2)]">
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--ink)]">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full gloss">
                       <Icon name="check" size={12} />
                     </span>
                     {point}

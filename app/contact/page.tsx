@@ -33,7 +33,7 @@ export default function ContactPage() {
 
             <ul className="relative mt-2 divide-y divide-[var(--line)] border-t border-[var(--line)]">
               <li className="flex gap-4 py-6">
-                <span className="chip-icon !bg-white/10 !text-[var(--amber)]">
+                <span className="chip-icon">
                   <Icon name="mail" />
                 </span>
                 <div className="min-w-0">
@@ -50,7 +50,7 @@ export default function ContactPage() {
                 </div>
               </li>
               <li className="flex gap-4 py-6">
-                <span className="chip-icon !bg-white/10 !text-[var(--amber)]">
+                <span className="chip-icon">
                   <Icon name="phone" />
                 </span>
                 <div className="min-w-0">
