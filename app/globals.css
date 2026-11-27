@@ -416,12 +416,10 @@
     0 1px 2px rgba(110, 64, 5, 0.22);
 }
 
-/* Les boutons ambre gardent leur texte bleu nuit (lisible), avec le même reflet, sur l'ambre clair. */
+/* Les boutons dorés : même or brillant que les pastilles, écriture blanche (Solal, 27/11/2026). */
 .gloss-btn {
-  color: #171d2b;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
-    linear-gradient(180deg, #f6b65a, var(--amber) 55%, #e99c30);
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(110, 64, 5, 0.28);
 }
 
 .chip-icon-neutral {

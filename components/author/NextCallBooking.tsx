@@ -66,7 +66,7 @@ export default function NextCallBooking({
 
   const pill = (on: boolean) =>
     `press rounded-[14px] text-center font-bold transition-colors ${
-      on ? "bg-[var(--amber)] text-[var(--ink)]" : "bg-white/[0.07] text-white hover:bg-white/[0.14]"
+      on ? "gloss gloss-btn" : "bg-white/[0.07] text-white hover:bg-white/[0.14]"
     }`;
 
   // Appel réservé : on l'affiche, avec « Changer » et « Annuler ».
