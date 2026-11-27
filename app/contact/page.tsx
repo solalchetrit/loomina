@@ -57,7 +57,7 @@ export default function ContactPage() {
                   <p className="text-[15px] font-bold text-[var(--ink-3)]">Pour essayer Loomina</p>
                   <a
                     href={`tel:${SITE.phone}`}
-                    className="mt-0.5 inline-block text-[24px] font-extrabold tracking-[-0.02em] text-[var(--amber-bright)] hover:brightness-110"
+                    className="mt-0.5 inline-block text-[24px] font-extrabold tracking-[-0.02em] text-[var(--amber)] hover:brightness-110"
                   >
                     {SITE.phoneDisplay}
                   </a>

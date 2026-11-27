@@ -43,7 +43,6 @@
   --noel-bright: #ff5a5f;    /* rouge de Noël lisible sur le bleu nuit */
   --noel-soft: #fbe9ea;
   --amber-deep: #6f4005;     /* texte sur --amber-soft */
-  --amber-bright: var(--amber); /* l'ambre sur le bleu nuit */
   --gloss-1: #f0a63f;        /* pastille brillante, motif blanc (Solal, 27/11/2026) : haut, milieu, bas du dégradé */
   --gloss-2: #e08f22;
   --gloss-3: #c97a12;
@@ -86,8 +85,8 @@
   --ink-2: rgba(255, 255, 255, 0.82);
   --ink-3: rgba(255, 255, 255, 0.64);
   --line: rgba(255, 255, 255, 0.16);
-  --amber-display: var(--amber-bright);
-  --amber-line: color-mix(in srgb, var(--amber-bright) 55%, transparent);
+  --amber-display: var(--amber);
+  --amber-line: color-mix(in srgb, var(--amber) 55%, transparent);
   background: linear-gradient(180deg, color-mix(in srgb, var(--night) 55%, var(--night-deep)) 0%, var(--night-deep) 100%);
   color: var(--ink);
 }
@@ -413,19 +412,6 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     inset 0 0 0 1px rgba(255, 255, 255, 0.14),
-    0 1px 2px rgba(110, 64, 5, 0.22);
-}
-
-/* Les boutons dorés (choix de Solal, 27/11/2026, « version A ») : or brillant, écriture brune
-   ton sur ton. Les pastilles d'icônes gardent l'ambre brillant et le motif blanc. */
-.gloss-btn {
-  color: #fff; /* écriture blanche sur un doré plus foncé (Solal, 27/11, 11:37) */
-  text-shadow: 0 1px 1px rgba(90, 50, 0, 0.3);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
-    linear-gradient(180deg, #db9130, #cf841f 55%, #c1770f);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
     0 1px 2px rgba(110, 64, 5, 0.22);
 }
 

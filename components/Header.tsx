@@ -72,7 +72,7 @@ export default function Header() {
             </Link>
             <a
               href={`tel:${SITE.phone}`}
-              className="press inline-flex h-12 items-center whitespace-nowrap rounded-[14px] gloss gloss-btn px-4 text-[15px] font-bold hover:brightness-110"
+              className="press inline-flex h-12 items-center whitespace-nowrap rounded-[14px] bg-[var(--amber-soft)] px-4 text-[15px] font-bold text-[var(--amber-deep)] hover:bg-[var(--amber-line)]"
             >
               Essayer la démo
             </a>
@@ -135,7 +135,7 @@ export default function Header() {
               </Link>
               <a
                 href={`tel:${SITE.phone}`}
-                className="press flex h-14 items-center justify-center rounded-[var(--radius-btn)] gloss gloss-btn text-[17px] font-bold"
+                className="press flex h-14 items-center justify-center rounded-[var(--radius-btn)] bg-[var(--amber)] text-[17px] font-bold text-[var(--ink)]"
               >
                 Essayer la démo : {SITE.phoneDisplay}
               </a>

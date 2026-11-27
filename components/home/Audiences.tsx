@@ -45,7 +45,7 @@ export default function Audiences() {
             <ul className="mt-6 space-y-2.5">
               {a.points.map((p) => (
                 <li key={p} className="flex gap-3 text-[16px]">
-                  <Icon name="check" size={20} className={`mt-0.5 shrink-0 ${a.dark ? "text-[var(--amber-bright)]" : "text-[var(--amber-ink)]"}`} />
+                  <Icon name="check" size={20} className={`mt-0.5 shrink-0 ${a.dark ? "text-[var(--amber)]" : "text-[var(--amber-ink)]"}`} />
                   {p}
                 </li>
               ))}

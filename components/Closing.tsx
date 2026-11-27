@@ -25,7 +25,7 @@ export default function Closing({
         <div className="flex flex-col gap-4 lg:items-end">
           <a
             href={`tel:${SITE.phone}`}
-            className="press inline-flex items-center justify-center rounded-[22px] gloss gloss-btn px-8 py-5 text-[clamp(1.9rem,3.6vw,2.75rem)] font-extrabold tracking-[-0.03em] hover:brightness-110"
+            className="press inline-flex items-center justify-center rounded-[22px] bg-[var(--amber)] px-8 py-5 text-[clamp(1.9rem,3.6vw,2.75rem)] font-extrabold tracking-[-0.03em] text-[var(--ink)] hover:brightness-105"
           >
             {SITE.phoneDisplay}
           </a>

@@ -20,7 +20,7 @@ export function BookCover({ className = "max-w-[340px]", compact = false }: { cl
         <div className="absolute inset-y-0 left-0 w-[8%] rounded-l-[6px] bg-gradient-to-r from-black/50 to-white/5" />
         <div className="absolute -right-[3%] inset-y-[2%] -z-10 w-[6%] rounded-r-[4px] bg-[repeating-linear-gradient(90deg,#f2f1ec_0_1px,#dedcd4_1px_2px)]" />
         <div className="absolute inset-0 flex flex-col items-center justify-between px-[14%] py-[16%] text-center">
-          <svg width={compact ? 14 : 26} height={compact ? 14 : 26} viewBox="0 0 24 24" className="text-[#f1a843]">
+          <svg width={compact ? 14 : 26} height={compact ? 14 : 26} viewBox="0 0 24 24" className="text-[var(--amber)]">
             <path fill="currentColor" d="M12 0c.9 6.4 5.6 11.1 12 12-6.4.9-11.1 5.6-12 12-.9-6.4-5.6-11.1-12-12C6.4 11.1 11.1 6.4 12 0z" />
           </svg>
           <p className={`font-serif italic leading-[1.1] text-white ${compact ? "text-[17px]" : "text-[30px] sm:text-[34px]"}`}>

@@ -61,7 +61,7 @@ function NextCall({
 }) {
   return (
     <section className="flex min-w-0 flex-col rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white md:p-7" aria-labelledby="prochain-appel">
-      <h2 id="prochain-appel" className="text-[17px] font-bold tracking-normal text-[var(--amber-bright)]">
+      <h2 id="prochain-appel" className="text-[17px] font-bold tracking-normal text-[var(--amber)]">
         Votre prochain appel
       </h2>
       {topic ? (
@@ -76,7 +76,7 @@ function NextCall({
       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
         <a
           href={`tel:${SITE.phone}`}
-          className="press inline-flex min-h-12 shrink-0 items-center rounded-full border border-white/25 px-6 text-[20px] font-extrabold tracking-[-0.02em] text-white hover:border-[var(--amber)] hover:text-[var(--amber-bright)]"
+          className="press inline-flex min-h-12 shrink-0 items-center rounded-full border border-white/25 px-6 text-[20px] font-extrabold tracking-[-0.02em] text-white hover:border-[var(--amber)] hover:text-[var(--amber)]"
         >
           {SITE.phoneDisplay}
         </a>
@@ -91,7 +91,7 @@ function NextCall({
       {canBook && (
         <p className="mt-3 text-[15px] text-[#cfcfc8]">
           {weekly ? `Rendez-vous ${weekly}. ` : "Un appel chaque semaine ? "}
-          <button type="button" onClick={onSettings} className="font-semibold text-white underline decoration-[var(--amber)] underline-offset-4 hover:text-[var(--amber-bright)]">
+          <button type="button" onClick={onSettings} className="font-semibold text-white underline decoration-[var(--amber)] underline-offset-4 hover:text-[var(--amber)]">
             {weekly ? "Modifier" : "Réglages"}
           </button>
         </p>
@@ -189,7 +189,7 @@ export default function AuthorSpace({
                         active ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:bg-[var(--canvas)] hover:text-[var(--ink)]"
                       }`}
                     >
-                      <Icon name={t.icon} size={18} className={active ? "text-[var(--amber-bright)]" : ""} />
+                      <Icon name={t.icon} size={18} className={active ? "text-[var(--amber)]" : ""} />
                       {t.label}
                     </button>
                   </li>

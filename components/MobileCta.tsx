@@ -32,7 +32,7 @@ export default function MobileCta() {
           <a
             href={`tel:${SITE.phone}`}
             tabIndex={visible ? 0 : -1}
-            className="press flex h-12 flex-1 items-center justify-center rounded-[14px] gloss gloss-btn text-[16px] font-bold"
+            className="press flex h-12 flex-1 items-center justify-center rounded-[14px] bg-[var(--amber-soft)] text-[16px] font-bold text-[var(--amber-deep)]"
           >
             Essayer la démo
           </a>

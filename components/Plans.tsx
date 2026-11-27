@@ -99,7 +99,7 @@ export default function Plans() {
                   </span>
                   <span
                     className={`mt-2 block font-extrabold tracking-[-0.04em] ${
-                      p.draft ? "text-[20px] text-[var(--ink-3)]" : "text-[44px] leading-none text-[var(--amber-bright)]"
+                      p.draft ? "text-[20px] text-[var(--ink-3)]" : "text-[44px] leading-none text-[var(--amber)]"
                     }`}
                   >
                     {p.price}

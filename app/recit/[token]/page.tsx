@@ -105,7 +105,7 @@ export default async function RecitPage({ params }: { params: Promise<{ token: s
                 Appel après appel, à votre rythme, chaque souvenir devient un chapitre, puis un livre à transmettre.
               </p>
             </div>
-            <Button href="/order" size="lg" className="gloss gloss-btn">
+            <Button href="/order" size="lg" className="!bg-[var(--amber)] !text-[var(--ink)]">
               Commencer mon livre
             </Button>
           </div>
