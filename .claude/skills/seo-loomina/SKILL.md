@@ -58,7 +58,7 @@ Les faits sur l'offre viennent de `config/offer.ts` et `config/site.ts`. Ne jama
 - `npm run check` puis `npx next build` : l'article doit apparaître dans la liste des pages générées.
 - Relire l'article une fois comme un lecteur de 70 ans, une fois comme un moteur : la réponse est-elle dans le premier paragraphe ?
 - Mettre à jour le nœud `d-blog` de `lib/admin/map.ts` seulement si le fonctionnement du blog change (pas à chaque article).
-- Mise en ligne : jamais sans que Solal écrive « déploie ».
+- Mise en ligne : un article du blog seul (un fichier dans `content/blog`) est fusionné et mis en ligne sans attendre, une fois les vérifications vertes (accord de Solal du 27/11/2026). Tout autre changement attend que Solal écrive « déploie ».
 
 ## Auditer le site
 
