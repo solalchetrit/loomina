@@ -896,7 +896,7 @@ test('récap : la phrase du jour et le sujet', () => {
         slot: { kind: 'jour', hour: 10, start: '', end: '', dayLabel: 'jeudi 26 novembre', since: 'depuis hier 20 h' },
         previous: null,
         byDay: null,
-        demos: [{ name: 'Joana', at: '2026-11-25T20:10:00Z', seconds: 300, status: 'written', smsSent: true, email: true, costHt: 0.3, costTtc: 0.36, estimated: false }],
+        demos: [{ name: 'Joana', phone: '07 98 76 54 32', at: '2026-11-25T20:10:00Z', seconds: 300, status: 'written', smsSent: true, email: true, costHt: 0.3, costTtc: 0.36, estimated: false }],
         calls: [
             { client: 'Patricia', profileId: 'x', at: '2026-11-26T08:00:00Z', seconds: 1320, status: 'processed', costHt: 1, costTtc: 1.2, estimated: false, first: false },
             { client: 'Patricia', profileId: 'x', at: '2026-11-26T07:00:00Z', seconds: 20, status: 'too_short', costHt: 0.01, costTtc: 0.012, estimated: false, first: false },
@@ -1013,6 +1013,14 @@ test('fin d’étape : l’e-mail et le SMS « une partie de votre livre est pr�
     assert.doesNotMatch(t.email + t.sms, /\b(vous|votre|vos)\b/i);
     // Jamais « relié », jamais de prix.
     for (const x of [v, t]) assert.doesNotMatch(x.email + x.sms + x.html, /reli[ée]|€/);
+});
+
+import { fmtPhone } from '../../lib/admin/format';
+test('numéro lisible des démos', () => {
+    assert.equal(fmtPhone('+33612345678'), '06 12 34 56 78');
+    assert.equal(fmtPhone('0159169357'), '01 59 16 93 57');
+    assert.equal(fmtPhone('+447700900123'), '+447700900123');
+    assert.equal(fmtPhone(null), 'numéro masqué');
 });
 
 test('récit : un appel où le narrateur a beaucoup parlé n’est jamais bridé comme « mince »', async () => {

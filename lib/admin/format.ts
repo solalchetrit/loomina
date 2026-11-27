@@ -21,6 +21,14 @@ export function fmtDuration(seconds: unknown): string {
     return m ? `${m} min${r ? ` ${r} s` : ''}` : `${r} s`;
 }
 
+/** Un numéro lisible : +33612345678 → 06 12 34 56 78 (les autres pays restent tels quels). */
+export function fmtPhone(v: unknown): string {
+    const raw = typeof v === 'string' ? v.trim() : '';
+    if (!raw) return 'numéro masqué';
+    const fr = raw.replace(/\s/g, '').match(/^(?:\+33|0033|0)([1-9]\d{8})$/);
+    return fr ? `0${fr[1]}`.replace(/(\d{2})(?=\d)/g, '$1 ') : raw;
+}
+
 export function fmtNumber(n: unknown): string {
     return new Intl.NumberFormat('fr-FR').format(Number(n) || 0);
 }

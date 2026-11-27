@@ -12,8 +12,8 @@ const example: RecapData = {
     previous: null,
     byDay: null,
     demos: [
-        { name: 'Prénom inconnu', at: '2026-11-25T20:25:12Z', seconds: 16, status: 'unusable', smsSent: false, email: false, costHt: 0.02, costTtc: 0.024, estimated: false },
-        { name: 'Joana', at: '2026-11-26T07:42:00Z', seconds: 312, status: 'written', smsSent: true, email: true, costHt: 0.41, costTtc: 0.49, estimated: false },
+        { name: 'Prénom inconnu', phone: '06 12 34 56 78', at: '2026-11-25T20:25:12Z', seconds: 16, status: 'unusable', smsSent: false, email: false, costHt: 0.02, costTtc: 0.024, estimated: false },
+        { name: 'Joana', phone: '07 98 76 54 32', at: '2026-11-26T07:42:00Z', seconds: 312, status: 'written', smsSent: true, email: true, costHt: 0.41, costTtc: 0.49, estimated: false },
     ],
     calls: [{ client: 'Jeanne Martin', profileId: 'exemple', at: '2026-11-26T08:20:00Z', seconds: 1382, status: 'processed', costHt: 1.12, costTtc: 1.34, estimated: false, first: false }],
     testCalls: 1,

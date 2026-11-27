@@ -25,6 +25,8 @@ import { SITE } from '../../config/site';
 
 export interface RecapDemo {
     name: string;
+    /** Le numéro qui a appelé (demande de Solal, 26/11/2026), lisible : 06 12 34 56 78. */
+    phone: string | null;
     at: string;
     seconds: number;
     /** written, unusable, failed, pending… (table demo_stories). */
@@ -196,7 +198,7 @@ export function recapText(d: RecapData): string {
     L.push(`DÉMOS (${d.demos.length})`);
     if (!d.demos.length) L.push('Aucune.');
     for (const x of d.demos)
-        L.push(`- ${at(x.at)} · ${x.name} · ${duration(x.seconds)} · ${DEMO_STATUS[x.status] ?? x.status}${x.smsSent ? ' · SMS parti' : ''}${x.email ? ' · e-mail laissé' : ''} · ${eur(x.costTtc)} TTC`);
+        L.push(`- ${at(x.at)} · ${x.name} · ${x.phone ?? 'numéro masqué'} · ${duration(x.seconds)} · ${DEMO_STATUS[x.status] ?? x.status}${x.smsSent ? ' · SMS parti' : ''}${x.email ? ' · e-mail laissé' : ''} · ${eur(x.costTtc)} TTC`);
     L.push('');
 
     L.push(`APPELS CLIENTS (${calls.length})`);
@@ -336,7 +338,7 @@ export function recapInnerHtml(d: RecapData): string {
         d.demos.length
             ? rows(
                   d.demos.map((x) => ({
-                      left: `<strong>${esc(x.name)}</strong> ${muted(`à ${at(x.at)}, ${duration(x.seconds)}`)}`,
+                      left: `<strong>${esc(x.name)}</strong> · ${x.phone ? `<a href="tel:${esc(x.phone.replace(/\s/g, ''))}" style="color:${INK};text-decoration:none;font-variant-numeric:tabular-nums">${esc(x.phone)}</a>` : muted('numéro masqué')} ${muted(`à ${at(x.at)}, ${duration(x.seconds)}`)}`,
                       sub: [DEMO_STATUS[x.status] ?? x.status, x.smsSent ? 'SMS parti' : x.status === 'written' ? 'SMS pas parti' : null, x.email ? 'e-mail laissé, PDF envoyé' : null].filter(Boolean).join(' · '),
                       right: `${eur(x.costTtc)} <span style="color:${MUTED};font-size:12px">TTC</span>`,
                   }))
