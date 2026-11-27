@@ -4,6 +4,7 @@ import LogoMotion, { TIGHT_WORDMARK } from "@/components/brand/LogoMotion";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Icon from "@/components/ui/Icon";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SITE } from "@/config/site";
@@ -74,6 +75,7 @@ export default function Header() {
               href={`tel:${SITE.phone}`}
               className="press inline-flex h-12 items-center whitespace-nowrap rounded-[14px] gloss gloss-btn px-4 text-[15px] font-bold hover:brightness-110"
             >
+              <span aria-hidden="true" className="gloss gloss-dot"><Icon name="phone" size={14} /></span>
               Essayer la démo
             </a>
             <Link
@@ -137,6 +139,7 @@ export default function Header() {
                 href={`tel:${SITE.phone}`}
                 className="press flex h-14 items-center justify-center rounded-[var(--radius-btn)] gloss gloss-btn text-[17px] font-bold"
               >
+                <span aria-hidden="true" className="gloss gloss-dot"><Icon name="phone" size={14} /></span>
                 Essayer la démo : {SITE.phoneDisplay}
               </a>
             </div>
