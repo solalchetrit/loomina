@@ -576,7 +576,7 @@ test('Mémo : son âge suit l’étape du livre, et il compte les souvenirs qui 
     assert.equal(m.age, 3);
     assert.equal(m.mood, 'steady');
     assert.equal(m.total - m.told, 5);
-    assert.match(m.headline, /Encore 5 souvenirs et Mémo met ses lunettes/);
+    assert.match(m.headline, /Encore 5 souvenirs et Mémo grandit/);
     assert.ok(m.path > 0.5 && m.path < 0.75);
 });
 

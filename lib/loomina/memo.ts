@@ -16,38 +16,38 @@ export type MemoAge = 1 | 2 | 3 | 4 | 5;
 export const MEMO_AGES: { age: MemoAge; name: string; stage: string; text: string; then: string; event: string; meaning: string }[] = [
     {
         age: 1,
-        name: 'Tout petit',
+        name: 'Présentation',
         stage: 'Faire connaissance',
         text: 'Mémo est tout petit. Vous faites connaissance : qui vous êtes, d’où vous venez.',
-        then: 'se lève',
+        then: 'grandit',
         event: 'Voici Mémo',
         meaning: 'Mémo n’oublie rien. Il retient chaque souvenir que vous racontez. À chaque souvenir, il grandit, et votre livre avance.',
     },
     {
         age: 2,
-        name: 'Premiers pas',
+        name: 'Racines',
         stage: 'Les racines',
-        text: 'Mémo se lève. Vous racontez vos racines : vos parents, votre enfance, l’école.',
-        then: 'prend la plume',
-        event: 'Mémo fait ses premiers pas',
+        text: 'Mémo grandit. Vous racontez vos racines : vos parents, votre enfance, l’école.',
+        then: 'grandit',
+        event: 'Mémo a grandi',
         meaning: 'Vous avez fait connaissance. Prochaine étape, vos racines : vos parents, votre enfance, l’école.',
     },
     {
         age: 3,
-        name: 'La plume',
+        name: 'Vie adulte',
         stage: 'La vie adulte',
-        text: 'Mémo prend la plume. Vous racontez votre vie adulte : votre métier, vos amours, vos enfants.',
-        then: 'met ses lunettes',
-        event: 'Mémo prend la plume',
+        text: 'Mémo grandit encore. Vous racontez votre vie adulte : votre métier, vos amours, vos enfants.',
+        then: 'grandit',
+        event: 'Mémo a grandi',
         meaning: 'Vos racines sont racontées. Prochaine étape, votre vie adulte : votre métier, vos amours, vos enfants.',
     },
     {
         age: 4,
-        name: 'Les lunettes',
+        name: 'Transmission',
         stage: 'Ce que vous transmettez',
-        text: 'Mémo met ses lunettes. Vous dites ce que vous voulez transmettre : vos valeurs, vos messages.',
+        text: 'Mémo est presque grand. Vous dites ce que vous voulez transmettre : vos valeurs, vos messages.',
         then: 'reçoit votre livre',
-        event: 'Mémo met ses lunettes',
+        event: 'Mémo a encore grandi',
         meaning: 'Votre vie est racontée. Dernière étape, ce que vous voulez transmettre : vos valeurs, vos messages.',
     },
     {
@@ -126,7 +126,10 @@ export function memoState(input: {
             note: input.scheduleText ? `Premier appel ${input.scheduleText}.` : family ? `${who} peut appeler quand bon lui semble.` : 'Appelez quand vous voulez.',
         };
     }
-    const headline = `Encore ${left} souvenir${left > 1 ? 's' : ''} et Mémo ${MEMO_AGES[age - 1].then}.`;
+    // Ce qui attend l'auteur au bout de l'étape : Mémo grandit, ou le récit est complet
+    // (Solal, 26/11/2026 : plus de « prend la plume » ni de « met ses lunettes »).
+    const reward = age === 4 ? (family ? `le récit de ${who} est complet` : 'votre récit est complet') : `Mémo ${MEMO_AGES[age - 1].then}`;
+    const headline = `Encore ${left} souvenir${left > 1 ? 's' : ''} et ${reward}.`;
     const since = now - last;
     if (since < MEMO_FRESH_HOURS * 3600 * 1000) {
         return { ...base, mood: 'fresh', headline, note: input.lastTitle ? `Mémo vient de retenir « ${input.lastTitle} ».` : family ? `Mémo a retenu le dernier récit de ${who}.` : 'Mémo a retenu votre dernier récit.' };
