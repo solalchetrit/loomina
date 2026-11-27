@@ -40,7 +40,7 @@ export default function OffrePage() {
         <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col px-4 sm:px-6">
           <div className="rise grid flex-1 grid-cols-1 content-center overflow-hidden rounded-[var(--radius-card)] bg-[var(--ink)] text-white md:rounded-[var(--radius-card)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
             <div className="flex min-w-0 flex-col justify-center p-5 pb-4 sm:p-9 lg:px-12 lg:py-10">
-              <p className="text-[14px] font-bold text-[var(--amber)]">{OFFER_PAGE_LABEL}</p>
+              <p className="text-[14px] font-bold text-[var(--amber-bright)]">{OFFER_PAGE_LABEL}</p>
               <h1 className="t-display mt-2 text-balance text-white">
                 Votre livre, tout compris
               </h1>
@@ -49,9 +49,9 @@ export default function OffrePage() {
               </p>
               <div className="mt-5 flex flex-wrap items-end gap-x-4 gap-y-3 md:mt-7">
                 {SHOW_PRICE ? (
-                  <LaunchPrice tone="dark" priceClassName="text-[48px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber)] md:text-[68px]" />
+                  <LaunchPrice tone="dark" priceClassName="text-[48px] font-extrabold leading-[0.85] tracking-[-0.05em] text-[var(--amber-bright)] md:text-[68px]" />
                 ) : (
-                  <p className="whitespace-nowrap text-[34px] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--amber)] md:text-[46px]">
+                  <p className="whitespace-nowrap text-[34px] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--amber-bright)] md:text-[46px]">
                     {LAUNCH.label.replace(/^\S+ /, "")}
                   </p>
                 )}
@@ -68,7 +68,7 @@ export default function OffrePage() {
                 </Button>
               </div>
               <p className="mt-4 flex items-center gap-3 text-[15px] text-white md:mt-6">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-white">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full gloss">
                   <Icon name="check" size={14} />
                 </span>
                 <span>

@@ -37,7 +37,7 @@ export default function Audiences() {
           >
             <Photo {...a.photo} ratio="aspect-[16/10]" className="!rounded-[20px]" />
             <div className="flex flex-1 flex-col p-4 pt-7 md:p-7 md:pt-8">
-            <span className={`chip-icon ${a.dark ? "!bg-[var(--amber)] !text-white" : ""}`}>
+            <span className={"chip-icon"}>
               <Icon name={a.icon} />
             </span>
             <h3 className={`t-heading mt-6 !text-[clamp(1.45rem,2.2vw,1.8rem)] ${a.dark ? "text-white" : ""}`}>{a.title}</h3>
@@ -45,7 +45,7 @@ export default function Audiences() {
             <ul className="mt-6 space-y-2.5">
               {a.points.map((p) => (
                 <li key={p} className="flex gap-3 text-[16px]">
-                  <Icon name="check" size={20} className={`mt-0.5 shrink-0 ${a.dark ? "text-[var(--amber)]" : "text-[var(--amber-ink)]"}`} />
+                  <Icon name="check" size={20} className={`mt-0.5 shrink-0 ${a.dark ? "text-[var(--amber-bright)]" : "text-[var(--amber-ink)]"}`} />
                   {p}
                 </li>
               ))}

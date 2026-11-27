@@ -77,7 +77,7 @@ export default function NextCallBooking({
         <p className="mt-1 text-[19px] font-extrabold leading-snug tracking-[-0.01em] text-white first-letter:uppercase">{describeCallOnce(booked) ?? ""}</p>
         <p className="mt-1 text-[14px] text-[#cfcfc8]">{status === "saved" ? "C’est enregistré. " : ""}Un SMS vous prévient une demi-heure avant.</p>
         <div className="mt-3 flex gap-5 text-[15px] font-semibold">
-          <button type="button" onClick={() => { setDate(booked.date); setTime(booked.time); setStatus("idle"); setOpen(true); }} className="text-white underline decoration-[var(--amber)] underline-offset-4 hover:text-[var(--amber)]">
+          <button type="button" onClick={() => { setDate(booked.date); setTime(booked.time); setStatus("idle"); setOpen(true); }} className="text-white underline decoration-[var(--amber)] underline-offset-4 hover:text-[var(--amber-bright)]">
             Changer
           </button>
           <button type="button" disabled={status === "saving"} onClick={() => void save(null)} className="text-[#cfcfc8] underline decoration-white/30 underline-offset-4 hover:text-white">
@@ -101,7 +101,7 @@ export default function NextCallBooking({
           <span className="block text-[16px] font-bold text-white">Choisir le jour de mon prochain appel</span>
           <span className="block text-[14px] text-[#cfcfc8]">Loomina vous appelle à l’heure dite.</span>
         </span>
-        <span aria-hidden="true" className="text-[22px] text-[var(--amber)]">→</span>
+        <span aria-hidden="true" className="text-[22px] text-[var(--amber-bright)]">→</span>
       </button>
     );
   }
@@ -152,7 +152,7 @@ export default function NextCallBooking({
           type="button"
           disabled={!ready || status === "saving"}
           onClick={() => date && time && void save({ date, time })}
-          className="press inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap rounded-full bg-[var(--amber)] px-4 text-[15px] font-extrabold sm:w-auto sm:px-6 sm:text-[16px] text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+          className="press inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap rounded-full gloss px-4 text-[15px] font-extrabold sm:w-auto sm:px-6 sm:text-[16px] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {status === "saving" ? "Enregistrement…" : "Enregistrer mon prochain appel"}
         </button>
