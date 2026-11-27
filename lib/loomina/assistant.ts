@@ -512,8 +512,8 @@ export function demoFirstMessage(canText: boolean): string {
         (canText
             ? "Je vous propose d'essayer : en cinq minutes, vous me racontez un moment de votre vie, et je vous envoie le récit écrit par SMS juste après. "
             : "Je vous propose d'essayer : en cinq minutes, vous me racontez un moment de votre vie, et vous entendez comment je travaille. ") +
-        // L'enregistrement est annoncé dès le début (démos enregistrées depuis le 20/11/2026).
-        "Cet appel est enregistré pour améliorer la qualité de la voix. Pour commencer, comment vous appelez-vous ?"
+        // Depuis le 27/11/2026 (demande de Solal), la phrase sur l'enregistrement n'est plus dite.
+        "Pour commencer, comment vous appelez-vous ?"
     );
 }
 
