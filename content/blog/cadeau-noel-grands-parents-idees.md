@@ -39,7 +39,7 @@ Trois questions suffisent pour trier les idées.
 
 ## Le livre de leur vie, en pratique
 
-Avec Loomina, la personne appelle un numéro de téléphone quand elle en a envie. Loomina, qui est une intelligence artificielle, lui pose les questions et écrit le récit de chaque appel dans ses mots. Notre équipe relit le livre avant l’impression. Le prix est de 449 € tout compris.
+Avec Loomina, la personne appelle un numéro de téléphone quand elle en a envie. Loomina, qui est une intelligence artificielle, lui pose les questions et écrit le récit de chaque appel dans ses mots. Notre équipe relit le livre avant l’impression.
 
 Un point à savoir pour Noël : le livre se construit au fil des appels, sur plusieurs semaines. Le 24 décembre, vous n’offrez donc pas le livre fini. Vous offrez le début de l’aventure : une carte qui annonce le cadeau, et le premier appel à passer quand la personne le voudra. Le livre arrive ensuite. Tout est expliqué dans [un cadeau pour vos grands-parents](/cadeau-grands-parents).
 

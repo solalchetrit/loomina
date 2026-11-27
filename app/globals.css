@@ -38,7 +38,14 @@
   --amber-soft: #fcebd2;     /* fond de pastille */
   --amber-line: #f6ddb5;
   --amber-wash: #fdf3e4;     /* fond très clair d'une ligne mise en avant */
+  --noel: #b3202b;           /* rouge de Noël : bandeaux d'urgence de l'offre de lancement (Solal, 26/11/2026) */
+  --noel-deep: #8f1821;
+  --noel-bright: #ff5a5f;    /* rouge de Noël lisible sur le bleu nuit */
+  --noel-soft: #fbe9ea;
   --amber-deep: #6f4005;     /* texte sur --amber-soft */
+  --gloss-1: #f0a63f;        /* pastille brillante, motif blanc (Solal, 27/11/2026) : haut, milieu, bas du dégradé */
+  --gloss-2: #e08f22;
+  --gloss-3: #c97a12;
 
   /* États */
   --success: #2f5b3a;
@@ -385,12 +392,32 @@
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: var(--amber-soft);
-  color: var(--amber-ink);
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
+    linear-gradient(180deg, var(--gloss-1), var(--gloss-2) 55%, var(--gloss-3));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 1px 2px rgba(110, 64, 5, 0.22);
+}
+
+/* Le même brillant pour les boutons et les petites pastilles rondes (Solal, 27/11/2026 :
+   fond ambre avec un reflet discret, motif blanc). */
+.gloss {
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)) top / 100% 50% no-repeat,
+    linear-gradient(180deg, var(--gloss-1), var(--gloss-2) 55%, var(--gloss-3));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 1px 2px rgba(110, 64, 5, 0.22);
 }
 
 .chip-icon-neutral {
   background: var(--surface-2);
+  box-shadow: none;
   color: var(--ink);
 }
 
@@ -830,3 +857,40 @@ img[src*="photos/photos-de-famille"] {
 .site-chrome { display: contents; }
 html[data-space="auteur"] .site-chrome,
 html[data-space="famille"] .site-chrome { display: none; }
+/* Le bandeau de Noël (NoelBanner) est caché avec le reste du site : on retire aussi
+   la place qu'il réservait en haut, sinon un grand vide sépare le menu de l'espace (Solal, 26/11/2026). */
+html[data-space="auteur"],
+html[data-space="famille"] { --promo-h: 0px; }
+html[data-space="auteur"] body,
+html[data-space="famille"] body { padding-top: 0; }
+
+/* La carte à offrir (app/carte-cadeau) : une A4, la carte sur la moitié du haut,
+   on plie la feuille en deux. Tailles fixes en mm à l'impression. */
+@media print {
+  html[data-print="carte"] { background: #fff; }
+  html[data-print="carte"] body { background: #fff !important; padding: 0 !important; }
+  html[data-print="carte"] body > :not(main),
+  html[data-print="carte"] .site-chrome,
+  html[data-print="carte"] .carte-ecran { display: none !important; }
+  html[data-print="carte"] main > div { max-width: none; padding: 0; margin: 0; }
+  html[data-print="carte"] main > div > div { display: block; }
+  html[data-print="carte"] .carte-feuille { width: 210mm; height: 296mm; position: relative; }
+  html[data-print="carte"] .carte {
+    width: 210mm; height: 148.5mm; max-width: none; aspect-ratio: auto; box-shadow: none; margin: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  html[data-print="carte"] .carte-cadre { inset: 8mm; }
+  html[data-print="carte"] .carte-pour { font-size: 11pt; }
+  html[data-print="carte"] .carte-titre { font-size: 34pt; }
+  html[data-print="carte"] .carte-texte,
+  html[data-print="carte"] .carte-appel { font-size: 11pt; }
+  html[data-print="carte"] .carte-numero { font-size: 24pt; }
+  html[data-print="carte"] .carte-appel span:last-child { font-size: 10pt; }
+  html[data-print="carte"] .carte-mot { font-size: 12pt; }
+  html[data-print="carte"] .carte-de { font-size: 10.5pt; }
+  html[data-print="carte"] .carte-pli {
+    position: absolute; left: 0; right: 0; top: 148.5mm; border-top: 0.3mm dashed #c9ccd3;
+  }
+}
+@page carte { size: A4 portrait; margin: 0; }
+.carte-feuille { page: carte; }

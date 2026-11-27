@@ -26,7 +26,7 @@ import {
     axisDepth,
 } from '../../lib/loomina/phase-plan';
 import type { PhaseState, Topic, ToldScene } from '../../lib/loomina/phase-plan';
-import { applyPolish, chapterSignature, renderBook } from '../../lib/loomina/book';
+import { applyPolish, applyFidelity, stripSpellings, chapterSignature, renderBook } from '../../lib/loomina/book';
 import { bookTitle } from '../../lib/loomina/book-print';
 import { toPhase } from '../../lib/loomina/phases';
 import { remainingSuggestions, normalizeContext } from '../../lib/loomina/context';
@@ -328,6 +328,38 @@ test('relecture du livre : une retouche s\'applique seulement si le passage est 
     const locked = applyPolish(chapters, [{ chapter: 2, find: 'La maison sentait la soupe et le feu de bois. ', replace: '', why: 'redite' }], [2]);
     assert.equal(locked.applied, 0);
     assert.equal(locked.chapters[1].content, chapters[1].content);
+});
+
+test('livre : un nom épelé au téléphone n\'est jamais imprimé lettre par lettre', () => {
+    assert.equal(stripSpellings('Je m’appelle Patricia Azoulay. Azoulay, A-Z-O-U-L-A-Y, c’est mon nom de jeune fille.'), 'Je m’appelle Patricia Azoulay. Azoulay, c’est mon nom de jeune fille.');
+    assert.equal(stripSpellings('Mon nom, c’est Azoulay, A, Z, O, U, L, A, Y.'), 'Mon nom, c’est Azoulay.');
+    assert.equal(stripSpellings('Il s’appelait Dany (D-A-N-Y) et il riait.'), 'Il s’appelait Dany et il riait.');
+    // Rien d'autre ne bouge : sigles, initiales, phrases normales.
+    for (const ok of ['J’ai travaillé à la SNCF, puis à la RATP.', 'À Paris, il faisait froid. A Alger, non.', 'Jean-Pierre et Marie-Louise habitaient le 17e.', 'Le choix du roi, comme on dit.']) assert.equal(stripSpellings(ok), ok);
+});
+
+test('relecture de fidélité : retire une phrase sans appui, n\'écrit jamais, ne touche ni citation ni intertitre', () => {
+    const content = '## Rue de Passy\n\nJ’ai travaillé deux ans dans un bureau d’assurance. Je n’étais pas à ma place là-dedans.\n\nMa mère m’a dit : « Tu as fait ce que je n’ai pas pu faire. » Peu à peu, j’ai trouvé ma place, près de la mer.\n\n' + 'Nous partions à pied à l’école, et le chemin était long. '.repeat(8);
+    const done = applyFidelity(content, [
+        { find: 'Je n’étais pas à ma place là-dedans.', replace: '' },
+        // Une partie de phrase retirée, sans mot nouveau : acceptée.
+        { find: 'Peu à peu, j’ai trouvé ma place, près de la mer.', replace: 'Près de la mer.' },
+        // Un mot nouveau : refusé.
+        { find: 'J’ai travaillé deux ans dans un bureau d’assurance.', replace: 'J’ai travaillé longtemps.' },
+        // Une citation : refusée.
+        { find: 'Ma mère m’a dit : « Tu as fait ce que je n’ai pas pu faire. »', replace: '' },
+        // Un intertitre : refusé.
+        { find: '## Rue de Passy', replace: '' },
+    ]);
+    assert.equal(done.removed, 2);
+    assert.ok(!done.content.includes('à ma place là-dedans'));
+    assert.ok(done.content.includes('Près de la mer.'));
+    assert.ok(done.content.includes('bureau d’assurance.'));
+    assert.ok(done.content.includes('« Tu as fait ce que je n’ai pas pu faire. »'));
+    assert.ok(done.content.startsWith('## Rue de Passy'));
+    // Trop de retraits d'un coup (plus d'un cinquième du chapitre) : rien n'est retiré.
+    const big = applyFidelity('Une phrase assez longue pour compter. Une autre phrase assez longue aussi.', [{ find: 'Une phrase assez longue pour compter. ', replace: '' }]);
+    assert.equal(big.removed, 0);
 });
 
 test('livre : un chapitre dont les scènes n\'ont pas changé garde la même empreinte', () => {
@@ -805,4 +837,194 @@ test('voix : les noms propres de l’auteur vont à la transcription', async () 
     const { authorHints } = (await import(planModule)) as { authorHints: (c: unknown) => string[] };
     const hints = authorHints({ identity: { full_name: 'Patricia', places: ['Alger', 'la Casbah', 'Bab El Oued'] }, family: [{ name: 'Charlie' }, { name: 'Charlie' }] });
     assert.deepEqual(hints, ['Patricia', 'Alger', 'Casbah', 'Bab El Oued', 'Charlie']);
+});
+
+// ------------------------------------------------------------
+// Démo : une seule par numéro, limites anti-abus (25/11/2026)
+// ------------------------------------------------------------
+test('démo : empreinte du numéro identique à celle de la migration SQL', async () => {
+    const { demoPhoneHash } = await import('../../lib/loomina/demo-limit');
+    // select encode(sha256(convert_to('loomina-demo|+33600000000','UTF8')),'hex')
+    assert.equal(demoPhoneHash('+33600000000'), '294423d47e5c51550599280dfcf6e01222e4afa20a530f1ea4081df8071ece50');
+});
+
+test('démo : base injoignable → la démo a lieu quand même ; numéro d’équipe sans limite', async () => {
+    const { demoGate, demoRefusal } = await import('../../lib/loomina/demo-limit');
+    const saved = { url: process.env.NEXT_PUBLIC_SUPABASE_URL, unl: process.env.DEMO_UNLIMITED_PHONES };
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    try {
+        assert.equal(await demoGate('+33612345670'), 'ok');
+        process.env.DEMO_UNLIMITED_PHONES = '+33600000001, +33600000002';
+        assert.equal(await demoGate('+33600000002'), 'ok');
+    } finally {
+        if (saved.url) process.env.NEXT_PUBLIC_SUPABASE_URL = saved.url;
+        if (saved.unl === undefined) delete process.env.DEMO_UNLIMITED_PHONES; else process.env.DEMO_UNLIMITED_PHONES = saved.unl;
+    }
+    assert.match(demoRefusal('already_done'), /déjà fait votre essai/);
+    assert.ok(!/relié/.test(demoRefusal('already_done') + demoRefusal('too_many_tries') + demoRefusal('busy')));
+});
+
+// ------------------------------------------------------------
+// Le récap de 10 h et de 20 h (26/11/2026)
+// ------------------------------------------------------------
+import { slotFor, dueSlot, weekSlotFor } from '../../lib/admin/recap';
+import { headline, recapSubject, type RecapData } from '../../lib/admin/recap-mail';
+
+test('récap : créneaux à l’heure de Paris, hiver comme été', () => {
+    const morning = slotFor('2026-11-26', 10);
+    assert.equal(morning.start.toISOString(), '2026-11-25T19:00:00.000Z');
+    assert.equal(morning.end.toISOString(), '2026-11-26T09:00:00.000Z');
+    const evening = slotFor('2026-11-26', 20);
+    assert.equal(evening.start.toISOString(), morning.end.toISOString());
+    assert.equal(slotFor('2026-07-01', 20).end.toISOString(), '2026-07-01T18:00:00.000Z');
+    // Changement d'heure de mars : la nuit ne dure que 13 h.
+    assert.equal(slotFor('2026-03-29', 10).end.toISOString(), '2026-03-29T08:00:00.000Z');
+    assert.equal(dueSlot(new Date('2026-11-26T09:04:00Z'))?.key, 'recap:2026-11-26:10');
+    assert.equal(dueSlot(new Date('2026-11-26T19:59:00Z'))?.key, 'recap:2026-11-26:20');
+    assert.equal(dueSlot(new Date('2026-11-26T12:00:00Z')), null);
+    // Le lundi à 9 h : la semaine passée, du lundi 0 h au lundi suivant 0 h.
+    const week = dueSlot(new Date('2026-11-30T08:10:00Z'));
+    assert.equal(week?.key, 'recap:semaine:2026-11-30');
+    assert.equal(week?.start.toISOString(), '2026-11-22T23:00:00.000Z');
+    assert.equal(week?.end.toISOString(), '2026-11-29T23:00:00.000Z');
+    assert.equal(weekSlotFor('2026-12-02').key, 'recap:semaine:2026-11-30');
+    assert.equal(dueSlot(new Date('2026-11-26T08:10:00Z')), null);
+});
+
+test('récap : la phrase du jour et le sujet', () => {
+    const d = {
+        slot: { kind: 'jour', hour: 10, start: '', end: '', dayLabel: 'jeudi 26 novembre', since: 'depuis hier 20 h' },
+        previous: null,
+        byDay: null,
+        demos: [{ name: 'Joana', at: '2026-11-25T20:10:00Z', seconds: 300, status: 'written', smsSent: true, email: true, costHt: 0.3, costTtc: 0.36, estimated: false }],
+        calls: [
+            { client: 'Patricia', profileId: 'x', at: '2026-11-26T08:00:00Z', seconds: 1320, status: 'processed', costHt: 1, costTtc: 1.2, estimated: false, first: false },
+            { client: 'Patricia', profileId: 'x', at: '2026-11-26T07:00:00Z', seconds: 20, status: 'too_short', costHt: 0.01, costTtc: 0.012, estimated: false, first: false },
+        ],
+        testCalls: 0,
+        signups: [],
+        orders: [],
+        contacts: [],
+        upcoming: [],
+        totals: { clients: 1, activeBooks: 1, completedBooks: 0, realCalls: 2, minutes: 40, words: 3000, demos30: 7 },
+        month: { label: 'novembre 2026', spendHt: 10, spendTtc: 12, collected: 0, orders: 0 },
+        audience: null,
+        alerts: [{ level: 'orange', text: 'x' }],
+        errors: [],
+    } satisfies RecapData;
+    assert.equal(headline(d), 'Depuis hier 20 h : 1 démo, 1 appel client (22 min), 1 récit écrit, aucune commande.');
+    assert.equal(recapSubject(d), 'Récap Loomina de 10 h : 1 démo, 1 appel, 0 commande · 1 point à voir');
+});
+
+// ------------------------------------------------------------
+// Souvenirs soufflés : chacun attend sa période de vie (Solal, 26/11/2026)
+// ------------------------------------------------------------
+
+const souffles = { suggestion_phases: { 'sa rencontre avec papi': 3, 'où êtes-vous née ?': 1, 'la maison de son enfance': 2 } };
+const topics = ['Sa rencontre avec papi', 'Où êtes-vous née ?', 'La maison de son enfance', 'Un sujet pas encore rangé'];
+
+test('souvenirs soufflés : au premier appel, seulement la vue d\'ensemble', () => {
+    const p = prompt(project({ phase: 1, context: {}, next_question_strategy: null, project_metadata: souffles }));
+    const ctx = { suggested_topics: topics };
+    const first = prompt(project({ phase: 1, context: ctx, project_metadata: souffles, next_question_strategy: null }));
+    assert.ok(!p.includes('Sa rencontre avec papi'));
+    assert.ok(!first.includes('Sa rencontre avec papi'));
+    assert.ok(!first.includes('La maison de son enfance'));
+});
+
+test('souvenirs soufflés : en phase 2, l\'enfance oui, la rencontre amoureuse non', () => {
+    const p = prompt(project({ phase: 2, context: { identity: { full_name: 'Jeanne Morel' }, last_call: { summary: 'La maison.' }, suggested_topics: topics }, project_metadata: souffles }));
+    assert.ok(p.includes('La maison de son enfance'));
+    assert.ok(p.includes('Où êtes-vous née ?'));
+    assert.ok(!p.includes('Sa rencontre avec papi'));
+    assert.ok(p.includes('Un sujet pas encore rangé'));
+    assert.ok(p.includes("n'ont pas encore de période attribuée"));
+});
+
+test('souvenirs soufflés : en phase 3, la rencontre arrive', () => {
+    const p = prompt(project({ phase: 3, context: { identity: { full_name: 'Jeanne Morel' }, last_call: { summary: 'La maison.' }, suggested_topics: topics }, project_metadata: souffles }));
+    assert.ok(p.includes('Sa rencontre avec papi'));
+    assert.ok(p.includes('La maison de son enfance'));
+});
+
+// ── Codes promo de l'admin (26/11/2026) ─────────────────────────────────────
+import { newPromoCode, parsePromoForm } from '../../lib/admin/promo';
+
+test('codes promo : un code tiré au hasard, sans lettres ambiguës', () => {
+    const a = newPromoCode();
+    assert.match(a, /^LOOM-[A-HJKMNP-Z2-9]{5}-[A-HJKMNP-Z2-9]{5}$/);
+    assert.notEqual(a, newPromoCode());
+    assert.match(newPromoCode('Noël 2026 !'), /^NOEL2026-/);
+});
+
+test('codes promo : le formulaire refuse ce qui n’a pas de sens', () => {
+    const form = (o: Record<string, string>) => { const f = new FormData(); for (const [k, v] of Object.entries(o)) f.set(k, v); return f; };
+    const ok = { note: 'Tante Monique', type: 'percent', valeur: '100', utilisations: '1', jours: '30', mot: '' };
+    assert.deepEqual(parsePromoForm(form(ok)), { note: 'Tante Monique', word: '', kind: 'percent', value: 100, uses: 1, days: 30 });
+    assert.equal(typeof parsePromoForm(form({ ...ok, valeur: '120' })), 'string');
+    assert.equal(typeof parsePromoForm(form({ ...ok, note: ' ' })), 'string');
+    assert.equal(typeof parsePromoForm(form({ ...ok, utilisations: '0' })), 'string');
+});
+
+// ------------------------------------------------------------
+// Le livre s'écrit à la fin de chaque étape (lib/loomina/book-edition.ts)
+// ------------------------------------------------------------
+test('le livre va jusqu’à la dernière étape finie', async () => {
+    const { bookThrough, inScope, upToDate } = await import('../../lib/loomina/book-edition');
+    // Première étape en cours : pas encore de livre.
+    assert.equal(bookThrough({ phase: 1, status: 'active' }), 0);
+    assert.equal(bookThrough({ phase: 2, status: 'active' }), 1);
+    assert.equal(bookThrough({ phase: 4, status: 'active' }), 3);
+    // Récit complet : tout le livre.
+    assert.equal(bookThrough({ phase: 4, status: 'completed' }), 4);
+
+    // C'est l'étape de l'APPEL qui compte, pas la période racontée : un souvenir
+    // d'enfance (période 2) dit pendant « Faire connaissance » (étape 1) entre dans le livre dès la fin de l'étape 1.
+    assert.equal(inScope({ callPhase: 1, phase: 2 }, 1), true);
+    // Un récit de l'étape en cours attend la fin de son étape.
+    assert.equal(inScope({ callPhase: 2, phase: 2 }, 1), false);
+    assert.equal(inScope({ callPhase: 2, phase: 1 }, 1), false);
+    // Sans appel connu, le récit suit sa période. Livre complet : tout entre.
+    assert.equal(inScope({ callPhase: null, phase: 1 }, 1), true);
+    assert.equal(inScope({ callPhase: null, phase: 3 }, 1), false);
+    assert.equal(inScope({ callPhase: 4, phase: 4 }, 4), true);
+
+    // Un livre est à jour s'il raconte la bonne étape avec tous ses récits.
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 1, 3), true);
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 2, 7), false);
+    assert.equal(upToDate({ source_count: 3, extras: { through: 1 } }, 1, 4), false);
+    // Un livre d'avant les étapes (pas d'étape notée) n'est jamais « à jour ».
+    assert.equal(upToDate({ source_count: 3, extras: {} }, 1, 3), false);
+});
+
+test('fin d’étape : l’e-mail et le SMS « une partie de votre livre est prête »', async () => {
+    const { stageBookTexts } = await import('../../lib/loomina/notify');
+    const v = stageBookTexts({ first_name: 'Jeanne', politeness_preference: 'vous' }, 1, 3);
+    assert.equal(v.subject, 'La première partie de votre livre est prête');
+    assert.match(v.email, /vous avez fini l’étape « Faire connaissance »/);
+    assert.match(v.email, /3 chapitres/);
+    assert.match(v.email, /Prochaine étape : « Les racines »/);
+    assert.match(v.sms, /La première partie de votre livre est prête à lire sur .*\/dashboard/);
+    assert.match(v.html, /etape-memo-2\.png/);
+    const t = stageBookTexts({ first_name: 'Jeanne', politeness_preference: 'tu' }, 2, 7);
+    assert.match(t.subject, /^Ton livre s’est allongé/);
+    assert.match(t.email, /tu as fini l’étape « Les racines »/);
+    assert.match(t.email, /Tu racontes ta vie adulte : ton métier, tes amours, tes enfants\./);
+    assert.doesNotMatch(t.email + t.sms, /\b(vous|votre|vos)\b/i);
+    // Jamais « relié », jamais de prix.
+    for (const x of [v, t]) assert.doesNotMatch(x.email + x.sms + x.html, /reli[ée]|€/);
+});
+
+test('récit : un appel où le narrateur a beaucoup parlé n’est jamais bridé comme « mince »', async () => {
+    const { narratorWords, effectiveMaterial, THIN_MAX_NARRATOR_WORDS } = await import('../../lib/loomina/writer');
+    const court = 'AI: Tu travaillais où ?\nUser: J’étais secrétaire dans une banque.\nAI: Et ensuite ?\nUser: Je suis fatiguée, on arrête.';
+    assert.equal(narratorWords(court), 11);
+    assert.equal(effectiveMaterial('thin', court), 'thin');
+    // Les questions de Loomina ne comptent pas, même très longues.
+    const bavarde = `AI: ${'mot '.repeat(1000)}\nUser: Oui.`;
+    assert.equal(effectiveMaterial('thin', bavarde), 'thin');
+    const survol = `AI: Raconte.\nUser: ${'fait '.repeat(THIN_MAX_NARRATOR_WORDS + 1)}`;
+    assert.equal(effectiveMaterial('thin', survol), 'rich');
+    assert.equal(effectiveMaterial('rich', court), 'rich');
+    assert.equal(effectiveMaterial(undefined, survol), undefined);
 });

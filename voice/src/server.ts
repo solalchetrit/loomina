@@ -100,6 +100,10 @@ async function handleVoice(req: http.IncomingMessage, res: http.ServerResponse):
 
     try {
         const plan = await planForCaller(customer || null);
+        if (plan.refuse) {
+            console.info(`[voice] ${direction} ${callSid} → ${plan.label}`);
+            return reply(res, 200, sayAndHangupTwiml(plan.refuse), 'text/xml');
+        }
         const session = new CallSession({ callSid, from, to, direction, plan });
         sessions.set(callSid, session);
         console.info(`[voice] ${direction} ${callSid} → ${plan.label}`);

@@ -130,6 +130,8 @@ export class CallSession {
     private readonly turns: TurnRecord[] = [];
     private readonly modelLatenciesMs: number[] = [];
     private promptTokens = 0;
+    /** Part des jetons lus servie depuis le cache d'OpenAI (facturée 4 fois moins pour gpt-4.1). */
+    private cachedTokens = 0;
     private completionTokens = 0;
     private interruptions = 0;
     /** Attente ajoutée après chaque coupure (voir PATIENCE_STEP_MS). */
@@ -330,6 +332,7 @@ export class CallSession {
             metadata: { ...this.plan.metadata, ...(this.recordingSid ? { recordingSid: this.recordingSid } : {}) },
             modelLatenciesMs: this.modelLatenciesMs,
             promptTokens: this.promptTokens,
+            cachedTokens: this.cachedTokens,
             completionTokens: this.completionTokens,
             interruptions: this.interruptions,
         });
@@ -408,10 +411,21 @@ export class CallSession {
         // Ne rien dire avant `releaseAt` (voir holdFor). La lecture du flux
         // est suspendue pendant ce temps ; les morceaux attendent.
         let released = releaseAt <= Date.now();
+        // Appel de Patricia (26/11/2026, 24 « Pardon, je n'ai pas bien
+        // entendu ») : le minuteur « OpenAI muet » tournait pendant cette
+        // attente voulue. Avec les délais de #203 (jusqu'à 3,4 s + 1,2 s de
+        // patience), il expirait avant la fin de l'attente alors que la
+        // réponse était déjà là : elle était jetée et remplacée par l'excuse.
+        // Le minuteur est donc arrêté pendant l'attente, puis relancé.
         const hold = async () => {
             if (released) return;
             const wait = releaseAt - Date.now();
-            if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+            if (wait > 0) {
+                if (idle) clearTimeout(idle);
+                idle = null;
+                await new Promise((r) => setTimeout(r, wait));
+                if (!attemptCtl.signal.aborted) watch();
+            }
             released = true;
             if (this.heardAt) this.replyDelaysMs.push(Date.now() - this.heardAt);
         };
@@ -462,6 +476,7 @@ export class CallSession {
                         if (attemptCtl.signal.aborted) break;
                         if (chunk.usage) {
                             this.promptTokens += chunk.usage.prompt_tokens ?? 0;
+                            this.cachedTokens += chunk.usage.prompt_tokens_details?.cached_tokens ?? 0;
                             this.completionTokens += chunk.usage.completion_tokens ?? 0;
                         }
                         const delta = chunk.choices?.[0]?.delta?.content ?? '';
@@ -516,7 +531,9 @@ export class CallSession {
         } catch (err) {
             if (controller.signal.aborted) return;
             console.error(`[${this.callSid}] erreur modèle :`, err instanceof Error ? err.message : err);
-            const fallback = "Pardon, je n'ai pas bien entendu. Pouvez-vous répéter ?";
+            const fallback = this.plan.metadata.politeness === 'tu'
+                ? "Pardon, je n'ai pas bien entendu. Tu peux répéter ?"
+                : "Pardon, je n'ai pas bien entendu. Pouvez-vous répéter ?";
             this.sendText(spoken ? ` ${fallback}` : fallback, true);
             spoken = spoken ? `${spoken} ${fallback}` : fallback;
         } finally {

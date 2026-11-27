@@ -1,67 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import Icon, { type IconName } from "@/components/ui/Icon";
+import Icon from "@/components/ui/Icon";
 import { Section, SectionHead } from "@/components/ui/Section";
-import Button from "@/components/ui/Button";
-import { SITE } from "@/config/site";
+import SpaceDemo, { type SpaceId } from "@/components/SpaceDemo";
 
 /**
- * L'espace auteur, montré tel qu'il est : de vraies captures de l'espace,
- * prises sur le livre d'exemple de Jeanne (personne fictive, présentée comme telle).
+ * Les deux espaces de Loomina dans un seul module (Solal, 26/11/2026) :
+ * un petit sélecteur « Espace auteur » / « Espace famille », puis pour chacun
+ * une phrase, trois points et l'espace sur un téléphone. Compact exprès
+ * (Solal : les versions précédentes prenaient trop de place), et sans carte
+ * blanche autour : le contenu est posé directement sur la page. Volontairement léger : la
+ * première version, avec quatre onglets par espace, était trop lourde.
+ * Le téléphone montre l'espace tout seul, comme une vidéo (SpaceDemo), à partir
+ * de vraies captures sur le livre d'exemple de Jeanne (personne fictive).
  */
-const FEATURES: {
-  id: string;
-  icon: IconName;
-  title: string;
-  text: string;
-  image: string;
-  alt: string;
-  w: number;
-  h: number;
-}[] = [
-  {
-    id: "chapitre",
-    icon: "book",
-    title: "Lire chaque chapitre, comme dans le livre",
-    text: "Après chaque appel, le récit est écrit et votre livre se recompose, mis en page. Vous pouvez corriger un passage vous-même, ou demander à Loomina de le faire.",
-    image: "/espace-auteur/chapitre.webp",
-    alt: "Un chapitre dans l’espace auteur, mis en page comme un livre, avec le bouton « Corriger ce chapitre »",
-    w: 1200,
-    h: 1216,
+
+const SPACES: Record<SpaceId, { label: string; who: string; points: string[]; url: string; alt: string }> = {
+  auteur: {
+    label: "Espace auteur",
+    who: "Pour celui qui raconte",
+    points: ["Il lit chaque chapitre, mis en page comme dans le livre.", "Il corrige un passage, ou demande à Loomina de le faire.", "Il choisit le sujet du prochain appel."],
+    url: "loomina.eu/espace-auteur",
+    alt: "L’espace auteur de Jeanne, parcouru écran par écran : l’aperçu, son livre, sa vie, ses appels et ses réglages",
   },
-  {
-    id: "style",
-    icon: "pen",
-    title: "Choisir le ton de l’écriture",
-    text: "Naturel et sobre, chaleureux, littéraire, ou simple comme vous parlez. Le titre du livre, le « tu » ou le « vous » : c’est vous qui décidez.",
-    image: "/espace-auteur/style.webp",
-    alt: "Les réglages du livre : titre et ton de l’écriture",
-    w: 1036,
-    h: 1118,
+  famille: {
+    label: "Espace famille",
+    who: "Pour celui qui offre",
+    points: ["Il voit le livre avancer, appel après appel.", "Il pose une question, que Loomina glisse dans un prochain appel.", "Il commande un exemplaire pour chaque membre de la famille."],
+    url: "loomina.eu/espace-famille",
+    alt: "L’espace famille de Claire : le suivi du livre de Jeanne, la question à poser et les récits à lire",
   },
-  {
-    id: "sujet",
-    icon: "phone",
-    title: "Préparer le prochain appel",
-    text: "Vous voyez par quoi Loomina compte commencer, et vous pouvez lui souffler un souvenir à ne pas oublier, ou une question de la famille.",
-    image: "/espace-auteur/sujet.webp",
-    alt: "La carte « Suggérer un sujet » et les questions que Loomina garde en tête",
-    w: 1132,
-    h: 1236,
-  },
-  {
-    id: "frise",
-    icon: "user",
-    title: "Voir votre vie prendre forme",
-    text: "Les dates, les lieux et les personnes que vous avez évoqués se rangent dans une frise. Une erreur ? Vous la corrigez au prochain appel.",
-    image: "/espace-auteur/frise.webp",
-    alt: "La frise de vie : les grandes dates retenues par Loomina",
-    w: 1200,
-    h: 1113,
-  },
-];
+};
+
+const ORDER: SpaceId[] = ["auteur", "famille"];
 
 export default function AuthorShowcase({
   id = "espace-auteur",
@@ -70,172 +42,68 @@ export default function AuthorShowcase({
   id?: string;
   className?: string;
 }) {
-  const [active, setActive] = useState(0);
-  const current = FEATURES[active];
+  const [space, setSpace] = useState<SpaceId>("auteur");
+  // Tant que le visiteur n'a rien choisi, le téléphone enchaîne espace auteur puis espace famille.
+  const [auto, setAuto] = useState(true);
+  const current = SPACES[space];
 
   return (
     <Section id={id} className={className}>
-      <SectionHead
-        eyebrow="Inclus avec chaque livre"
-        title={"Votre espace auteur\u00a0: le livre se construit sous vos yeux"}
-        text="Après chaque appel, vous retrouvez votre livre en ligne. Vous lisez, vous corrigez, vous orientez la suite. Loomina écrit, vous gardez la main."
-      />
-
-      <div
-        className="head-gap grid items-start gap-6 lg:grid-cols-[1fr_1.25fr] lg:gap-10"
-        data-reveal
-      >
-        <ul
-          className="flex flex-col gap-3"
-          role="tablist"
-          aria-label="Ce que permet l’espace auteur"
-        >
-          {FEATURES.map((f, i) => {
-            const on = i === active;
-            return (
-              <li key={f.id} role="presentation">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={on}
-                  aria-controls={`${id}-apercu`}
-                  onClick={() => setActive(i)}
-                  className={`press flex w-full gap-4 rounded-[var(--radius-card)] border p-5 text-left transition-colors md:p-6 ${
-                    on
-                      ? "border-[var(--ink)] bg-white shadow-[var(--shadow-bar)]"
-                      : "border-[var(--line)] bg-transparent hover:border-[var(--ink-3)]"
-                  }`}
-                >
-                  <span
-                    className={`chip-icon shrink-0 ${on ? "!bg-[var(--amber)] !text-[var(--ink)]" : ""}`}
+      {/* Pas de carte : le titre et le sélecteur à gauche, le téléphone à droite sur toute la hauteur. */}
+      <div className="grid items-center gap-y-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-x-12 lg:gap-x-24" data-reveal>
+          <div className="min-w-0">
+            <SectionHead
+              eyebrow="Inclus avec chaque livre"
+              title="Un espace pour l’auteur, un pour sa famille"
+              text="L’auteur relit et corrige son livre. Sa famille le suit et y participe."
+            />
+            <div className="head-gap" />
+            {/* Le sélecteur : deux boutons côte à côte. */}
+            <div role="tablist" aria-label="Les deux espaces" className="grid w-full max-w-[24rem] grid-cols-2 gap-1 rounded-full bg-[var(--surface-2)] p-1">
+              {ORDER.map((key) => {
+                const on = key === space;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    role="tab"
+                    aria-selected={on}
+                    aria-controls={`${id}-espace`}
+                    onClick={() => {
+                      setAuto(false);
+                      setSpace(key);
+                    }}
+                    className={`press min-h-11 whitespace-nowrap rounded-full px-2 text-[15px] font-bold transition-colors sm:px-4 ${
+                      on ? "bg-[var(--ink)] text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]"
+                    }`}
                   >
-                    <Icon name={f.icon} />
-                  </span>
-                  <span>
-                    <span className="block text-[18px] font-bold leading-snug text-[var(--ink)]">
-                      {f.title}
-                    </span>
-                    <span
-                      className={`mt-1.5 block text-[16px] leading-relaxed text-[var(--ink-2)] ${on ? "" : "hidden md:block"}`}
-                    >
-                      {f.text}
-                    </span>
-                  </span>
-                </button>
-                {/* Sur téléphone, la capture s'affiche sous l'onglet ouvert. */}
-                {on && (
-                  <div className="mt-3 lg:hidden">
-                    <Screen feature={f} />
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                    {SPACES[key].label}
+                  </button>
+                );
+              })}
+            </div>
 
-        <div
-          id={`${id}-apercu`}
-          role="tabpanel"
-          className="hidden lg:sticky lg:top-32 lg:block"
-        >
-          <Screen feature={current} />
-        </div>
-      </div>
+            <div id={`${id}-espace`} role="tabpanel">
+              <p className="mt-6 text-[15px] font-bold text-[var(--amber-ink)]">{current.who}</p>
+              <ul className="mt-3 space-y-2.5">
+                {current.points.map((point) => (
+                  <li key={point} className="flex gap-3 text-[15px] leading-snug text-[var(--ink-2)]">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full gloss">
+                      <Icon name="check" size={12} />
+                    </span>
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
 
-      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="t-small">
-          Captures de l’espace auteur, sur un livre d’exemple.
-        </p>
-        <Button
-          href={`tel:${SITE.phone}`}
-          variant="secondary"
-          className="shrink-0"
-        >
-          Essayer Loomina gratuitement
-        </Button>
+          {/* L'espace choisi, sur un téléphone : il se parcourt tout seul (components/SpaceDemo.tsx). */}
+          <figure className="flex justify-center md:px-6 lg:pr-16">
+            <SpaceDemo space={space} auto={auto} onAutoNext={setSpace} label={current.alt} />
+            <figcaption className="sr-only">{current.label}, sur un livre d’exemple.</figcaption>
+          </figure>
       </div>
     </Section>
-  );
-}
-
-/** Une capture dans un cadre de navigateur, pour qu'on comprenne qu'il s'agit d'un écran. */
-function Screen({ feature }: { feature: (typeof FEATURES)[number] }) {
-  return (
-    <figure className="overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--canvas)] shadow-[var(--shadow-bar)]">
-      <div
-        className="flex items-center gap-2 border-b border-[var(--line)] bg-white px-4 py-3"
-        aria-hidden="true"
-      >
-        <span className="h-3 w-3 rounded-full bg-[var(--line)]" />
-        <span className="h-3 w-3 rounded-full bg-[var(--line)]" />
-        <span className="h-3 w-3 rounded-full bg-[var(--line)]" />
-        <span className="ml-3 truncate rounded-full bg-[var(--canvas)] px-3 py-1 text-[13px] text-[var(--ink-3)]">
-          loomina.eu/espace-auteur
-        </span>
-      </div>
-      <div className="flex max-h-[560px] items-start justify-center overflow-hidden p-4 sm:p-6">
-        {feature.id === "chapitre" ? (
-          <ChapterScreen />
-        ) : (
-          <Image
-            src={feature.image}
-            alt={feature.alt}
-            width={feature.w}
-            height={feature.h}
-            className="h-auto w-full max-w-[560px] rounded-[18px]"
-          />
-        )}
-      </div>
-      <figcaption className="sr-only">{feature.title}</figcaption>
-    </figure>
-  );
-}
-
-/** Le chapitre tel qu'on le lit dans l'espace auteur : la mise en page du livre imprimé. */
-function ChapterScreen() {
-  return (
-    <div
-      role="img"
-      aria-label={FEATURES[0].alt}
-      className="w-full max-w-[560px] rounded-[18px] bg-white px-6 pb-6 pt-9 sm:px-10"
-    >
-      <div
-        className="text-[#1d1b19]"
-        style={{
-          fontFamily: '"Times New Roman", Times, "Liberation Serif", serif',
-        }}
-        lang="fr"
-      >
-        <p className="text-center text-[16px]">Chapitre 1</p>
-        <p className="mt-1.5 text-center text-[18px] italic">
-          La maison de la rue des Tilleuls
-        </p>
-        <div className="mt-7 space-y-3 hyphens-auto text-justify text-[16px] leading-[1.4]">
-          <p>
-            Je suis née en 1948 à Rennes, dans une maison étroite de la rue des
-            Tilleuls, la troisième d’une fratrie de quatre. On y entrait par la
-            cuisine, toujours chaude, où ma mère faisait chanter la radio en
-            épluchant les légumes.
-          </p>
-          <p className="!mt-4 font-bold">Les trains du dimanche</p>
-          <p>
-            Mon père était cheminot. Il partait avant le jour et rentrait avec
-            l’odeur du charbon sur sa veste. Le dimanche, il nous emmenait voir
-            passer les trains depuis le pont de la gare, et il connaissait
-            chacun par son heure.
-          </p>
-          <p>
-            De cette maison, je garde surtout le bruit : les pas dans l’escalier
-            de bois, les disputes de mes frères, le poste de radio.
-          </p>
-        </div>
-        <p className="mt-6 text-right text-[14px]">9</p>
-      </div>
-      <div className="mt-5 border-t border-[var(--line-soft)] pt-5">
-        <span className="inline-flex min-h-11 items-center rounded-full px-5 text-[16px] font-bold shadow-[inset_0_0_0_1px_var(--line)]">
-          Corriger ce chapitre
-        </span>
-      </div>
-    </div>
   );
 }

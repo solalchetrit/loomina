@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { OFFER, normalizeExtraCopies } from "@/config/offer";
+import { OFFER, LAUNCH, isOrderOpen, isLaunchOffer, normalizeExtraCopies } from "@/config/offer";
 import { extraCopiesLineItem } from "@/lib/loomina/extra-copies";
 import { stripe } from "@/lib/stripe";
+import { allow, clientIp, TOO_MANY } from "@/lib/loomina/rate-limit";
 import { normalizeCallMinutes } from "@/lib/loomina/call-length";
 import { isTestAuthorPhone } from "@/lib/loomina/test-author";
 import { isTestFamilyPhone } from "@/lib/loomina/test-family";
 import { encodeFamilyForStripe } from "@/lib/loomina/giver";
 
 export async function POST(request: NextRequest) {
+    // Vitrine jusqu'au lancement : aucune nouvelle commande avant LAUNCH.opensAt.
+    if (!isOrderOpen()) {
+        return NextResponse.json({ error: `Les commandes ouvrent le ${LAUNCH.label}.` }, { status: 403 });
+    }
+    // Au plus 20 paniers Stripe par heure et par adresse (25/11/2026).
+    if (!(await allow(`checkout:ip:${clientIp(request.headers)}`, 3600, 20))) {
+        return NextResponse.json({ error: TOO_MANY }, { status: 429 });
+    }
     try {
         const body = await request.json();
         const { firstName, lastName, phone, email, isGift, callMinutes, giverFirstName, giverPhone } = body;
@@ -55,7 +64,7 @@ export async function POST(request: NextRequest) {
                     price_data: {
                         currency: "eur",
                         product_data: {
-                            name: `Loomina — ${OFFER.name}`,
+                            name: `Loomina — ${OFFER.name}${isLaunchOffer() ? " (offre de lancement)" : ""}`,
                             description: `Entretiens par téléphone, écriture, relecture humaine, livre imprimé (${OFFER.format}) livré chez vous, version numérique.`,
                             images: ["https://www.loomina.eu/og-image.jpg"],
                         },

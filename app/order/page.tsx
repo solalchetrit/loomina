@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { blurOf } from "@/lib/photo-blur";
 import Payment from "@/components/order/Payment";
@@ -10,9 +10,12 @@ import { formatToE164, formatPhoneNumberForDisplay } from "@/lib/phone";
 import { Input } from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
 import CheckoutBar, { CheckoutFooter } from "@/components/order/CheckoutBar";
-import { OFFER, EXTRA_COPY } from "@/config/offer";
+import { OFFER, EXTRA_COPY, isOrderOpen } from "@/config/offer";
+import OrderSoon from "@/components/order/OrderSoon";
 import CopiesStepper from "@/components/order/CopiesStepper";
 import { track } from "@/lib/analytics";
+
+const noSubscribe = () => () => {};
 
 const STEPS = ["Pour qui", "Coordonnées", "Paiement"];
 
@@ -26,7 +29,15 @@ function validPhone(raw: string): boolean {
   return /^\+33[1-9]\d{8}$/.test(e164) || /^\+\d{8,15}$/.test(e164);
 }
 
+/** Avant le lancement (config/offer.ts LAUNCH), la page annonce l'ouverture au lieu du formulaire. */
 export default function OrderPage() {
+  // Lu dans le navigateur (l'heure du visiteur) ; rien côté serveur, la page est statique.
+  const open = useSyncExternalStore(noSubscribe, () => isOrderOpen(), () => null);
+  if (open === null) return null;
+  return open ? <OrderForm /> : <OrderSoon />;
+}
+
+function OrderForm() {
   const [who, setWho] = useState<Who | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -308,19 +319,23 @@ export default function OrderPage() {
                     hint={isGift ? "Celui d’où cette personne appellera Loomina." : "Celui d’où vous appellerez Loomina."}
                     required
                   />
-                  <Input
-                    className={field}
-                    label="E-mail"
-                    name="email"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={onChange}
-                    error={errors.email}
-                    hint={isGift ? "Le vôtre ou le sien, pour la confirmation." : "Pour la confirmation et les nouvelles du livre."}
-                    required
-                  />
+                  {/* Livre offert : on ne demande que l'e-mail de celui qui offre, pour ne pas
+                      gâcher la surprise (audit du 26/11/2026). Le champ passe dans « Et vous ? ». */}
+                  {!isGift && (
+                    <Input
+                      className={field}
+                      label="E-mail"
+                      name="email"
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      value={form.email}
+                      onChange={onChange}
+                      error={errors.email}
+                      hint="Pour la confirmation et les nouvelles du livre."
+                      required
+                    />
+                  )}
                   {isGift && (
                     <div className="rounded-[16px] bg-[var(--canvas)] p-4 sm:col-span-2 sm:p-5">
                       <p className="text-[16px] font-bold">Et vous ?</p>
@@ -341,6 +356,21 @@ export default function OrderPage() {
                           hint="Pour recevoir votre code par SMS."
                           required
                         />
+                        <div className="sm:col-span-2">
+                          <Input
+                            className={field}
+                            label="Votre e-mail"
+                            name="email"
+                            type="email"
+                            inputMode="email"
+                            autoComplete="email"
+                            value={form.email}
+                            onChange={onChange}
+                            error={errors.email}
+                            hint={`Pour la confirmation de commande. Rien n’est envoyé à ${form.firstName.trim() || "votre proche"} : c’est vous qui annoncez le cadeau.`}
+                            required
+                          />
+                        </div>
                       </div>
 
                       {/* D'autres proches peuvent suivre le livre, chacun avec son numéro (Solal, 20/11/2026). */}

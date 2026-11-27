@@ -5,9 +5,58 @@
  * Tout ce qui est écrit ici figure aussi dans les CGV (app/cgv/page.tsx).
  */
 
+/**
+ * L'INTERRUPTEUR DE LA VERSION DE NOËL (Solal, 26/11/2026).
+ *
+ * false : le site reste la vitrine d'avant le lancement. Aucun prix affiché,
+ *         pas de bandeau rouge, pas de module de Noël, commandes fermées.
+ *         Tout le reste du site (ce qui ne concerne pas Noël) se met en ligne
+ *         normalement.
+ * true  : la version de Noël. Les prix s'affichent (199 € au lieu de 289 €
+ *         jusqu'au 24 décembre), le bandeau et les modules de Noël apparaissent,
+ *         et les commandes s'ouvrent aussitôt.
+ *
+ * « Lance la version de Noël » = passer cette ligne à true, puis déployer le
+ * site et le serveur d'appels. Rien d'autre à toucher.
+ */
+export const NOEL_LIVE = false;
+
+/** Affiche le prix sur le site : avec la version de Noël seulement. */
+export const SHOW_PRICE = NOEL_LIVE;
+
+/** Le lien vers /offre, dans le menu et le pied de page. */
+export const OFFER_PAGE_LABEL = SHOW_PRICE ? "Le livre et le prix" : "Le livre";
+
+/**
+ * Offre de lancement (Solal, 26/11/2026) : 199 € au lieu de 289 €, du
+ * lancement au 24 décembre inclus. Après, le prix normal revient tout seul
+ * au paiement (l'API lit l'heure). Les pages construites à l'avance gardent
+ * le prix du jour de leur construction : redéployer le site le 25 décembre.
+ */
+export const LAUNCH_OFFER = {
+  price: 199,
+  /** Première minute où le prix de lancement ne s'applique plus. */
+  endsAt: "2026-12-25T00:00:00+01:00",
+  label: "24 décembre",
+};
+
+export function isLaunchOffer(now: number = Date.now()): boolean {
+  return NOEL_LIVE && now < new Date(LAUNCH_OFFER.endsAt).getTime();
+}
+
+/** Jours pleins restants avant la fin de l'offre (0 le dernier jour). */
+export function launchOfferDaysLeft(now: number = Date.now()): number {
+  return Math.max(0, Math.ceil((new Date(LAUNCH_OFFER.endsAt).getTime() - now) / 86_400_000) - 1);
+}
+
 export const OFFER = {
   name: "Votre livre de vie, tout compris",
-  price: 449,
+  /** Le prix normal, hors offre de lancement. */
+  regularPrice: 289,
+  /** Le prix payé aujourd'hui : celui de l'offre de lancement jusqu'au 24 décembre. */
+  get price(): number {
+    return isLaunchOffer() ? LAUNCH_OFFER.price : this.regularPrice;
+  },
   currencySymbol: "€",
   /** Du premier appel au livre validé, en général. */
   delay: "6 à 8 semaines",
@@ -56,6 +105,12 @@ export function normalizeExtraCopies(raw: unknown): number {
  * Le coupon est créé une fois dans Stripe avec cet identifiant.
  */
 export const DEMO_PROMO = {
+  /**
+   * Solal, 26/11/2026 : plus de réduction dans l'e-mail de la démo, elle se
+   * cumulait avec l'offre de lancement. Les codes déjà envoyés restent valables
+   * jusqu'à leur date. Repasser à true pour la remettre.
+   */
+  enabled: false,
   couponId: "loomina-recit-demo-10",
   /** Réduction en pourcentage (Solal, 18/11/2026 : 10 %). */
   percentOff: 10,
@@ -90,3 +145,21 @@ export const THEMES: { title: string; desc: string }[] = [
   { title: "La transmission", desc: "Ce que l’on souhaite laisser aux siens." },
   { title: "Les projets", desc: "Ce qu’il reste à accomplir." },
 ];
+
+/**
+ * Ouverture des commandes (Solal, 25/11/2026 : le site reste une vitrine
+ * jusqu'au lancement du 1er décembre). Avant cette date, la page de commande
+ * annonce l'ouverture et l'API de paiement refuse toute nouvelle commande.
+ * Le jour venu, tout s'ouvre tout seul, sans redéploiement.
+ */
+export const LAUNCH = {
+  opensAt: "2026-12-01T00:00:00+01:00",
+  label: "mardi 1er décembre",
+};
+
+export function isOrderOpen(now: number = Date.now()): boolean {
+  // Les commandes s'ouvrent avec la version de Noël, au moment où Solal la lance (26/11/2026) :
+  // personne ne paie un prix qui n'est pas affiché. La date de LAUNCH n'est plus qu'une annonce.
+  void now;
+  return NOEL_LIVE;
+}

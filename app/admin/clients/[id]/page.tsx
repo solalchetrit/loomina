@@ -91,7 +91,15 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
             <span className="text-[var(--ink-3)]">client depuis le {fmtDate(profile.created_at, false)}</span>
           </p>
         </div>
-        {profile.email && <Link href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`} className="adm-btn adm-btn-sec"><AIcon name="message" size={15} /> Lui écrire</Link>}
+        <div className="flex flex-wrap gap-2">
+          {profile.phone_number && (
+            // Lien simple (pas de <Link>) : une redirection serveur vers /l/<jeton>, dans un nouvel onglet.
+            <a href={`/api/admin/clients/${id}/espace`} target="_blank" rel="noopener noreferrer" className="adm-btn adm-btn-sec" title="Ouvre son espace auteur dans un nouvel onglet, comme le lien de ses SMS">
+              <AIcon name="external" size={15} /> Ouvrir son espace
+            </a>
+          )}
+          {profile.email && <Link href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`} className="adm-btn adm-btn-sec"><AIcon name="message" size={15} /> Lui écrire</Link>}
+        </div>
       </header>
 
       {(fait || erreur) && (
@@ -218,7 +226,6 @@ export default async function AdminClient({ params, searchParams }: { params: Pr
           ) : (
           <dl>
             <Field label="Prénom, nom">{name}</Field>
-            <Field label="Prononcé">{profile.first_name_phonetic ?? "comme écrit"}</Field>
             <Field label="Téléphone">{profile.phone_number}</Field>
             <Field label="E-mail">{profile.email ? <Link className="underline" href={`/admin/mails?ecrire=${encodeURIComponent(profile.email)}`}>{profile.email}</Link> : null}</Field>
             <Field label="Tu / vous">{profile.politeness_preference === "tu" ? "tutoiement" : "vouvoiement"}</Field>
@@ -431,9 +438,6 @@ function NarratorForm({ id, profile }: { id: string; profile: { first_name: stri
         </Input>
         <Input label="Nom">
           <input name="last_name" maxLength={80} defaultValue={profile.last_name ?? ""} className={inputCls} />
-        </Input>
-        <Input label="Prononciation du prénom" hint="Vide : Loomina le dit comme il est écrit.">
-          <input name="first_name_phonetic" maxLength={80} defaultValue={profile.first_name_phonetic ?? ""} className={inputCls} />
         </Input>
         <Input label="Téléphone" hint="Reconnaît le narrateur quand il appelle, et sert aux rendez-vous.">
           <input name="phone_number" type="tel" required maxLength={30} defaultValue={profile.phone_number ?? ""} className={`${inputCls} tabular-nums`} />

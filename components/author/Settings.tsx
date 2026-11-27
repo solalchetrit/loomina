@@ -101,7 +101,7 @@ export default function Settings({
       const res = await fetch("/api/user/preferences", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, callOnce: undefined, title: form.title ?? "", firstNamePhonetic: form.firstNamePhonetic ?? "", writingStyle: form.writingStyle ?? "" }),
+        body: JSON.stringify({ ...form, callOnce: undefined, title: form.title ?? "", writingStyle: form.writingStyle ?? "" }),
       });
       if (res.status === 401) return onUnauthorized();
       if (!res.ok) throw new Error();
@@ -217,15 +217,6 @@ export default function Settings({
               </ul>
             )}
           </div>
-          <Input
-            label="Prononciation de votre prénom"
-            name="phonetic"
-            maxLength={80}
-            value={form.firstNamePhonetic ?? ""}
-            onChange={(e) => update({ firstNamePhonetic: e.target.value })}
-            placeholder={firstName ?? "Votre prénom"}
-            hint="Écrivez-le comme il se prononce."
-          />
         </div>
       </section>
 

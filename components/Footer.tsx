@@ -2,6 +2,7 @@ import LogoMotion, { TIGHT_WORDMARK } from "@/components/brand/LogoMotion";
 import Link from "next/link";
 import Image from "next/image";
 import { SITE } from "@/config/site";
+import { OFFER_PAGE_LABEL } from "@/config/offer";
 import CookieLink from "@/components/CookieLink";
 
 const COLUMNS = [
@@ -9,7 +10,7 @@ const COLUMNS = [
     title: "Loomina",
     links: [
       { href: "/experience", label: "Comment ça marche" },
-      { href: "/offre", label: "Le livre et le prix" },
+      { href: "/offre", label: OFFER_PAGE_LABEL },
       { href: "/faq", label: "Questions" },
       // « Notre histoire » (/about) masquée du menu à la demande de Solal (12/11/2026) ; la page existe toujours.
       // { href: "/about", label: "Notre histoire" },

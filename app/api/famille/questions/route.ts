@@ -4,6 +4,7 @@ import { readSession } from '@/lib/loomina/session';
 import { testFamilyReply } from '@/lib/loomina/test-family';
 import { findGiftProjects, giverPendingTopics } from '@/lib/loomina/giver';
 import { normalizeContext } from '@/lib/loomina/context';
+import { rememberSuggestionPhase } from '@/lib/loomina/suggestion-phase-store';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,9 +30,9 @@ export async function POST(request: NextRequest) {
         if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
         const context = normalizeContext(project.context);
-        if ((context.suggested_topics?.length ?? 0) >= 10) {
+        if ((context.suggested_topics?.length ?? 0) >= 20) {
             return NextResponse.json(
-                { error: 'Dix sujets attendent déjà : Loomina les abordera avant d’en ajouter d’autres.' },
+                { error: 'Vingt sujets attendent déjà : Loomina les abordera avant d’en ajouter d’autres.' },
                 { status: 409 }
             );
         }
@@ -41,6 +42,8 @@ export async function POST(request: NextRequest) {
         const meta = { ...(project.project_metadata ?? {}), giver_topics: [...kept, question].slice(-10) };
         const { error } = await db().from('projects').update({ context: next, project_metadata: meta }).eq('id', project.id);
         if (error) throw new Error(error.message);
+        // Le souvenir attendra la période de vie qu'il concerne (voir suggestion-phase.ts).
+        await rememberSuggestionPhase(project.id, question, next.suggested_topics ?? []);
 
         return NextResponse.json({ openQuestions: giverPendingTopics(meta, next.suggested_topics) });
     } catch (err) {

@@ -25,6 +25,8 @@ import { sweepReviews, sweepRelanceAlerts } from '@/lib/admin/watch';
 import { checkSharedSecret } from '@/lib/loomina/secret';
 import { sweepDemoStories, sweepDemoReminders } from '@/lib/loomina/demo-story';
 import { relanceAbandonedCarts } from '@/lib/loomina/abandoned-cart';
+import { sweepRecap } from '@/lib/admin/recap';
+import { sweepEditions } from '@/lib/loomina/book-edition';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -81,8 +83,25 @@ async function handle(request: NextRequest) {
         const reminders = await sweepDemoReminders();
         if (carts.results.length || reminders.results.length) console.info('[jobs] relances :', { carts: carts.results, reminders: reminders.results });
 
+        // Le récap de 10 h et de 20 h par e-mail (26/11/2026), une seule fois par créneau.
+        const recap = await sweepRecap();
+        if (recap) console.info('[jobs] récap envoyé :', recap);
+
+        // Les livres arrêtés en cours d'écriture (chaîne cassée par Vercel ou par un
+        // déploiement) : repris ici, s'il reste du temps (une étape dure jusqu'à 2 min).
+        let editions = { resumed: 0 };
+        if (Date.now() - startedAt < 120_000) {
+            editions = await sweepEditions(request.nextUrl.origin, 1).catch((err) => {
+                console.error('[jobs] livres arrêtés :', err instanceof Error ? err.message : String(err));
+                return { resumed: 0 };
+            });
+            if (editions.resumed) console.info('[jobs] livre(s) repris :', editions.resumed);
+        }
+
         return NextResponse.json({
             ok: true,
+            editions: editions.resumed,
+            recap,
             picked,
             results,
             corrections,

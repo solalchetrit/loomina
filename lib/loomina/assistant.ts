@@ -16,11 +16,12 @@ import { PHASE_KEYS, toPhase, isFinalPhase } from './phases';
 import { voicePromptTemplate, phaseObjective } from './voice-prompt';
 import { promptText } from './prompt-store';
 import { readPhaseState, spokenPhase, readTopics, openTopics, untouchedAxes, shallowAxes, readTold, readDeepen, openDeepen, sceneCounts, PHASE_AXES } from './phase-plan';
-import { OFFER } from '../../config/offer';
+import { OFFER, SHOW_PRICE, LAUNCH, LAUNCH_OFFER, isLaunchOffer } from '../../config/offer';
 import type { Profile, Project, SystemPrompt } from './db';
 import { renderContext, normalizeContext, contextFromLegacy, isEmptyContext, hasCallMemory } from './context';
 import type { LoominaContext } from './context';
 import { normalizeCallMinutes } from './call-length';
+import { suggestionsForCall } from './suggestion-phase';
 
 /**
  * LE réglage qui change tout côté coût.
@@ -263,13 +264,20 @@ export function sessionBlock(profile: Profile, project: Project, vars: Record<st
         );
     }
 
-    const suggestions = ctx.suggested_topics ?? [];
+    // Chaque sujet attend la période de vie qu'il concerne (suggestion-phase.ts) :
+    // « sa rencontre avec papi » ne tombe pas au premier appel, mais quand le
+    // livre arrive à la vie adulte.
+    const { now: ready, unsure } = suggestionsForCall(ctx.suggested_topics ?? [], meta, phaseNow, first);
+    const suggestions = [...ready, ...unsure];
     if (suggestions.length) {
         parts.push(
             [
                 `# SUJETS DEMANDÉS DEPUIS L'ESPACE AUTEUR (par ${name} ou un proche)`,
                 ...suggestions.map((t, i) => `${i + 1}. ${t}`),
                 `- Aborde le sujet n° 1 au cours de cet appel, puis les suivants dans l'ordre, un à la fois, tant que la durée souhaitée n'est pas atteinte (voir TEMPS DE L'APPEL) et que ${name} est en forme. Il n'y a pas de nombre maximum : seul le temps compte.`,
+                ...(unsure.length
+                    ? [`- Les sujets n° ${unsure.map((_, i) => ready.length + i + 1).join(', ')} n'ont pas encore de période attribuée : n'en parle que s'ils touchent la période de vie dont vous parlez en ce moment, ou une période déjà racontée. S'ils portent sur une période plus tardive de sa vie, garde-les pour plus tard, sans le dire.`]
+                    : []),
                 "- Choisis le bon moment : quand une histoire vient de se terminer, ou quand la conversation s'essouffle. Ne coupe jamais un récit pour ça.",
                 `- Présente-le simplement, sans dire qui l'a écrit : « On m'a glissé une question sur ${tu ? 'ton' : 'votre'} espace : … ». Reformule-le en ${tu ? 'tutoyant' : 'vouvoyant'} si besoin.`,
                 `- Si le sujet commence par « Photo envoyée » : dis d'abord que tu as bien vu la photo et ce qu'on y voit, en une phrase, puis demande simplement si ${name} veut ${tu ? "t'en" : 'vous en'} dire plus (« J'ai vu la photo… ${tu ? 'Tu veux' : 'Vous voulez'} me raconter ce qu'il y a derrière ? »). Si ${name} n'a rien à ajouter, n'insiste pas.`,
@@ -504,8 +512,8 @@ export function demoFirstMessage(canText: boolean): string {
         (canText
             ? "Je vous propose d'essayer : en cinq minutes, vous me racontez un moment de votre vie, et je vous envoie le récit écrit par SMS juste après. "
             : "Je vous propose d'essayer : en cinq minutes, vous me racontez un moment de votre vie, et vous entendez comment je travaille. ") +
-        // L'enregistrement est annoncé dès le début (démos enregistrées depuis le 20/11/2026).
-        "Cet appel est enregistré pour améliorer la qualité de la voix. Pour commencer, comment vous appelez-vous ?"
+        // Depuis le 27/11/2026 (demande de Solal), la phrase sur l'enregistrement n'est plus dite.
+        "Pour commencer, comment vous appelez-vous ?"
     );
 }
 
@@ -569,7 +577,7 @@ Ta première phrase t'a présenté (biographe par téléphone : tu aides à raco
 - Si elle veut arrêter, remercie-la et termine par ##END_CALL##.
 
 # CE QUE TU SAIS SUR LOUMINA (seulement si on te le demande)
-- Le prix : ${OFFER.price} euros, tout compris. Autant d'appels qu'il en faut, le récit de chaque appel à relire et corriger, une relecture par l'équipe, les photos, et le livre imprimé livré en France métropolitaine, avec sa version numérique.
+- Le prix : ${SHOW_PRICE ? (isLaunchOffer() ? `${LAUNCH_OFFER.price} euros jusqu'au ${LAUNCH_OFFER.label}, c'est l'offre de lancement ; ensuite ${OFFER.regularPrice} euros. Tout compris` : `${OFFER.regularPrice} euros, tout compris`) : `il sera annoncé à l'ouverture des commandes, le ${LAUNCH.label} ; ne cite aucun chiffre. C'est tout compris`}. Autant d'appels qu'il en faut, le récit de chaque appel à relire et corriger, une relecture par l'équipe, les photos, et le livre imprimé livré en France métropolitaine, avec sa version numérique.
 - Le remboursement : si le premier entretien ne convient pas, remboursement intégral sur simple demande dans les ${OFFER.guaranteeDays} jours qui suivent.
 - Le délai : en général ${OFFER.delay} du premier appel au livre validé, puis ${OFFER.printDelay} pour l'impression et l'envoi.
 - Comment ça marche : on s'appelle au téléphone, au rythme de la personne ; chaque appel devient un récit écrit dans ses mots ; à la fin, tout est réuni dans un livre.

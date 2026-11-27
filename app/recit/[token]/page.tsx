@@ -8,7 +8,6 @@ import RecitEmailForm from "./RecitEmailForm";
 import { getDemoStory, isExpired, storyTeaser } from "@/lib/loomina/demo-story";
 import { DEMO_PREVIEW, type DemoPreview } from "./preview";
 import { SITE } from "@/config/site";
-import { OFFER } from "@/config/offer";
 
 export const dynamic = "force-dynamic";
 
@@ -107,7 +106,7 @@ export default async function RecitPage({ params }: { params: Promise<{ token: s
               </p>
             </div>
             <Button href="/order" size="lg" className="!bg-[var(--amber)] !text-[var(--ink)]">
-              Commencer mon livre · {OFFER.price} €
+              Commencer mon livre
             </Button>
           </div>
         </section>

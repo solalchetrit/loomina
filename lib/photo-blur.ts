@@ -20,6 +20,7 @@ export const PHOTO_BLUR: Record<string, string> = {
   "livre-debout": "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAADwAQCdASoNABAAA4BaJQBOgCHglWzuiAAA/q73TpiIgS6ADMXze6X973LRSKKbnYkAAA==",
   "livre-deux-exemplaires": "data:image/webp;base64,UklGRkQAAABXRUJQVlA4IDgAAAAwAgCdASoNABAAA4BaJQBOgCHhGKBOhh2wAAD+00xpGf2uY2vpWIkheRi21/zHYuGQxCrIfWAAAA==",
   "mains-telephone": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAABQAgCdASoQAAsAA4BaJaQAD4pvAC2zeAuimgAA/tzajJZm4MFdjMsOKXYce2EHaJOUTT8X8lzuVudNzMC9G7SJU3+lxJu+BH46pZHM2t/8Uc29pGsRFuJRaOkgAAAA",
+  "noel-livre-rouge": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAADQAQCdASoQAAsAA4BaJbACdACA5wYvgAD+5s3ybPjU+xlVlCadas0ZY71JOSd2Ge8zZ2ZkHu0PP4UUCVcB6yjszvY+38O9FpLRkulQSfRN+RDtGGMhHod48HGaWkAAAAA=",
   "panier-de-photos": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAADwAQCdASoQAAsAA4BaJaQAD48ML+lFAzAA/tunt5k1LyuYd5a2c7PJtPvLUfpYWU2wQcgcpaUmCmdWkuqth4Ddo6Aujz58sDyta2RAQAFf3p2QXRvcTgnY0AA=",
   "petit-dejeuner": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAAAwAgCdASoQAAkAA4BaJaQAD4ZwcKB9+Ay0AAD9wanKTHTMg4kBBcfEcatATBzj68TrtGNbFbKldjyr61nlsRPmRx20iOdI/emjPHdKwAAAAA==",
   "photos-de-famille": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAADwAQCdASoQAAsAA4BaJaQAAv+q4g33ZrAA/t2xFVEem7nFMPeM3/HK7nQi2ebWlbIo6itu0zp2lCvWuAYSgyTdLuW/5uqAAAA=",

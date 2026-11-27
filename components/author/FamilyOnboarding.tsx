@@ -43,7 +43,6 @@ export default function FamilyOnboarding({
   const [step, setStep] = useState(Math.min(startAt, steps - 1));
   const [clip, setClip] = useState<MemoClip>("pop");
   const [firstName, setFirstName] = useState(setup?.firstName ?? "");
-  const [phonetic, setPhonetic] = useState(setup?.firstNamePhonetic ?? "");
   const [politeness, setPoliteness] = useState<"tu" | "vous">(setup?.politeness ?? "vous");
   const [topics, setTopics] = useState<string[]>(setup?.sensitiveTopics ?? []);
   const [draft, setDraft] = useState("");
@@ -75,7 +74,7 @@ export default function FamilyOnboarding({
       const body =
         skip || !setup
           ? { projectId }
-          : { projectId, firstName: firstName.trim() || undefined, firstNamePhonetic: phonetic, politeness, sensitiveTopics: all };
+          : { projectId, firstName: firstName.trim() || undefined, politeness, sensitiveTopics: all };
       const res = await fetch("/api/famille/preferences", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (res.status === 401) return onUnauthorized();
       const data = await res.json().catch(() => ({}));
@@ -107,7 +106,7 @@ export default function FamilyOnboarding({
               {giverFirstName ? `Bienvenue, ${giverFirstName}` : "Bienvenue"}
             </h2>
             <p className={text}>
-              Ici, vous suivez le livre de {who}. Après chaque appel, vous le voyez avancer. Et vous pouvez poser une question ou souffler un souvenir, que Loomina abordera au prochain appel.
+              Ici, vous suivez le livre de {who}. Après chaque appel, vous le voyez avancer. Et vous pouvez poser une question ou souffler un souvenir, que Loomina abordera au bon moment du récit.
             </p>
           </div>
         )}
@@ -136,19 +135,11 @@ export default function FamilyOnboarding({
               Ce que vous dites ici, Loomina n’aura pas à le demander. {who} pourra toujours le changer.
             </p>
             <div className="mt-6 space-y-5">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="famille-prenom" className="field-label">
-                    Son prénom
-                  </label>
-                  <input id="famille-prenom" className="field w-full" value={firstName} maxLength={60} autoComplete="off" onChange={(e) => setFirstName(e.target.value)} />
-                </div>
-                <div>
-                  <label htmlFor="famille-prononciation" className="field-label">
-                    Il se prononce <span className="font-normal text-[var(--ink-3)]">(facultatif)</span>
-                  </label>
-                  <input id="famille-prononciation" className="field w-full" value={phonetic} maxLength={80} autoComplete="off" placeholder="Par exemple : Jo-zé" onChange={(e) => setPhonetic(e.target.value)} />
-                </div>
+              <div>
+                <label htmlFor="famille-prenom" className="field-label">
+                  Son prénom
+                </label>
+                <input id="famille-prenom" className="field w-full" value={firstName} maxLength={60} autoComplete="off" onChange={(e) => setFirstName(e.target.value)} />
               </div>
               <fieldset>
                 <legend className="field-label">Loomina lui dit</legend>

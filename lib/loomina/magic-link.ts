@@ -32,9 +32,17 @@ function sign(body: string, secret: string): string {
 
 /** Le jeton d'un numéro E.164, ou null si les liens sont indisponibles (pas de secret, numéro invalide). */
 export function magicToken(phone: string, now = Date.now(), days = LINK_DAYS): string | null {
+    return magicTokenMinutes(phone, Math.round(days * 24 * 60), now);
+}
+
+/**
+ * Un jeton qui expire au bout de quelques minutes : celui du bouton « Ouvrir
+ * son espace » de l'admin (demande de Solal du 26/11/2026), jamais envoyé.
+ */
+export function magicTokenMinutes(phone: string, minutes: number, now = Date.now()): string | null {
     const secret = key();
-    if (!secret || !/^\+\d{8,15}$/.test(phone)) return null;
-    const exp = Math.floor(now / 60_000) + days * 24 * 60; // en minutes, pour un nombre plus court
+    if (!secret || !/^\+\d{8,15}$/.test(phone) || !Number.isInteger(minutes) || minutes <= 0) return null;
+    const exp = Math.floor(now / 60_000) + minutes; // en minutes, pour un nombre plus court
     const body = `${BigInt(phone.slice(1)).toString(36)}.${exp.toString(36)}`;
     return `${body}.${sign(body, secret)}`;
 }

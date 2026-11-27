@@ -17,6 +17,7 @@ import {
     canReceiveSms,
 } from '../../lib/loomina/assistant';
 import { config } from './config.ts';
+import { demoGate, demoRefusal } from '../../lib/loomina/demo-limit';
 import { hardLimitSeconds, normalizeCallMinutes } from '../../lib/loomina/call-length';
 import { refreshPrompts } from '../../lib/loomina/prompt-store';
 
@@ -31,6 +32,8 @@ export interface CallPlan {
     label: string;
     /** Noms propres de cet auteur (lieux, proches), pour la transcription. */
     hints?: string[];
+    /** Démo refusée (déjà faite, trop d'appels) : la phrase à dire avant de raccrocher. */
+    refuse?: string;
 }
 
 /**
@@ -77,7 +80,12 @@ export async function planForCaller(customerNumber: string | null): Promise<Call
     await refreshPrompts();
 
     // La démonstration : le récit part par SMS si le numéro est un portable.
-    const demo = () => fromVapiShape(buildUnknownCallerAssistant(serverUrl, { canText: canReceiveSms(customerNumber) }), DEMO_MAX_SECONDS, true, 'demo');
+    // Une seule démo par numéro, et des plafonds contre les appels en boucle (lib/loomina/demo-limit.ts).
+    const demo = async (): Promise<CallPlan> => {
+        const gate = await demoGate(customerNumber);
+        const plan = fromVapiShape(buildUnknownCallerAssistant(serverUrl, { canText: canReceiveSms(customerNumber) }), DEMO_MAX_SECONDS, true, 'demo');
+        return gate === 'ok' ? plan : { ...plan, label: `demo-refusee-${gate}`, refuse: demoRefusal(gate) };
+    };
 
     if (!customerNumber) {
         return demo();

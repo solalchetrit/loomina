@@ -14,7 +14,7 @@ import { voicePromptTemplate, VOICE_INTRO, VOICE_SPEAK, PHASE_OBJECTIVES } from 
 import { REVIEW_SYSTEM } from '@/lib/loomina/book-review';
 import { directorSystemPrompt, DIRECTOR_MODEL, DIRECTOR_FALLBACK_MODEL } from '@/lib/loomina/director';
 import { WRITER_SYSTEM, WRITER_MODEL, CORRECTION_SYSTEM } from '@/lib/loomina/writer';
-import { PLAN_SYSTEM, WRITE_SYSTEM, CARRY_SYSTEM, POLISH_SYSTEM, PIECES_SYSTEM, BOOK_MODEL } from '@/lib/loomina/book';
+import { PLAN_SYSTEM, WRITE_SYSTEM, CARRY_SYSTEM, POLISH_SYSTEM, FIDELITY_SYSTEM, PIECES_SYSTEM, BOOK_MODEL } from '@/lib/loomina/book';
 import { BOOK_PLAN_SYSTEM, BOOK_PLAN_MODEL } from '@/lib/loomina/book-plan';
 import { timeNote } from '@/lib/loomina/call-length';
 import { promptText } from '@/lib/loomina/prompt-store';
@@ -191,7 +191,7 @@ export function aiCatalog(): Ai[] {
             role: "Recompose le livre en quatre temps : le plan (chapitres dans l'ordre de la vie, sans redites, en gardant le plan précédent tant qu'il tient), l'écriture des chapitres un par un à partir des récits ET des paroles d'origine (un chapitre dont les scènes n'ont pas changé est repris mot pour mot), une relecture du livre entier (redites, noms, raccords), puis les pièces du livre (titre, dédicace, avant-propos, remerciements, quatrième de couverture).",
             model: `${BOOK_MODEL} (OpenAI, raisonnement moyen).`,
             where: 'Site (Vercel), par étapes (une étape = le plan, un chapitre, la relecture ou les pièces)',
-            when: "Automatiquement après chaque nouveau récit (dès 2 récits), ou quand l'auteur clique « recomposer ».",
+            when: "Automatiquement à la fin de chaque étape de Mémo (depuis le 26/11/2026) : le livre est écrit jusqu'à l'étape finie, avec tous les récits des appels de cette étape et des précédentes. Plus de réécriture après chaque appel.",
             reads: "Tous les récits, les paroles d'origine des appels (transcripts, sauf pour un récit que l'auteur a corrigé), la mémoire du livre, les sujets à éviter, les souhaits de la personne pour son livre, l'édition précédente.",
             writes: 'book_editions (plan, chapitres, état, et dans « extras » : retouches de la relecture, pièces du livre).',
             file: 'lib/loomina/book.ts, lib/loomina/book-edition.ts',
@@ -199,6 +199,7 @@ export function aiCatalog(): Ai[] {
                 { title: 'Le plan du livre', text: promptText('livre.plan', PLAN_SYSTEM) },
                 { title: "L'écriture d'un chapitre du livre", text: promptText('livre.ecriture', WRITE_SYSTEM) },
                 { title: 'La relecture du livre entier (retouches appliquées par le code)', text: promptText('livre.finition', POLISH_SYSTEM) },
+                { title: 'La relecture de fidélité : retire les phrases que la personne n’a pas dites', text: promptText('livre.fidelite', FIDELITY_SYSTEM) },
                 { title: 'Les pièces du livre : titre, dédicace, avant-propos, remerciements, quatrième de couverture', text: promptText('livre.pieces', PIECES_SYSTEM) },
                 { title: "Report d'une correction de l'auteur dans le livre composé", text: promptText('livre.report', CARRY_SYSTEM) },
             ],
@@ -269,6 +270,7 @@ export function editablePrompts(): EditablePrompt[] {
         { key: 'livre.plan', ai: 'editeur', title: 'Le plan du livre', original: PLAN_SYSTEM },
         { key: 'livre.ecriture', ai: 'editeur', title: 'L’écriture d’un chapitre du livre', original: WRITE_SYSTEM },
         { key: 'livre.finition', ai: 'editeur', title: 'La relecture du livre entier', original: POLISH_SYSTEM },
+        { key: 'livre.fidelite', ai: 'editeur', title: 'La relecture de fidélité (phrases jamais dites)', original: FIDELITY_SYSTEM },
         { key: 'livre.pieces', ai: 'editeur', title: 'Les pièces du livre (titre, dédicace, avant-propos, remerciements, dos)', original: PIECES_SYSTEM },
         { key: 'livre.report', ai: 'editeur', title: 'Report d’une correction de l’auteur dans le livre composé', original: CARRY_SYSTEM },
         { key: 'avis', ai: 'editeur', title: 'L’avis de lecture sur le livre entier', original: REVIEW_SYSTEM },

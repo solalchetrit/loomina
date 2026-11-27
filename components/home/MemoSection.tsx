@@ -63,7 +63,6 @@ export default function MemoSection({ id = "memo" }: { id?: string }) {
       <SectionHead
         eyebrow="Dans votre espace auteur"
         title={"Voici Mémo. Il grandit avec votre livre."}
-        text="Mémo est le petit éléphant de votre espace auteur. Il retient chaque souvenir que vous racontez. À chaque souvenir, il grandit, et votre livre avance."
       />
 
       <div ref={root} className="head-gap grid items-stretch gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10" data-reveal>

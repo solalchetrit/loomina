@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { SITE } from "@/config/site";
 import { OFFER } from "@/config/offer";
 import Button from "@/components/ui/Button";
+import { HeroOffer } from "@/components/LaunchOffer";
 import Icon from "@/components/ui/Icon";
 import VoiceToBook from "@/components/home/VoiceToBook";
 import ScrollCue from "@/components/home/ScrollCue";
@@ -33,12 +34,13 @@ export default function Hero() {
           </p>
           </div>
           <div className="mt-9 max-lg:order-3">
+          <HeroOffer className="rise mb-6" />
           <div className="rise flex flex-col gap-3 sm:flex-row" style={{ "--i": 3 } as CSSProperties}>
             <Button href="/order" size="lg">
               Commander
             </Button>
             <Button href={`tel:${SITE.phone}`} variant="secondary" size="lg">
-              Essayer gratuitement
+              Essayer la démo
             </Button>
           </div>
           <p className="rise mt-4 text-[16px] text-[var(--ink-2)]" style={{ "--i": 4 } as CSSProperties}>
@@ -55,7 +57,7 @@ export default function Hero() {
           >
             {REASSURANCE.map((r) => (
               <li key={r.title} className="flex gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full gloss">
                   <Icon name="check" size={14} />
                 </span>
                 <p className="text-[15px] leading-snug text-[var(--ink-2)]">

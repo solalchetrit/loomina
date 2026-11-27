@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { findByInvite, ESSAI_INVITE_TOKEN } from '@/lib/loomina/photo-invite';
 import { addPhoto, PhotoRefused } from '@/lib/loomina/photos';
+import { allow, clientIp, TOO_MANY } from '@/lib/loomina/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,7 @@ export const maxDuration = 90;
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
     const { token } = await params;
+    if (!(await allow(`photos:ip:${clientIp(request.headers)}`, 3600, 60))) return NextResponse.json({ error: TOO_MANY }, { status: 429 });
     try {
         const form = await request.formData();
         const file = form.get('photo');
